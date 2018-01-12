@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuQqBotHttp", "OsuQqBotHttp\OsuQqBotHttp.csproj", "{CC06F456-CB9F-4A6F-9D7B-AD702003C597}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsuQqBot", "OsuQqBot\OsuQqBot.csproj", "{CA198E3B-B788-4CB9-A4AC-74836A08B02F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC06F456-CB9F-4A6F-9D7B-AD702003C597}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC06F456-CB9F-4A6F-9D7B-AD702003C597}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC06F456-CB9F-4A6F-9D7B-AD702003C597}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC06F456-CB9F-4A6F-9D7B-AD702003C597}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA198E3B-B788-4CB9-A4AC-74836A08B02F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA198E3B-B788-4CB9-A4AC-74836A08B02F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA198E3B-B788-4CB9-A4AC-74836A08B02F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA198E3B-B788-4CB9-A4AC-74836A08B02F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {58D20C04-C48A-4859-AAFD-DF0FDFD2D699}
+	EndGlobalSection
+EndGlobal
