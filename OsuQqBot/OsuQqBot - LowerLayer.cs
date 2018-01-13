@@ -24,6 +24,12 @@ namespace OsuQqBot
                     Query(endPoint, uid.Value, message.Trim().Substring(1).Trim());
                 }
             }
+
+            switch (endPoint)
+            {
+                default:
+                    break;
+            }
         }
 
         public void ProcessPrivateMessage(PrivateEndPoint endPoint, MessageSource source, string message)

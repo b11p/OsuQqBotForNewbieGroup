@@ -50,7 +50,7 @@ namespace OsuQqBot.Api
         {
             public long userId { get; set; }
             public string role { get; set; }
-            public int qq { get; set; }
+            public long qq { get; set; }
             public string legacyUname { get; set; }
             public string currentUname { get; set; }
             public bool banned { get; set; }
