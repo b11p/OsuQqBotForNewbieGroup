@@ -210,19 +210,19 @@ namespace OsuQqBotHttp
                         groupMessage.message
                         );
 
-                    Task.Run(() =>
-                    {
-                        try
-                        {
-                            if (osuBot.UpdateUserBandingAsync(groupMessage.group_id, groupMessage.user_id, groupMessage.message).Result) return;
-                            if (osuBot.WhirIsBest(groupMessage.group_id, groupMessage.user_id, groupMessage.message)) return;
-                            osuBot.TestInGroupNameAsync(groupMessage.group_id, groupMessage.user_id, groupMessage.message).Wait();
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogException(e);
-                        }
-                    });
+                    //Task.Run(() =>
+                    //{
+                    //    try
+                    //    {
+                    //        if (osuBot.UpdateUserBandingAsync(groupMessage.group_id, groupMessage.user_id, groupMessage.message).Result) return;
+                    //        if (osuBot.WhirIsBest(groupMessage.group_id, groupMessage.user_id, groupMessage.message)) return;
+                    //        osuBot.TestInGroupNameAsync(groupMessage.group_id, groupMessage.user_id, groupMessage.message).Wait();
+                    //    }
+                    //    catch (Exception e)
+                    //    {
+                    //        Logger.LogException(e);
+                    //    }
+                    //});
                     break;
                 case "anonymous":
                     break;

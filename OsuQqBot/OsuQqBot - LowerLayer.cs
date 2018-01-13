@@ -27,7 +27,13 @@ namespace OsuQqBot
 
             switch (endPoint)
             {
-                default:
+                case PrivateEndPoint p:
+                    ProcessPrivateMessage(p, source, message);
+                    break;
+                case GroupEndPoint g:
+                    ProcessGroupMessage(g, source, message);
+                    break;
+                case DiscussEndPoint d:
                     break;
             }
         }
