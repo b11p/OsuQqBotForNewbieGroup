@@ -12,7 +12,7 @@ namespace OsuQqBot.Functions
 
         public string GetHelp()
         {
-            
+            throw new NotImplementedException();
         }
 
         public IManagementContext Manage(string commond) => throw new NotImplementedException();

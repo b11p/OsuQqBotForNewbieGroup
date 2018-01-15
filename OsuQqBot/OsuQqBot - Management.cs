@@ -22,13 +22,19 @@ namespace OsuQqBot
         /// </summary>
         readonly long id_Kamisama;
 
-        public bool ProcessPrivateMessage(long qq, string message)
+        /// <summary>
+        /// 接收私聊消息，管理bot
+        /// </summary>
+        /// <param name="qq"></param>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public bool PrivateManage(long qq, string command)
         {
             if (qq != id_Kamisama) return false;
             const string startCheckPP = "开启PP检查";
             const string stopCheckPP = "停止PP检查";
             const string help = "帮助";
-            switch (message)
+            switch (command)
             {
                 case help:
                     this.qq.SendPrivateMessageAsync(qq, startCheckPP + Environment.NewLine + stopCheckPP);
@@ -46,7 +52,7 @@ namespace OsuQqBot
             }
             System.Text.RegularExpressions.Regex ignoreCommandRegex = new System.Text.RegularExpressions.Regex(
                 @"^\s*ignore\s*(\d+)\s*$");
-            var ignoreCommandMatch = ignoreCommandRegex.Match(message);
+            var ignoreCommandMatch = ignoreCommandRegex.Match(command);
             if (ignoreCommandMatch.Success)
             {
                 if (long.TryParse(ignoreCommandMatch.Groups[1].Value, out long ignoredId))
@@ -65,7 +71,7 @@ namespace OsuQqBot
 
             System.Text.RegularExpressions.Regex ignorePPCommandRegex = new System.Text.RegularExpressions.Regex(
                 @"^\s*ignore\s+pp\s*(\d+)\s*$");
-            var ignorePPCommandMatch = ignorePPCommandRegex.Match(message);
+            var ignorePPCommandMatch = ignorePPCommandRegex.Match(command);
             if (ignorePPCommandMatch.Success)
             {
                 if (long.TryParse(ignorePPCommandMatch.Groups[1].Value, out long ignoredId))

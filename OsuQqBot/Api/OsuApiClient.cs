@@ -29,14 +29,17 @@ namespace OsuQqBot.Api
         {
             if (string.IsNullOrWhiteSpace(apiKey)) throw new ArgumentNullException(nameof(apiKey));
             this.apiKey = apiKey;
+            if (Client == null) Client = this;
         }
+
+        public static OsuApiClient Client { get; private set; }
 
         /// <summary>
         /// 获取用户信息（修复了API问题）
         /// </summary>
         /// <param name="u">用户名或者 ID（必需）</param>
         /// <param name="type">指定u是用户名还是id</param>
-        /// <param name="m">模式（可选，-1为默认）</param>
+        /// <param name="mode">模式（可选，-1为默认）</param>
         /// <param name="event_days"></param>
         /// <returns>查找到的用户数组；如果没找到，返回空数组；如果发生异常，返回null</returns>
         public async Task<UserRaw[]> GetUserAsync(string u, UsernameType type = UsernameType.Unspecified, Mode mode = Mode.Unspecified, int event_days = -1)
@@ -89,6 +92,20 @@ namespace OsuQqBot.Api
         }
 
         /// <summary>
+        /// 获取用户信息（修复了API问题），可以指定是否允许本地缓存（未实现）
+        /// </summary>
+        /// <param name="forceUpdate">强制不使用缓存</param>
+        /// <param name="u">用户名或者 ID（必需）</param>
+        /// <param name="type">指定u是用户名还是id</param>
+        /// <param name="mode">模式（可选，-1为默认）</param>
+        /// <param name="event_days"></param>
+        /// <returns>查找到的用户数组；如果没找到，返回空数组；如果发生异常，返回null</returns>
+        public /*async*/ Task<UserRaw[]> GetUserAsync(bool forceUpdate, string u, UsernameType type = UsernameType.Unspecified, Mode mode = Mode.Unspecified, int event_days = -1)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// 从 uid 查找用户名
         /// </summary>
         /// <param name="uid">uid</param>
@@ -100,6 +117,15 @@ namespace OsuQqBot.Api
             if (!users.Any()) return string.Empty;
             if (users[0].user_id != uid.ToString()) return string.Empty;
             return users[0].username;
+        }
+
+        public async Task<Beatmap> GetBeatmapAsync(long bid)
+        {
+            string json = await GetHttpAsync($"{protocol}://{site}{paths[InformationType.Beatmap]}", new KeyValuePair<string, string>("b", bid.ToString()));
+            if (json == null) return null;
+            var result = JsonConvert.DeserializeObject<beatmap[]>(json);
+            if (result == null || result.Length == 0) return null;
+            return result[0];
         }
 
         //public Beatmap[] GetBeatmap(string k, string b)
@@ -140,6 +166,16 @@ namespace OsuQqBot.Api
             }
         }
 
+        private static async Task<string> GetHttpAsync(string path, params (string key, string value)[] paras)
+        {
+            LinkedList<KeyValuePair<string, string>> pair = new LinkedList<KeyValuePair<string, string>>();
+            foreach (var (key, value) in paras)
+            {
+                pair.AddLast(new KeyValuePair<string, string>(key, value));
+            }
+            return await GetHttpAsync(path, pair.ToArray());
+        }
+
         enum InformationType
         {
             Beatmap,
@@ -170,17 +206,8 @@ namespace OsuQqBot.Api
             User_id
         }
 
-        public enum Mode
-        {
-            Unspecified = -1,
-            Std = 0,
-            Taiko = 1,
-            Ctb = 2,
-            Mania = 3,
-        }
-
         [Flags]
-        enum Mods
+        public enum Mods
         {
             None = 0,
             NoFail = 1,
@@ -214,6 +241,15 @@ namespace OsuQqBot.Api
             Key3 = 134217728,
             Key2 = 268435456
         }
+    }
+
+    public enum Mode
+    {
+        Unspecified = -1,
+        Std = 0,
+        Taiko = 1,
+        Ctb = 2,
+        Mania = 3,
     }
 
     static class OsuApiExtends

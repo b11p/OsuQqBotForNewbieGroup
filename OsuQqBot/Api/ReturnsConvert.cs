@@ -9,25 +9,25 @@ namespace OsuQqBot.Api
 
         }
 
-        public long Id { get; set; }
-        public string Name { get; set; }
-        //public string count300 { get; set; }
-        //public string count100 { get; set; }
-        //public string count50 { get; set; }
-        public long Tth { get; set; }
-        public int PlayCount { get; set; }
-        public long RankedScore { get; set; }
-        public long TotalScore { get; set; }
-        public int Rank { get; set; }
-        public double Level { get; set; }
-        public double PP { get; set; }
-        public double Accuracy { get; set; }
-        //public string count_rank_ss { get; set; }
-        //public string count_rank_s { get; set; }
-        //public string count_rank_a { get; set; }
-        public string Country { get; set; }
-        public int CountryRank { get; set; }
-        //public Event[] events { get; set; }
+        public long Id { get; private set; }
+        public string Name { get; private set; }
+        //public string count300 { get; private set; }
+        //public string count100 { get; private set; }
+        //public string count50 { get; private set; }
+        public long Tth { get; private set; }
+        public int PlayCount { get; private set; }
+        public long RankedScore { get; private set; }
+        public long TotalScore { get; private set; }
+        public int Rank { get; private set; }
+        public double Level { get; private set; }
+        public double PP { get; private set; }
+        public double Accuracy { get; private set; }
+        //public string count_rank_ss { get; private set; }
+        //public string count_rank_s { get; private set; }
+        //public string count_rank_a { get; private set; }
+        public string Country { get; private set; }
+        public int CountryRank { get; private set; }
+        //public Event[] events { get; private set; }
 
         public static implicit operator User(UserRaw raw)
         {
@@ -300,5 +300,108 @@ namespace OsuQqBot.Api
             {"ZM", "Zambia" },
             {"ZW", "Zimbabwe" },
         };
+    }
+
+    class Beatmap
+    {
+        private Beatmap() { }
+
+        public long Sid { get; set; }
+        public long Bid { get; set; }
+        //public string approved { get; set; }
+        //public string total_length { get; set; }
+        //public string hit_length { get; set; }
+        public string Difficulty { get; set; }
+        //public string MD5 { get; set; }
+        public double CS { get; set; }
+        public double OD { get; set; }
+        public double AR { get; set; }
+        public double HP { get; set; }
+        //public Mode Mode { get; set; }
+        //public string approved_date { get; set; }
+        //public string last_update { get; set; }
+        public string Artist { get; set; }
+        public string Title { get; set; }
+        public string Creator { get; set; }
+        public double Bpm { get; set; }
+        //public string source { get; set; }
+        //public string tags { get; set; }
+        //public string genre_id { get; set; }
+        //public string language_id { get; set; }
+        //public string favourite_count { get; set; }
+        //public string playcount { get; set; }
+        //public string passcount { get; set; }
+        //public string max_combo { get; set; }
+        public double Stars { get; set; }
+
+        public static implicit operator Beatmap(beatmap raw)
+        {
+            return new Beatmap
+            {
+                Sid = long.Parse(raw.beatmapset_id),
+                Bid = long.Parse(raw.beatmap_id),
+                Difficulty = raw.version,
+                CS = double.Parse(raw.diff_size),
+                OD = double.Parse(raw.diff_overall),
+                AR = double.Parse(raw.diff_approach),
+                HP = double.Parse(raw.diff_drain),
+                Artist = raw.artist,
+                Title = raw.title,
+                Creator = raw.creator,
+                Bpm = double.Parse(raw.bpm),
+                Stars = double.Parse(raw.difficultyrating),
+            };
+        }
+    }
+
+    class BestPerformance
+    {
+        private BestPerformance() { }
+
+        private Beatmap _beatmap;
+
+        public Beatmap Beatmap
+        {
+            get => _beatmap;
+            set => _beatmap = value;
+        }
+
+        public long BeatmapId { get; private set; }
+        public long Score { get; private set; }
+        public int Combo { get; private set; }
+        public int Count300 { get; private set; }
+        public int Count100 { get; private set; }
+        public int Count50 { get; private set; }
+        public int CountMiss { get; private set; }
+        public int CountKatu { get; private set; }
+        public int CountGeki { get; private set; }
+        public bool FullCombo { get; private set; }
+        public OsuApiClient.Mods EnabledMods { get; private set; }
+        public long UserId { get; private set; }
+        //public string Date { get; private set; }
+        public string Rank { get; private set; }
+        public double PP { get; private set; }
+
+        public static implicit operator BestPerformance(best_performance bp)
+        {
+            return new BestPerformance
+            {
+                BeatmapId = long.Parse(bp.beatmap_id),
+                Score = long.Parse(bp.score),
+                Combo = int.Parse(bp.maxcombo),
+                Count300 = int.Parse(bp.count300),
+                Count100 = int.Parse(bp.count100),
+                Count50 = int.Parse(bp.count50),
+                CountMiss = int.Parse(bp.countmiss),
+                CountKatu = int.Parse(bp.countkatu),
+                CountGeki = int.Parse(bp.countgeki),
+                FullCombo = bp.perfect == "1",
+                EnabledMods = (OsuApiClient.Mods)int.Parse(bp.enabled_mods),
+                UserId = long.Parse(bp.user_id),
+                //Date = 
+                Rank = bp.rank,
+                PP = double.Parse(bp.pp),
+            };
+        }
     }
 }

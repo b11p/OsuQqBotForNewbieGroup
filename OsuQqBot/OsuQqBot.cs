@@ -51,7 +51,7 @@ namespace OsuQqBot
         /// 被At时升级用户数据
         /// </summary>
         /// <param name="context"></param>
-        public async Task<bool> UpdateUserBandingAsync(long group, long qq, string message)
+        internal async Task<bool> UpdateUserBandingAsync(long group, long qq, string message)
         {
             if (group == GroupId && !ignoreList.Contains(qq))
                 if (message.Contains($"[CQ:at,qq={CurrentQq}]"))
@@ -82,14 +82,20 @@ namespace OsuQqBot
             return false;
         }
 
+
+
         // 暂不支持
-        private void Query(EndPoint endPoint, string username) => throw new NotImplementedException();
-        private async void Query(EndPoint endPoint, long uid, string para = "")
+        private void SendQueryMessage(EndPoint endPoint, string username)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task SendQueryMessage(EndPoint endPoint, long uid, string para = "")
         {
             switch (endPoint)
             {
                 case GroupEndPoint g:
-                    Query(g.GroupId, uid, para);
+                    await SendQueryMessage(g.GroupId, uid, para);
                     break;
                 default:
                     //string message;
@@ -109,12 +115,12 @@ namespace OsuQqBot
         {
             bool success;
             string message;
-            var mode = OsuApiClient.Mode.Unspecified;
+            var mode = Mode.Unspecified;
             var paras = para.Split();
-            if (paras.Any(p => p == "0" || p.ToLowerInvariant() == "std")) mode = OsuApiClient.Mode.Std;
-            else if (paras.Any(p => p == "1" || p.ToLowerInvariant() == "taiko")) mode = OsuApiClient.Mode.Taiko;
-            else if (paras.Any(p => p == "2" || p.ToLowerInvariant() == "ctb" || p.ToLowerInvariant() == "catch")) mode = OsuApiClient.Mode.Ctb;
-            else if (paras.Any(p => p == "3" || p.ToLowerInvariant() == "mania")) mode = OsuApiClient.Mode.Mania;
+            if (paras.Any(p => p == "0" || p.ToLowerInvariant() == "std")) mode = Mode.Std;
+            else if (paras.Any(p => p == "1" || p.ToLowerInvariant() == "taiko")) mode = Mode.Taiko;
+            else if (paras.Any(p => p == "2" || p.ToLowerInvariant() == "ctb" || p.ToLowerInvariant() == "catch")) mode = Mode.Ctb;
+            else if (paras.Any(p => p == "3" || p.ToLowerInvariant() == "mania")) mode = Mode.Mania;
 
             var users = await apiClient.GetUserAsync(uid.ToString(), OsuApiClient.UsernameType.User_id, mode);
             if (users == null) { success = false; message = "网络错误"; }
@@ -125,7 +131,7 @@ namespace OsuQqBot
 
                 StringBuilder sb = new StringBuilder();
                 sb.Append(users[0].username + "的个人信息")
-                    .Append(mode == OsuApiClient.Mode.Unspecified ? "" : "—" + mode.GetModeString()).AppendLine();
+                    .Append(mode == Mode.Unspecified ? "" : "—" + mode.GetModeString()).AppendLine();
                 sb.AppendLine();
                 sb.AppendLine(users[0].pp_raw + "pp 表现");
                 sb.Append("#" + users[0].pp_rank)
@@ -155,7 +161,7 @@ namespace OsuQqBot
         /// <param name="group"></param>
         /// <param name="uid"></param>
         /// <param name="para"></param>
-        private async void Query(long group, long uid, string para = "")
+        private async Task SendQueryMessage(long group, long uid, string para = "")
         {
             var memberList = qq.GetGroupMemberList(group);
             //if (memberList.Any(m => m.Qq == 2478057279))
@@ -168,10 +174,11 @@ namespace OsuQqBot
             //    ), true);
             //}
             //else 
-            if (memberList.Any(m => m.Qq == 1335734629))
+            if (memberList.Any(m => m.Qq == 1335734629) &&
+                !(para.Length > 0 && !para.StartsWith('#')))
             {// 白菜
-                if (para.Length > 0 && !para.StartsWith('#')) para = "#" + para;
-                this.qq.SendGroupMessageAsync(group, $"!statu {uid} {para}", true);
+                if (para.Length > 0) para = " " + para;
+                this.qq.SendGroupMessageAsync(group, $"!statu {uid}{para}", true);
             }
             else
             {
@@ -194,23 +201,102 @@ namespace OsuQqBot
         Random random = new Random();
         private readonly List<string> Tips = new List<string>
         {
-            "你不合适屙屎——interBot",
-            "求求你别糊图了——interBot",
-            "再见了——interBot",
-            "pp刷子——interBot",
-            "打图经验充足，不飞升没理由——interBot",
+            //"你不合适屙屎——interBot",
+            //"求求你别糊图了——interBot",
+            //"再见了——interBot",
+            //"pp刷子——interBot",
+            //"打图经验充足，不飞升没理由——interBot",
             "再@我，我叫咩咩打你——我说的",
             "whir爷爷——大家如是说",
-            "标准的正常玩家——interBot",
-            "你们还是去床上解决吧——interBot",
-            "相信你一定可以克服瓶颈",
-            At(1677323371)+"你快回来，生命因你而精彩",
-            At(1677323371)+"你快回来，把我的思念带回来",
-            "别让我的心空如大海——《你快回来》",
+            //"标准的正常玩家——interBot",
+            //"你们还是去床上解决吧——interBot",
+            //"相信你一定可以克服瓶颈",
+            //At(1677323371)+"你快回来，生命因你而精彩",
+            //At(1677323371)+"你快回来，把我的思念带回来",
+            //"别让我的心空如大海——《你快回来》",
             "新人赛火热进行中（化学式承办）",
             "广告位招租",
             "中国的whir，我被他打爆！",
         };
+
+        private async Task BindAsync(EndPoint sendBack, long qq, string username)
+        {
+            long? find = await FindUid(qq);
+            UserRaw[] users = await apiClient.GetUserAsync(username, OsuApiClient.UsernameType.Username);
+
+            // 判断网络、判断已绑定。
+            if (!find.HasValue || users == null) this.qq.SendMessageAsync(sendBack, "网络错误");
+            else if (find.Value != 0 || users.Length == 0) this.qq.SendMessageAsync(sendBack, "未更改绑定");
+            else
+            {
+                User u = users[0];
+
+                database.Bind(qq, u.Id, "群员手动执行命令");
+                this.qq.SendMessageAsync(sendBack, $"绑定为{u.Name}", true);
+            }
+        }
+
+        /// <summary>
+        /// 显示帮助
+        /// </summary>
+        /// <param name="endPoint"></param>
+        /// <param name="commonds">要显示哪个命令的帮助</param>
+        private void ShowHelp(EndPoint endPoint, params string[] commonds)
+        {
+            if (commonds.Length == 0) TellInstructions(endPoint);
+            else //if (commonds[0] == "帮助")
+            {
+                string help = "";
+                switch (commonds[0])
+                {
+                    case "帮助":
+                        help = @"查看帮助
+用法：帮助 [<命令>]
+选项：
+命令 要显示帮助的命令；如果没有填写，则显示命令列表
+
+用法说明：
+带有尖括号的部分，请根据其中的描述用适当内容取代，不要保留尖括号
+带有方括号的部分为可选，参考选项说明";
+                        break;
+                    case "~":
+                    case "～":
+                        help = @"查询个人信息
+用法：~ [<模式>]
+选项：
+模式 要查询的模式，允许以下值
+0/std 查询osu!模式信息
+1/taiko 查询osu!taiko模式信息
+2/ctb/catch 查询osu!catch模式信息
+3/mania 查询osu!mania模式信息";
+                        break;
+                    case "绑定":
+                        help = @"绑定osu!账号
+用法：绑定 <用户名>
+选项：
+用户名 要绑定的账号";
+                        break;
+                    default:
+                        break;
+                }
+                this.qq.SendMessageAsync(endPoint, help);
+            }
+        }
+
+        /// <summary>
+        /// 向目标发送指令列表
+        /// </summary>
+        /// <param name="endPoint"></param>
+        private void TellInstructions(EndPoint endPoint)
+        {
+            string help = @"命令列表
+帮助 显示帮助
+~ 查询个人信息
+绑定 绑定osu!账号
+
+使用命令“帮助 <命令>”查看特定命令的帮助";
+            this.qq.SendMessageAsync(endPoint, help);
+        }
 
         /// <summary>
         /// 根据某人的昵称，或者At某人快速查询数据
@@ -219,7 +305,7 @@ namespace OsuQqBot
         /// <param name="qq"></param>
         /// <param name="message"></param>
         /// <returns>是否已处理（无论是否查询成功）</returns>
-        public bool WhirIsBest(long group, long qq, string message)
+        internal async Task<bool> WhirIsBestAsync(long group, long qq, string message)
         {
             string queryAtPatten = @"^\s*查\s*\[CQ:at,qq=(\d+)\]\s*(.*)$";
             var queryAtRegex = new System.Text.RegularExpressions.Regex(queryAtPatten);
@@ -230,12 +316,12 @@ namespace OsuQqBot
                 {
                     // 判断一下群名片
                 }
-                Task.Run(async () =>
+                await Task.Run(async () =>
                 {
                     long? aimUid = await FindUid(long.Parse(atMatch.Groups[1].Value));
                     if (aimUid.HasValue)
                         if (aimUid.Value != 0)
-                            Query(group, aimUid.Value, atMatch.Groups[2].Value);
+                            await SendQueryMessage(group, aimUid.Value, atMatch.Groups[2].Value);
                         else this.qq.SendGroupMessageAsync(group, "此人未绑定 id");
                 });
                 return true;
@@ -250,8 +336,8 @@ namespace OsuQqBot
             {
                 string wantedNickname = queryMatch.Groups[1].Value.ToLowerInvariant();
                 long? uid = database.GetUidFromNickname(wantedNickname);
-                if (!uid.HasValue) this.qq.SendGroupMessageAsync(group, $"咱还不知道{queryMatch.Groups[1].Value}是谁呢。", true);
-                else Query(group, uid.Value);
+                if (!uid.HasValue) this.qq.SendGroupMessageAsync(group, $"我不知道{queryMatch.Groups[1].Value}是谁。", true);
+                else await SendQueryMessage(group, uid.Value);
                 return true;
             }
 
@@ -260,7 +346,7 @@ namespace OsuQqBot
             var nickMatch = nickRegex.Match(message);
             if (nickMatch.Success)
             {
-                Task.Run(async () =>
+                await Task.Run(async () =>
                 {
                     string matchUsername = nickMatch.Groups[1].Value;
 
@@ -271,7 +357,7 @@ namespace OsuQqBot
                     string newNick = nickMatch.Groups[2].Value;
                     if (newNick.EndsWith("，记住了。"))
                     {
-                        this.qq.SendGroupMessageAsync(group, "调戏咱很好玩吗？");
+                        //this.qq.SendGroupMessageAsync(group, "调戏咱很好玩吗？");
                         return;
                     }
 
@@ -303,8 +389,8 @@ namespace OsuQqBot
                             this.qq.SendGroupMessageAsync(group, $"有时会突然忘了，{newNick}是谁，但是从现在起，{newNick}就是{users[0].username}，记住了！", true);
                         else if (
                             previousUsername.ToLowerInvariant() == users[0].username.ToLowerInvariant()
-                        ) this.qq.SendGroupMessageAsync(group, $"咱早就知道{newNick}是{previousUsername}了！", true);
-                        else this.qq.SendGroupMessageAsync(group, $"咱还以为{newNick}是{previousUsername}，原来是{users[0].username}，记住了！", true);
+                        ) this.qq.SendGroupMessageAsync(group, $"我知道{newNick}是{previousUsername}。", true);
+                        else this.qq.SendGroupMessageAsync(group, $"我还以为{newNick}是{previousUsername}，原来是{users[0].username}，记住了！", true);
                     }
                 });
                 return true;
@@ -322,7 +408,7 @@ namespace OsuQqBot
         /// 自动绑定，并检测群名片是否包含ID，并且检测PP是否超限
         /// </summary>
         /// <param name="context"></param>
-        public async Task TestInGroupNameAsync(long fromGroup, long fromQq, string message)
+        internal async Task TestInGroupNameAsync(long fromGroup, long fromQq, string message)
         {
             if (!checkSwitch) return;
             if (fromGroup != GroupId) return;
@@ -348,7 +434,7 @@ namespace OsuQqBot
                             $"欢迎来到osu!新人群。请发送“~”查询信息。如果你不是{username}，请联系bleatingsheep。"
                         );
                         (bool queryOK, string query) = await ProcessQuery(_uid);
-                        if (queryOK) query += Environment.NewLine + Environment.NewLine + "此号数据优秀，同分段中的王者！——interBot";
+                        if (queryOK) query += Environment.NewLine + Environment.NewLine + "此号数据卓越，同分段中的王者！——interBot";
                         this.qq.SendGroupMessageAsync(fromGroup, query, true);
                     }
                     else
@@ -410,7 +496,7 @@ namespace OsuQqBot
         }
 
         /// <summary>
-        /// 根据群名片和用户名
+        /// 根据群名片和用户名推荐群名片
         /// </summary>
         /// <param name="card"></param>
         /// <param name="username"></param>

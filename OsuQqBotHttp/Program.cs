@@ -195,7 +195,7 @@ namespace OsuQqBotHttp
                 new MessageSource { FromQq = privateMessage.user_id },
                 privateMessage.message
                 );
-            osuBot.ProcessPrivateMessage(privateMessage.user_id, privateMessage.message);
+            //osuBot.ProcessPrivateMessage(privateMessage.user_id, privateMessage.message);
         }
 
         void ProcessGroupMessage(string json)

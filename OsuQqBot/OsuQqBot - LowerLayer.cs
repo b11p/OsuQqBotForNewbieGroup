@@ -17,12 +17,41 @@ namespace OsuQqBot
                 }
                 else if (uid.Value == 0)
                 {
-                    qq.SendMessageAsync(endPoint, "未绑定");
+                    qq.SendMessageAsync(endPoint, "未绑定，请使用绑定<你的名字>命令绑定");
                 }
                 else
                 {
-                    Query(endPoint, uid.Value, message.Trim().Substring(1).Trim());
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await SendQueryMessage(endPoint, uid.Value, message.Trim().Substring(1).Trim());
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogException(e);
+                        }
+                    });
                 }
+            }
+            else if (message.Trim().StartsWith("绑定"))
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await BindAsync(endPoint, source.FromQq, message.Trim().Substring(2).Trim());
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogException(e);
+                    }
+                });
+            }
+            else if (!string.IsNullOrWhiteSpace(message) && message.Split()[0] == "帮助")
+            {
+                if (message.Split().Length > 1) ShowHelp(endPoint, message.Split()[1]);
+                else ShowHelp(endPoint);
             }
 
             switch (endPoint)
@@ -40,18 +69,18 @@ namespace OsuQqBot
 
         public void ProcessPrivateMessage(PrivateEndPoint endPoint, MessageSource source, string message)
         {
-
+            PrivateManage(endPoint.UserId, message);
         }
 
         public void ProcessGroupMessage(GroupEndPoint endPoint, MessageSource source, string message)
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 try
                 {
-                    if (UpdateUserBandingAsync(endPoint.GroupId, source.FromQq, message).Result) return;
-                    if (WhirIsBest(endPoint.GroupId, source.FromQq, message)) return;
-                    TestInGroupNameAsync(endPoint.GroupId, source.FromQq, message).Wait();
+                    if (await UpdateUserBandingAsync(endPoint.GroupId, source.FromQq, message)) return;
+                    if (await WhirIsBestAsync(endPoint.GroupId, source.FromQq, message)) return;
+                    await TestInGroupNameAsync(endPoint.GroupId, source.FromQq, message);
                 }
                 catch (Exception e)
                 {
