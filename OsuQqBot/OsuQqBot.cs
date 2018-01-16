@@ -221,6 +221,9 @@ namespace OsuQqBot
 
         private async Task BindAsync(EndPoint sendBack, long qq, string username)
         {
+            string[] uname = ParseUsername(username);
+            if (!(uname.Length == 1 && uname[0] == username)) return;
+
             long? find = await FindUid(qq);
             UserRaw[] users = await apiClient.GetUserAsync(username, OsuApiClient.UsernameType.Username);
 
@@ -252,6 +255,7 @@ namespace OsuQqBot
                     case "帮助":
                         help = @"查看帮助
 用法：帮助 [<命令>]
+示例：帮助
 选项：
 命令 要显示帮助的命令；如果没有填写，则显示命令列表
 
@@ -263,6 +267,7 @@ namespace OsuQqBot
                     case "～":
                         help = @"查询个人信息
 用法：~ [<模式>]
+示例：~ taiko
 选项：
 模式 要查询的模式，允许以下值
 0/std 查询osu!模式信息
@@ -273,6 +278,7 @@ namespace OsuQqBot
                     case "绑定":
                         help = @"绑定osu!账号
 用法：绑定 <用户名>
+示例：绑定 bleatingsheep
 选项：
 用户名 要绑定的账号";
                         break;
@@ -478,7 +484,7 @@ namespace OsuQqBot
                     if (!string.IsNullOrEmpty(hint))
                     {
                         this.qq.SendGroupMessageAsync(fromGroup, At(fromQq) + Environment.NewLine +
-                            hisUsername + "，您好。" + hint);
+                            hisUsername + "，您好。" + this.qq.BeforeSend(hint));
                     }
 
                     if (!ignorePPList.Contains(fromQq))

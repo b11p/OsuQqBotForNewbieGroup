@@ -16,5 +16,12 @@ namespace OsuQqBot.QqBot
 
         void SendMessageAsync(EndPoint endPoint, string message);
         void SendMessageAsync(EndPoint endPoint, string message, bool isPlainText);
+
+        /// <summary>
+        /// 转义非功能部分
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        string BeforeSend(string message);
     }
 }
