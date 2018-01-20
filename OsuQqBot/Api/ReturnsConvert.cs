@@ -19,7 +19,7 @@ namespace OsuQqBot.Api
         public long RankedScore { get; private set; }
         public long TotalScore { get; private set; }
         public int Rank { get; private set; }
-        public double Level { get; private set; }
+        private double Level { get; set; }
         public double PP { get; private set; }
         public double Accuracy { get; private set; }
         //public string count_rank_ss { get; private set; }
@@ -334,7 +334,7 @@ namespace OsuQqBot.Api
         //public string max_combo { get; set; }
         public double Stars { get; set; }
 
-        public static implicit operator Beatmap(beatmap raw)
+        public static explicit operator Beatmap(beatmap raw)
         {
             return new Beatmap
             {
@@ -382,7 +382,7 @@ namespace OsuQqBot.Api
         public string Rank { get; private set; }
         public double PP { get; private set; }
 
-        public static implicit operator BestPerformance(best_performance bp)
+        public static explicit operator BestPerformance(best_performance bp)
         {
             return new BestPerformance
             {

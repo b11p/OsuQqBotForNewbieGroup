@@ -148,7 +148,7 @@ namespace OsuQqBot.LocalData
                 if (CachedData.TryGetValue(uid, out var cachedData))
                 {
                     if (DateTime.UtcNow - cachedData.LastUpdate >
-                        new TimeSpan(7, 0, 0, 0)) return null;
+                        new TimeSpan(3, 0, 0, 0)) return null;
                     return cachedData.Username;
                 }
                 else return null;

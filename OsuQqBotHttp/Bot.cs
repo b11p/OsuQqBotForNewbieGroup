@@ -47,7 +47,7 @@ namespace OsuQqBotHttp
             string resultStr = Post(GroupMemberListUrl, json).Result;
             if (resultStr == null) return null;
             var response = JsonConvert.DeserializeObject<GroupMemberListResponse>(resultStr);
-            if (response == null) return null;
+            if (response == null || response.retcode != 0) return null;
             var result = new LinkedList<OsuQqBot.QqBot.GroupMemberInfo>();
             foreach (var info in response.data)
             {
@@ -55,7 +55,7 @@ namespace OsuQqBotHttp
             }
             return result;
         }
-        
+
         public string GetLoginName() => throw new NotImplementedException();
         public long GetLoginQq()
         {
@@ -148,15 +148,15 @@ namespace OsuQqBotHttp
 
         public void SendMessageAsync(EndPoint endPoint, string message)
         {
-            if(endPoint is PrivateEndPoint privateEP)
+            if (endPoint is PrivateEndPoint privateEP)
             {
                 SendPrivateMessageAsync(privateEP.UserId, message);
             }
-            else if(endPoint is GroupEndPoint groupEP)
+            else if (endPoint is GroupEndPoint groupEP)
             {
                 SendGroupMessageAsync(groupEP.GroupId, message);
             }
-            else if(endPoint is DiscussEndPoint discussEP)
+            else if (endPoint is DiscussEndPoint discussEP)
             {
 
             }

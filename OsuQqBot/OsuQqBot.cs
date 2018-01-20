@@ -128,31 +128,69 @@ namespace OsuQqBot
             else
             {
                 User user = users[0];
+                var history = mode == Mode.Std || mode == Mode.Unspecified ? await MotherShipApi.GetUserNearest(uid) : null;
 
-                StringBuilder sb = new StringBuilder();
-                sb.Append(users[0].username + "的个人信息")
-                    .Append(mode == Mode.Unspecified ? "" : "—" + mode.GetModeString()).AppendLine();
-                sb.AppendLine();
-                sb.AppendLine(users[0].pp_raw + "pp 表现");
-                sb.Append("#" + users[0].pp_rank)
-                    .AppendLine(" (" + user.Country + " #" + user.CountryRank + ")");
-                string displayAcc;
-                try
-                {
-                    displayAcc = users[0].accuracy.Substring(0, 5);
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    displayAcc = users[0].accuracy;
-                }
-                sb.AppendLine(users[0].ranked_score + " Ranked谱面总分");
-                sb.AppendLine(displayAcc + "% 准确率");
-                sb.AppendLine(users[0].playcount + " 游玩次数");
-                sb.Append(((User)users[0]).Tth + " 总命中次数");
-                message = sb.ToString();
+                message = BuildQueryMessage(mode, user, history);
                 success = true;
             }
             return (success, message);
+        }
+
+        private static string BuildQueryMessage(Mode mode, User user, MotherShipUserData history = null)
+        {
+            string message;
+            //StringBuilder sb = new StringBuilder();
+            string[] byLine = new string[9];
+
+            //sb.Append(user.Name + "的个人信息")
+            //    .Append(mode == Mode.Unspecified ? "" : "—" + mode.GetModeString()).AppendLine();
+            //sb.AppendLine();
+            //sb.AppendLine(user.PP + "pp 表现");
+            //sb.Append("#" + user.Rank)
+            //    .AppendLine(" (" + user.Country + " #" + user.CountryRank + ")");
+            string displayAcc;
+            try
+            {
+                displayAcc = user.Accuracy.ToString("#.##");
+            }
+            catch (FormatException)
+            {
+                displayAcc = user.Accuracy.ToString();
+            }
+            //sb.AppendLine(user.RankedScore + " Ranked谱面总分");
+            //sb.AppendLine(displayAcc + " 准确率");
+            //sb.AppendLine(user.PlayCount + " 游玩次数");
+            //sb.Append(user.Tth + " 总命中次数");
+            //message = sb.ToString();
+            //return message;
+
+            byLine[0] = user.Name + "的个人信息" + (mode == Mode.Unspecified ? "" : "—" + mode.GetModeString());
+            byLine[1] = string.Empty;
+            byLine[2] = user.PP + "pp 表现";
+            byLine[3] = "#" + user.Rank;
+            byLine[4] = user.Country + " #" + user.CountryRank;
+            byLine[5] = (user.RankedScore).ToString("#,###") + " Ranked谱面总分";
+            byLine[6] = displayAcc + "% 准确率";
+            byLine[7] = user.PlayCount + " 游玩次数";
+            byLine[8] = (user.Tth).ToString("#,###") + " 总命中次数";
+
+            if (history != null)
+            {
+                if (history.PP < user.PP) byLine[2] += " (+" + (user.PP - history.PP).ToString(".##") + ")";
+                if (history.Rank > user.Rank) byLine[3] += " (↑" + (history.Rank - user.Rank) + ")";
+                //if(history.RankedScore)
+                if (user.Accuracy != history.Accuracy)
+                {
+                    string displayAccChange = (user.Accuracy > history.Accuracy ? "+" : "") + (user.Accuracy - history.Accuracy).ToString(".##");
+                    if (displayAccChange == "") displayAccChange = "-";
+                    if (char.IsDigit(displayAccChange.Last())) displayAccChange += "%";
+                    byLine[6] += " (" + displayAccChange + ")";
+                }
+                if (history.PlayCount < user.PlayCount) byLine[7] += " (+" + (user.PlayCount - history.PlayCount) + ")";
+                if (history.Tth < user.Tth) byLine[8] += " (+" + (user.Tth - history.Tth).ToString("#,###") + ")";
+            }
+
+            return string.Join(Environment.NewLine, byLine);
         }
 
         /// <summary>
@@ -332,77 +370,88 @@ namespace OsuQqBot
                 });
                 return true;
             }
-            if (message.HasCQFunction()) return false;
-            message = message.Replace("&#91;", "[").Replace("&#93;", "]").Replace("&amp;", "&");
+            //if (message.HasCQFunction()) return false;
+            //message = message.Replace("&#91;", "[").Replace("&#93;", "]").Replace("&amp;", "&");
 
-            string queryPatten = @"^\s*查\s*(\S+)\s*$";
-            System.Text.RegularExpressions.Regex queryRegex = new System.Text.RegularExpressions.Regex(queryPatten);
-            var queryMatch = queryRegex.Match(message);
-            if (queryMatch.Success)
-            {
-                string wantedNickname = queryMatch.Groups[1].Value.ToLowerInvariant();
-                long? uid = database.GetUidFromNickname(wantedNickname);
-                if (!uid.HasValue) this.qq.SendGroupMessageAsync(group, $"我不知道{queryMatch.Groups[1].Value}是谁。", true);
-                else await SendQueryMessage(group, uid.Value);
-                return true;
-            }
+            //string queryPatten = @"^\s*查\s*(\S+)\s*$";
+            //System.Text.RegularExpressions.Regex queryRegex = new System.Text.RegularExpressions.Regex(queryPatten);
+            //var queryMatch = queryRegex.Match(message);
+            //if (queryMatch.Success)
+            //{
+            //    string wantedNickname = queryMatch.Groups[1].Value.ToLowerInvariant();
+            //    long? uid = database.GetUidFromNickname(wantedNickname);
+            //    if (!uid.HasValue) this.qq.SendGroupMessageAsync(group, $"我不知道{queryMatch.Groups[1].Value}是谁。", true);
+            //    else await SendQueryMessage(group, uid.Value);
+            //    return true;
+            //}
 
-            string nickPatten = @"^\s*(.+?)\s*叫\s*(\S+)\s*$";
-            var nickRegex = new System.Text.RegularExpressions.Regex(nickPatten);
-            var nickMatch = nickRegex.Match(message);
-            if (nickMatch.Success)
-            {
-                await Task.Run(async () =>
-                {
-                    string matchUsername = nickMatch.Groups[1].Value;
+            //string nickPatten = @"^\s*(.+?)\s*叫\s*(\S+)\s*$";
+            //var nickRegex = new System.Text.RegularExpressions.Regex(nickPatten);
+            //var nickMatch = nickRegex.Match(message);
+            //if (nickMatch.Success)
+            //{
+            //    await Task.Run(async () =>
+            //    {
+            //        string matchUsername = nickMatch.Groups[1].Value;
 
-                    // 检查是否是合法的用户名（减少误触发）
-                    var uMatch = regexMatchingUsername.Match(matchUsername);
-                    if (!uMatch.Success || uMatch.Groups[1].Value != matchUsername) return;
+            //        // 检查是否是合法的用户名（减少误触发）
+            //        var uMatch = regexMatchingUsername.Match(matchUsername);
+            //        if (!uMatch.Success || uMatch.Groups[1].Value != matchUsername) return;
 
-                    string newNick = nickMatch.Groups[2].Value;
-                    if (newNick.EndsWith("，记住了。"))
-                    {
-                        //this.qq.SendGroupMessageAsync(group, "调戏咱很好玩吗？");
-                        return;
-                    }
+            //        string newNick = nickMatch.Groups[2].Value;
+            //        if (newNick.EndsWith("，记住了。"))
+            //        {
+            //            //this.qq.SendGroupMessageAsync(group, "调戏咱很好玩吗？");
+            //            return;
+            //        }
 
-                    var users = await apiClient.GetUserAsync(matchUsername, OsuApiClient.UsernameType.Username);
-                    if (users == null)
-                    {
-                        this.qq.SendGroupMessageAsync(group, "再试一次吧~");
-                        return;
-                    }
-                    if (!users.Any())
-                    {
-                        this.qq.SendGroupMessageAsync(group, "没这个人！叫什么叫！");
-                        return;
-                    }
-                    if (!long.TryParse(users[0].user_id, out long uid))
-                    {
-                        this.qq.SendGroupMessageAsync(group, "不知道为什么出错了。");
-                        return;
-                    }
-                    var previous = database.SaveNickname(newNick.ToLower(System.Globalization.CultureInfo.InvariantCulture), uid);
-                    if (!previous.HasValue)
-                    {
-                        this.qq.SendGroupMessageAsync(group, $"{users[0].username}叫{newNick}，记住了。", true);
-                    }
-                    else
-                    {
-                        string previousUsername = await FindUsername(previous.Value);
-                        if (string.IsNullOrEmpty(previousUsername))
-                            this.qq.SendGroupMessageAsync(group, $"有时会突然忘了，{newNick}是谁，但是从现在起，{newNick}就是{users[0].username}，记住了！", true);
-                        else if (
-                            previousUsername.ToLowerInvariant() == users[0].username.ToLowerInvariant()
-                        ) this.qq.SendGroupMessageAsync(group, $"我知道{newNick}是{previousUsername}。", true);
-                        else this.qq.SendGroupMessageAsync(group, $"我还以为{newNick}是{previousUsername}，原来是{users[0].username}，记住了！", true);
-                    }
-                });
-                return true;
-            }
+            //        var users = await apiClient.GetUserAsync(matchUsername, OsuApiClient.UsernameType.Username);
+            //        if (users == null)
+            //        {
+            //            this.qq.SendGroupMessageAsync(group, "再试一次吧~");
+            //            return;
+            //        }
+            //        if (!users.Any())
+            //        {
+            //            this.qq.SendGroupMessageAsync(group, "没这个人！叫什么叫！");
+            //            return;
+            //        }
+            //        if (!long.TryParse(users[0].user_id, out long uid))
+            //        {
+            //            this.qq.SendGroupMessageAsync(group, "不知道为什么出错了。");
+            //            return;
+            //        }
+            //        var previous = database.SaveNickname(newNick.ToLower(System.Globalization.CultureInfo.InvariantCulture), uid);
+            //        if (!previous.HasValue)
+            //        {
+            //            this.qq.SendGroupMessageAsync(group, $"{users[0].username}叫{newNick}，记住了。", true);
+            //        }
+            //        else
+            //        {
+            //            string previousUsername = await FindUsername(previous.Value);
+            //            if (string.IsNullOrEmpty(previousUsername))
+            //                this.qq.SendGroupMessageAsync(group, $"有时会突然忘了，{newNick}是谁，但是从现在起，{newNick}就是{users[0].username}，记住了！", true);
+            //            else if (
+            //                previousUsername.ToLowerInvariant() == users[0].username.ToLowerInvariant()
+            //            ) this.qq.SendGroupMessageAsync(group, $"我知道{newNick}是{previousUsername}。", true);
+            //            else this.qq.SendGroupMessageAsync(group, $"我还以为{newNick}是{previousUsername}，原来是{users[0].username}，记住了！", true);
+            //        }
+            //    });
+            //    return true;
+            //}
 
             return false;
+        }
+
+        private async Task<bool> Where(EndPoint endPoint, string where)
+        {
+            string[] coms = where.Split();
+            throw new NotImplementedException();
+        }
+
+        private async Task<bool> WhereFrom(EndPoint endPoint, string where, string from)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -555,105 +604,105 @@ namespace OsuQqBot
             });
         }
 
-        /// <summary>
-        /// （废弃)（执行）检查群名片
-        /// </summary>
-        /// <param name="fromGroup"></param>
-        /// <param name="fromQq"></param>
-        /// <param name="message"></param>
-        /// <param name="inGroupName"></param>
-        /// <param name="uid"></param>
-        /// <returns></returns>
-        private async Task CheckIfInGroupNameQualified(long fromGroup, long fromQq, long uid)
-        {
-            string inGroupName;
-            try
-            {
-                var memberInfo = qq.GetGroupMemberInfo(fromGroup, fromQq);
-                if (memberInfo == null)
-                {
-                    return;
-                }
-                inGroupName = memberInfo.InGroupName;
-                if (string.IsNullOrEmpty(inGroupName))
-                    inGroupName = memberInfo.QqNickname;
-            }
-            catch (FormatException e)
-            {// 此 try-catch 好像是遗留问题，可以考虑去掉
-                Logger.Log("获取群名片出现问题");
-                Logger.Log(fromGroup.ToString());
-                Logger.Log(fromQq.ToString());
-                Logger.LogException(e);
-                Logger.Log("return");
-                return;
-            }
-            var possibleUsernames = ParseUsername(inGroupName);
-            if (possibleUsernames.Length == 0)
-            {
-                await Task.Delay(60000);
-                qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 请修改群名片，必须包括osu!用户名");
-                return;
-            }
+        ///// <summary>
+        ///// （废弃)（执行）检查群名片
+        ///// </summary>
+        ///// <param name="fromGroup"></param>
+        ///// <param name="fromQq"></param>
+        ///// <param name="message"></param>
+        ///// <param name="inGroupName"></param>
+        ///// <param name="uid"></param>
+        ///// <returns></returns>
+        //private async Task CheckIfInGroupNameQualified(long fromGroup, long fromQq, long uid)
+        //{
+        //    string inGroupName;
+        //    try
+        //    {
+        //        var memberInfo = qq.GetGroupMemberInfo(fromGroup, fromQq);
+        //        if (memberInfo == null)
+        //        {
+        //            return;
+        //        }
+        //        inGroupName = memberInfo.InGroupName;
+        //        if (string.IsNullOrEmpty(inGroupName))
+        //            inGroupName = memberInfo.QqNickname;
+        //    }
+        //    catch (FormatException e)
+        //    {// 此 try-catch 好像是遗留问题，可以考虑去掉
+        //        Logger.Log("获取群名片出现问题");
+        //        Logger.Log(fromGroup.ToString());
+        //        Logger.Log(fromQq.ToString());
+        //        Logger.LogException(e);
+        //        Logger.Log("return");
+        //        return;
+        //    }
+        //    var possibleUsernames = ParseUsername(inGroupName);
+        //    if (possibleUsernames.Length == 0)
+        //    {
+        //        await Task.Delay(60000);
+        //        qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 请修改群名片，必须包括osu!用户名");
+        //        return;
+        //    }
 
-            if (uid != 0)
-            {
-                string foundUsername = await FindUsername(uid); //找到的用户名
-                if (foundUsername == null) return; //查找失败
-                if (possibleUsernames.Any(psb =>
-                    psb.ToLowerInvariant() == foundUsername.ToLowerInvariant()
-                )) return; //OK
-                Logger.Log(inGroupName + "用户名不OK" + foundUsername);
-                await Task.Delay(60000);
-                if (inGroupName.Contains(foundUsername))
-                {
-                    string hint = $"[CQ:at,qq={fromQq}] 请修改群名片，不要在用户名前后添加可以被用做用户名的字符，以免混淆。";
-                    int firstIndex = inGroupName.IndexOf(foundUsername);
-                    if (firstIndex != -1)
-                    {
-                        string recommendCard = inGroupName.Substring(0, firstIndex);
-                        if (firstIndex != 0)
-                            recommendCard += "|";
-                        recommendCard += foundUsername;
-                        if (firstIndex + foundUsername.Length < inGroupName.Length)
-                        {
-                            recommendCard += "|" + inGroupName.Substring(firstIndex + foundUsername.Length);
-                        }
-                        hint += Environment.NewLine + "建议群名片：" + Environment.NewLine;
-                        hint += recommendCard;
-                        qq.SendGroupMessageAsync(fromGroup, hint);
-                    }
-                    else
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.AppendLine("无法给出推荐名片");
-                        sb.AppendLine("群名：" + inGroupName);
-                        sb.AppendLine("用户名：" + foundUsername);
-                        Logger.Log(sb.ToString());
-                    }
+        //    if (uid != 0)
+        //    {
+        //        string foundUsername = await FindUsername(uid); //找到的用户名
+        //        if (foundUsername == null) return; //查找失败
+        //        if (possibleUsernames.Any(psb =>
+        //            psb.ToLowerInvariant() == foundUsername.ToLowerInvariant()
+        //        )) return; //OK
+        //        Logger.Log(inGroupName + "用户名不OK" + foundUsername);
+        //        await Task.Delay(60000);
+        //        if (inGroupName.Contains(foundUsername))
+        //        {
+        //            string hint = $"[CQ:at,qq={fromQq}] 请修改群名片，不要在用户名前后添加可以被用做用户名的字符，以免混淆。";
+        //            int firstIndex = inGroupName.IndexOf(foundUsername);
+        //            if (firstIndex != -1)
+        //            {
+        //                string recommendCard = inGroupName.Substring(0, firstIndex);
+        //                if (firstIndex != 0)
+        //                    recommendCard += "|";
+        //                recommendCard += foundUsername;
+        //                if (firstIndex + foundUsername.Length < inGroupName.Length)
+        //                {
+        //                    recommendCard += "|" + inGroupName.Substring(firstIndex + foundUsername.Length);
+        //                }
+        //                hint += Environment.NewLine + "建议群名片：" + Environment.NewLine;
+        //                hint += recommendCard;
+        //                qq.SendGroupMessageAsync(fromGroup, hint);
+        //            }
+        //            else
+        //            {
+        //                StringBuilder sb = new StringBuilder();
+        //                sb.AppendLine("无法给出推荐名片");
+        //                sb.AppendLine("群名：" + inGroupName);
+        //                sb.AppendLine("用户名：" + foundUsername);
+        //                Logger.Log(sb.ToString());
+        //            }
 
-                }
-                else qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 请修改群名片，必须包括正确的osu!用户名。数据库中您的名字是{foundUsername}，如改名请@我，如有错误请联系bleatingsheep。");
-            }
-            else
-            {
-                (string username, long findUid) = await CheckUsername(possibleUsernames);
-                if (username == null) return;
-                if (username == string.Empty)
-                {
-                    qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您尚未绑定osu!id，请将群名片改为osu!中的名字，直到提示您绑定成功。");
-                    //+ Environment.NewLine + "!setid 您的id");
-                }
-                else
-                {
-                    database.CacheUsername(findUid, username);
-                    database.Bind(fromQq, findUid, "Auto");
-                    var success = await Int100ApiClient.BindQqAndOsuUid(fromQq, findUid);
-                    qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 自动绑定为{username}，{(success ? string.Empty : "但不知道是否成功，")}请发送“~”查询信息。如有错误请联系bleatingsheep。");
-                    Logger.Log("自动绑定" + fromQq + username);
-                    qq.SendGroupMessageAsync(fromGroup, $"!stats {findUid}");
-                }
-            }
-        }
+        //        }
+        //        else qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 请修改群名片，必须包括正确的osu!用户名。数据库中您的名字是{foundUsername}，如改名请@我，如有错误请联系bleatingsheep。");
+        //    }
+        //    else
+        //    {
+        //        (string username, long findUid) = await CheckUsername(possibleUsernames);
+        //        if (username == null) return;
+        //        if (username == string.Empty)
+        //        {
+        //            qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您尚未绑定osu!id，请将群名片改为osu!中的名字，直到提示您绑定成功。");
+        //            //+ Environment.NewLine + "!setid 您的id");
+        //        }
+        //        else
+        //        {
+        //            database.CacheUsername(findUid, username);
+        //            database.Bind(fromQq, findUid, "Auto");
+        //            var success = await Int100ApiClient.BindQqAndOsuUid(fromQq, findUid);
+        //            qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 自动绑定为{username}，{(success ? string.Empty : "但不知道是否成功，")}请发送“~”查询信息。如有错误请联系bleatingsheep。");
+        //            Logger.Log("自动绑定" + fromQq + username);
+        //            qq.SendGroupMessageAsync(fromGroup, $"!stats {findUid}");
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// 检查群名片是否包含osu的名字

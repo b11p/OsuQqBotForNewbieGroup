@@ -24,7 +24,7 @@ namespace OsuQqBot.Api
                 { InformationType.ReplayData, "/api/get_replay" }
             }; // 各查询类型对应的路径
 
-        private string apiKey;
+        private readonly string apiKey;
         public OsuApiClient(string apiKey)
         {
             if (string.IsNullOrWhiteSpace(apiKey)) throw new ArgumentNullException(nameof(apiKey));
@@ -119,19 +119,48 @@ namespace OsuQqBot.Api
             return users[0].username;
         }
 
+        public async Task<BestPerformance[]> GetBestPerformanceAsync(long uid, int count)
+        {
+            string dnmlgb = await GetHttpAsync(InformationType.BestPerformance, ("k", apiKey), ("u", uid.ToString()), ("limit", count.ToString()));
+            if (dnmlgb == null) return null;
+            best_performance[] bpRaw = JsonConvert.DeserializeObject<best_performance[]>(dnmlgb);
+
+            //BestPerformance[] result = new BestPerformance[bpRaw.Length];
+            //for (int i = 0; i < bpRaw.Length; i++)
+            //{
+            //    result[i] = (BestPerformance)bpRaw[i];
+            //}
+            //return result;
+
+            var previousIsShit = from bp in bpRaw
+                                 select (BestPerformance)bp;
+            return previousIsShit.ToArray();
+        }
+
         public async Task<Beatmap> GetBeatmapAsync(long bid)
         {
             string json = await GetHttpAsync($"{protocol}://{site}{paths[InformationType.Beatmap]}", new KeyValuePair<string, string>("b", bid.ToString()));
             if (json == null) return null;
             var result = JsonConvert.DeserializeObject<beatmap[]>(json);
             if (result == null || result.Length == 0) return null;
-            return result[0];
+            return (Beatmap)result[0];
         }
 
         //public Beatmap[] GetBeatmap(string k, string b)
         //{
         //    throw new NotImplementedException();
         //}
+
+        /// <summary>
+        /// 传入参数并获取 http
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="paras">参数</param>
+        /// <returns></returns>
+        private static async Task<string> GetHttpAsync(InformationType type, params (string key, string value)[] paras)
+        {
+            return await GetHttpAsync($"{protocol}://{site}{paths[type]}", paras);
+        }
 
         /// <summary>
         /// 传入参数并获取 http
@@ -166,6 +195,12 @@ namespace OsuQqBot.Api
             }
         }
 
+        /// <summary>
+        /// 传入参数并获取 http
+        /// </summary>
+        /// <param name="path">访问的路径（完整，包含协议名）</param>
+        /// <param name="paras">参数</param>
+        /// <returns>获取到的数据（JSON）；如果失败，则为null</returns>
         private static async Task<string> GetHttpAsync(string path, params (string key, string value)[] paras)
         {
             LinkedList<KeyValuePair<string, string>> pair = new LinkedList<KeyValuePair<string, string>>();
