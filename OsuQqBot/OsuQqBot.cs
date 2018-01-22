@@ -136,9 +136,16 @@ namespace OsuQqBot
             return (success, message);
         }
 
+        /// <summary>
+        /// 根据查询结果和历史数据构造查询结果字符串
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="user"></param>
+        /// <param name="history"></param>
+        /// <returns></returns>
         private static string BuildQueryMessage(Mode mode, User user, MotherShipUserData history = null)
         {
-            string message;
+            //string message;
             //StringBuilder sb = new StringBuilder();
             string[] byLine = new string[9];
 
