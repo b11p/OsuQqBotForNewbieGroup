@@ -775,7 +775,7 @@ namespace OsuQqBot
             {
                 database.CacheUsername(findUid, username);
                 database.Bind(qq, findUid, "Auto");
-                var success = await Int100ApiClient.BindQqAndOsuUid(qq, findUid);
+                //var success = await Int100ApiClient.BindQqAndOsuUid(qq, findUid);
                 Logger.Log("自动绑定" + qq + username);
                 return (true, username, findUid);
             }
