@@ -94,7 +94,7 @@ namespace OsuQqBot
         /// </summary>
         /// <param name="qq"></param>
         /// <returns></returns>
-        private static string At(long qq) => $"[CQ:at,qq={qq}] ";
+        private static string At(long qq) => $"[CQ:at,qq={qq}]";
 
         /// <summary>
         /// 获取群名片

@@ -252,16 +252,21 @@ namespace OsuQqBot
             //"pp刷子——interBot",
             //"打图经验充足，不飞升没理由——interBot",
             "再@我，我叫咩咩打你——我说的",
-            "whir爷爷——大家如是说",
+            //"whir爷爷——大家如是说",
             //"标准的正常玩家——interBot",
             //"你们还是去床上解决吧——interBot",
             //"相信你一定可以克服瓶颈",
             //At(1677323371)+"你快回来，生命因你而精彩",
             //At(1677323371)+"你快回来，把我的思念带回来",
             //"别让我的心空如大海——《你快回来》",
-            "新人赛火热进行中（化学式承办）",
+            //"新人赛火热进行中（化学式承办）",
             "广告位招租",
             "中国的whir，我被他打爆！",
+            "早上好",
+            "求求你别复读了",
+            "ญ็้็้็้็้็้็้็้็้็้็้็้ŭ..",
+            "。",
+            "Jump有用？",
         };
 
         private async Task BindAsync(EndPoint sendBack, long qq, string username)
@@ -452,7 +457,10 @@ namespace OsuQqBot
 
         private async Task<bool> Where(EndPoint endPoint, string where)
         {
-            string[] coms = where.Split();
+            string[] coms = where.Split(',', '，');
+            if (coms.Length == 1)
+            {
+            }
             throw new NotImplementedException();
         }
 
@@ -491,7 +499,7 @@ namespace OsuQqBot
                     if (!success.HasValue) return;
                     if (success.Value)
                     {
-                        this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)}" + Environment.NewLine +
+                        this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} " + Environment.NewLine +
                             $"{username}，你好！" + Environment.NewLine +
                             $"欢迎来到osu!新人群。请发送“~”查询信息。如果你不是{username}，请联系bleatingsheep。"
                         );
@@ -826,7 +834,16 @@ namespace OsuQqBot
             if (double.TryParse(users[0].pp_raw, out double pp))
                 if (pp >= 3000)
                     qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您的PP超限，即将离开本群");
-            //qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您的PP已经超过2600，如果超过3000，将离开本群");
+                //qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您的PP已经超过2600，如果超过3000，将离开本群");
+                else
+                {
+                    var bp = await apiClient.GetBestPerformanceAsync(uid, 1);
+                    double bpLimit = 185;
+                    if (bp?.Length > 0 && bp[0]?.PP >= bpLimit)
+                    {
+                        this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} 您的BP超限，即将离开本群");
+                    }
+                }
         }
 
         private readonly OsuApiClient apiClient;
