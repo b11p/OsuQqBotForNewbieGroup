@@ -48,6 +48,21 @@ namespace OsuQqBot
                     }
                 });
             }
+            else if (message.Trim().ToLowerInvariant().StartsWith("where"))
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        var (success, info) = await ProcessQuery(username: message.Trim().Substring("where".Length).Trim());
+                        this.qq.SendMessageAsync(endPoint, this.qq.BeforeSend(info));
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogException(e);
+                    }
+                });
+            }
             else if (!string.IsNullOrWhiteSpace(message) && message.Split()[0] == "帮助")
             {
                 if (message.Split().Length > 1) ShowHelp(endPoint, message.Split()[1]);

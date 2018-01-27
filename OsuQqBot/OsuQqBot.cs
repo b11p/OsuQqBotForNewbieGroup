@@ -113,6 +113,7 @@ namespace OsuQqBot
         /// <returns></returns>
         private async Task<(bool success, string info)> ProcessQuery(long uid, string para = "")
         {
+            // 和重载 ProcessQuery(string) 有重复代码，必须择日重构
             bool success;
             string message;
             var mode = Mode.Unspecified;
@@ -134,6 +135,26 @@ namespace OsuQqBot
                 success = true;
             }
             return (success, message);
+        }
+
+        /// <summary>
+        /// 通过用户名查询信息，返回字符串（太傻逼了，必须重构）
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        private async Task<(bool success, string info)> ProcessQuery(string username)
+        {
+            // 和重载 ProcessQuery(long uid, string para = "") 有重复代码，必须择日重构
+            var users = await apiClient.GetUserAsync(username, OsuApiClient.UsernameType.Username);
+            if (users == null) return (false, "网络错误");
+            else if (users.Length == 0) return (false, "没这个人！");
+            else
+            {
+                User user = users[0];
+                var history = await MotherShipApi.GetUserNearest(user.Id);
+
+                return (true, BuildQueryMessage(Mode.Unspecified, user, history));
+            }
         }
 
         /// <summary>
@@ -187,7 +208,8 @@ namespace OsuQqBot
                 if (history.Rank > user.Rank) byLine[3] += " (↑" + (history.Rank - user.Rank) + ")";
                 //if(history.RankedScore)
                 // 98.96934509277344 98.969345
-                if (Math.Round(user.Accuracy, 6) != Math.Round(history.Accuracy, 6))
+                // 99.02718353271484 99.02718
+                if (Math.Abs(user.Accuracy - history.Accuracy) > 0.000_005)
                 {
                     string displayAccChange = (user.Accuracy > history.Accuracy ? "+" : "") + (user.Accuracy - history.Accuracy).ToString(".##");
                     if (displayAccChange == "") displayAccChange = "-";
