@@ -18,7 +18,10 @@ namespace OsuQqBot.LocalData
          */
 
         string basePath;
-        
+
+        private static Database single;
+        public static Database Single => single;
+
         /// <summary>
         /// 指定路径，创建Database的新实例
         /// </summary>
@@ -60,7 +63,7 @@ namespace OsuQqBot.LocalData
                     nickData = string.Empty;
                 }
                 NicknameData = DeserializeObject<Dictionary<string, long>>(nickData) ?? new Dictionary<string, long>();
-                
+                if (single == null) single = this;
             }
             catch (Exception e)
             {
@@ -92,6 +95,7 @@ namespace OsuQqBot.LocalData
         IDictionary<long, BindingData> BindData { get; set; }
         IDictionary<long, CachedData> CachedData { get; set; }
         IDictionary<string, long> NicknameData { get; set; }
+        DataHolder<ISet<long>> Administrators { get; set; }
 
         public long? Bind(long QQ, long uid, string source)
         {

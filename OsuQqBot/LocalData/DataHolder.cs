@@ -6,13 +6,13 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace OsuQqBot.LocalData
 {
-    class DataHolder<T> where T : class, new()
+    class DataHolder<T> where T : class
     {
         readonly T data;
 
         readonly string path;
 
-        private static T Init(string path)
+        private static T Init(string path, T instance)
         {
             string data = "";
             try
@@ -23,13 +23,24 @@ namespace OsuQqBot.LocalData
             {
                 data = "";
             }
-            return DeserializeObject<T>(data) ?? new T();
+            return DeserializeObject<T>(data) ?? instance ?? throw new ArgumentNullException(nameof(instance));
         }
 
-        public DataHolder(string path)
+        /// <summary>
+        /// 从文件构造DataHolder类的新实例
+        /// </summary>
+        /// <param name="path">文件路径</param>
+        /// <param name="instance">如果反序列化失败要使用的默认值</param>
+        public DataHolder(string path, T instance)
         {
             this.path = path;
-            data = Init(path);
+            if (!string.IsNullOrEmpty(path))
+                data = Init(path, instance);
+            else
+            {
+                path = null;
+                data = instance ?? throw new ArgumentNullException(nameof(instance));
+            }
         }
 
         readonly System.Threading.ReaderWriterLock readerWriterLock = new System.Threading.ReaderWriterLock();
@@ -50,7 +61,8 @@ namespace OsuQqBot.LocalData
             try
             {
                 writeMethod(data);
-                File.WriteAllText(path, SerializeObject(data, Newtonsoft.Json.Formatting.Indented));
+                if (path != null)
+                    File.WriteAllText(path, SerializeObject(data, Newtonsoft.Json.Formatting.Indented));
             }
             finally { readerWriterLock.ReleaseWriterLock(); }
         }
@@ -61,7 +73,8 @@ namespace OsuQqBot.LocalData
             try
             {
                 var result = writeMethod(data);
-                File.WriteAllText(path, SerializeObject(data, Newtonsoft.Json.Formatting.Indented));
+                if (path != null)
+                    File.WriteAllText(path, SerializeObject(data, Newtonsoft.Json.Formatting.Indented));
                 return result;
             }
             finally { readerWriterLock.ReleaseWriterLock(); }
