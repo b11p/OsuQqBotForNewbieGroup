@@ -6,6 +6,8 @@ namespace OsuQqBot.Functions
 {
     interface IManagementContext
     {
+        string Name { get; }
+        string Description { get; }
         IManagementContext Manage(string commond);
         string GetHelp();
         (string commond, string description)[] GetCommonds();

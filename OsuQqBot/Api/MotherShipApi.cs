@@ -42,6 +42,12 @@ namespace OsuQqBot.Api
         public static async Task<MotherShipUserData> GetUserNearest(long uid)
         {
             var Nope = await CallApi<MotherShipUserData>($"http://www.mothership.top:8080/api/v1/userinfo/nearest/{uid}");
+            if (Nope == null) // 如果没找到记录，就访问妈船API让白菜开始记录
+                using (HttpClient httpClient = new HttpClient())
+                    try
+                    { using (await httpClient.GetStreamAsync($"http://www.mothership.top:8080/api/v1/stat/{uid}")) { } }
+                    catch (HttpRequestException)
+                    { }
             return Nope;
         }
 

@@ -8,24 +8,6 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace OsuQqBot.LocalData
 {
-    static class Extends
-    {
-        public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
-        {
-            lock (dictionary)
-            {
-                try
-                {
-                    return dictionary[key];
-                }
-                catch (KeyNotFoundException)
-                {
-                    return default(TValue);
-                }
-            }
-        }
-    }
-
     /// <summary>
     /// 给机器人提供数据存储服务的类
     /// </summary>
@@ -36,7 +18,7 @@ namespace OsuQqBot.LocalData
          */
 
         string basePath;
-
+        
         /// <summary>
         /// 指定路径，创建Database的新实例
         /// </summary>
@@ -78,6 +60,7 @@ namespace OsuQqBot.LocalData
                     nickData = string.Empty;
                 }
                 NicknameData = DeserializeObject<Dictionary<string, long>>(nickData) ?? new Dictionary<string, long>();
+                
             }
             catch (Exception e)
             {
@@ -103,6 +86,8 @@ namespace OsuQqBot.LocalData
         string NicknamePath => Path.Combine(basePath, "nicknames");
 
         string NicknameFilename => Path.Combine(NicknamePath, "Nick.json");
+
+        string TipsFilename => Path.Combine(basePath, "tips.json");
 
         IDictionary<long, BindingData> BindData { get; set; }
         IDictionary<long, CachedData> CachedData { get; set; }

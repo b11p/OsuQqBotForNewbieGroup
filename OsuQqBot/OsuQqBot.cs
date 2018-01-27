@@ -186,7 +186,8 @@ namespace OsuQqBot
                 if (history.PP < user.PP) byLine[2] += " (+" + (user.PP - history.PP).ToString(".##") + ")";
                 if (history.Rank > user.Rank) byLine[3] += " (↑" + (history.Rank - user.Rank) + ")";
                 //if(history.RankedScore)
-                if (Math.Round(user.Accuracy, 5) != Math.Round(history.Accuracy, 5))
+                // 98.96934509277344 98.969345
+                if (Math.Round(user.Accuracy, 6) != Math.Round(history.Accuracy, 6))
                 {
                     string displayAccChange = (user.Accuracy > history.Accuracy ? "+" : "") + (user.Accuracy - history.Accuracy).ToString(".##");
                     if (displayAccChange == "") displayAccChange = "-";
