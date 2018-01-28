@@ -22,7 +22,7 @@ namespace OsuQqBot.Functions
 
         public (bool handled, IFunction state) ProcessMessage(EndPoint endPoint, MessageSource messageSource, string message)
         {
-
+            return (false, null);
         }
     }
 }
