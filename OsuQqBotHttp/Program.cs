@@ -150,22 +150,31 @@ namespace OsuQqBotHttp
 
         public int Port { get; private set; }
 
-        string ProcessPost(string json)
+        void ProcessPost(string json)
         {
-            var p = JsonConvert.DeserializeObject<Post>(json);
-            switch (p.post_type)
+            Task.Run(() =>
             {
-                case "message":
-                    ProcessMessage(json);
-                    break;
-                case "event":
-                    break;
-                case "request":
-                    break;
-                default:
-                    break;
-            }
-            return null;
+                try
+                {
+                    var p = JsonConvert.DeserializeObject<Post>(json);
+                    switch (p.post_type)
+                    {
+                        case "message":
+                            ProcessMessage(json);
+                            break;
+                        case "event":
+                            break;
+                        case "request":
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.LogException(e);
+                }
+            });
         }
 
         Message ProcessMessage(string json)

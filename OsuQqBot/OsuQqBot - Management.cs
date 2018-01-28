@@ -23,6 +23,11 @@ namespace OsuQqBot
         readonly long id_Kamisama;
 
         /// <summary>
+        /// 公开的主管理员ID
+        /// </summary>
+        public static long IdWhoLovesInt100Best { get; private set; }
+
+        /// <summary>
         /// 接收私聊消息，管理bot
         /// </summary>
         /// <param name="qq"></param>

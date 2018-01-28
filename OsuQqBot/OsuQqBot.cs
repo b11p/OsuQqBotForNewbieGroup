@@ -16,14 +16,17 @@ namespace OsuQqBot
     public partial class OsuQqBot
     {
         IQqBot qq;
+        public static IQqBot QqApi { get; private set; }
         readonly LocalData.Database database = new LocalData.Database(Paths.DataPath);
 
         public OsuQqBot(IQqBot qqBot)
         {
             qq = qqBot;
+            QqApi = qq;
             CurrentQq = qq.GetLoginQq();
             Config config = Newtonsoft.Json.JsonConvert.DeserializeObject<Config>(File.ReadAllText(Paths.JsonConfigPath));
             id_Kamisama = config.Kamisama;
+            IdWhoLovesInt100Best = id_Kamisama;
             GroupId = config.MainGroup;
             foreach (var item in config.ValidGroups)
             {

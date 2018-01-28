@@ -20,7 +20,7 @@ namespace OsuQqBot.LocalData
         string basePath;
 
         private static Database single;
-        public static Database Single => single;
+        public static Database Instance => single;
 
         /// <summary>
         /// 指定路径，创建Database的新实例
@@ -63,6 +63,7 @@ namespace OsuQqBot.LocalData
                     nickData = string.Empty;
                 }
                 NicknameData = DeserializeObject<Dictionary<string, long>>(nickData) ?? new Dictionary<string, long>();
+                Administrators = new DataHolder<ISet<long>>(AdministratorsPath, new HashSet<long>());
                 if (single == null) single = this;
             }
             catch (Exception e)
@@ -91,6 +92,8 @@ namespace OsuQqBot.LocalData
         string NicknameFilename => Path.Combine(NicknamePath, "Nick.json");
 
         string TipsFilename => Path.Combine(basePath, "tips.json");
+
+        string AdministratorsPath => Path.Combine(basePath, "adminlist.json");
 
         IDictionary<long, BindingData> BindData { get; set; }
         IDictionary<long, CachedData> CachedData { get; set; }
@@ -220,6 +223,19 @@ namespace OsuQqBot.LocalData
                 return NicknameData.TryGetValue(nickname, out long uid) ? (long?)uid : null;
             }
         }
+
+        public bool IsAdministrator(long qq) => Administrators.Read(set => set.Contains(qq));
+
+        /// <summary>
+        /// 添加管理员，返回是否成功
+        /// </summary>
+        /// <param name="qq"></param>
+        /// <returns>true if the element is added to the set; false if the element is already in the set.</returns>
+        public bool GiveAdministrator(long qq) => Administrators.Write(set => set.Add(qq));
+
+        public bool RevokeAdministrator(long qq) => Administrators.Write(set => set.Remove(qq));
+
+        public IEnumerable<long> ListAdministrators() => Administrators.Read(set => new List<long>(set));
 
         public void Commit()
         {

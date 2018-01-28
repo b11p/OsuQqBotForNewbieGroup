@@ -28,7 +28,7 @@ namespace OsuQqBot
                 {
                     Logger.Log($"从妈船找QQ={qq}的绑定信息失败（网络问题）");
                 }
-                if (uid.Value != 0)
+                else if (uid.Value != 0)
                 {
                     isFromApi = true;
                     fromApi = "Mother Ship";
@@ -43,7 +43,7 @@ namespace OsuQqBot
                     Logger.Log($"找QQ={qq}的绑定信息失败");
                     return null;
                 }
-                if (uid.Value != 0)
+                else if (uid.Value != 0)
                 {
                     isFromApi = true;
                     fromApi = "int100";

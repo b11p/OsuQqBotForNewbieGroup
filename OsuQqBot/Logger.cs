@@ -29,6 +29,7 @@ namespace OsuQqBot
         public static string LogException(Exception e, bool inner = false)
         {
             StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(DateTime.Now.ToString());
             if (!inner && e is AggregateException) stringBuilder.AppendLine("------Start Aggregate------");
             stringBuilder.AppendLine(e.GetType().ToString());
             stringBuilder.AppendLine(e.Message);
