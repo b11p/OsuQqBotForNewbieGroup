@@ -1,35 +1,35 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using OsuQqBot.QqBot;
+using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text;
-using Newtonsoft.Json;
-using OsuQqBot.QqBot;
+using System.Threading.Tasks;
 
 namespace OsuQqBotHttp
 {
-    internal static class Program
+    class Program
     {
-        private static void Main(string[] args)
+        static void Main(string[] args)
         {
+            System.Net.WebSockets.WebSocket webSocket = new System.Net.WebSockets.ClientWebSocket();
+            //new MyWebServer().StartListenAsync().Wait();
+            //new MyWebServer().Listener();
             // this is test
             new PostProcessor(8876).Listen();
-#if DEBUG
-            using (var client = new HttpClient())
+            using (HttpClient client = new HttpClient())
             {
 
                 client.GetStringAsync("http://127.0.0.1:5700/send_private_msg?user_id=962549599&message=hello%20HTTP/1.1").Wait();
-                
-                var json = JsonConvert.SerializeObject(new
+                string json = JsonConvert.SerializeObject(new
                 {
                     user_id = 962549599,
                     message = "hello"
                 });
-                
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                
                 var t = client.PostAsync("http://127.0.0.1:5700/send_private_msg/", content);
                 t.Wait();
-                
                 var r = t.Result;
                 Console.WriteLine(r.Content.ReadAsStringAsync().Result);
 
@@ -38,16 +38,12 @@ namespace OsuQqBotHttp
                     group_id = 614892339,
                     user_id = 2930081217
                 });
-                
                 content = new StringContent(json, Encoding.UTF8, "application/json");
-                
                 t = client.PostAsync("http://127.0.0.1:5700/get_group_member_info", content);
                 t.Wait();
-                
                 r = t.Result;
                 Console.WriteLine(r.Content.ReadAsStringAsync().Result);
             }
-#endif
             Console.Read();
         }
     }
@@ -55,7 +51,7 @@ namespace OsuQqBotHttp
     /// <summary>
     /// 处理上报消息的类
     /// </summary>
-    internal class PostProcessor
+    class PostProcessor
     {
         public PostProcessor(int port)
         {
@@ -63,11 +59,11 @@ namespace OsuQqBotHttp
             Port = port;
         }
 
-        private readonly OsuQqBot.OsuQqBot _osuBot = new OsuQqBot.OsuQqBot(new QqBot());
+        OsuQqBot.OsuQqBot osuBot = new OsuQqBot.OsuQqBot(new QqBot());
 
-        private int Port { get; set; }
+        public int Port { get; private set; }
 
-        private void ProcessPost(string json)
+        string ProcessPost(string json)
         {
             var p = JsonConvert.DeserializeObject<Post>(json);
             switch (p.post_type)
@@ -82,9 +78,10 @@ namespace OsuQqBotHttp
                 default:
                     break;
             }
+            return null;
         }
 
-        private void ProcessMessage(string json)
+        Message ProcessMessage(string json)
         {
             var m = JsonConvert.DeserializeObject<Message>(json);
             switch (m.message_type)
@@ -100,12 +97,13 @@ namespace OsuQqBotHttp
                 default:
                     break;
             }
+            return null;
         }
 
-        private void ProcessPrivateMessage(string json)
+        void ProcessPrivateMessage(string json)
         {
             var privateMessage = JsonConvert.DeserializeObject<PrivateMessage>(json);
-            _osuBot.ProcessMessage(
+            osuBot.ProcessMessage(
                 new PrivateEndPoint { EndPointType = EndPointType.Private, UserId = privateMessage.user_id },
                 new MessageSource { FromQq = privateMessage.user_id },
                 privateMessage.message
@@ -113,17 +111,31 @@ namespace OsuQqBotHttp
             //osuBot.ProcessPrivateMessage(privateMessage.user_id, privateMessage.message);
         }
 
-        private void ProcessGroupMessage(string json)
+        void ProcessGroupMessage(string json)
         {
             var groupMessage = JsonConvert.DeserializeObject<GroupMessage>(json);
             switch (groupMessage.sub_type)
             {
                 case "normal":
-                    _osuBot.ProcessMessage(
+                    osuBot.ProcessMessage(
                         new GroupEndPoint { EndPointType = EndPointType.Group, GroupId = groupMessage.group_id },
                         new MessageSource { FromQq = groupMessage.user_id },
                         groupMessage.message
                         );
+
+                    //Task.Run(() =>
+                    //{
+                    //    try
+                    //    {
+                    //        if (osuBot.UpdateUserBandingAsync(groupMessage.group_id, groupMessage.user_id, groupMessage.message).Result) return;
+                    //        if (osuBot.WhirIsBest(groupMessage.group_id, groupMessage.user_id, groupMessage.message)) return;
+                    //        osuBot.TestInGroupNameAsync(groupMessage.group_id, groupMessage.user_id, groupMessage.message).Wait();
+                    //    }
+                    //    catch (Exception e)
+                    //    {
+                    //        Logger.LogException(e);
+                    //    }
+                    //});
                     break;
                 case "anonymous":
                     break;
@@ -139,7 +151,7 @@ namespace OsuQqBotHttp
         {
             try
             {
-                using (var listener = new System.Net.HttpListener())
+                using (System.Net.HttpListener listener = new System.Net.HttpListener())
                 {
                     listener.Prefixes.Add($"http://127.0.0.1:{Port}/");
                     listener.Start();
@@ -147,7 +159,7 @@ namespace OsuQqBotHttp
                     {
                         var context = listener.GetContext();
                         using (var inputStream = context.Request.InputStream)
-                        using (var sr = new StreamReader(inputStream))
+                        using (StreamReader sr = new StreamReader(inputStream))
                         {
                             var message = sr.ReadToEnd();
                             Console.WriteLine(message);
