@@ -264,10 +264,16 @@ namespace OsuQqBot
             }
         }
 
-        private string GetTip(long group) =>
-            group == 514661057 || group == 614892339 ?
-            this.Tips[this.random.Next(this.Tips.Count)] :
-            string.Empty;
+        private string GetTip(long group)
+        // =>
+        //group == 514661057 || group == 614892339 ?
+        //this.Tips[this.random.Next(this.Tips.Count)] :
+        //string.Empty;
+        {
+            if (group != 514661057 && group != 614892339) return string.Empty;
+            var tips = database.ListTips();
+            return tips[this.random.Next(tips.Length)];
+        }
 
         Random random = new Random();
         private readonly List<string> Tips = new List<string>
@@ -292,7 +298,7 @@ namespace OsuQqBot
             "求求你别复读了",
             "ญ็้็้็้็้็้็้็้็้็้็้็้ŭ..",
             "。",
-            "Jump有用？",
+            "jump有用？",
         };
 
         private async Task BindAsync(EndPoint sendBack, long qq, string username)

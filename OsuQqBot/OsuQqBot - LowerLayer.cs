@@ -8,6 +8,7 @@ namespace OsuQqBot
     {
         public void ProcessMessage(EndPoint endPoint, MessageSource source, string message)
         {
+            if (new StatelessFunctions.ManageTips().ProcessMessage(endPoint, source, message)) return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～"))
             {
                 var uid = FindUid(source.FromQq).Result;

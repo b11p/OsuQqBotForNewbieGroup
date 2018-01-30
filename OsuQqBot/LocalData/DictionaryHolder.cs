@@ -10,6 +10,10 @@ namespace OsuQqBot.LocalData
             base(path, new Dictionary<TKey, TValue>())
         { }
 
+        public DictionaryHolder(string path, Dictionary<TKey, TValue> dictionary) :
+            base(path, dictionary)
+        { }
+
         public TValue GetValueOrDefault(TKey key, TValue defaultValue) =>
             Read<TValue>(dictionary => dictionary.TryGetValue(key, out var value) ? value : defaultValue);
 
@@ -61,5 +65,21 @@ namespace OsuQqBot.LocalData
 
         public bool Delete(TKey key) =>
             Write(dictionary => dictionary.Remove(key));
+
+        //public class ValueCachedDictionaryHolder : DictionaryHolder<TKey, TValue>
+        //{
+        //    private IReadOnlyList<TValue> _cache;
+
+        //    public ValueCachedDictionaryHolder(string path) : base(path) =>
+        //        _cache = Read(d => new List<TValue>(d.Values));
+
+        //    public ValueCachedDictionaryHolder(string path, Dictionary<TKey, TValue> dictionary) :
+        //        base(path, dictionary) =>
+        //        _cache = Read(d => new List<TValue>(d.Values));
+
+
+
+        //    public IReadOnlyList<TValue> CachedValues => _cache;
+        //}
     }
 }

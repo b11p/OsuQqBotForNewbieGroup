@@ -3,6 +3,7 @@ using OsuQqBot.LocalData.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using static Newtonsoft.Json.JsonConvert;
 
@@ -64,6 +65,10 @@ namespace OsuQqBot.LocalData
                 }
                 NicknameData = DeserializeObject<Dictionary<string, long>>(nickData) ?? new Dictionary<string, long>();
                 Administrators = new DataHolder<ISet<long>>(AdministratorsPath, new HashSet<long>());
+                Tips = new DictionaryHolder<string, string>(TipsPath,
+                    new Dictionary<string, string>(StatelessFunctions.ManageTips.DefaultTips
+                        .Select(tip => new KeyValuePair<string, string>(tip.ToLowerInvariant(), tip))));
+
                 if (single == null) single = this;
             }
             catch (Exception e)
@@ -84,6 +89,7 @@ namespace OsuQqBot.LocalData
         /// </summary>
         string CachedFilename => Path.Combine(BindPath, "Cached.json");
 
+        #region Paths
         /// <summary>
         /// 存储昵称的目录
         /// </summary>
@@ -95,10 +101,21 @@ namespace OsuQqBot.LocalData
 
         string AdministratorsPath => Path.Combine(basePath, "adminlist.json");
 
+        string TipsPath => Path.Combine(basePath, "tips.json");
+        #endregion
+
         IDictionary<long, BindingData> BindData { get; set; }
         IDictionary<long, CachedData> CachedData { get; set; }
         IDictionary<string, long> NicknameData { get; set; }
         DataHolder<ISet<long>> Administrators { get; set; }
+        DictionaryHolder<string, string> Tips { get; set; }
+
+        private string[] _tipsCache = null;
+        private string[] TipsCache
+        {
+            get => _tipsCache ?? (_tipsCache = Tips.Read(t => t.Values.ToArray()));
+            set => _tipsCache = value;
+        }
 
         public long? Bind(long QQ, long uid, string source)
         {
@@ -237,6 +254,23 @@ namespace OsuQqBot.LocalData
 
         public IEnumerable<long> ListAdministrators() => Administrators.Read(set => new List<long>(set));
 
+        #region tips
+        public string[] ListTips() => TipsCache;
+
+        public bool AddTip(string tip) => Tips.Write(t =>
+        {
+            TipsCache = null;
+            return t.TryAdd(tip.ToLowerInvariant(), tip);
+        });
+
+        public bool DeleteTip(string tip) => Tips.Write(t =>
+        {
+            TipsCache = null;
+            return t.Remove(tip.ToLowerInvariant());
+        });
+        #endregion
+
+        #region commit (old)
         public void Commit()
         {
             CommitBind();
@@ -267,6 +301,7 @@ namespace OsuQqBot.LocalData
                 File.WriteAllText(NicknameFilename, SerializeObject(NicknameData, Formatting.Indented));
             }
         }
+        #endregion
 
         //public void CommitManually()
         //{
