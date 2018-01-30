@@ -57,11 +57,11 @@ namespace OsuQqBot.StatelessFunctions
                     break;
                 case "add":
                     if (commonds.Length < 3) return;
-                    AddTip(endPoint, commonds[2]);
+                    AddTip(endPoint, OsuQqBot.QqApi.AfterReceive(commonds[2]));
                     break;
                 case "delete":
                     if (commonds.Length < 3) return;
-                    DeleteTip(endPoint, commonds[2]);
+                    DeleteTip(endPoint, OsuQqBot.QqApi.AfterReceive(commonds[2]));
                     break;
                 default:
                     break;
@@ -72,7 +72,7 @@ namespace OsuQqBot.StatelessFunctions
         {
             string[] tips = LocalData.Database.Instance.ListTips();
             string result = string.Join(Environment.NewLine, tips);
-            OsuQqBot.QqApi.SendMessageAsync(endPoint, result);
+            OsuQqBot.QqApi.SendMessageAsync(endPoint, OsuQqBot.QqApi.BeforeSend(result));
         }
 
         private void AddTip(EndPoint endPoint, string newTip) =>

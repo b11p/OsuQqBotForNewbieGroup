@@ -179,5 +179,6 @@ namespace OsuQqBotHttp
         }
 
         public string BeforeSend(string message) => message.Replace("&", "&amp;").Replace("[", "&#91;").Replace("]", "&#93;");
+        public string AfterReceive(string message) => message.Replace("&#91;", "[").Replace("&#93;", "]").Replace("&amp;", "&");
     }
 }

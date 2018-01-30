@@ -55,7 +55,9 @@ namespace OsuQqBot
                 {
                     try
                     {
-                        var (success, info) = await ProcessQuery(username: message.Trim().Substring("where".Length).Trim());
+                        string uNameToQuery = message.Trim().Substring("where".Length).Trim();
+                        if (string.IsNullOrEmpty(uNameToQuery)) return;
+                        var (success, info) = await ProcessQuery(username: uNameToQuery);
                         this.qq.SendMessageAsync(endPoint, this.qq.BeforeSend(info));
                     }
                     catch (Exception e)

@@ -131,11 +131,21 @@ namespace OsuQqBot
             else if (!users.Any()) { success = false; message = "没这个人！"; }
             else
             {
-                User user = users[0];
-                var history = mode == Mode.Std || mode == Mode.Unspecified ? await MotherShipApi.GetUserNearest(uid) : null;
+                try
+                {
+                    User user = users[0];
+                    var history = mode == Mode.Std || mode == Mode.Unspecified ? await MotherShipApi.GetUserNearest(uid) : null;
 
-                message = BuildQueryMessage(mode, user, history);
-                success = true;
+                    message = BuildQueryMessage(mode, user, history);
+                    success = true;
+                }
+                catch(ArgumentNullException e)
+                {
+                    Logger.Log("这是非常重要的异常记录！");
+                    Logger.LogException(e);
+                    Logger.Log(Newtonsoft.Json.JsonConvert.SerializeObject(users[0]));
+                    return (false, "未知异常，真的是未知的，咩咩找了好久都没找出来，请联系咩咩并且告诉他最近做了什么操作");
+                }
             }
             return (success, message);
         }
@@ -245,7 +255,7 @@ namespace OsuQqBot
             //    ), true);
             //}
             //else 
-            if (memberList.Any(m => m.Qq == 1335734629) &&
+            if ((memberList?.Any(m => m.Qq == 1335734629) ?? false) &&
                 !(para.Length > 0 && !para.StartsWith('#')))
             {// 白菜
                 if (para.Length > 0) para = " " + para;

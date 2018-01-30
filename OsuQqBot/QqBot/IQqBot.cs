@@ -23,5 +23,12 @@ namespace OsuQqBot.QqBot
         /// <param name="message"></param>
         /// <returns></returns>
         string BeforeSend(string message);
+
+        /// <summary>
+        /// 转换出原始消息
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        string AfterReceive(string message);
     }
 }
