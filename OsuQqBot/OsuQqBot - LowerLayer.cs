@@ -11,6 +11,11 @@ namespace OsuQqBot
             if (new StatelessFunctions.ManageTips().ProcessMessage(endPoint, source, message)) return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～"))
             {
+                if (source.FromQq == 1677323371)
+                {
+                    qq.SendMessageAsync(endPoint, "不查，浪费资源");
+                    return;
+                }
                 var uid = FindUid(source.FromQq).Result;
                 if (uid == null)
                 {
