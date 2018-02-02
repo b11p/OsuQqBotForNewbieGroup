@@ -9,6 +9,7 @@ namespace OsuQqBot
         public void ProcessMessage(EndPoint endPoint, MessageSource source, string message)
         {
             if (new StatelessFunctions.ManageTips().ProcessMessage(endPoint, source, message)) return;
+            if (new StatelessFunctions.IntIsMeimei().ProcessMessage(endPoint, source, message)) return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～"))
             {
                 if (source.FromQq == 1677323371)
