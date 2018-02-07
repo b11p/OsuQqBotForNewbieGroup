@@ -30,5 +30,7 @@ namespace OsuQqBot.QqBot
         /// <param name="message"></param>
         /// <returns></returns>
         string AfterReceive(string message);
+
+        string At(long qq);
     }
 }

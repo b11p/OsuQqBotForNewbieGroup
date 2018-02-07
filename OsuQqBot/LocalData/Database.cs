@@ -254,7 +254,7 @@ namespace OsuQqBot.LocalData
 
         public IEnumerable<long> ListAdministrators() => Administrators.Read(set => new List<long>(set));
 
-        #region tips
+        #region tips添加、删除和读取
         public string[] ListTips() => TipsCache;
 
         public bool AddTip(string tip) => Tips.Write(t =>
@@ -268,6 +268,11 @@ namespace OsuQqBot.LocalData
             TipsCache = null;
             return t.Remove(tip.ToLowerInvariant());
         });
+        #endregion
+
+        #region chart
+
+        
         #endregion
 
         #region commit (old)

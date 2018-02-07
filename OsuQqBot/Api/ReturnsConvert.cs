@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OsuQqBot.Api
 {
@@ -360,10 +361,17 @@ namespace OsuQqBot.Api
 
         private Beatmap _beatmap;
 
-        public Beatmap Beatmap
+        /// <summary>
+        /// 此方法线程不安全（根本未实现）
+        /// </summary>
+        /// <param name="api"></param>
+        /// <returns></returns>
+        public async System.Threading.Tasks.Task<Beatmap> GetBeatmapAsync(OsuApiClient api)
         {
-            get => _beatmap;
-            set => _beatmap = value;
+            if (_beatmap != null) return _beatmap;
+
+            var beatmap = await api.GetBeatmapAsync(BeatmapId);
+            throw new NotImplementedException();
         }
 
         public long BeatmapId { get; private set; }
