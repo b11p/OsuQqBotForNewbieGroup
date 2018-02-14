@@ -80,6 +80,7 @@ namespace OsuQqBotHttp
                             ProcessMessage(json);
                             break;
                         case "event":
+                            ProcessEvent(json);
                             break;
                         case "request":
                             break;
@@ -165,7 +166,7 @@ namespace OsuQqBotHttp
             switch (e._event)
             {
                 case "group_admin":
-                    _qq.
+                    _qq.GroupAdminChanging(JsonConvert.DeserializeObject<GroupAdminChanged>(json));
                     break;
                 default:
                     break;
