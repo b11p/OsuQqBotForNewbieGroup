@@ -9,6 +9,10 @@ namespace OsuQqBot.LocalData.DataTypes
     /// </summary>
     class Chart
     {
+        public int ChartID { get; set; }
+
+        public string Title { get; set; }
+
         public IList<long> Maps { get; set; }
 
         public DateTime StartTime { get; set; }

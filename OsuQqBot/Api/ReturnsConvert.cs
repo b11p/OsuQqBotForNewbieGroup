@@ -32,21 +32,33 @@ namespace OsuQqBot.Api
 
         public static implicit operator User(UserRaw raw)
         {
-            return new User
+            try
             {
-                Id = long.Parse(raw.user_id),
-                Name = raw.username,
-                Tth = long.Parse(raw.count300) + long.Parse(raw.count100) + long.Parse(raw.count50),
-                PlayCount = int.Parse(raw.playcount),
-                RankedScore = long.Parse(raw.ranked_score),
-                TotalScore = long.Parse(raw.total_score),
-                Rank = int.Parse(raw.pp_rank),
-                Level = double.Parse(raw.level),
-                PP = double.Parse(raw.pp_raw),
-                Accuracy = double.Parse(raw.accuracy),
-                Country = countries.GetValueOrDefault(raw.country, raw.country),
-                CountryRank = int.Parse(raw.pp_country_rank),
-            };
+                return new User
+                {
+                    Id = long.Parse(raw.user_id),
+                    Name = raw.username,
+                    Tth = long.Parse(raw.count300) + long.Parse(raw.count100) + long.Parse(raw.count50),
+                    PlayCount = int.Parse(raw.playcount),
+                    RankedScore = long.Parse(raw.ranked_score),
+                    TotalScore = long.Parse(raw.total_score),
+                    Rank = int.Parse(raw.pp_rank),
+                    Level = double.Parse(raw.level),
+                    PP = double.Parse(raw.pp_raw),
+                    Accuracy = double.Parse(raw.accuracy),
+                    Country = countries.GetValueOrDefault(raw.country, raw.country),
+                    CountryRank = int.Parse(raw.pp_country_rank),
+                };
+            }
+            catch (ArgumentNullException)
+            {
+                return new User
+                {
+                    Id = long.Parse(raw.user_id),
+                    Name = raw.username,
+                    Country = countries.GetValueOrDefault(raw.country, raw.country),
+                };
+            }
         }
 
         private static Dictionary<string, string> countries = new Dictionary<string, string>
