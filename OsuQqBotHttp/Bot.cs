@@ -14,12 +14,32 @@ namespace OsuQqBotHttp
         static readonly string server = "http://127.0.0.1:5700";
         static readonly string privatePath = "/send_private_msg_async";
         static readonly string groupPath = "/send_group_msg_async";
+        static readonly string discussPath = "/send_discuss_msg_async";
         static readonly string groupMemberInfoPath = "/get_group_member_info";
         static readonly string groupMemberListPath = "/get_group_member_list";
         static readonly string loginInfoPath = "/get_login_info";
 
+        private ICollection<GroupAdminChangeEventHandler> groupAdminChange = new LinkedList<GroupAdminChangeEventHandler>();
+
+        public event GroupAdminChangeEventHandler GroupAdminChange
+        {
+            add => groupAdminChange.Add(value);
+            remove => groupAdminChange.Remove(value);
+        }
+
+        internal void GroupAdminChanging(GroupAdminChanged data)
+        {
+            var args = data.ToGroupAdminChangeEventArgs();
+            foreach (var handler in groupAdminChange)
+            {
+                handler.Invoke(this, args);
+                if (args.Handled) break;
+            }
+        }
+
         static string PrivateUrl => server + privatePath;
         static string GroupUrl => server + groupPath;
+        static string DiscussUrl => server + discussPath;
         static string GroupMemberInfoUrl => server + groupMemberInfoPath;
         static string GroupMemberListUrl => server + groupMemberListPath;
         static string LoginInfoUrl => server + loginInfoPath;
@@ -56,7 +76,14 @@ namespace OsuQqBotHttp
             return result;
         }
 
-        public string GetLoginName() => throw new NotImplementedException();
+        public string GetLoginName()
+        {
+            string json = JsonConvert.SerializeObject(new { });
+            var resultStr = Post(LoginInfoUrl, json).Result;
+            dynamic response = JsonConvert.DeserializeObject(resultStr);
+            return response.data.nickname;
+        }
+
         public long GetLoginQq()
         {
             string json = JsonConvert.SerializeObject(new { });
@@ -105,6 +132,27 @@ namespace OsuQqBotHttp
                 auto_escape = auto_escape
             });
             await Post(PrivateUrl, json);
+        }
+
+        public async void SendDiscussMessageAsync(long discuss_id, string message)
+        {
+            string json = JsonConvert.SerializeObject(new
+            {
+                discuss_id = discuss_id,
+                message = message,
+            });
+            await Post(DiscussUrl, json);
+        }
+
+        public async void SendDiscussMessageAsync(long discuss_id, string message, bool auto_escape)
+        {
+            string json = JsonConvert.SerializeObject(new
+            {
+                discuss_id = discuss_id,
+                message = message,
+                auto_escape = auto_escape,
+            });
+            await Post(DiscussUrl, json);
         }
 
         private static async System.Threading.Tasks.Task<string> Post(string url, string json)

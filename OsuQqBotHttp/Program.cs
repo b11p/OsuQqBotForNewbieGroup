@@ -57,9 +57,13 @@ namespace OsuQqBotHttp
         {
             if (port <= 0 || port >= 65536) throw new ArgumentException(nameof(port));
             Port = port;
+
+            osuBot = new OsuQqBot.OsuQqBot(_qq);
         }
 
-        OsuQqBot.OsuQqBot osuBot = new OsuQqBot.OsuQqBot(new QqBot());
+        QqBot _qq = new QqBot();
+
+        OsuQqBot.OsuQqBot osuBot;
 
         public int Port { get; private set; }
 
@@ -155,6 +159,18 @@ namespace OsuQqBotHttp
             }
         }
 
+        void ProcessEvent(string json)
+        {
+            var e = JsonConvert.DeserializeObject<Event>(json);
+            switch (e._event)
+            {
+                case "group_admin":
+                    _qq.
+                    break;
+                default:
+                    break;
+            }
+        }
 
         public void Listen()
         {

@@ -48,6 +48,27 @@ namespace OsuQqBot
             if (ignorePPList == null) ignorePPList = new HashSet<long>();
 
             apiClient = new OsuApiClient(config.ApiKey);
+
+            qq.GroupAdminChange += OnGroupAdminChanged;
+        }
+
+        private void OnGroupAdminChanged(IQqBot sender, GroupAdminChangeEventArgs e)
+        {
+            string message;
+            switch (e.Type)
+            {
+                case GroupAdminChangeEventArgs.GroupAdminChangeType.Set:
+                    message = "新的狗管理诞生了";
+                    break;
+                case GroupAdminChangeEventArgs.GroupAdminChangeType.Unset:
+                    message = "从现在起，你就是狗群员了，给我老实点";
+                    break;
+                default:
+                    return;
+            }
+            message = sender.At(e.UserId) + " " + message;
+            sender.SendGroupMessageAsync(e.GroupId, message);
+            e.Handled = true;
         }
 
         /// <summary>

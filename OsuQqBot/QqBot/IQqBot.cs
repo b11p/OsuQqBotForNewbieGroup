@@ -13,6 +13,8 @@ namespace OsuQqBot.QqBot
         void SendPrivateMessageAsync(long qq, string message, bool isPlainText);
         void SendGroupMessageAsync(long group, string message);
         void SendGroupMessageAsync(long group, string message, bool isPlainText);
+        void SendDiscussMessageAsync(long discuss, string message);
+        void SendDiscussMessageAsync(long discuss, string message, bool isPlainText);
 
         void SendMessageAsync(EndPoint endPoint, string message);
         void SendMessageAsync(EndPoint endPoint, string message, bool isPlainText);
@@ -32,5 +34,7 @@ namespace OsuQqBot.QqBot
         string AfterReceive(string message);
 
         string At(long qq);
+
+        event GroupAdminChangeEventHandler GroupAdminChange;
     }
 }
