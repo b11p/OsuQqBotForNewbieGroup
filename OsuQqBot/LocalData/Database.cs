@@ -102,6 +102,8 @@ namespace OsuQqBot.LocalData
         string AdministratorsPath => Path.Combine(basePath, "adminlist.json");
 
         string TipsPath => Path.Combine(basePath, "tips.json");
+
+        string ChartPath => Path.Combine(basePath, "chart");
         #endregion
 
         IDictionary<long, BindingData> BindData { get; set; }
@@ -109,6 +111,7 @@ namespace OsuQqBot.LocalData
         IDictionary<string, long> NicknameData { get; set; }
         DataHolder<ISet<long>> Administrators { get; set; }
         DictionaryHolder<string, string> Tips { get; set; }
+        DataHolder<List<Chart>> ChartList { get; set; }
 
         private string[] _tipsCache = null;
         private string[] TipsCache
@@ -271,8 +274,9 @@ namespace OsuQqBot.LocalData
         #endregion
 
         #region chart
+        public IEnumerable<(int id, string title)> GetChartList() => ChartList.Read(list => list.Select(chart => (chart.ChartID, chart.Title)));
+        public Chart GetChart(string title) => ChartList.Read(list => list.Find(chart => chart.Title.ToLowerInvariant() == title.ToLowerInvariant()));
 
-        
         #endregion
 
         #region commit (old)
