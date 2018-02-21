@@ -229,5 +229,6 @@ namespace OsuQqBotHttp
         public string BeforeSend(string message) => message.Replace("&", "&amp;").Replace("[", "&#91;").Replace("]", "&#93;").Replace(",", "&#44;");
         public string AfterReceive(string message) => message.Replace("&#44;", ",").Replace(" &#91;", "[").Replace("&#93;", "]").Replace("&amp;", "&");
         public string At(long qq) => $"[CQ:at,qq={qq}]";
+        public string LocalImage(string path) => $"[CQ:image,file=file://{path}]";
     }
 }

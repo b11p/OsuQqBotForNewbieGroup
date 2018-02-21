@@ -35,6 +35,8 @@ namespace OsuQqBot.QqBot
 
         string At(long qq);
 
+        string LocalImage(string path);
+
         event GroupAdminChangeEventHandler GroupAdminChange;
     }
 }
