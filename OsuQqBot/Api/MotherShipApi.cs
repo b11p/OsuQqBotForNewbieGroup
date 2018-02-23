@@ -51,6 +51,8 @@ namespace OsuQqBot.Api
             return Nope;
         }
 
+        public static string GetStatUrl(long uid) => $"http://www.mothership.top:8080/api/v1/stat/{uid}";
+
         private class MotherShipReturns
         {
             public int code { get; set; }
