@@ -373,7 +373,7 @@ namespace OsuQqBot
             else //if (commonds[0] == "帮助")
             {
                 string help = "";
-                switch (commonds[0])
+                switch (commonds[0].ToLowerInvariant())
                 {
                     case "帮助":
                         help = @"查看帮助
@@ -405,6 +405,13 @@ namespace OsuQqBot
 选项：
 用户名 要绑定的账号";
                         break;
+                    case "where":
+                        help = @"查询某个玩家的信息（暂只支持std）
+用法：where <用户名>
+示例：where daloubot
+选项：
+用户名 要查询的玩家名称";
+                        break;
                     default:
                         break;
                 }
@@ -422,6 +429,7 @@ namespace OsuQqBot
 帮助 显示帮助
 ~ 查询个人信息
 绑定 绑定osu!账号
+where 查询某个osu!玩家
 
 使用命令“帮助 <命令>”查看特定命令的帮助";
             this.qq.SendMessageAsync(endPoint, help);
