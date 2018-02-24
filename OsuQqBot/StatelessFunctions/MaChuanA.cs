@@ -18,7 +18,7 @@ namespace OsuQqBot.StatelessFunctions
                 if (!uid.HasValue) return true;
                 string url = MotherShipApi.GetStatUrl(uid.Value);
                 var api = OsuQqBot.QqApi;
-                string content = api.OnlineImage(url);
+                string content = api.OnlineImage(url, true);
                 api.SendMessageAsync(endPoint, content);
             }
             return false;
