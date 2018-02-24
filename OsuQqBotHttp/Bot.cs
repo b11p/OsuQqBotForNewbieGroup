@@ -231,5 +231,6 @@ namespace OsuQqBotHttp
         public string At(long qq) => $"[CQ:at,qq={qq}]";
         public string LocalImage(string path) => $"[CQ:image,file=file://{path}]";
         public string OnlineImage(string url) => $"[CQ:image,file={url}]";
+        public string OnlineImage(string url, bool noCache) => $"[CQ:image,{(noCache ? "cache=0," : "")}file={url}]";
     }
 }
