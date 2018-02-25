@@ -275,7 +275,8 @@ namespace OsuQqBot
         /// <param name="para"></param>
         private async Task SendQueryMessage(long group, long uid, string para = "")
         {
-            var memberList = qq.GetGroupMemberList(group);
+            //var memberList = qq.GetGroupMemberList(group);
+            #region BanchoBot
             //if (memberList.Any(m => m.Qq == 2478057279))
             //{// inter
             //    this.qq.SendGroupMessageAsync(group, $"!stats {uid}" +
@@ -286,13 +287,16 @@ namespace OsuQqBot
             //    ), true);
             //}
             //else 
-            if ((memberList?.Any(m => m.Qq == 1335734629) ?? false) &&
-                !(para.Length > 0 && !para.StartsWith('#')))
-            {// 白菜
-                if (para.Length > 0) para = " " + para;
-                this.qq.SendGroupMessageAsync(group, $"!statu {uid}{para}", true);
-            }
-            else
+            #endregion
+            #region 白菜
+            //if ((memberList?.Any(m => m.Qq == 1335734629) ?? false) &&
+            //    !(para.Length > 0 && !para.StartsWith('#')))
+            //{// 白菜
+            //    if (para.Length > 0) para = " " + para;
+            //    this.qq.SendGroupMessageAsync(group, $"!statu {uid}{para}", true);
+            //}
+            //else
+            #endregion
             {
                 (bool success, string message) = await ProcessQuery(uid, para);
                 if (success)
