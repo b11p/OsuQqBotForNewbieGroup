@@ -86,7 +86,7 @@ namespace OsuQqBot.StatelessFunctions
             regex[0] = new Regex(@"^(?:\S|\S.*?\S) - (?:\S|\S.*?\S) \[(?:\S|\S.*\S)]$", RegexOptions.Compiled);
             regex[1] = new Regex(@"^Beatmap by (?:\S|\S.*\S)$", RegexOptions.Compiled);
             regex[2] = new Regex(@"^https:\/\/osu.ppy.sh\/b\/(\d+)$", RegexOptions.Compiled);
-            regex[3] = new Regex(@"^(?:Mods: \S+ )?Rank: [ABCDSXF] Star: (\d*\.\d{2})\*$", RegexOptions.Compiled);
+            regex[3] = new Regex(@"^(?:Mods: \S+ )?Rank: (?:[ABCDSXF]|SH|XH) Star: (\d*\.\d{2})\*$", RegexOptions.Compiled);
             regex[4] = new Regex(@"^$", RegexOptions.Compiled);
             regex[5] = new Regex(@"^对比: \(现在 \/ fc \/ 98%\)$", RegexOptions.Compiled);
             regex[6] = new Regex(@"^\d{1,3}\.\d{2}% \/ \d{1,3}\.\d{2}% \/ 98\.00%$", RegexOptions.Compiled);
