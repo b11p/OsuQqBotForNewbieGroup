@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OsuQqBot.QqBot;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -184,6 +185,7 @@ namespace OsuQqBotHttp
                     while (true)
                     {
                         var context = listener.GetContext();
+                        var sw = Stopwatch.StartNew();
                         using (var inputStream = context.Request.InputStream)
                         using (StreamReader sr = new StreamReader(inputStream))
                         {
@@ -191,6 +193,7 @@ namespace OsuQqBotHttp
                             Console.WriteLine(message);
                             ProcessPost(message);
                         }
+                        Console.WriteLine(sw.Elapsed);
                     }
                 }
             }
