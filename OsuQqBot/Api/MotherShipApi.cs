@@ -45,7 +45,7 @@ namespace OsuQqBot.Api
             if (Nope == null) // 如果没找到记录，就访问妈船API让白菜开始记录
                 using (HttpClient httpClient = new HttpClient())
                     try
-                    { using (await httpClient.GetStreamAsync($"http://www.mothership.top:8080/api/v1/stat/{uid}")) { } }
+                    { using (await httpClient.GetStreamAsync(GetStatUrl(uid))) { } }
                     catch (HttpRequestException)
                     { }
             return Nope;
