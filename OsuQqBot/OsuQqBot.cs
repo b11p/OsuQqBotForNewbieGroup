@@ -540,6 +540,16 @@ where 查询某个osu!玩家
             return false;
         }
 
+        private async Task<string> QueryFromQq(long qq, string param = "")
+        {
+            long? aimUid = await FindUid(qq);
+            if (aimUid.HasValue)
+                if (aimUid.Value != 0)
+                    return (await ProcessQuery(aimUid.Value, param)).info;
+                else return "此人未绑定id";
+            return "网络错误";
+        }
+
         private async Task<bool> Where(EndPoint endPoint, string where)
         {
             string[] coms = where.Split(',', '，');

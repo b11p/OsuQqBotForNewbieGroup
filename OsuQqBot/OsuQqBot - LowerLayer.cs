@@ -1,5 +1,6 @@
 ﻿using OsuQqBot.QqBot;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace OsuQqBot
@@ -66,6 +67,14 @@ namespace OsuQqBot
                     {
                         string uNameToQuery = message.Trim().Substring("where".Length).Trim();
                         if (string.IsNullOrEmpty(uNameToQuery)) return;
+                        const string pattern = @"^qq\s*=\s*(\d+)$";
+                        var match = Regex.Match(uNameToQuery, pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        if (match.Success)
+                        {
+                            long qq = long.Parse(match.Groups[1].Value);
+                            this.qq.SendMessageAsync(endPoint, await QueryFromQq(qq));
+                            return;
+                        }
                         var (success, info) = await ProcessQuery(username: uNameToQuery);
                         this.qq.SendMessageAsync(endPoint, this.qq.BeforeSend(info));
                     }
