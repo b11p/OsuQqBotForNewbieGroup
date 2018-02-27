@@ -55,8 +55,7 @@ namespace OsuQqBot.StatelessFunctions
             }
             if (star >= 5.5m)
             {
-                api.SendMessageAsync(endPoint, "This is a test.\r\nLast !rctpp: " + star + "*");
-                return true;
+                NotifyOverstar(g, star);
             }
             return false;
         }
