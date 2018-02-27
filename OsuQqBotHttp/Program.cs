@@ -3,6 +3,7 @@ using OsuQqBot.QqBot;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
@@ -178,16 +179,17 @@ namespace OsuQqBotHttp
         {
             try
             {
-                using (System.Net.HttpListener listener = new System.Net.HttpListener())
+                using (var listener = new HttpListener())
                 {
                     listener.Prefixes.Add($"http://127.0.0.1:{Port}/");
                     listener.Start();
                     while (true)
                     {
                         var context = listener.GetContext();
+                        if (!IPAddress.IsLoopback(context.Request.RemoteEndPoint.Address)) continue;
                         var sw = Stopwatch.StartNew();
                         using (var inputStream = context.Request.InputStream)
-                        using (StreamReader sr = new StreamReader(inputStream))
+                        using (var sr = new StreamReader(inputStream))
                         {
                             var message = sr.ReadToEnd();
                             Console.WriteLine(message);
