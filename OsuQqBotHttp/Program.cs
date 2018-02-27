@@ -192,6 +192,7 @@ namespace OsuQqBotHttp
                             var message = sr.ReadToEnd();
                             Console.WriteLine(message);
                             ProcessPost(message);
+                            using (context.Response) { }
                         }
                         Console.WriteLine(sw.Elapsed);
                     }
