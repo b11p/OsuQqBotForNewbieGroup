@@ -62,9 +62,9 @@ namespace OsuQqBot.StatelessFunctions
 
         private static void NotifyFail(string message, int i)
         {
-            var api = OsuQqBot.QqApi;
-            api.SendPrivateMessageAsync(manager, "第" + (i + 1) + "行匹配失败");
-            api.SendPrivateMessageAsync(manager, message, true);
+            //var api = OsuQqBot.QqApi;
+            //api.SendPrivateMessageAsync(manager, "第" + (i + 1) + "行匹配失败");
+            //api.SendPrivateMessageAsync(manager, message, true);
         }
 
         private static void NotifyOverstar(GroupEndPoint g, decimal star)
@@ -83,7 +83,7 @@ namespace OsuQqBot.StatelessFunctions
         static CannotOverStar()
         {
             regex = new Regex[9];
-            regex[0] = new Regex(@"^(?:\S|\S.*?\S) - (?:\S|\S.*?\S) \[(?:\S|\S.*\S)]$", RegexOptions.Compiled);
+            regex[0] = new Regex(@"^.*? - .*? \[(?:\S|\S.*\S)]$", RegexOptions.Compiled); // 非贪婪匹配可能有性能提升，在不完全的测试中证实了这一点
             regex[1] = new Regex(@"^Beatmap by (?:\S|\S.*\S)$", RegexOptions.Compiled);
             regex[2] = new Regex(@"^https:\/\/osu.ppy.sh\/b\/(\d+)$", RegexOptions.Compiled);
             regex[3] = new Regex(@"^(?:Mods: \S+ )?Rank: (?:[ABCDSXF]|SH|XH) Star: (\d*\.\d{2})\*$", RegexOptions.Compiled);
