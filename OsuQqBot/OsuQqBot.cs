@@ -155,7 +155,7 @@ namespace OsuQqBot
                 try
                 {
                     User user = users[0];
-                    var history = mode == Mode.Std || mode == Mode.Unspecified ? await MotherShipApi.GetUserNearest(uid) : null;
+                    var history = await MotherShipApi.GetUserNearest(uid, mode);
 
                     message = BuildQueryMessage(mode, user, history);
                     success = true;
