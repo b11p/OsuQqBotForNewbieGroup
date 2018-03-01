@@ -41,6 +41,7 @@ namespace OsuQqBot.Api
 
         public static async Task<MotherShipUserData> GetUserNearest(long uid, Mode mode = Mode.Std)
         {
+            if (mode == Mode.Unspecified) mode = Mode.Std;
             var Nope = await CallApi<MotherShipUserData>($"http://www.mothership.top:8080/api/v1/userinfo/nearest/{uid}?mode={(int)mode}");
             if (Nope == null)
             {   // 如果没找到记录，就访问妈船API让白菜开始记录
@@ -56,7 +57,11 @@ namespace OsuQqBot.Api
             return Nope;
         }
 
-        public static string GetStatUrl(long uid, Mode mode = Mode.Std) => $"http://www.mothership.top:8080/api/v1/stat/{uid}?mode={(int)mode}";
+        public static string GetStatUrl(long uid, Mode mode = Mode.Std)
+        {
+            if (mode == Mode.Unspecified) mode = Mode.Std;
+            return $"http://www.mothership.top:8080/api/v1/stat/{uid}?mode={(int)mode}";
+        }
 
         private class MotherShipReturns
         {
