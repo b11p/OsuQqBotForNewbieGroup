@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using OsuQqBot.QqBot;
 
@@ -10,7 +11,25 @@ namespace OsuQqBot.StatelessFunctions
         private const long bot = 1677323371;
         private const double limit = 5.5;
 
-        private const long manager = 962549599;
+        private const long admin = 962549599;
+
+        private static readonly IReadOnlyList<long> managerList = new List<long>
+        {
+            962549599, // 咩咩
+            2541721178, // heisiban
+            546748348, // 化学式
+            1012621328, // 咪咪
+            2482000231, // 杰克王
+        };
+
+        private static readonly Random random = new Random();
+
+        private static long RandomManager()
+        {
+            int length = managerList.Count;
+            var wanted = random.Next(length);
+            return managerList[wanted];
+        }
 
         private static readonly string img = @"C:\Users\Administrator\OneDrive - NTUA\Server\image\我真想禁你言.jpg";
 
@@ -63,8 +82,8 @@ namespace OsuQqBot.StatelessFunctions
         private static void NotifyFail(string message, int i)
         {
             var api = OsuQqBot.QqApi;
-            api.SendPrivateMessageAsync(manager, "第" + (i + 1) + "行匹配失败");
-            api.SendPrivateMessageAsync(manager, message, true);
+            api.SendPrivateMessageAsync(admin, "第" + (i + 1) + "行匹配失败");
+            api.SendPrivateMessageAsync(admin, message, true);
         }
 
         private static void NotifyOverstar(GroupEndPoint g, decimal star)
@@ -76,7 +95,7 @@ namespace OsuQqBot.StatelessFunctions
             string imgMessage = api.LocalImage(img);
             string hint = (hours != 0 ? hours + "h " : "") + (minutes != 0 ? minutes + "min " : "");
             api.SendMessageAsync(g, imgMessage + api.BeforeSend(hint));
-            api.SendMessageAsync(g, api.At(962549599));
+            api.SendMessageAsync(g, api.At(RandomManager()));
         }
 
         private static readonly Regex[] regex;
