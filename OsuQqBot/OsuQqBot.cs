@@ -604,7 +604,14 @@ where 查询某个osu!玩家
                     }
                     else
                     {
-                        this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} 你好，请将群名片改为osu!中的名字，以便互相认识。");
+                        string inGroupName = this.qq.GetGroupMemberInfo(fromGroup, fromQq)?.InGroupName;
+                        if (inGroupName?.StartsWith("【无ID】") ?? false)
+                        {
+                            if (!lastCheckTime.TryAdd(fromQq, DateTime.UtcNow)) lastCheckTime[fromQq] = DateTime.UtcNow;
+                            this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} 你好，请尽快注册，并修改群名片。");
+                        }
+                        else
+                            this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} 你好，请将群名片改为osu!中的名字，以便互相认识。如果暂时没有 ID，请保证群名片以“【无ID】”开头。");
                     }
                 }
                 else
