@@ -156,6 +156,7 @@ namespace OsuQqBotHttp
                 case "anonymous":
                     break;
                 case "notice":
+
                     break;
                 default:
                     break;
@@ -165,7 +166,7 @@ namespace OsuQqBotHttp
         void ProcessEvent(string json)
         {
             var e = JsonConvert.DeserializeObject<Event>(json);
-            switch (e._event)
+            switch (e.EventType)
             {
                 case "group_admin":
                     _qq.GroupAdminChanging(JsonConvert.DeserializeObject<GroupAdminChanged>(json));

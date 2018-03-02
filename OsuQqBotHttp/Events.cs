@@ -7,7 +7,7 @@ namespace OsuQqBotHttp
     public class Event : Post
     {
         [Newtonsoft.Json.JsonProperty("event")]
-        public string _event { get; set; }
+        public string EventType { get; set; }
     }
 
     public class GroupAdminChanged : Event

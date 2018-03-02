@@ -4,6 +4,8 @@ namespace OsuQqBot.QqBot
 {
     public delegate void GroupAdminChangeEventHandler(IQqBot sender, GroupAdminChangeEventArgs e);
 
+    public delegate void GroupNoticeEventHandler(IQqBot sender, GroupNoticeEventArgs e);
+
     public abstract class QqEventArgs : EventArgs
     {
         public DateTime Time { get; set; }
@@ -21,5 +23,11 @@ namespace OsuQqBot.QqBot
             Set,
             Unset,
         }
+    }
+
+    public class GroupNoticeEventArgs : QqEventArgs
+    {
+        public long GroupId { get; }
+        public string Info { get; }
     }
 }
