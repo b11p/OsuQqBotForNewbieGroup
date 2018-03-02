@@ -39,19 +39,29 @@ namespace OsuQqBot.Api
             }
         }
 
-        public static async Task<MotherShipUserData> GetUserNearest(long uid)
+        public static async Task<MotherShipUserData> GetUserNearest(long uid, Mode mode = Mode.Std)
         {
-            var Nope = await CallApi<MotherShipUserData>($"http://www.mothership.top:8080/api/v1/userinfo/nearest/{uid}");
-            if (Nope == null) // 如果没找到记录，就访问妈船API让白菜开始记录
-                using (HttpClient httpClient = new HttpClient())
+            if (mode == Mode.Unspecified) mode = Mode.Std;
+            var Nope = await CallApi<MotherShipUserData>($"http://www.mothership.top:8080/api/v1/userinfo/nearest/{uid}?mode={(int)mode}");
+            if (Nope == null)
+            {   // 如果没找到记录，就访问妈船API让白菜开始记录
+                // 实际应该调用不到了
+                // 如果还是调用了，会有日志记录
+                Logger.Log($"为什么妈船还是没有这个人的数据啊。（uid={uid}, mode={mode})");
+                using (var httpClient = new HttpClient())
                     try
                     { using (await httpClient.GetStreamAsync(GetStatUrl(uid))) { } }
                     catch (HttpRequestException)
                     { }
+            }
             return Nope;
         }
 
-        public static string GetStatUrl(long uid) => $"http://www.mothership.top:8080/api/v1/stat/{uid}";
+        public static string GetStatUrl(long uid, Mode mode = Mode.Std)
+        {
+            if (mode == Mode.Unspecified) mode = Mode.Std;
+            return $"http://www.mothership.top:8080/api/v1/stat/{uid}?mode={(int)mode}";
+        }
 
         private class MotherShipReturns
         {
