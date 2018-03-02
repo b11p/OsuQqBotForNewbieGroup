@@ -82,8 +82,8 @@ namespace OsuQqBot.StatelessFunctions
         private static void NotifyFail(string message, int i)
         {
             var api = OsuQqBot.QqApi;
-            api.SendPrivateMessageAsync(admin, "第" + (i + 1) + "行匹配失败");
-            api.SendPrivateMessageAsync(admin, message, true);
+            //api.SendPrivateMessageAsync(admin, "第" + (i + 1) + "行匹配失败");
+            //api.SendPrivateMessageAsync(admin, message, true);
         }
 
         private static void NotifyOverstar(GroupEndPoint g, decimal star)
