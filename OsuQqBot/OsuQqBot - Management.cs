@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using OsuQqBot.QqBot;
 
 namespace OsuQqBot
 {
@@ -94,6 +97,36 @@ namespace OsuQqBot
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// 从群里接收命令，显示未绑定的群员。
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="qq"></param>
+        /// <returns></returns>
+        private bool ListUnbind(long group, long qq, string message)
+        {
+            if (!database.IsAdministrator(qq)) return false;
+            if (message != "列出未绑定的群友") return false;
+
+            var members = this.qq.GetGroupMemberList(group);
+            var ignore = ignoreList.Union(ignorePPList).Distinct();
+
+            var unbind = members.Where(m => !ignore.Contains(m.Qq) && FindUid(m.Qq).Result == 0);
+
+            var sb = new StringBuilder();
+            foreach (var item in unbind)
+            {
+                sb.AppendFormat("{0}({1})", item.InGroupOrNickname(), item.Qq);
+                sb.AppendLine();
+            }
+
+            sb.Append("---end---");
+
+            this.qq.SendGroupMessageAsync(group, sb.ToString(), true);
+
+            return true;
         }
     }
 }

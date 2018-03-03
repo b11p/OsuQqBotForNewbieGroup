@@ -122,6 +122,7 @@ namespace OsuQqBot
                 {
                     if (await UpdateUserBandingAsync(endPoint.GroupId, source.FromQq, message)) return;
                     if (await WhirIsBestAsync(endPoint.GroupId, source.FromQq, message)) return;
+                    if (ListUnbind(endPoint.GroupId, source.FromQq, message)) return;
                     await TestInGroupNameAsync(endPoint.GroupId, source.FromQq, message);
                 }
                 catch (Exception e)
