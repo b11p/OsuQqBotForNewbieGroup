@@ -89,6 +89,22 @@ namespace OsuQqBot
                 if (message.Split().Length > 1) ShowHelp(endPoint, message.Split()[1]);
                 else ShowHelp(endPoint);
             }
+            else if (message.Trim().StartsWith("bid"))
+            {
+                var match = Regex.Match(message.Trim(), "^bid (\\d+)$");
+                if (!match.Success) return;
+                string bidString = match.Groups[1].Value;
+                if (!int.TryParse(bidString, out int bid)) return;
+                var api = Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(osuApiKey);
+                var beatmaps = api.GetBeatmapsAsync(bid).Result;
+                if (beatmaps?.Length != 1) return;
+                var beatmap = beatmaps[0];
+                var result = string.Format(@"Beatmap {0}
+{1} - {2}[{3}]
+Beatmap by {4}
+Stars {5}", bid, beatmap.Artist, beatmap.Title, beatmap.DifficultyName, beatmap.Creator, beatmap.Stars.ToString(".##"));
+                qq.SendMessageAsync(endPoint, result);
+            }
             else
             {
                 bool done = false;

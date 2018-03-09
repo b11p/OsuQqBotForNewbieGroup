@@ -1,5 +1,5 @@
-﻿using OsuQqBot.Api;
-using OsuQqBot.Functions;
+﻿using Newtonsoft.Json;
+using OsuQqBot.Api;
 using OsuQqBot.QqBot;
 using System;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace OsuQqBot
             qq = qqBot;
             QqApi = qq;
             CurrentQq = qq.GetLoginQq();
-            Config config = Newtonsoft.Json.JsonConvert.DeserializeObject<Config>(File.ReadAllText(Paths.JsonConfigPath));
+            Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(Paths.JsonConfigPath));
             id_Kamisama = config.Kamisama;
             IdWhoLovesInt100Best = id_Kamisama;
             GroupId = config.MainGroup;
@@ -38,8 +38,8 @@ namespace OsuQqBot
                 var ignoreLines = File.ReadAllLines(Paths.IgnoreListPath);
                 if (ignoreLines.Length == 2)
                 {
-                    ignoreList = Newtonsoft.Json.JsonConvert.DeserializeObject<HashSet<long>>(ignoreLines[0]);
-                    ignorePPList = Newtonsoft.Json.JsonConvert.DeserializeObject<HashSet<long>>(ignoreLines[1]);
+                    ignoreList = JsonConvert.DeserializeObject<HashSet<long>>(ignoreLines[0]);
+                    ignorePPList = JsonConvert.DeserializeObject<HashSet<long>>(ignoreLines[1]);
                 }
             }
             catch (FileNotFoundException)
@@ -47,6 +47,7 @@ namespace OsuQqBot
             if (ignoreList == null) ignoreList = new HashSet<long>();
             if (ignorePPList == null) ignorePPList = new HashSet<long>();
 
+            osuApiKey = config.ApiKey;
             apiClient = new OsuApiClient(config.ApiKey);
 
             qq.GroupAdminChange += OnGroupAdminChanged;
@@ -362,7 +363,7 @@ namespace OsuQqBot
             {
                 this.qq.SendMessageAsync(sendBack, "在已绑定的情况下不允许修改，如需修改请联系 bleatingsheep。");
             }
-            else if(users.Length == 0)
+            else if (users.Length == 0)
             {
                 this.qq.SendMessageAsync(sendBack, "找不到用户，未更改绑定。");
             }
@@ -958,6 +959,7 @@ where 查询某个osu!玩家
         }
 
         private readonly OsuApiClient apiClient;
+        public static string osuApiKey { get; private set; }
 
         private readonly long CurrentQq;
     }
