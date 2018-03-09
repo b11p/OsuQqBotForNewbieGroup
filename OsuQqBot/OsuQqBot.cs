@@ -249,7 +249,9 @@ namespace OsuQqBot
             if (history != null)
             {
                 if (history.PP < user.PP) byLine[2] += " (+" + (user.PP - history.PP).ToString(".##") + ")";
+                else if (history.PP > user.PP) byLine[2] += " (-" + (history.PP - user.PP).ToString(".##") + ")";
                 if (history.Rank > user.Rank) byLine[3] += " (↑" + (history.Rank - user.Rank) + ")";
+                else if (history.Rank < user.Rank) byLine[3] += " (↓" + (user.Rank - history.Rank) + ")";
                 //if(history.RankedScore)
                 // 98.96934509277344 98.969345
                 // 99.02718353271484 99.02718
@@ -356,7 +358,14 @@ namespace OsuQqBot
 
             // 判断网络、判断已绑定。
             if (!find.HasValue || users == null) this.qq.SendMessageAsync(sendBack, "网络错误");
-            else if (find.Value != 0 || users.Length == 0) this.qq.SendMessageAsync(sendBack, "未更改绑定");
+            else if (find.Value != 0)
+            {
+                this.qq.SendMessageAsync(sendBack, "在已绑定的情况下不允许修改，如需修改请联系 bleatingsheep。");
+            }
+            else if(users.Length == 0)
+            {
+                this.qq.SendMessageAsync(sendBack, "找不到用户，未更改绑定。");
+            }
             else
             {
                 User u = users[0];
