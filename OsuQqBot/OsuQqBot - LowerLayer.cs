@@ -14,6 +14,7 @@ namespace OsuQqBot
             if (new StatelessFunctions.IntIsMeimei().ProcessMessage(endPoint, source, message)) return;
             if (new StatelessFunctions.Rinima().ProcessMessage(endPoint, source, message)) return;
             if (new StatelessFunctions.MaChuanA().ProcessMessage(endPoint, source, message)) return;
+            if (new StatelessFunctions.DalouRecommend().ProcessMessage(endPoint, source, message)) return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～") || message.Trim().StartsWith("∼"))
             {
                 if (source.FromQq == 1677323371)
@@ -99,10 +100,10 @@ namespace OsuQqBot
                 var beatmaps = api.GetBeatmapsAsync(bid).Result;
                 if (beatmaps?.Length != 1) return;
                 var beatmap = beatmaps[0];
-                var result = string.Format(@"Beatmap {0}
-{1} - {2}[{3}]
-Beatmap by {4}
-Stars {5}", bid, beatmap.Artist, beatmap.Title, beatmap.DifficultyName, beatmap.Creator, beatmap.Stars.ToString(".##"));
+                var result = $@"Beatmap {bid}
+{beatmap.Artist} - {beatmap.Title}[{beatmap.DifficultyName}]
+Beatmap by {beatmap.Creator}
+Stars {beatmap.Stars.ToString(".##")}";
                 qq.SendMessageAsync(endPoint, result);
             }
             else
