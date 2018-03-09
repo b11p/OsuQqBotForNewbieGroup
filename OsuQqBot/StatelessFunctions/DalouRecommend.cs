@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using OsuQqBot.QqBot;
@@ -11,6 +11,7 @@ namespace OsuQqBot.StatelessFunctions
     {
         private const long DalouBot = 1061566571;
         private const long Sheep = 962549599;
+        private const long DebugGroup = 72318078;
 
         public bool ProcessMessage(EndPoint endPoint, MessageSource messageSource, string message)
         {
@@ -36,12 +37,23 @@ namespace OsuQqBot.StatelessFunctions
             {
                 OsuQqBot.QqApi.SendMessageAsync(endPoint, "!getmap");
             }
+            else if (message == "Private Filter")
+            {
+                OsuQqBot.QqApi.SendPrivateMessageAsync(DalouBot, "!getmap");
+            }
             return false;
         }
 
         private bool DalouMessage(EndPoint endPoint, string message)
         {
             var qq = OsuQqBot.QqApi;
+            bool isPrivate = endPoint is PrivateEndPoint;
+            if (isPrivate)
+            {
+                qq.SendGroupMessageAsync(DebugGroup, message);
+                message = "[CQ:at,qq=122866607] \r\n" + message;
+            }
+
             message = qq.AfterReceive(message);
             var messages = message.Split("\r\n");
             if (messages.Length <= 3) return false;
@@ -49,7 +61,7 @@ namespace OsuQqBot.StatelessFunctions
             if (messages[1] != "bleatingsheep的推荐图如下:") return false;
             if (messages[2] != "Bid, Mod, pp, 推荐指数") return false;
 
-            var ps = new(int bid, bool hasHT)[messages.Length - 3];
+            var ps = new(int bid, bool hasHT, bool hasDT)[messages.Length - 3];
 
             for (int i = 3; i < messages.Length; i++)
             {
@@ -57,20 +69,22 @@ namespace OsuQqBot.StatelessFunctions
                 if (!match.Success || !int.TryParse(match.Groups[1].Value, out int bid))
                 {
                     qq.SendMessageAsync(endPoint, "失败，" + (i + 1));
+                    if (isPrivate) qq.SendGroupMessageAsync(DebugGroup, "失败，" + (i + 1));
                     return false;
                 }
                 string mods = match.Groups[2].Value;
                 bool hasHT = false;
-                //if (mods.Contains("DT") || mods.Contains("HT")) speed = 1.5;
-                //else
-                if (mods.Contains("HT")) hasHT = true;
-                ps[i - 3] = (bid, hasHT);
+                bool hasDT = false;
+                if (mods.Contains("DT") || mods.Contains("HT")) hasDT = true;
+                else if (mods.Contains("HT")) hasHT = true;
+
+                ps[i - 3] = (bid, hasHT, hasDT);
             }
             var t = Task.Run(() =>
             {
-                qq.SendMessageAsync(endPoint, "嗯");
-                var beatmaps = GetBeatmaps(ps);
-                qq.SendMessageAsync(endPoint, "好");
+                qq.SendGroupMessageAsync(DebugGroup, "嗯");
+                var beatmaps = GetBeatmaps(ps.Select(b => b.bid));
+                qq.SendGroupMessageAsync(DebugGroup, "好");
                 using (var stringWriter = new System.IO.StringWriter())
                 {
                     bool needNewLine = false;
@@ -78,9 +92,12 @@ namespace OsuQqBot.StatelessFunctions
                     {
                         if (needNewLine) stringWriter.Write("\r\n\r\n");
 
-                        if (beatmap.TotalLength < 100)
+                        if (beatmap.HitLength < 150 ||
+                            ps.Any(b => b.hasDT && b.bid == beatmap.Bid) && beatmap.HitLength < 200
+                            )
                         {
                             qq.SendMessageAsync(endPoint, "!banmap " + beatmap.Bid);
+                            if (isPrivate) qq.SendGroupMessageAsync(DebugGroup, "!banmap " + beatmap.Bid);
                         }
                         stringWriter.WriteLine($"{beatmap.Artist} - {beatmap.Title}[{beatmap.DifficultyName}]");
                         stringWriter.WriteLine($"https://osu.ppy.sh/b/{beatmap.Bid}");
@@ -91,6 +108,7 @@ namespace OsuQqBot.StatelessFunctions
                     }
                     string m = stringWriter.ToString();
                     qq.SendMessageAsync(endPoint, m, true);
+                    if (isPrivate) qq.SendGroupMessageAsync(DebugGroup, m, true);
                 }
             });
             Task.Run(() =>
@@ -101,17 +119,17 @@ namespace OsuQqBot.StatelessFunctions
                 }
                 catch (AggregateException e)
                 {
-                    qq.SendMessageAsync(endPoint, e.InnerException.ToString(), true);
+                    qq.SendGroupMessageAsync(DebugGroup, e.InnerException.ToString(), true);
                 }
             });
             return true;
         }
 
-        private IEnumerable<Bleatingsheep.OsuMixedApi.Beatmap> GetBeatmaps((int bid, bool hasHT)[] ps)
+        private IEnumerable<Bleatingsheep.OsuMixedApi.Beatmap> GetBeatmaps(IEnumerable<int> bids)
         {
             string key = OsuQqBot.osuApiKey;
             var api = Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(key);
-            foreach (var (bid, hasHT) in ps)
+            foreach (int bid in bids)
             {
                 var beatmaps = api.GetBeatmapsAsync(bid).Result;
                 if (beatmaps?.Length >= 1)
