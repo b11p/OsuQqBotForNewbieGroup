@@ -87,6 +87,12 @@ namespace OsuQqBot.Api
                         Task.Delay(100).Wait();
                         tryTime--;
                     }
+                    catch (TaskCanceledException)
+                    {
+                        Logger.Log("抓到TaskCanceledException了");
+                        Task.Delay(123).Wait();
+                        tryTime--;
+                    }
                 while (tryTime > 0);
                 if (jsonResult == null) return null;
                 var response = JsonConvert.DeserializeObject<MotherShipResponse<T>>(jsonResult);
