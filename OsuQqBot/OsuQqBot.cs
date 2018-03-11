@@ -55,13 +55,27 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
         }
 
-        private static void OnGroupMemberIncreased(IQqBot sender, GroupMemberIncreaseEventArgs e)
+        private void OnGroupMemberIncreased(IQqBot sender, GroupMemberIncreaseEventArgs e)
         {
-            string message = "欢迎";
-            sender.SendGroupMessageAsync(e.GroupId, message);
-            string debug = $"gr:{e.GroupId}, us:{e.UserId}, op:{e.OperatorId}";
+            // debug新成员事件
+            string debug = $"gr:{e.GroupId}, us:{e.UserId}, op:{e.OperatorId}\r\n{e.Time}";
             sender.SendGroupMessageAsync(72318078, debug, true);
-            e.Handled = true;
+
+            // 欢迎（在新人群）
+            if (e.GroupId == GroupId)
+            {
+                long newUser = e.UserId;
+                long? uid = FindUid(newUser).Result;
+                if (uid == 0) return;
+                string username = null;
+                if (uid.HasValue)
+                    username = FindUsername(uid.Value).Result;
+                sender.SendGroupMessageAsync(e.GroupId,
+                    (username != null ?
+                    username + "，" :
+                    "") +
+                    "你好，欢迎来到新人群");
+            }
         }
 
         private static void OnGroupAdminChanged(IQqBot sender, GroupAdminChangeEventArgs e)
