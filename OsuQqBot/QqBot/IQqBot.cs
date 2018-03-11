@@ -42,5 +42,7 @@ namespace OsuQqBot.QqBot
         string OnlineImage(string url, bool noCache);
 
         event GroupAdminChangeEventHandler GroupAdminChange;
+
+        event GroupMemberIncreaseEventHandler GroupMemberIncrease;
     }
 }

@@ -171,6 +171,9 @@ namespace OsuQqBotHttp
                 case "group_admin":
                     _qq.GroupAdminChanging(JsonConvert.DeserializeObject<GroupAdminChanged>(json));
                     break;
+                case "group_increase":
+                    _qq.GroupMemberIncreased(JsonConvert.DeserializeObject<SomeoneComesToGroup>(json));
+                    break;
                 default:
                     break;
             }

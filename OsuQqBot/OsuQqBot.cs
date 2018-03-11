@@ -51,9 +51,20 @@ namespace OsuQqBot
             apiClient = new OsuApiClient(config.ApiKey);
 
             qq.GroupAdminChange += OnGroupAdminChanged;
+
+            qq.GroupMemberIncrease += OnGroupMemberIncreased;
         }
 
-        private void OnGroupAdminChanged(IQqBot sender, GroupAdminChangeEventArgs e)
+        private static void OnGroupMemberIncreased(IQqBot sender, GroupMemberIncreaseEventArgs e)
+        {
+            string message = "欢迎";
+            sender.SendGroupMessageAsync(e.GroupId, message);
+            string debug = $"gr:{e.GroupId}, us:{e.UserId}, op:{e.OperatorId}";
+            sender.SendGroupMessageAsync(72318078, debug, true);
+            e.Handled = true;
+        }
+
+        private static void OnGroupAdminChanged(IQqBot sender, GroupAdminChangeEventArgs e)
         {
             string message;
             switch (e.Type)

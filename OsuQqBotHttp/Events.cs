@@ -36,5 +36,23 @@ namespace OsuQqBotHttp
             return args;
         }
     }
+
+    public class SomeoneComesToGroup : Event
+    {
+        public string sub_type { get; set; }
+        public long group_id { get; set; }
+        public long user_id { get; set; }
+        public long operator_id { get; set; }
+
+        public GroupMemberIncreaseEventArgs ToGroupMemberIncreaseEventArgs()
+        {
+            var args = new GroupMemberIncreaseEventArgs();
+            args.Time = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(this.time);
+            args.GroupId = this.group_id;
+            args.UserId = this.user_id;
+            args.OperatorId = this.operator_id;
+            return args;
+        }
+    }
 }
 #pragma warning restore IDE1006

@@ -21,16 +21,34 @@ namespace OsuQqBotHttp
 
         private ICollection<GroupAdminChangeEventHandler> groupAdminChange = new LinkedList<GroupAdminChangeEventHandler>();
 
+        private ICollection<GroupMemberIncreaseEventHandler> groupMemberIncrease = new LinkedList<GroupMemberIncreaseEventHandler>();
+
         public event GroupAdminChangeEventHandler GroupAdminChange
         {
             add => groupAdminChange.Add(value);
             remove => groupAdminChange.Remove(value);
         }
 
+        public event GroupMemberIncreaseEventHandler GroupMemberIncrease
+        {
+            add => groupMemberIncrease.Add(value);
+            remove => groupMemberIncrease.Remove(value);
+        }
+
         internal void GroupAdminChanging(GroupAdminChanged data)
         {
             var args = data.ToGroupAdminChangeEventArgs();
             foreach (var handler in groupAdminChange)
+            {
+                handler.Invoke(this, args);
+                if (args.Handled) break;
+            }
+        }
+
+        internal void GroupMemberIncreased(SomeoneComesToGroup data)
+        {
+            var args = data.ToGroupMemberIncreaseEventArgs();
+            foreach (var handler in groupMemberIncrease)
             {
                 handler.Invoke(this, args);
                 if (args.Handled) break;
