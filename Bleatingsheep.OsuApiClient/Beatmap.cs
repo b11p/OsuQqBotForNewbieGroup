@@ -5,8 +5,6 @@ namespace Bleatingsheep.OsuMixedApi
 {
     public class Beatmap
     {
-        private static readonly TimeSpan TimeZone = new TimeSpan(8, 0, 0);
-
         [JsonProperty("beatmapset_id")]
         public int Sid { get; set; }
         [JsonProperty("beatmap_id")]
@@ -41,7 +39,7 @@ namespace Bleatingsheep.OsuMixedApi
             {
                 var appDate = ApprovedDate;
                 if (appDate.HasValue)
-                    return new DateTimeOffset(appDate.Value, TimeZone);
+                    return new DateTimeOffset(appDate.Value, OsuApiClient.TimeZone);
                 return null;
             }
         }
@@ -49,7 +47,7 @@ namespace Bleatingsheep.OsuMixedApi
         [JsonProperty("last_update")]
         private DateTime LastUpdate { get; set; }
         [JsonIgnore]
-        public DateTimeOffset LastUpdateOffset => new DateTimeOffset(LastUpdate, TimeZone);
+        public DateTimeOffset LastUpdateOffset => new DateTimeOffset(LastUpdate, OsuApiClient.TimeZone);
 
         [JsonProperty("artist")]
         public string Artist { get; set; }
