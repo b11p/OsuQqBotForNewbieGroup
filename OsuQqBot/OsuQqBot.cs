@@ -64,6 +64,7 @@ namespace OsuQqBot
             // 欢迎（在新人群）
             if (e.GroupId == GroupId)
             {
+                Logger.Log("start welcome");
                 long newUser = e.UserId;
                 long? uid = FindUid(newUser).Result;
                 if (uid == 0) return;
@@ -75,6 +76,7 @@ namespace OsuQqBot
                     username + "，" :
                     "") +
                     "你好，欢迎来到新人群");
+                Logger.Log("end welcome");
             }
         }
 
