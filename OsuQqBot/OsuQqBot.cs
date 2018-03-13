@@ -58,25 +58,21 @@ namespace OsuQqBot
         private void OnGroupMemberIncreased(IQqBot sender, GroupMemberIncreaseEventArgs e)
         {
             // debug新成员事件
-            string debug = $"gr:{e.GroupId}, us:{e.UserId}, op:{e.OperatorId}\r\n{e.Time}";
-            sender.SendGroupMessageAsync(72318078, debug, true);
+            //string debug = $"gr:{e.GroupId}, us:{e.UserId}, op:{e.OperatorId}\r\n{e.Time}";
+            //sender.SendGroupMessageAsync(72318078, debug, true);
 
             // 欢迎（在新人群）
             if (e.GroupId == GroupId)
             {
-                Logger.Log("start welcome");
                 long newUser = e.UserId;
-                long? uid = FindUid(newUser).Result;
-                if (uid == 0) return;
+                long uid = FindUid(newUser).Result ?? 0;
                 string username = null;
-                if (uid.HasValue)
-                    username = FindUsername(uid.Value).Result;
-                sender.SendGroupMessageAsync(e.GroupId,
-                    (username != null ?
-                    username + "，" :
-                    "") +
-                    "你好，欢迎来到新人群");
-                Logger.Log("end welcome");
+                string welcome;
+                if (uid != 0)
+                    username = FindUsername(uid).Result;
+                welcome = username != null ? (username == "" ? "被ban的朋友，" : (username + "，")) : "";
+                welcome += "你好，欢迎来到新人群";
+                sender.SendGroupMessageAsync(e.GroupId, welcome, true);
             }
         }
 
