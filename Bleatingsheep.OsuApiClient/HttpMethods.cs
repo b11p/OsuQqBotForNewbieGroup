@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Bleatingsheep.OsuMixedApi
 {
-    internal static class Utils
+    internal static class HttpMethods
     {
         internal static async Task<T[]> GetJsonArrayDeserializeAsync<T>(string url, params (string key, string value)[] ps)
         {

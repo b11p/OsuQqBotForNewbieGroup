@@ -88,7 +88,7 @@ namespace Bleatingsheep.OsuMixedApi
         {
             // TODO: 增加访问数限制。
 
-            var result = await Utils.GetJsonArrayDeserializeAsync<T>(url, ps);
+            var result = await HttpMethods.GetJsonArrayDeserializeAsync<T>(url, ps);
             return result;
         }
 

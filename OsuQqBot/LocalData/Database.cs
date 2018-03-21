@@ -68,6 +68,7 @@ namespace OsuQqBot.LocalData
                 Tips = new DictionaryHolder<string, string>(TipsPath,
                     new Dictionary<string, string>(StatelessFunctions.ManageTips.DefaultTips
                         .Select(tip => new KeyValuePair<string, string>(tip.ToLowerInvariant(), tip))));
+                Charts = new DataHolder<NumberedCollection<Table<ChartMap, ChartInfo>>>(ChartPath, new NumberedCollection<Table<ChartMap, ChartInfo>>());
 
                 if (single == null) single = this;
             }
@@ -111,7 +112,7 @@ namespace OsuQqBot.LocalData
         IDictionary<string, long> NicknameData { get; set; }
         DataHolder<ISet<long>> Administrators { get; set; }
         DictionaryHolder<string, string> Tips { get; set; }
-        DataHolder<List<Chart>> ChartList { get; set; }
+        DataHolder<NumberedCollection<Table<ChartMap, ChartInfo>>> Charts { get; set; }
 
         private string[] _tipsCache = null;
         private string[] TipsCache
@@ -274,9 +275,34 @@ namespace OsuQqBot.LocalData
         #endregion
 
         #region chart
-        public IEnumerable<(int id, string title)> GetChartList() => ChartList.Read(list => list.Select(chart => (chart.ChartID, chart.Title)));
-        public Chart GetChart(string title) => ChartList.Read(list => list.Find(chart => chart.Title.ToLowerInvariant() == title.ToLowerInvariant()));
+        public int CreateChart(string chartName, string chartDescription, long creator)
+            => this.Charts.Write(
+                chartList =>
+        {
+            var chart = new Table<ChartMap, ChartInfo>(chartName, chartDescription, creator)
+            {
+                Extra = new ChartInfo()
+            };
+            return chartList.Insert(chart);
+        });
 
+        /// <summary>
+        /// 通过传入编辑 Chart 的委托来编辑 Chart 信息。
+        /// </summary>
+        /// <param name="chartNum">Chart 编号。</param>
+        /// <param name="action">要进行编辑的委托。</param>
+        /// <returns>如果执行了委托，返回<c>true</c>，如果此 Chart 编号不存在，返回<c>false</c>。</returns>
+        public bool EditChart(int chartNum, Action<Table<ChartMap, ChartInfo>> action)
+        {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            return Charts.Write((chartList) =>
+            {
+                if (!chartList.Item.TryGetValue(chartNum, out Table<ChartMap, ChartInfo> chartTable))
+                    return false;
+                action(chartTable);
+                return true;
+            });
+        }
         #endregion
 
         #region commit (old)

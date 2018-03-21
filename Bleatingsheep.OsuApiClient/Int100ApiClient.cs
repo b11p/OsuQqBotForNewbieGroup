@@ -19,7 +19,7 @@ namespace Bleatingsheep.OsuMixedApi
         {
             const string bindedUrl = "http://www.int100.org/api/get_id.php";
 
-            var (success, result) = await Utils.GetJsonDeserializeAsync<dynamic>(bindedUrl, (apiKeyParameterName, key), (qqParameterName, qq.ToString()));
+            var (success, result) = await HttpMethods.GetJsonDeserializeAsync<dynamic>(bindedUrl, (apiKeyParameterName, key), (qqParameterName, qq.ToString()));
 
             if (!success) return null;
 
