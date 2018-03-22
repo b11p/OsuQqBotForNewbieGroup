@@ -16,6 +16,7 @@ namespace OsuQqBot
             if (new StatelessFunctions.MaChuanA().ProcessMessage(endPoint, source, message)) return;
             if (new StatelessFunctions.DalouRecommend().ProcessMessage(endPoint, source, message)) return;
             if (new StatelessFunctions.Konachan().ProcessMessage(endPoint, source, message)) return;
+            if (new StatelessFunctions.KjMeimeiTime().ProcessMessage(endPoint, source, message)) return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～") || message.Trim().StartsWith("∼"))
             {
                 if (source.FromQq == 1677323371)
