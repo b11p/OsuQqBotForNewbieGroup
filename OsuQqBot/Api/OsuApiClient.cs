@@ -188,7 +188,7 @@ namespace OsuQqBot.Api
                 {
                     return null;
                 }
-                catch (System.IO.IOException)
+                catch (TaskCanceledException)
                 {
                     return null;
                 }
