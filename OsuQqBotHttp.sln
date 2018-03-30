@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsuQqBot", "OsuQqBot\OsuQqB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.OsuMixedApi", "Bleatingsheep.OsuApiClient\Bleatingsheep.OsuMixedApi.csproj", "{7A8C5120-70EE-4061-8AEC-7405E155A81E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{9FACEA7C-D2F3-47EE-942D-E17565F72292}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{9FACEA7C-D2F3-47EE-942D-E17565F72292}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bleatingsheep.OsuQqBot.Database", "Bleatingsheep.OsuQqBot.Database\Bleatingsheep.OsuQqBot.Database.csproj", "{1A110CC5-B7EE-4925-85A5-9C8A429531D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{9FACEA7C-D2F3-47EE-942D-E17565F72292}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FACEA7C-D2F3-47EE-942D-E17565F72292}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FACEA7C-D2F3-47EE-942D-E17565F72292}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A110CC5-B7EE-4925-85A5-9C8A429531D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A110CC5-B7EE-4925-85A5-9C8A429531D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A110CC5-B7EE-4925-85A5-9C8A429531D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A110CC5-B7EE-4925-85A5-9C8A429531D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
