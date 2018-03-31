@@ -49,7 +49,7 @@ namespace Test
                 Console.WriteLine(e);
             }
         }
-
+        
         static void DatabaseQueryTest()
         {
             var result = NewbieDatabase.ChartInGroup(641236878);
@@ -78,8 +78,9 @@ namespace Test
             var myRecent = await api.GetRecentlyAsync(6659067, Mode.Standard, 1);
             //var myRecent = await api.GetRecentlyAsync(9453012, Mode.Standard, 1);
 
-            var result = NewbieDatabase.Commit(514661057, myRecent[0], 3099);
-            Console.WriteLine(result.ToString());
+            // old
+            //var result = NewbieDatabase.Commit(514661057, myRecent[0], 3099);
+            //Console.WriteLine(result.ToString());
         }
     }
 }

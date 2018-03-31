@@ -31,8 +31,32 @@ namespace Bleatingsheep.OsuQqBot.Database
             }
         }
 
-        public static CommitResult Commit(long groupId, PlayRecord record, double performance)
+        public static (Chart chart, ChartCommit[] commits)[] Commits(long groupId, int uid)
         {
+            using (var context = new NewbieContext())
+            {
+                var now = DateTimeOffset.Now;
+                var chart_commit = (from chart in context.Charts
+                                    from commit in context.ChartCommits
+                                    where (from g in context.ChartValidGroups
+                                           where g.GroupId == groupId
+                                           select g.ChartId).Contains(chart.ChartId)
+                                          && commit.Uid == uid
+                                          && chart.ChartId == commit.ChartId
+                                    group commit by chart).ToArray();
+                return chart_commit
+                    .Select(g => (g.Key, g.ToArray()))
+                    .OrderBy(t => t.Item1.ChartId)
+                    .ToArray();
+            }
+        }
+
+        public static CommitResult
+        Commit(
+            long groupId, PlayRecord record, double performance, out Chart[] commitedCharts
+        )
+        {
+            commitedCharts = null;
             Chart[] chartsInThisGroup;
             Dictionary<int, ChartBeatmap> beatmaps;
             using (var context = new NewbieContext())
@@ -80,7 +104,8 @@ namespace Bleatingsheep.OsuQqBot.Database
             foreach (var group in chartResults)
             {
                 if (group.Key != CommitResult.Success) return group.Key;
-                int commited = 0;
+                //int commited = 0;
+                var commited = new List<Chart>();
                 foreach (var chart in group)
                 {
                     using (var context = new NewbieContext())
@@ -89,14 +114,17 @@ namespace Bleatingsheep.OsuQqBot.Database
                         {
                             context.ChartCommits.Add(ChartCommit.FromRecord(beatmaps[chart.ChartId], record, performance));
                             context.SaveChanges();
-                            commited++;
+                            //commited++;
+                            commited.Add(chart);
                         }
                         catch (DbUpdateException e)
                         when (e.InnerException is Microsoft.Data.Sqlite.SqliteException)
                         { }
                     }
                 }
-                if (commited == 0) return CommitResult.CommitedException;
+                //if (commited == 0) return CommitResult.CommitedException;
+                if (commited.Count == 0) return CommitResult.CommitedException;
+                commitedCharts = commited.ToArray();
                 return CommitResult.Success;
             }
             return CommitResult.UnknownException;
@@ -114,7 +142,7 @@ namespace Bleatingsheep.OsuQqBot.Database
                            where (from g in context.ChartValidGroups
                                   where g.GroupId == groupId
                                   select g.ChartId).Contains(c.ChartId)
-                                  //&& c.IsRunning
+                                  && c.IsRunning
                                   && c.ChartId == b.ChartId
                            group b by c).ToArray();
                 return c_b.Select(g => (g.Key, g.ToArray())).ToArray();

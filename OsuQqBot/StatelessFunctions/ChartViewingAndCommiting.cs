@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.OsuQqBot.Database;
 using Bleatingsheep.OsuQqBot.Database.Models;
@@ -12,7 +13,7 @@ namespace OsuQqBot.StatelessFunctions
         public bool ProcessMessage(EndPoint endPoint, MessageSource messageSource, string message)
         {
             if (!(endPoint is GroupEndPoint g)) return false;
-            if (message.Trim().ToLowerInvariant() == "charts")
+            if (message.ToLowerInvariant() == " charts")
             {
                 var charts = NewbieDatabase.ChartInGroup(g.GroupId);
                 var infos = ChartInfo(charts);
@@ -23,7 +24,7 @@ namespace OsuQqBot.StatelessFunctions
                 api.SendMessageAsync(g, result, true);
                 return true;
             }
-            if (message.Trim().ToLowerInvariant() == "commit")
+            if (message.ToLowerInvariant() == " commit")
             {
                 var api = OsuQqBot.QqApi;
                 Task.Run(async () =>
@@ -39,7 +40,43 @@ namespace OsuQqBot.StatelessFunctions
                 });
                 return true;
             }
+            if (message.ToLowerInvariant() == " my")
+            {
+                var api = OsuQqBot.QqApi;
+                ListCommits(g, messageSource);
+                return true;
+            }
             return false;
+        }
+
+        private static void ListCommits(GroupEndPoint endPoint, MessageSource messageSource)
+        {
+            var api = OsuQqBot.QqApi;
+
+            var uid = LocalData.Database.Instance.GetUidFromQq(messageSource.FromQq);
+            if (uid == null)
+            {
+                api.SendMessageAsync(endPoint, "未绑定");
+                return;
+            }
+            var commits = NewbieDatabase.Commits(endPoint.GroupId, (int)uid);
+
+            var infos = commits.Select(cc =>
+                string.Join(
+                    Environment.NewLine,
+                    cc.commits
+                        .Select(c =>
+                            string.Join(
+                                Environment.NewLine,
+                                LinkOf(c),
+                                $"{c.Rank}, {c.Accuracy:.##%}, {c.Combo}x, {c.Score} + {c.Mods}"
+                            )
+                        )
+                        .Prepend(cc.chart.ChartId + "：" + cc.chart.ChartName)
+                )
+            );
+            string info = string.Join(Environment.NewLine + Environment.NewLine, infos);
+            api.SendMessageAsync(endPoint, info, true);
         }
 
         private static async Task CommitAsync(GroupEndPoint endPoint, MessageSource messageSource)
@@ -71,16 +108,22 @@ namespace OsuQqBot.StatelessFunctions
                 qq.SendMessageAsync(endPoint, "没打图！");
                 return;
             }
-            var result = NewbieDatabase.Commit(endPoint.GroupId, recent[0], ((Api.User)user[0]).PP);
-            qq.SendMessageAsync(endPoint, ResultHint(result));
+            var result = NewbieDatabase.Commit(endPoint.GroupId, recent[0], ((Api.User)user[0]).PP, out var commited);
+            qq.SendMessageAsync(endPoint, ResultHint(result, commited), true);
         }
 
-        private static string ResultHint(CommitResult result)
+        private static string ResultHint(CommitResult result, params Chart[] charts)
         {
             switch (result)
             {
                 case CommitResult.Success:
-                    return "提交成功";
+                    return
+                        string.Join(
+                            Environment.NewLine,
+                            charts
+                                .Select(c => c.ChartId + "：" + c.ChartName)
+                                .Prepend("在下列 Chart 中提交成功")
+                        );
                 case CommitResult.CommitedException:
                     return "你已经提交过本成绩了，请再打一次";
                 case CommitResult.Failed:
@@ -134,7 +177,7 @@ namespace OsuQqBot.StatelessFunctions
             foreach (var map in maps)
             {
                 var info = new LinkedList<string>();
-                info.AddLast($"https://osu.ppy.sh/b/{map.BeatmapId}&m={(int)map.Mode}");
+                info.AddLast(LinkOf(map));
                 if (!string.IsNullOrEmpty(map.ScoreCalculation))
                     info.AddLast(map.ScoreCalculation);
                 if (map.RequiredMods != Bleatingsheep.OsuMixedApi.Mods.None)
@@ -147,5 +190,10 @@ namespace OsuQqBot.StatelessFunctions
                 yield return String.Join(Environment.NewLine, info);
             }
         }
+
+        private static string LinkOf(ChartBeatmap map)
+            => $"https://osu.ppy.sh/b/{map.BeatmapId}&m={(int)map.Mode}";
+        private static string LinkOf(ChartCommit commit)
+            => $"https://osu.ppy.sh/b/{commit.BeatmapId}&m={(int)commit.Mode}";
     }
 }
