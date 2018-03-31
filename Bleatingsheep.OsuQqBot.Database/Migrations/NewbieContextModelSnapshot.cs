@@ -69,6 +69,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.Property<int>("Mode");
 
+                    b.Property<bool>("AllowsFail");
+
                     b.Property<int>("BannedMods");
 
                     b.Property<int>("ForceMods");
@@ -79,29 +81,22 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("ChartId", "BeatmapId", "Mode");
 
-                    b.ToTable("ChartMaps");
+                    b.ToTable("ChartBeatmaps");
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.ChartCommit", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<double>("Accuracy");
+                    b.Property<int>("ChartId");
 
                     b.Property<int>("BeatmapId");
 
-                    b.Property<int?>("ChartBeatmapBeatmapId");
+                    b.Property<int>("Mode");
 
-                    b.Property<int?>("ChartBeatmapChartId");
+                    b.Property<long>("Date");
 
-                    b.Property<int?>("ChartBeatmapMode");
-
-                    b.Property<int>("ChartId");
+                    b.Property<double>("Accuracy");
 
                     b.Property<int>("Combo");
-
-                    b.Property<DateTimeOffset>("Date");
 
                     b.Property<int>("Mods");
 
@@ -114,11 +109,9 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.Property<int>("Uid");
 
-                    b.HasKey("Id");
+                    b.HasKey("ChartId", "BeatmapId", "Mode", "Date");
 
-                    b.HasIndex("ChartBeatmapChartId", "ChartBeatmapBeatmapId", "ChartBeatmapMode");
-
-                    b.ToTable("Commits");
+                    b.ToTable("ChartCommits");
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.ChartValidGroup", b =>
@@ -152,7 +145,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 {
                     b.HasOne("Bleatingsheep.OsuQqBot.Database.Models.ChartBeatmap")
                         .WithMany("Commits")
-                        .HasForeignKey("ChartBeatmapChartId", "ChartBeatmapBeatmapId", "ChartBeatmapMode");
+                        .HasForeignKey("ChartId", "BeatmapId", "Mode")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.ChartValidGroup", b =>

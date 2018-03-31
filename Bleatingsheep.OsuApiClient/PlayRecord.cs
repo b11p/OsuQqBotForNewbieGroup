@@ -35,6 +35,7 @@ namespace Bleatingsheep.OsuMixedApi
                 return accuracy;
             }
         }
+        public bool Pass => Rank != "F";
 
         [JsonProperty("beatmap_id")]
         public int Bid { get; private set; }

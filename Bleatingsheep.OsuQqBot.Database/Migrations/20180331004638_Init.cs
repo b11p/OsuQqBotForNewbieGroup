@@ -48,12 +48,13 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChartMaps",
+                name: "ChartBeatmaps",
                 columns: table => new
                 {
                     ChartId = table.Column<int>(nullable: false),
                     BeatmapId = table.Column<int>(nullable: false),
                     Mode = table.Column<int>(nullable: false),
+                    AllowsFail = table.Column<bool>(nullable: false),
                     BannedMods = table.Column<int>(nullable: false),
                     ForceMods = table.Column<int>(nullable: false),
                     RequiredMods = table.Column<int>(nullable: false),
@@ -61,9 +62,9 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChartMaps", x => new { x.ChartId, x.BeatmapId, x.Mode });
+                    table.PrimaryKey("PK_ChartBeatmaps", x => new { x.ChartId, x.BeatmapId, x.Mode });
                     table.ForeignKey(
-                        name: "FK_ChartMaps_Charts_ChartId",
+                        name: "FK_ChartBeatmaps_Charts_ChartId",
                         column: x => x.ChartId,
                         principalTable: "Charts",
                         principalColumn: "ChartId",
@@ -89,19 +90,15 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Commits",
+                name: "ChartCommits",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Accuracy = table.Column<double>(nullable: false),
-                    BeatmapId = table.Column<int>(nullable: false),
-                    ChartBeatmapBeatmapId = table.Column<int>(nullable: true),
-                    ChartBeatmapChartId = table.Column<int>(nullable: true),
-                    ChartBeatmapMode = table.Column<int>(nullable: true),
                     ChartId = table.Column<int>(nullable: false),
+                    BeatmapId = table.Column<int>(nullable: false),
+                    Mode = table.Column<int>(nullable: false),
+                    Date = table.Column<long>(nullable: false),
+                    Accuracy = table.Column<double>(nullable: false),
                     Combo = table.Column<int>(nullable: false),
-                    Date = table.Column<DateTimeOffset>(nullable: false),
                     Mods = table.Column<int>(nullable: false),
                     PPWhenCommit = table.Column<double>(nullable: false),
                     Rank = table.Column<string>(nullable: false),
@@ -110,19 +107,14 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Commits", x => x.Id);
+                    table.PrimaryKey("PK_ChartCommits", x => new { x.ChartId, x.BeatmapId, x.Mode, x.Date });
                     table.ForeignKey(
-                        name: "FK_Commits_ChartMaps_ChartBeatmapChartId_ChartBeatmapBeatmapId_ChartBeatmapMode",
-                        columns: x => new { x.ChartBeatmapChartId, x.ChartBeatmapBeatmapId, x.ChartBeatmapMode },
-                        principalTable: "ChartMaps",
+                        name: "FK_ChartCommits_ChartBeatmaps_ChartId_BeatmapId_Mode",
+                        columns: x => new { x.ChartId, x.BeatmapId, x.Mode },
+                        principalTable: "ChartBeatmaps",
                         principalColumns: new[] { "ChartId", "BeatmapId", "Mode" },
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Commits_ChartBeatmapChartId_ChartBeatmapBeatmapId_ChartBeatmapMode",
-                table: "Commits",
-                columns: new[] { "ChartBeatmapChartId", "ChartBeatmapBeatmapId", "ChartBeatmapMode" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -131,13 +123,13 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 name: "ChartAdministrators");
 
             migrationBuilder.DropTable(
+                name: "ChartCommits");
+
+            migrationBuilder.DropTable(
                 name: "ChartValidGroups");
 
             migrationBuilder.DropTable(
-                name: "Commits");
-
-            migrationBuilder.DropTable(
-                name: "ChartMaps");
+                name: "ChartBeatmaps");
 
             migrationBuilder.DropTable(
                 name: "Charts");

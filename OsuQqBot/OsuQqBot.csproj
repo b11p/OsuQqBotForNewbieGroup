@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bleatingsheep.OsuApiClient\Bleatingsheep.OsuMixedApi.csproj" />
+    <ProjectReference Include="..\Bleatingsheep.OsuQqBot.Database\Bleatingsheep.OsuQqBot.Database.csproj" />
   </ItemGroup>
 
 </Project>

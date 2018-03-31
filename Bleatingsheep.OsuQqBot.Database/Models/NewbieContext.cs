@@ -6,10 +6,10 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
     internal class NewbieContext : DbContext
     {
         public DbSet<Chart> Charts { get; private set; }
-        public DbSet<ChartBeatmap> ChartMaps { get; private set; }
+        public DbSet<ChartBeatmap> ChartBeatmaps { get; private set; }
         public DbSet<ChartValidGroup> ChartValidGroups { get; private set; }
         public DbSet<ChartAdministrator> ChartAdministrators { get; private set; }
-        public DbSet<ChartCommit> Commits { get; private set; }
+        public DbSet<ChartCommit> ChartCommits { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -29,6 +29,9 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
             modelBuilder.Entity<ChartValidGroup>()
                 .HasKey(g => new { g.ChartId, g.GroupId });
+
+            modelBuilder.Entity<ChartCommit>()
+                .HasKey(c => new { c.ChartId, c.BeatmapId, c.Mode, c.Date });
         }
     }
 }
