@@ -76,6 +76,7 @@ namespace OsuQqBot.StatelessFunctions
                 )
             );
             string info = string.Join(Environment.NewLine + Environment.NewLine, infos);
+            if (string.IsNullOrWhiteSpace(info)) info = "没找到结果";
             api.SendMessageAsync(endPoint, info, true);
         }
 
