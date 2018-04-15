@@ -42,14 +42,23 @@ namespace Test
         {
             try
             {
-                DatabaseQueryTest();
+                await BloodcatTestAsync();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
         }
-        
+
+        static async Task BloodcatTestAsync()
+        {
+            var api = BloodcatApi.Client;
+            var result = await api.SearchRankedByKeywordAsync("");
+            var r2 = await api.SearchRankedByKeywordAsync("no title");
+            var resultMania = await api.SearchRankedByKeywordAsync("apple", Mode.Mania);
+            var resultMult = await api.SearchRankedByKeywordAsync("apple", Mode.Standard, Mode.Mania);
+        }
+
         static void DatabaseQueryTest()
         {
             var result = NewbieDatabase.ChartInGroup(641236878);
