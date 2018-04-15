@@ -195,7 +195,16 @@ namespace OsuQqBotHttp
                         using (var inputStream = context.Request.InputStream)
                         using (var sr = new StreamReader(inputStream))
                         {
-                            var message = sr.ReadToEnd();
+                            string message;
+                            try
+                            {
+                                message = sr.ReadToEnd();
+                            }
+                            catch (HttpListenerException e)
+                            {
+                                Logger.LogException(e);
+                                continue;
+                            }
                             Console.WriteLine(message);
                             ProcessPost(message);
                             using (context.Response) { }

@@ -33,7 +33,7 @@ namespace OsuQqBot
                 }
                 else if (uid.Value == 0)
                 {
-                    qq.SendMessageAsync(endPoint, "未绑定，请使用绑定<你的名字>命令绑定");
+                    qq.SendMessageAsync(endPoint, "未绑定，请使用绑定<你的账号>命令绑定");
                 }
                 else
                 {
