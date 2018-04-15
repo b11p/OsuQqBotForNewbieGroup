@@ -74,7 +74,8 @@ namespace OsuQqBot.Api
         {
             using (HttpClient client = new HttpClient())
             {
-                int tryTime = 5;
+                client.Timeout = new TimeSpan(0, 0, 2);
+                int tryTime = 0;
                 string jsonResult = null;
                 do
                     try
@@ -84,13 +85,14 @@ namespace OsuQqBot.Api
                     }
                     catch (HttpRequestException)
                     {
-                        Task.Delay(100).Wait();
                         tryTime--;
+                        if (tryTime > 0)
+                            await Task.Delay(100);
                     }
                     catch (TaskCanceledException)
                     {
                         Logger.Log("抓到TaskCanceledException了");
-                        Task.Delay(123).Wait();
+                        //Task.Delay(123).Wait();
                         tryTime--;
                     }
                 while (tryTime > 0);
