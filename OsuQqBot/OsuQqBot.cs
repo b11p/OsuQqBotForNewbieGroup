@@ -1,12 +1,17 @@
 ﻿using Newtonsoft.Json;
 using OsuQqBot.Api;
+using OsuQqBot.AttributedFunctions;
 using OsuQqBot.QqBot;
+using Sisters.WudiLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using wudipost = Sisters.WudiLib.Posts;
 
 namespace OsuQqBot
 {
@@ -18,9 +23,15 @@ namespace OsuQqBot
         IQqBot qq;
         public static IQqBot QqApi { get; private set; }
         readonly LocalData.Database database = new LocalData.Database(Paths.DataPath);
+        HttpApiClient v2;
+        private static HttpApiClient s_apiV2;
+        public static HttpApiClient ApiV2 { get => s_apiV2; private set => s_apiV2 = value; }
+        wudipost::ApiPostListener _listener;
+        //LinkedList<IGroupInvitation> groupInvitations = new LinkedList<IGroupInvitation>();
 
-        public OsuQqBot(IQqBot qqBot)
+        public OsuQqBot(IQqBot qqBot, HttpApiClient apiClientV2, wudipost::ApiPostListener listener)
         {
+            // 旧版初始化代码
             qq = qqBot;
             QqApi = qq;
             CurrentQq = qq.GetLoginQq();
@@ -53,6 +64,38 @@ namespace OsuQqBot
             qq.GroupAdminChange += OnGroupAdminChanged;
 
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
+
+            // 初始化
+            v2 = apiClientV2;
+            Interlocked.CompareExchange(ref s_apiV2, v2, null);
+            _listener = listener;
+
+            Init();
+        }
+
+        private void Init()
+        {
+            var types = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t.GetCustomAttributes<FunctionAttribute>().Any());
+            foreach (var t in types)
+            {
+                InitType(t);
+            }
+        }
+
+        private void InitType(Type t)
+        {
+            var interfaces = t.GetInterfaces();
+            var lazy = new Lazy<object>(() =>
+                Assembly.GetExecutingAssembly().CreateInstance(t.FullName),
+                LazyThreadSafetyMode.None);
+            foreach (var i in interfaces)
+            {
+                if (i == typeof(IGroupInvitation))
+                {
+                    _listener.GroupInviteEvent += ((IGroupInvitation)lazy.Value).GroupInvitation;
+                }
+            }
         }
 
         private void OnGroupMemberIncreased(IQqBot sender, GroupMemberIncreaseEventArgs e)

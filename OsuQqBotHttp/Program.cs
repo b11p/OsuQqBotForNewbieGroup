@@ -15,11 +15,8 @@ namespace OsuQqBotHttp
     {
         static void Main(string[] args)
         {
-            System.Net.WebSockets.WebSocket webSocket = new System.Net.WebSockets.ClientWebSocket();
-            //new MyWebServer().StartListenAsync().Wait();
-            //new MyWebServer().Listener();
-            // this is test
-            new PostProcessor(8876).Listen();
+
+            new PostProcessor(port: 8877, wudiPort: 8876).Listen();
             using (HttpClient client = new HttpClient())
             {
 
@@ -55,15 +52,28 @@ namespace OsuQqBotHttp
     /// </summary>
     class PostProcessor
     {
-        public PostProcessor(int port)
+        public PostProcessor(int port, int wudiPort)
         {
             if (port <= 0 || port >= 65536) throw new ArgumentException(nameof(port));
             Port = port;
 
-            osuBot = new OsuQqBot.OsuQqBot(_qq);
+            apiClient = new Sisters.WudiLib.HttpApiClient();
+            apiClient.ApiAddress = "http://127.0.0.1:5700";
+
+            _listener = new Sisters.WudiLib.Posts.ApiPostListener();
+            _listener.ApiClient = apiClient;
+            _listener.PostAddress = $"http://127.0.0.1:{wudiPort}/";
+            _listener.ForwardTo = $"http://127.0.0.1:{port}/";
+            _listener.StartListen();
+
+            osuBot = new OsuQqBot.OsuQqBot(_qq, apiClient, _listener);
         }
 
         QqBot _qq = new QqBot();
+
+        Sisters.WudiLib.HttpApiClient apiClient;
+
+        Sisters.WudiLib.Posts.ApiPostListener _listener;
 
         OsuQqBot.OsuQqBot osuBot;
 
@@ -190,7 +200,7 @@ namespace OsuQqBotHttp
                     while (true)
                     {
                         var context = listener.GetContext();
-                        if (!IPAddress.IsLoopback(context.Request.RemoteEndPoint.Address)) continue;
+                        //if (!IPAddress.IsLoopback(context.Request.RemoteEndPoint.Address)) continue;
                         var sw = Stopwatch.StartNew();
                         using (var inputStream = context.Request.InputStream)
                         using (var sr = new StreamReader(inputStream))
