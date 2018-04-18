@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OsuQqBot.Api;
 using OsuQqBot.AttributedFunctions;
+using OsuQqBot.Functions;
 using OsuQqBot.QqBot;
 using Sisters.WudiLib;
 using System;
@@ -543,75 +544,77 @@ where 查询某个osu!玩家
                 });
                 return true;
             }
-            //if (message.HasCQFunction()) return false;
-            //message = message.Replace("&#91;", "[").Replace("&#93;", "]").Replace("&amp;", "&");
 
-            //string queryPatten = @"^\s*查\s*(\S+)\s*$";
-            //System.Text.RegularExpressions.Regex queryRegex = new System.Text.RegularExpressions.Regex(queryPatten);
-            //var queryMatch = queryRegex.Match(message);
-            //if (queryMatch.Success)
-            //{
-            //    string wantedNickname = queryMatch.Groups[1].Value.ToLowerInvariant();
-            //    long? uid = database.GetUidFromNickname(wantedNickname);
-            //    if (!uid.HasValue) this.qq.SendGroupMessageAsync(group, $"我不知道{queryMatch.Groups[1].Value}是谁。", true);
-            //    else await SendQueryMessage(group, uid.Value);
-            //    return true;
-            //}
+            if (group != 623698222) return false;
+            if (message.HasCQFunction()) return false;
+            message = message.Replace("&#91;", "[").Replace("&#93;", "]").Replace("&amp;", "&");
 
-            //string nickPatten = @"^\s*(.+?)\s*叫\s*(\S+)\s*$";
-            //var nickRegex = new System.Text.RegularExpressions.Regex(nickPatten);
-            //var nickMatch = nickRegex.Match(message);
-            //if (nickMatch.Success)
-            //{
-            //    await Task.Run(async () =>
-            //    {
-            //        string matchUsername = nickMatch.Groups[1].Value;
+            string queryPatten = @"^\s*查\s*(\S+)\s*$";
+            System.Text.RegularExpressions.Regex queryRegex = new System.Text.RegularExpressions.Regex(queryPatten);
+            var queryMatch = queryRegex.Match(message);
+            if (queryMatch.Success)
+            {
+                string wantedNickname = queryMatch.Groups[1].Value.ToLowerInvariant();
+                long? uid = database.GetUidFromNickname(wantedNickname);
+                if (!uid.HasValue) this.qq.SendGroupMessageAsync(group, $"我不知道{queryMatch.Groups[1].Value}是谁。", true);
+                else await SendQueryMessage(group, uid.Value);
+                return true;
+            }
 
-            //        // 检查是否是合法的用户名（减少误触发）
-            //        var uMatch = regexMatchingUsername.Match(matchUsername);
-            //        if (!uMatch.Success || uMatch.Groups[1].Value != matchUsername) return;
+            string nickPatten = @"^\s*(.+?)\s*叫\s*(\S+)\s*$";
+            var nickRegex = new System.Text.RegularExpressions.Regex(nickPatten);
+            var nickMatch = nickRegex.Match(message);
+            if (nickMatch.Success)
+            {
+                await Task.Run(async () =>
+                {
+                    string matchUsername = nickMatch.Groups[1].Value;
 
-            //        string newNick = nickMatch.Groups[2].Value;
-            //        if (newNick.EndsWith("，记住了。"))
-            //        {
-            //            //this.qq.SendGroupMessageAsync(group, "调戏咱很好玩吗？");
-            //            return;
-            //        }
+                    // 检查是否是合法的用户名（减少误触发）
+                    var uMatch = regexMatchingUsername.Match(matchUsername);
+                    if (!uMatch.Success || uMatch.Groups[1].Value != matchUsername) return;
 
-            //        var users = await apiClient.GetUserAsync(matchUsername, OsuApiClient.UsernameType.Username);
-            //        if (users == null)
-            //        {
-            //            this.qq.SendGroupMessageAsync(group, "再试一次吧~");
-            //            return;
-            //        }
-            //        if (!users.Any())
-            //        {
-            //            this.qq.SendGroupMessageAsync(group, "没这个人！叫什么叫！");
-            //            return;
-            //        }
-            //        if (!long.TryParse(users[0].user_id, out long uid))
-            //        {
-            //            this.qq.SendGroupMessageAsync(group, "不知道为什么出错了。");
-            //            return;
-            //        }
-            //        var previous = database.SaveNickname(newNick.ToLower(System.Globalization.CultureInfo.InvariantCulture), uid);
-            //        if (!previous.HasValue)
-            //        {
-            //            this.qq.SendGroupMessageAsync(group, $"{users[0].username}叫{newNick}，记住了。", true);
-            //        }
-            //        else
-            //        {
-            //            string previousUsername = await FindUsername(previous.Value);
-            //            if (string.IsNullOrEmpty(previousUsername))
-            //                this.qq.SendGroupMessageAsync(group, $"有时会突然忘了，{newNick}是谁，但是从现在起，{newNick}就是{users[0].username}，记住了！", true);
-            //            else if (
-            //                previousUsername.ToLowerInvariant() == users[0].username.ToLowerInvariant()
-            //            ) this.qq.SendGroupMessageAsync(group, $"我知道{newNick}是{previousUsername}。", true);
-            //            else this.qq.SendGroupMessageAsync(group, $"我还以为{newNick}是{previousUsername}，原来是{users[0].username}，记住了！", true);
-            //        }
-            //    });
-            //    return true;
-            //}
+                    string newNick = nickMatch.Groups[2].Value;
+                    if (newNick.EndsWith("，记住了。"))
+                    {
+                        //this.qq.SendGroupMessageAsync(group, "调戏Bot很好玩吗？");
+                        return;
+                    }
+
+                    var users = await apiClient.GetUserAsync(matchUsername, OsuApiClient.UsernameType.Username);
+                    if (users == null)
+                    {
+                        this.qq.SendGroupMessageAsync(group, "再试一次吧~");
+                        return;
+                    }
+                    if (!users.Any())
+                    {
+                        this.qq.SendGroupMessageAsync(group, "没这个人！叫什么叫！");
+                        return;
+                    }
+                    if (!long.TryParse(users[0].user_id, out long uid))
+                    {
+                        this.qq.SendGroupMessageAsync(group, "不知道为什么出错了。");
+                        return;
+                    }
+                    var previous = database.SaveNickname(newNick.ToLower(System.Globalization.CultureInfo.InvariantCulture), uid);
+                    if (!previous.HasValue)
+                    {
+                        this.qq.SendGroupMessageAsync(group, $"{users[0].username}叫{newNick}，记住了。", true);
+                    }
+                    else
+                    {
+                        string previousUsername = await FindUsername(previous.Value);
+                        if (string.IsNullOrEmpty(previousUsername))
+                            this.qq.SendGroupMessageAsync(group, $"有时会突然忘了，{newNick}是谁，但是从现在起，{newNick}就是{users[0].username}，记住了！", true);
+                        else if (
+                            previousUsername.ToLowerInvariant() == users[0].username.ToLowerInvariant()
+                        ) this.qq.SendGroupMessageAsync(group, $"我知道{newNick}是{previousUsername}。", true);
+                        else this.qq.SendGroupMessageAsync(group, $"我还以为{newNick}是{previousUsername}，原来是{users[0].username}，记住了！", true);
+                    }
+                });
+                return true;
+            }
 
             return false;
         }
