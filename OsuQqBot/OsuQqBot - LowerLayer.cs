@@ -19,7 +19,6 @@ namespace OsuQqBot
             //if (new StatelessFunctions.KjMeimeiTime().ProcessMessage(endPoint, source, message)) return;
             if (new StatelessFunctions.ChartViewingAndCommiting().ProcessMessage(endPoint, source, message)) return;
             if (new StatelessFunctions.DalouNoHarm().ProcessMessage(endPoint, source, message)) return;
-            if (new StatelessFunctions.KeywordToPicture().ProcessMessage(endPoint, source, message)) return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～") || message.Trim().StartsWith("∼"))
             {
                 if (source.FromQq == 1677323371)
