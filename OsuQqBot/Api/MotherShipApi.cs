@@ -74,7 +74,7 @@ namespace OsuQqBot.Api
         {
             using (HttpClient client = new HttpClient())
             {
-                client.Timeout = new TimeSpan(0, 0, 2);
+                client.Timeout = new TimeSpan(0, 0, 15);
                 int tryTime = 0;
                 string jsonResult = null;
                 do
