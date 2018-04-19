@@ -12,9 +12,10 @@ using System;
 namespace Bleatingsheep.OsuQqBot.Database.Migrations
 {
     [DbContext(typeof(NewbieContext))]
-    partial class NewbieContextModelSnapshot : ModelSnapshot
+    [Migration("20180419021618_AddBeatmapCache")]
+    partial class AddBeatmapCache
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

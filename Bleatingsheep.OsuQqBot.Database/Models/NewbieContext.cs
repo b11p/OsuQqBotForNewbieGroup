@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Bleatingsheep.OsuMixedApi;
+using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models
@@ -10,6 +11,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<ChartValidGroup> ChartValidGroups { get; private set; }
         public DbSet<ChartAdministrator> ChartAdministrators { get; private set; }
         public DbSet<ChartCommit> ChartCommits { get; private set; }
+        public DbSet<Beatmap> CachedBeatmaps { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -32,6 +34,20 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
             modelBuilder.Entity<ChartCommit>()
                 .HasKey(c => new { c.ChartId, c.BeatmapId, c.Mode, c.Date });
+
+            var beatmaps = modelBuilder.Entity<Beatmap>();
+            beatmaps
+                .Ignore(b => b.PlayCount)
+                .Ignore(b => b.PassCount);
+            beatmaps
+                .HasKey(b => new { b.Bid, b.Mode });
+            beatmaps.Property("DifficultyName").IsRequired();
+            beatmaps.Property("FileMD5").IsRequired();
+            beatmaps.Property("Artist").IsRequired();
+            beatmaps.Property("Title").IsRequired();
+            beatmaps.Property("Creator").IsRequired();
+            beatmaps.Property("Source").IsRequired();
+            beatmaps.Property("Tags").IsRequired();
         }
     }
 }

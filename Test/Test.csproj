@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Bleatingsheep.OsuApiClient\Bleatingsheep.OsuMixedApi.csproj" />
     <ProjectReference Include="..\Bleatingsheep.OsuQqBot.Database\Bleatingsheep.OsuQqBot.Database.csproj" />
+    <ProjectReference Include="..\OsuQqBot\OsuQqBot.csproj" />
   </ItemGroup>
 
 </Project>

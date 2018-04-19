@@ -42,12 +42,25 @@ namespace Bleatingsheep.OsuMixedApi
                     return new DateTimeOffset(appDate.Value, OsuApiClient.TimeZone);
                 return null;
             }
+            private set
+            {
+                if (value == null)
+                {
+                    ApprovedDate = null;
+                    return;
+                }
+                ApprovedDate = value.Value.ToOffset(OsuApiClient.TimeZone).DateTime;
+            }
         }
 
         [JsonProperty("last_update")]
         private DateTime LastUpdate { get; set; }
         [JsonIgnore]
-        public DateTimeOffset LastUpdateOffset => new DateTimeOffset(LastUpdate, OsuApiClient.TimeZone);
+        public DateTimeOffset LastUpdateOffset
+        {
+            get => new DateTimeOffset(LastUpdate, OsuApiClient.TimeZone);
+            private set => LastUpdate = value.ToOffset(OsuApiClient.TimeZone).DateTime;
+        }
 
         [JsonProperty("artist")]
         public string Artist { get; set; }

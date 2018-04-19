@@ -1,6 +1,7 @@
 ﻿using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database;
 using Bleatingsheep.OsuQqBot.Database.Models;
+using OsuQqBot;
 using System;
 using System.Threading.Tasks;
 
@@ -38,11 +39,21 @@ namespace Test
             best = api.GetBestPerformancesAsync("bleatingsheep", Mode.Mania, 17).Result;
         }
 
+        static async Task CachedTest()
+        {
+            string key = string.Empty;
+            Console.WriteLine("input key");
+            while (key == string.Empty)
+                key = Console.ReadLine().Trim();
+            var r = await CachedQuerying.GetBeatmapAsync(1493143, Mode.Standard, key);
+        }
+
         static async Task Main(string[] args)
         {
             try
             {
-                await BloodcatTestAsync();
+                await CachedTest();
+                //await BloodcatTestAsync();
             }
             catch (Exception e)
             {

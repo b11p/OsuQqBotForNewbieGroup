@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Bleatingsheep.OsuQqBot.Database
 {
@@ -146,6 +147,32 @@ namespace Bleatingsheep.OsuQqBot.Database
                                   && c.ChartId == b.ChartId
                            group b by c).ToArray();
                 return c_b.Select(g => (g.Key, g.ToArray())).ToArray();
+            }
+        }
+
+        public static async Task<Beatmap> GetBeatmapAsync(int bid, Mode mode)
+        {
+            using (var context = new NewbieContext())
+            {
+                return await context.CachedBeatmaps.SingleOrDefaultAsync(b => b.Bid == bid && b.Mode == mode);
+            }
+        }
+
+        public static async Task<Beatmap> CacheBeatmapAsync(Beatmap beatmap)
+        {
+            using (var context = new NewbieContext())
+            {
+
+                try
+                {
+                    var result = await context.CachedBeatmaps.AddAsync(beatmap);
+                    await context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
+                {
+                    return null;
+                }
+                return beatmap;
             }
         }
     }
