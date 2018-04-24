@@ -69,6 +69,7 @@ namespace OsuQqBot
             v2 = apiClientV2;
             Interlocked.CompareExchange(ref s_apiV2, v2, null);
             _listener = listener;
+            _listener.FriendRequestEvent += wudipost.ApiPostListener.ApproveAllFriendRequests;
 
             Init();
         }
