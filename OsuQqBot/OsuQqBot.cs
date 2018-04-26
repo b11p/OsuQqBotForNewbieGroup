@@ -493,6 +493,14 @@ namespace OsuQqBot
 选项：
 用户名 要查询的玩家名称";
                         break;
+                    case "chart":
+                        help = @"chart有关命令列表
+*请注意所有命令均以空格（ ）开头*
+ charts 查看本群chart
+ commit 提交chart
+ my 查看提交记录
+ rank x 查看编号为x的chart排名";
+                        break;
                     default:
                         break;
                 }
@@ -512,7 +520,8 @@ namespace OsuQqBot
 绑定 绑定osu!账号
 where 查询某个osu!玩家
 
-使用命令“帮助 <命令>”查看特定命令的帮助";
+使用命令“帮助 <命令>”查看特定命令的帮助
+此外，请使用“帮助 chart”查看chart有关命令的帮助";
             this.qq.SendMessageAsync(endPoint, help);
         }
 

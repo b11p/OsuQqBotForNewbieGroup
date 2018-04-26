@@ -59,7 +59,8 @@ namespace Test
                 //var result = await RankAsync(8);
                 //await CachedTest();
                 //await BloodcatTestAsync();
-                ApiTest();
+                await DatabaseTestAsync();
+                //ApiTest();
             }
             catch (Exception e)
             {
@@ -120,15 +121,19 @@ namespace Test
             var chart = new Chart();
             chart.ChartAdministrators.Add(1004121460);
             chart.ChartCreator = 962549599;
-            chart.ChartName = "测试chart";
-            chart.ChartDescription = "这是测试chart";
-            chart.Groups.Add(514661057);
-            chart.Groups.Add(641236878);
+            chart.ChartName = "新人群第0.1期Chart（Beta）";
+            chart.ChartDescription = "这是新人群第0.1期Chart，因为是技术测试，所以暂时没有奖励";
+            chart.Groups.Add(614892339);
+            //chart.Groups.Add(641236878);
             chart.IsRunning = true;
-            chart.Maps.Add(ChartBeatmap.FromBid(459939));
-            chart.StartTime = new DateTimeOffset(2018, 3, 30, 0, 0, 0, new TimeSpan(8, 0, 0));
-            chart.MaximumPerformance = 3100;
-            //NewbieDatabase.AddChart(chart);
+            chart.Maps.Add(ChartBeatmap.FromBid(1568319));
+            chart.Maps.Add(ChartBeatmap.FromBid(1489625));
+            chart.Maps.Add(ChartBeatmap.FromBid(1421312));
+            chart.StartTime = new DateTimeOffset(2018, 4, 27, 0, 0, 0, new TimeSpan(8, 0, 0));
+            chart.MaximumPerformance = 2500;
+            chart.RecommendPerformance = 1250;
+            chart.Public = true;
+            NewbieDatabase.AddChart(chart);
 
             string key = string.Empty;
             Console.WriteLine("input key");
