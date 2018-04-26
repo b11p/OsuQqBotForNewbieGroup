@@ -63,6 +63,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
         public int ChartId { get; set; }
 
+        public Chart Chart { get; set; }
+
         public static ChartBeatmap FromBid(int bid, Mode mode = Mode.Standard)
             => new ChartBeatmap { BeatmapId = bid, Mode = mode };
     }
@@ -84,6 +86,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public double Accuracy { get; set; }
         [Required]
         public string Rank { get; set; }
+
+        public ChartBeatmap Beatmap { get; set; }
 
         /// <summary>
         /// 

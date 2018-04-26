@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using OsuQqBot.QqBot;
@@ -45,6 +46,10 @@ namespace OsuQqBot.StatelessFunctions
                 var api = OsuQqBot.QqApi;
                 ListCommits(g, messageSource);
                 return true;
+            }
+            if (message.ToLowerInvariant().StartsWith(" rank "))
+            {
+                return ChartRank(message.Substring(" rank ".Length), g.GroupId);
             }
             return false;
         }
@@ -145,6 +150,56 @@ namespace OsuQqBot.StatelessFunctions
                 default:
                     return "未知错误";
             }
+        }
+
+        private static bool ChartRank(string id, long groupId)
+        {
+            bool isInt = int.TryParse(id, out int chartId);
+            if (isInt)
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        //var chart = await NewbieDatabase.GetChartWithCommitsAsync(chartId);
+                        var chart = await Charts.Statistics.RankAsync(chartId);
+                        if (chart.title == null)
+                        {
+                            await OsuQqBot.ApiV2.SendGroupMessageAsync(groupId, "没有找到 Chart");
+                            return;
+                        }
+                        var message = ChartRankInfo(chart);
+                        await OsuQqBot.ApiV2.SendGroupMessageAsync(groupId, message);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogException(e);
+                    }
+                });
+            return isInt;
+        }
+
+        private static string ChartRankInfo((string title, IEnumerable<(int uid, double score)> rank) chart)
+        {
+            var rank = chart.rank.ToArray();
+            string[] results = new string[rank.Length];
+            var api = OsuApiClient.ClientUsingKey(OsuQqBot.osuApiKey);
+            var parallelLoopResult = Parallel.For(0, rank.Length, i =>
+            {
+                var (success, user) = api.GetUserInfoAsync(rank[i].uid, Mode.Standard).Result;
+                string userInfo;
+                if (!success)
+                {
+                    userInfo = rank[i].uid.ToString();
+                }
+                else
+                {
+                    string name = user?.Name ?? "被 ban 用户";
+                    userInfo = $"{name}({rank[i].uid.ToString()})";
+                }
+                results[i] = $"{userInfo} / {rank[i].score}";
+            });
+            string message = string.Join(Environment.NewLine, results.Prepend($"{chart.title}的排名信息"));
+            return message;
         }
 
         private static IEnumerable<string> ChartInfo((Chart chart, ChartBeatmap[] maps)[] ps)

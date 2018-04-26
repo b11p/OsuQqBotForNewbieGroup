@@ -3,6 +3,8 @@ using Bleatingsheep.OsuQqBot.Database;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using OsuQqBot;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Test
@@ -37,6 +39,8 @@ namespace Test
             //    Console.WriteLine(m);
             //}
             best = api.GetBestPerformancesAsync("bleatingsheep", Mode.Mania, 17).Result;
+
+            var user = api.GetUserInfoAsync(9408048, Mode.Ctb).Result;
         }
 
         static async Task CachedTest()
@@ -52,13 +56,44 @@ namespace Test
         {
             try
             {
-                await CachedTest();
+                //var result = await RankAsync(8);
+                //await CachedTest();
                 //await BloodcatTestAsync();
+                ApiTest();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+        }
+
+        public static async Task<IEnumerable<(int uid, double score)>> RankAsync(int chartId)
+        {
+            var chart = await NewbieDatabase.GetChartWithCommitsAsync(chartId);
+            if (chart == null) return null;
+
+            var maps = chart.Maps.Select(b => (beatmap: b, score: (Func<ChartCommit, double>)(s => s.Score)));
+
+            var debugResult1 = from m in maps
+                               from c in m.beatmap.Commits
+                               let calcRawScore = m.score(c)
+                               let score = double.IsNaN(calcRawScore) ? 0 : calcRawScore
+                               select m;
+            //group new { commit = c, score } by new { c.BeatmapId, c.Uid };
+
+            var results =
+                from m in maps
+                from c in m.beatmap.Commits
+                let calcRawScore = m.score(c)
+                let score = double.IsNaN(calcRawScore) ? 0 : calcRawScore
+                group new { commit = c, score } by new { c.Beatmap, c.Uid } into commits // Key 是 map 和 uid，Values 是 Commits。
+                group commits.Max(cm => cm.score) by commits.Key.Uid into highScores // Key 是 uid，Values 是每个图的最高分。
+                //select (uid: highScores.Key, score: highScores.Sum()) into r
+                let r = (uid: highScores.Key, score: highScores.Sum())
+                orderby r.score descending
+                select r;
+
+            return results;
         }
 
         static async Task BloodcatTestAsync()
@@ -68,6 +103,11 @@ namespace Test
             var r2 = await api.SearchRankedByKeywordAsync("no title");
             var resultMania = await api.SearchRankedByKeywordAsync("apple", Mode.Mania);
             var resultMult = await api.SearchRankedByKeywordAsync("apple", Mode.Standard, Mode.Mania);
+        }
+
+        static async Task ChartQueryTestAsync()
+        {
+            var result = await NewbieDatabase.GetChartWithCommitsAsync(8);
         }
 
         static void DatabaseQueryTest()

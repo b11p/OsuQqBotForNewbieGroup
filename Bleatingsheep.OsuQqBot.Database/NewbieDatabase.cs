@@ -52,6 +52,21 @@ namespace Bleatingsheep.OsuQqBot.Database
             }
         }
 
+        private static async Task<Chart> GetChartAsync(int chartId, Func<IQueryable<Chart>, IQueryable<Chart>> includes = null)
+        {
+            using (var context = new NewbieContext())
+            {
+                IQueryable<Chart> charts = context.Charts;
+                if (includes != null) charts = includes(charts);
+                return await charts.SingleOrDefaultAsync(c => c.ChartId == chartId);
+            }
+        }
+
+        public static async Task<Chart> GetChartWithCommitsAsync(int chartId)
+        {
+            return await GetChartAsync(chartId, charts => charts.Include(c => c.Maps).ThenInclude(map => map.Commits));
+        }
+
         public static CommitResult
         Commit(
             long groupId, PlayRecord record, double performance, out Chart[] commitedCharts
