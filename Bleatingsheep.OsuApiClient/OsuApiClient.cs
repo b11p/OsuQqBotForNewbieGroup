@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Bleatingsheep.OsuMixedApi
@@ -15,6 +16,7 @@ namespace Bleatingsheep.OsuMixedApi
         private static string BeatmapUrl => Root + "/api/get_beatmaps";
         private static string RecentlyPlayedUrl => Root + "/api/get_user_recent";
         private static string BestPerformanceUrl => Root + "/api/get_user_best";
+        private static string UserUrl => Root + "/api/get_user";
         #endregion
 
         #region Limits
@@ -81,6 +83,14 @@ namespace Bleatingsheep.OsuMixedApi
             var result = await GetRecentlyAsync(username, "string", mode, limit);
             return result;
         }
+
+        public async Task<(bool networkSuccess, UserInfo)> GetUserInfoAsync(int uid, Mode mode)
+        {
+            var result = await GetUserInfoAsync(uid.ToString(), "u", mode);
+            if (result == null) return (false, null);
+            var filter = result.Where(u => u.Id == uid);
+            return (true, filter.SingleOrDefault());
+        }
         #endregion
 
         #region Utils
@@ -113,6 +123,18 @@ namespace Bleatingsheep.OsuMixedApi
                ("limit", limit.ToString()),
                ("type", type));
             Array.ForEach(result, bp => bp.Mode = m);
+            return result;
+        }
+
+        private async Task<UserInfo[]> GetUserInfoAsync(string u, string type, Mode m, int event_days = 1)
+        {
+            var result = await SafeGetArrayAsync<UserInfo>(UserUrl,
+                ("k", apiKey),
+                ("u", u),
+                ("m", ((int)m).ToString()),
+                ("event_days", event_days.ToString()),
+                ("type", type));
+            Array.ForEach(result, user => user.Mode = m);
             return result;
         }
         #endregion
