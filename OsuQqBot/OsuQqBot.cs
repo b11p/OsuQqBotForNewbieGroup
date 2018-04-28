@@ -444,8 +444,8 @@ namespace OsuQqBot
 
         private async Task BindAsync(EndPoint sendBack, long qq, string username)
         {
-            string[] uname = ParseUsername(username);
-            if (!(uname.Length == 1 && uname[0] == username)) return;
+            IList<string> uname = UsernameUtils.ParseUsername(username);
+            if (!(uname.Count == 1 && uname[0] == username)) return;
 
             long? find = await FindUid(qq);
             UserRaw[] users = await apiClient.GetUserAsync(username, OsuApiClient.UsernameType.Username);
@@ -942,8 +942,8 @@ where 查询某个osu!玩家
         /// <returns></returns>
         private async Task<InGroupNameCheckResult> CheckInGroupName(string inGroupName, long uid)
         {
-            var possibleUsernames = ParseUsername(inGroupName);
-            if (possibleUsernames.Length == 0)
+            var possibleUsernames = UsernameUtils.ParseUsername(inGroupName);
+            if (possibleUsernames.Count == 0)
             {
                 return InGroupNameCheckResult.NotContains;
             }
@@ -985,7 +985,7 @@ where 查询某个osu!玩家
             }
             inGroupName = memberInfo.InGroupName;
 
-            var possibleUsernames = ParseUsername(inGroupName);
+            var possibleUsernames = UsernameUtils.ParseUsername(inGroupName);
 
             (string username, long findUid) = await CheckUsername(possibleUsernames);
             if (username == null) return (null, null, 0);

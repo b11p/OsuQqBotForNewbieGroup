@@ -77,7 +77,7 @@ namespace OsuQqBot
         /// </summary>
         /// <param name="possibleUsernames"></param>
         /// <returns>真正被注册的用户名；如果有多个有效或者查询失败，则返回null；如果没有一个有效，返回string.Empty</returns>
-        private async Task<(string username, long uid)> CheckUsername(string[] possibleUsernames)
+        private async Task<(string username, long uid)> CheckUsername(IEnumerable<string> possibleUsernames)
         {
             List<UserRaw> list = new List<UserRaw>();
             foreach (var uName in possibleUsernames)
