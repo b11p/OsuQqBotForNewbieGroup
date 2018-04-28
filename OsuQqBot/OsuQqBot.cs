@@ -27,7 +27,7 @@ namespace OsuQqBot
         private static HttpApiClient s_apiV2;
         public static HttpApiClient ApiV2 { get => s_apiV2; private set => s_apiV2 = value; }
         wudipost::ApiPostListener _listener;
-        //LinkedList<IGroupInvitation> groupInvitations = new LinkedList<IGroupInvitation>();
+        LinkedList<IMessageCommandable> _messageCommands = new LinkedList<IMessageCommandable>();
 
         public OsuQqBot(IQqBot qqBot, HttpApiClient apiClientV2, wudipost::ApiPostListener listener)
         {
@@ -82,6 +82,7 @@ namespace OsuQqBot
             {
                 InitType(t);
             }
+            _listener.MessageEvent += MessageEvent;
         }
 
         private void InitType(Type t)
@@ -96,6 +97,31 @@ namespace OsuQqBot
                 {
                     _listener.GroupInviteEvent += ((IGroupInvitation)lazy.Value).GroupInvitation;
                 }
+                if (i == typeof(IMessageCommandable))
+                {
+                    _messageCommands.AddLast((IMessageCommandable)lazy.Value);
+                }
+            }
+        }
+
+        private void MessageEvent(HttpApiClient api, wudipost.Message message) => MessageFunctions(message, _messageCommands, api);
+
+        private static void MessageFunctions(wudipost::Message message, IEnumerable<IMessageCommandable> commandables, HttpApiClient api)
+        {
+            try
+            {
+                foreach (var function in commandables.Select(f => f.Create()))
+                {
+                    if (function.ShouldResponse(message))
+                    {
+                        function.Process(message, api);
+                        return;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogException(e);
             }
         }
 
