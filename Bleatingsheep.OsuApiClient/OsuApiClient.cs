@@ -91,6 +91,14 @@ namespace Bleatingsheep.OsuMixedApi
             var filter = result.Where(u => u.Id == uid);
             return (true, filter.SingleOrDefault());
         }
+
+        public async Task<(bool networkSuccess, UserInfo)> GetUserInfoAsync(string username, Mode mode)
+        {
+            var result = await GetUserInfoAsync(username, "string", mode);
+            if (result == null) return (false, null);
+            var filter = result.Where(u => string.Compare(u.Name, username, true) == 0);
+            return (true, filter.SingleOrDefault());
+        }
         #endregion
 
         #region Utils
