@@ -28,6 +28,8 @@ namespace OsuQqBot
         public static HttpApiClient ApiV2 { get => s_apiV2; private set => s_apiV2 = value; }
         wudipost::ApiPostListener _listener;
         LinkedList<IMessageCommandable> _messageCommands = new LinkedList<IMessageCommandable>();
+        private static long daloubot;
+        public static long Daloubot => daloubot;
 
         public OsuQqBot(IQqBot qqBot, HttpApiClient apiClientV2, wudipost::ApiPostListener listener)
         {
@@ -66,6 +68,9 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
 
             // 初始化
+            Querying.SetKey(config.ApiKey);
+            Interlocked.CompareExchange(ref daloubot, config.Daloubot, 0);
+
             v2 = apiClientV2;
             Interlocked.CompareExchange(ref s_apiV2, v2, null);
             _listener = listener;

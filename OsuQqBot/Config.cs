@@ -10,5 +10,6 @@ namespace OsuQqBot
         public long MainGroup { get; set; }
         public long[] ValidGroups { get; set; }
         public string ApiKey { get; set; }
+        public long Daloubot { get; set; }
     }
 }
