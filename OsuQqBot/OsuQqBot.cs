@@ -422,30 +422,6 @@ namespace OsuQqBot
         }
 
         Random random = new Random();
-        private readonly List<string> Tips = new List<string>
-        {
-            //"你不合适屙屎——interBot",
-            //"求求你别糊图了——interBot",
-            //"再见了——interBot",
-            //"pp刷子——interBot",
-            //"打图经验充足，不飞升没理由——interBot",
-            "再@我，我叫咩咩打你——我说的",
-            //"whir爷爷——大家如是说",
-            //"标准的正常玩家——interBot",
-            //"你们还是去床上解决吧——interBot",
-            //"相信你一定可以克服瓶颈",
-            //At(1677323371)+"你快回来，生命因你而精彩",
-            //At(1677323371)+"你快回来，把我的思念带回来",
-            //"别让我的心空如大海——《你快回来》",
-            //"新人赛火热进行中（化学式承办）",
-            "广告位招租",
-            "中国的whir，我被他打爆！",
-            "早上好",
-            "求求你别复读了",
-            "ญ็้็้็้็้็้็้็้็้็้็้็้ŭ..",
-            "。",
-            "jump有用？",
-        };
 
         private async Task BindAsync(EndPoint sendBack, long qq, string username)
         {
@@ -676,11 +652,6 @@ where 查询某个osu!玩家
             throw new NotImplementedException();
         }
 
-        private async Task<bool> WhereFrom(EndPoint endPoint, string where, string from)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// 上次检查群名片的时间
         /// </summary>
@@ -837,106 +808,6 @@ where 查询某个osu!玩家
                 ignorePPString
             });
         }
-
-        ///// <summary>
-        ///// （废弃)（执行）检查群名片
-        ///// </summary>
-        ///// <param name="fromGroup"></param>
-        ///// <param name="fromQq"></param>
-        ///// <param name="message"></param>
-        ///// <param name="inGroupName"></param>
-        ///// <param name="uid"></param>
-        ///// <returns></returns>
-        //private async Task CheckIfInGroupNameQualified(long fromGroup, long fromQq, long uid)
-        //{
-        //    string inGroupName;
-        //    try
-        //    {
-        //        var memberInfo = qq.GetGroupMemberInfo(fromGroup, fromQq);
-        //        if (memberInfo == null)
-        //        {
-        //            return;
-        //        }
-        //        inGroupName = memberInfo.InGroupName;
-        //        if (string.IsNullOrEmpty(inGroupName))
-        //            inGroupName = memberInfo.QqNickname;
-        //    }
-        //    catch (FormatException e)
-        //    {// 此 try-catch 好像是遗留问题，可以考虑去掉
-        //        Logger.Log("获取群名片出现问题");
-        //        Logger.Log(fromGroup.ToString());
-        //        Logger.Log(fromQq.ToString());
-        //        Logger.LogException(e);
-        //        Logger.Log("return");
-        //        return;
-        //    }
-        //    var possibleUsernames = ParseUsername(inGroupName);
-        //    if (possibleUsernames.Length == 0)
-        //    {
-        //        await Task.Delay(60000);
-        //        qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 请修改群名片，必须包括osu!用户名");
-        //        return;
-        //    }
-
-        //    if (uid != 0)
-        //    {
-        //        string foundUsername = await FindUsername(uid); //找到的用户名
-        //        if (foundUsername == null) return; //查找失败
-        //        if (possibleUsernames.Any(psb =>
-        //            psb.ToLowerInvariant() == foundUsername.ToLowerInvariant()
-        //        )) return; //OK
-        //        Logger.Log(inGroupName + "用户名不OK" + foundUsername);
-        //        await Task.Delay(60000);
-        //        if (inGroupName.Contains(foundUsername))
-        //        {
-        //            string hint = $"[CQ:at,qq={fromQq}] 请修改群名片，不要在用户名前后添加可以被用做用户名的字符，以免混淆。";
-        //            int firstIndex = inGroupName.IndexOf(foundUsername);
-        //            if (firstIndex != -1)
-        //            {
-        //                string recommendCard = inGroupName.Substring(0, firstIndex);
-        //                if (firstIndex != 0)
-        //                    recommendCard += "|";
-        //                recommendCard += foundUsername;
-        //                if (firstIndex + foundUsername.Length < inGroupName.Length)
-        //                {
-        //                    recommendCard += "|" + inGroupName.Substring(firstIndex + foundUsername.Length);
-        //                }
-        //                hint += Environment.NewLine + "建议群名片：" + Environment.NewLine;
-        //                hint += recommendCard;
-        //                qq.SendGroupMessageAsync(fromGroup, hint);
-        //            }
-        //            else
-        //            {
-        //                StringBuilder sb = new StringBuilder();
-        //                sb.AppendLine("无法给出推荐名片");
-        //                sb.AppendLine("群名：" + inGroupName);
-        //                sb.AppendLine("用户名：" + foundUsername);
-        //                Logger.Log(sb.ToString());
-        //            }
-
-        //        }
-        //        else qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 请修改群名片，必须包括正确的osu!用户名。数据库中您的名字是{foundUsername}，如改名请@我，如有错误请联系bleatingsheep。");
-        //    }
-        //    else
-        //    {
-        //        (string username, long findUid) = await CheckUsername(possibleUsernames);
-        //        if (username == null) return;
-        //        if (username == string.Empty)
-        //        {
-        //            qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您尚未绑定osu!id，请将群名片改为osu!中的名字，直到提示您绑定成功。");
-        //            //+ Environment.NewLine + "!setid 您的id");
-        //        }
-        //        else
-        //        {
-        //            database.CacheUsername(findUid, username);
-        //            database.Bind(fromQq, findUid, "Auto");
-        //            var success = await Int100ApiClient.BindQqAndOsuUid(fromQq, findUid);
-        //            qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 自动绑定为{username}，{(success ? string.Empty : "但不知道是否成功，")}请发送“~”查询信息。如有错误请联系bleatingsheep。");
-        //            Logger.Log("自动绑定" + fromQq + username);
-        //            qq.SendGroupMessageAsync(fromGroup, $"!stats {findUid}");
-        //        }
-        //    }
-        //}
 
         /// <summary>
         /// 检查群名片是否包含osu的名字

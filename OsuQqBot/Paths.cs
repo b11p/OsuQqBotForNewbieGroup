@@ -15,16 +15,6 @@ namespace OsuQqBot
         /// </summary>
         internal static string DataPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Sheep Bot Data");
 
-        ///// <summary>
-        ///// 存储 QQ 与 osu!ID 的绑定数据
-        ///// </summary>
-        //internal static string BindPath => Path.Combine(DataPath, "Binding Data");
-
-        ///// <summary>
-        ///// 存储昵称的目录
-        ///// </summary>
-        //internal static string NicknamePath => Path.Combine(DataPath, "nicknames");
-
         /// <summary>
         /// json配置文件所在路径
         /// </summary>
