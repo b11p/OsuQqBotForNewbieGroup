@@ -1,8 +1,9 @@
 ﻿using Bleatingsheep.OsuMixedApi;
+using OsuQqBot.Api;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
+using mixed = Bleatingsheep.OsuMixedApi;
 
 namespace OsuQqBot
 {
@@ -16,12 +17,12 @@ namespace OsuQqBot
         public IReadOnlyCollection<UserInfo> CheckUsername(IEnumerable<string> possibleUsernames, bool requireAllSucceeded = true)
         {
             var userInfos = new System.Collections.Concurrent.ConcurrentBag<UserInfo>();
-            var api = OsuApiClient.ClientUsingKey(key);
+            var api = mixed::OsuApiClient.ClientUsingKey(key);
 
             var result = System.Threading.Tasks.Parallel.ForEach(possibleUsernames, (name, state) =>
             {
                 if (state.IsStopped) return;
-                var (networkSuccess, userInfo) = api.GetUserInfoAsync(name, Mode.Standard).Result;
+                var (networkSuccess, userInfo) = api.GetUserInfoAsync(name, mixed::Mode.Standard).Result;
                 if (requireAllSucceeded && !networkSuccess)
                 {
                     state.Stop();
@@ -74,13 +75,13 @@ namespace OsuQqBot
                 displayAcc = userInfo.Accuracy.ToString();
             }
 
-            byLine[0] = userInfo.Name + "的个人信息" + (userInfo.Mode == Mode.Standard && !showMode ? "" : "—" + userInfo.Mode.GetModeString());
+            byLine[0] = userInfo.Name + "的个人信息" + (userInfo.Mode == mixed::Mode.Standard && !showMode ? "" : "—" + userInfo.Mode.GetModeString());
             byLine[1] = string.Empty;
             byLine[2] = userInfo.Performance + "pp 表现";
             byLine[3] = "#" + userInfo.Rank;
-            byLine[4] = userInfo.CountryCode + " #" + userInfo.CountryRank;
+            byLine[4] = userInfo.Country() + " #" + userInfo.CountryRank;
             byLine[5] = (userInfo.RankedScore).ToString("#,###") + " Ranked谱面总分";
-            byLine[6] = displayAcc + "% 准确率";
+            byLine[6] = displayAcc + " 准确率";
             byLine[7] = userInfo.PlayCount + " 游玩次数";
             byLine[8] = (userInfo.TotalHits).ToString("#,###") + " 总命中次数";
 
@@ -90,17 +91,17 @@ namespace OsuQqBot
 
     static class ModeExtends
     {
-        public static string GetModeString(this Mode mode)
+        public static string GetModeString(this mixed::Mode mode)
         {
             switch (mode)
             {
-                case Mode.Standard:
+                case mixed::Mode.Standard:
                     return "osu!";
-                case Mode.Taiko:
+                case mixed::Mode.Taiko:
                     return "taiko";
-                case Mode.Ctb:
+                case mixed::Mode.Ctb:
                     return "catch";
-                case Mode.Mania:
+                case mixed::Mode.Mania:
                     return "mania";
                 default:
                     return null;

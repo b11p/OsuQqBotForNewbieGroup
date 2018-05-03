@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bleatingsheep.OsuMixedApi;
+using System;
 using System.Collections.Generic;
 
 namespace OsuQqBot.Api
@@ -46,7 +47,7 @@ namespace OsuQqBot.Api
                     Level = double.Parse(raw.level),
                     PP = double.Parse(raw.pp_raw),
                     Accuracy = double.Parse(raw.accuracy),
-                    Country = countries.GetValueOrDefault(raw.country, raw.country),
+                    Country = raw.Country(),
                     CountryRank = int.Parse(raw.pp_country_rank),
                 };
             }
@@ -56,11 +57,124 @@ namespace OsuQqBot.Api
                 {
                     Id = long.Parse(raw.user_id),
                     Name = raw.username,
-                    Country = countries.GetValueOrDefault(raw.country, raw.country),
+                    Country = raw.Country(),
                 };
             }
         }
+    }
 
+    class Beatmap
+    {
+        private Beatmap() { }
+
+        public long Sid { get; set; }
+        public long Bid { get; set; }
+        //public string approved { get; set; }
+        //public string total_length { get; set; }
+        //public string hit_length { get; set; }
+        public string Difficulty { get; set; }
+        //public string MD5 { get; set; }
+        public double CS { get; set; }
+        public double OD { get; set; }
+        public double AR { get; set; }
+        public double HP { get; set; }
+        //public Mode Mode { get; set; }
+        //public string approved_date { get; set; }
+        //public string last_update { get; set; }
+        public string Artist { get; set; }
+        public string Title { get; set; }
+        public string Creator { get; set; }
+        public double Bpm { get; set; }
+        //public string source { get; set; }
+        //public string tags { get; set; }
+        //public string genre_id { get; set; }
+        //public string language_id { get; set; }
+        //public string favourite_count { get; set; }
+        //public string playcount { get; set; }
+        //public string passcount { get; set; }
+        //public string max_combo { get; set; }
+        public double Stars { get; set; }
+
+        public static explicit operator Beatmap(beatmap raw)
+        {
+            return new Beatmap
+            {
+                Sid = long.Parse(raw.beatmapset_id),
+                Bid = long.Parse(raw.beatmap_id),
+                Difficulty = raw.version,
+                CS = double.Parse(raw.diff_size),
+                OD = double.Parse(raw.diff_overall),
+                AR = double.Parse(raw.diff_approach),
+                HP = double.Parse(raw.diff_drain),
+                Artist = raw.artist,
+                Title = raw.title,
+                Creator = raw.creator,
+                Bpm = double.Parse(raw.bpm),
+                Stars = double.Parse(raw.difficultyrating),
+            };
+        }
+    }
+
+    class BestPerformance
+    {
+        private BestPerformance() { }
+
+        private Beatmap _beatmap;
+
+        /// <summary>
+        /// 此方法线程不安全（根本未实现）
+        /// </summary>
+        /// <param name="api"></param>
+        /// <returns></returns>
+        public async System.Threading.Tasks.Task<Beatmap> GetBeatmapAsync(OsuApiClient api)
+        {
+            if (_beatmap != null) return _beatmap;
+
+            var beatmap = await api.GetBeatmapAsync(BeatmapId);
+            throw new NotImplementedException();
+        }
+
+        public long BeatmapId { get; private set; }
+        public long Score { get; private set; }
+        public int Combo { get; private set; }
+        public int Count300 { get; private set; }
+        public int Count100 { get; private set; }
+        public int Count50 { get; private set; }
+        public int CountMiss { get; private set; }
+        public int CountKatu { get; private set; }
+        public int CountGeki { get; private set; }
+        public bool FullCombo { get; private set; }
+        public OsuApiClient.Mods EnabledMods { get; private set; }
+        public long UserId { get; private set; }
+        //public string Date { get; private set; }
+        public string Rank { get; private set; }
+        public double PP { get; private set; }
+
+        public static explicit operator BestPerformance(best_performance bp)
+        {
+            return new BestPerformance
+            {
+                BeatmapId = long.Parse(bp.beatmap_id),
+                Score = long.Parse(bp.score),
+                Combo = int.Parse(bp.maxcombo),
+                Count300 = int.Parse(bp.count300),
+                Count100 = int.Parse(bp.count100),
+                Count50 = int.Parse(bp.count50),
+                CountMiss = int.Parse(bp.countmiss),
+                CountKatu = int.Parse(bp.countkatu),
+                CountGeki = int.Parse(bp.countgeki),
+                FullCombo = bp.perfect == "1",
+                EnabledMods = (OsuApiClient.Mods)int.Parse(bp.enabled_mods),
+                UserId = long.Parse(bp.user_id),
+                //Date = 
+                Rank = bp.rank,
+                PP = double.Parse(bp.pp),
+            };
+        }
+    }
+
+    static class UserCountryExtensions
+    {
         private static Dictionary<string, string> countries = new Dictionary<string, string>
         {
             {"AF", "Afghanistan" },
@@ -313,115 +427,9 @@ namespace OsuQqBot.Api
             {"ZM", "Zambia" },
             {"ZW", "Zimbabwe" },
         };
-    }
 
-    class Beatmap
-    {
-        private Beatmap() { }
+        public static string Country(this UserRaw user) => countries.GetValueOrDefault(user.country, user.country);
 
-        public long Sid { get; set; }
-        public long Bid { get; set; }
-        //public string approved { get; set; }
-        //public string total_length { get; set; }
-        //public string hit_length { get; set; }
-        public string Difficulty { get; set; }
-        //public string MD5 { get; set; }
-        public double CS { get; set; }
-        public double OD { get; set; }
-        public double AR { get; set; }
-        public double HP { get; set; }
-        //public Mode Mode { get; set; }
-        //public string approved_date { get; set; }
-        //public string last_update { get; set; }
-        public string Artist { get; set; }
-        public string Title { get; set; }
-        public string Creator { get; set; }
-        public double Bpm { get; set; }
-        //public string source { get; set; }
-        //public string tags { get; set; }
-        //public string genre_id { get; set; }
-        //public string language_id { get; set; }
-        //public string favourite_count { get; set; }
-        //public string playcount { get; set; }
-        //public string passcount { get; set; }
-        //public string max_combo { get; set; }
-        public double Stars { get; set; }
-
-        public static explicit operator Beatmap(beatmap raw)
-        {
-            return new Beatmap
-            {
-                Sid = long.Parse(raw.beatmapset_id),
-                Bid = long.Parse(raw.beatmap_id),
-                Difficulty = raw.version,
-                CS = double.Parse(raw.diff_size),
-                OD = double.Parse(raw.diff_overall),
-                AR = double.Parse(raw.diff_approach),
-                HP = double.Parse(raw.diff_drain),
-                Artist = raw.artist,
-                Title = raw.title,
-                Creator = raw.creator,
-                Bpm = double.Parse(raw.bpm),
-                Stars = double.Parse(raw.difficultyrating),
-            };
-        }
-    }
-
-    class BestPerformance
-    {
-        private BestPerformance() { }
-
-        private Beatmap _beatmap;
-
-        /// <summary>
-        /// 此方法线程不安全（根本未实现）
-        /// </summary>
-        /// <param name="api"></param>
-        /// <returns></returns>
-        public async System.Threading.Tasks.Task<Beatmap> GetBeatmapAsync(OsuApiClient api)
-        {
-            if (_beatmap != null) return _beatmap;
-
-            var beatmap = await api.GetBeatmapAsync(BeatmapId);
-            throw new NotImplementedException();
-        }
-
-        public long BeatmapId { get; private set; }
-        public long Score { get; private set; }
-        public int Combo { get; private set; }
-        public int Count300 { get; private set; }
-        public int Count100 { get; private set; }
-        public int Count50 { get; private set; }
-        public int CountMiss { get; private set; }
-        public int CountKatu { get; private set; }
-        public int CountGeki { get; private set; }
-        public bool FullCombo { get; private set; }
-        public OsuApiClient.Mods EnabledMods { get; private set; }
-        public long UserId { get; private set; }
-        //public string Date { get; private set; }
-        public string Rank { get; private set; }
-        public double PP { get; private set; }
-
-        public static explicit operator BestPerformance(best_performance bp)
-        {
-            return new BestPerformance
-            {
-                BeatmapId = long.Parse(bp.beatmap_id),
-                Score = long.Parse(bp.score),
-                Combo = int.Parse(bp.maxcombo),
-                Count300 = int.Parse(bp.count300),
-                Count100 = int.Parse(bp.count100),
-                Count50 = int.Parse(bp.count50),
-                CountMiss = int.Parse(bp.countmiss),
-                CountKatu = int.Parse(bp.countkatu),
-                CountGeki = int.Parse(bp.countgeki),
-                FullCombo = bp.perfect == "1",
-                EnabledMods = (OsuApiClient.Mods)int.Parse(bp.enabled_mods),
-                UserId = long.Parse(bp.user_id),
-                //Date = 
-                Rank = bp.rank,
-                PP = double.Parse(bp.pp),
-            };
-        }
+        public static string Country(this UserInfo userInfo) => countries.GetValueOrDefault(userInfo.CountryCode, userInfo.CountryCode);
     }
 }
