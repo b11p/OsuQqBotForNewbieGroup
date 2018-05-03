@@ -7,8 +7,6 @@ namespace OsuQqBot.StatelessFunctions
 {
     class DalouNoHarm : IStatelessFunction
     {
-        const long dalou = 1061566571;
-
         static readonly ConcurrentQueue<(long group, string message)> queue;
 
         static readonly IReadOnlyCollection<long> valid = new List<long> { 514661057, 641236878 };
@@ -29,7 +27,7 @@ namespace OsuQqBot.StatelessFunctions
                 if (m == message) return (m, ++no);
                 return (message, 1);
             });
-            if (nv.num == 4 && fromQq == dalou) return true;
+            if (nv.num == 4 && fromQq == OsuQqBot.Daloubot) return true;
             return false;
         }
 

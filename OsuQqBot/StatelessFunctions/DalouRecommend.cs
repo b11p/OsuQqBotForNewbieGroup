@@ -9,7 +9,7 @@ namespace OsuQqBot.StatelessFunctions
 {
     class DalouRecommend : IStatelessFunction
     {
-        private const long DalouBot = 1061566571;
+        private long DalouBot => OsuQqBot.Daloubot;
         private const long Sheep = 962549599;
         private const long DebugGroup = 72318078;
 
