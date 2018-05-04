@@ -33,7 +33,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
                 .HasKey(g => new { g.ChartId, g.GroupId });
 
             modelBuilder.Entity<ChartCommit>()
-                .HasKey(c => new { c.ChartId, c.BeatmapId, c.Mode, c.Date });
+                .HasKey(c => new { c.ChartId, c.BeatmapId, c.Mode, c.Date, c.Uid });
 
             var beatmaps = modelBuilder.Entity<Beatmap>();
             beatmaps

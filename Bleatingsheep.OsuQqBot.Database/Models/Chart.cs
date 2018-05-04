@@ -87,6 +87,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         [Required]
         public string Rank { get; set; }
 
+        public Chart Chart { get; set; }
+
         public ChartBeatmap Beatmap { get; set; }
 
         /// <summary>
