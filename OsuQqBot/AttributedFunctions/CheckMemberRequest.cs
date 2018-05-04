@@ -19,7 +19,7 @@ namespace OsuQqBot.AttributedFunctions
         private long UserId => long.Parse(_match.Groups[2].Value);
         private string Message => _match.Groups[3].Value;
 
-        private string InfoOf(UserInfo userInfo) => userInfo.TextInfo();
+        private static string InfoOf(UserInfo userInfo) => userInfo.TextInfo();
 
         IMessageCommandable IMessageCommandable.Create() => new CheckMemberRequest();
 
@@ -31,7 +31,7 @@ namespace OsuQqBot.AttributedFunctions
             {
                 try
                 {
-                    api.SendMessageAsync(message, InfoOf(user)).Wait();
+                    api.SendMessageAsync(message.Endpoint, InfoOf(user)).Wait();
                 }
                 catch (AggregateException) { }
             }
