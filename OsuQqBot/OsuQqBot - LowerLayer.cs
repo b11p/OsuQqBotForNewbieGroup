@@ -11,7 +11,7 @@ namespace OsuQqBot
         {
             if (new StatelessFunctions.ManageTips().ProcessMessage(endPoint, source, message)) return;
             if (new StatelessFunctions.CannotOverStar().ProcessMessage(endPoint, source, message)) return;
-            if (new StatelessFunctions.IntIsMeimei().ProcessMessage(endPoint, source, message)) return;
+            //if (new StatelessFunctions.IntIsMeimei().ProcessMessage(endPoint, source, message)) return;
             //if (new StatelessFunctions.Rinima().ProcessMessage(endPoint, source, message)) return;
             if (new StatelessFunctions.MaChuanA().ProcessMessage(endPoint, source, message)) return;
             if (new StatelessFunctions.DalouRecommend().ProcessMessage(endPoint, source, message)) return;
