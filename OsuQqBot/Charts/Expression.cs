@@ -8,7 +8,7 @@ namespace OsuQqBot.Charts
     class Expression<T>
     {
         private readonly string _expression;
-        private readonly IReadOnlyDictionary<string, (Action<Stack<double>> function, int priority)> _operatorsMap;
+        private readonly IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> _operatorsMap;
         private readonly IReadOnlyDictionary<string, Func<T, double>> _valuesMap;
 
         /// <summary>
@@ -18,10 +18,10 @@ namespace OsuQqBot.Charts
         /// <param name="operatorsMap">不能包括字母、数字、下划线、括号以及空白字符。</param>
         /// <param name="valuesMap">字母或下划线开头，可以包括字母数字下划线。</param>
         /// <exception cref="FormatException"></exception>
-        public Expression(string expression, IReadOnlyDictionary<string, (Action<Stack<double>> function, int priority)> operatorsMap, IReadOnlyDictionary<string, Func<T, double>> valuesMap)
+        public Expression(string expression, IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> operatorsMap, IReadOnlyDictionary<string, Func<T, double>> valuesMap)
         {
             _expression = expression;
-            _operatorsMap = new Dictionary<string, (Action<Stack<double>> function, int priority)>(operatorsMap);
+            _operatorsMap = new Dictionary<string, (Func<double, double, double> function, int priority)>(operatorsMap);
             _valuesMap = new Dictionary<string, Func<T, double>>(valuesMap);
             Init();
         }
@@ -43,13 +43,11 @@ namespace OsuQqBot.Charts
 
             if (index < expression.Length) throw new FormatException("Analyzing error. Most possibly you lost an open parenthesis in the beginning.");
 
-            while (data.Stack.TryPop(out string top))
-            {
-                data.Expression.AddLast(top);
-            }
+            data.Complete();
         }
         private static void ProcessExpression(string expression, ProcessingData data, ref int index)
         {
+            data.Mark();
             while (index < expression.Length)
             {
                 string next;
@@ -60,13 +58,17 @@ namespace OsuQqBot.Charts
                 // 括号
                 if (next == null) ProcessExpression(expression, data, ref index);
                 // 数字入表达式
-                else data.Expression.AddLast(next);
+                else data.FeedValue(next);
 
                 // want: ")" or symbol or end
                 next = NextSymbolOrEnd(expression, ref index);
 
                 // 括号或结束
-                if (next == null) return;
+                if (next == null)
+                {
+                    data.Recycle();
+                    break;
+                }
                 // 入栈
                 else data.SmartPush(next);
 
@@ -153,15 +155,17 @@ namespace OsuQqBot.Charts
 
         private class ProcessingData
         {
-            private readonly IReadOnlyDictionary<string, (Action<Stack<double>> function, int priority)> _operators;
+            private readonly IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> _operators;
             private readonly IReadOnlyDictionary<string, Func<T, double>> _variablesMap;
             private int _operatorsCount = 0;
             private int _variablesCount = 0;
 
             private readonly Stack<string> _stack = new Stack<string>();
-            public LinkedList<string> Expression { get; } = new LinkedList<string>();
+            private readonly LinkedList<string> _expression = new LinkedList<string>();
 
-            public ProcessingData(IReadOnlyDictionary<string, (Action<Stack<double>> function, int priority)> operators, IReadOnlyDictionary<string, Func<T, double>> variablesMap)
+            private const string Flag = "_stack_"; // flag for stack.
+
+            public ProcessingData(IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> operators, IReadOnlyDictionary<string, Func<T, double>> variablesMap)
             {
                 _operators = operators;
                 _variablesMap = variablesMap;
@@ -180,7 +184,7 @@ namespace OsuQqBot.Charts
                 while (_stack.TryPeek(out string top) && _operators[top].priority >= newPriority)
                 {
                     _stack.Pop();
-                    Expression.AddLast(top);
+                    _expression.AddLast(top);
                 }
                 _stack.Push(symbol);
                 _operatorsCount++;
@@ -190,8 +194,21 @@ namespace OsuQqBot.Charts
             {
                 if (!double.TryParse(value, out _) && !_variablesMap.ContainsKey(value)) throw new FormatException("Invalid value or varaiable name.");
 
-                Expression.AddLast(value);
+                _expression.AddLast(value);
                 _variablesCount++;
+            }
+
+            public void Mark() => _stack.Push(Flag);
+
+            public void Recycle()
+            {
+                while (_stack.TryPop(out string top) && top != Flag) _expression.AddLast(top);
+            }
+
+            public void Complete()
+            {
+                Recycle();
+                if (_stack.TryPeek(out _)) throw new FormatException("Stack error.");
             }
         }
     }
