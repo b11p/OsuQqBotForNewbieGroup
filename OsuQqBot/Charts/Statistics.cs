@@ -190,6 +190,7 @@ namespace OsuQqBot.Charts
                     Stack.Pop();
                     Expression.AddLast(top);
                 }
+                Stack.Push(symbol);
             }
 
             public static ProcessingData Create()
