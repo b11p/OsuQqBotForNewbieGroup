@@ -73,6 +73,12 @@ namespace Bleatingsheep.OsuMixedApi
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="modString"></param>
+        /// <exception cref="ArgumentException"></exception>
+        /// <returns></returns>
         public static Mods Parse(string modString)
         {
             if (modString == null)
