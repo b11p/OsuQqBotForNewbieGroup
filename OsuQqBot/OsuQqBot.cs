@@ -710,10 +710,9 @@ where 查询某个osu!玩家
                     inGroupName = GetInGroupName(fromGroup, fromQq);
                     if (inGroupName == null) return;
 
-                    var result = await CheckInGroupName(inGroupName, uid.Value);
+                    var (result, hisUsername) = await CheckInGroupName(inGroupName, uid.Value);
 
                     string hint = string.Empty;
-                    string hisUsername = await FindUsername(uid.Value);
                     switch (result)
                     {
                         case InGroupNameCheckResult.NeverBind:
@@ -816,28 +815,28 @@ where 查询某个osu!玩家
         /// <param name="fromQq">来自QQ</param>
         /// <param name="uid">osu! uid，如果未绑定，则为0</param>
         /// <returns></returns>
-        private async Task<InGroupNameCheckResult> CheckInGroupName(string inGroupName, long uid)
+        private async Task<(InGroupNameCheckResult, string)> CheckInGroupName(string inGroupName, long uid)
         {
             var possibleUsernames = UsernameUtils.ParseUsername(inGroupName);
             if (possibleUsernames.Count == 0)
             {
-                return InGroupNameCheckResult.NotContains;
+                return (InGroupNameCheckResult.NotContains, null);
             }
 
             if (uid != 0)
             {
                 string foundUsername = await FindUsername(uid); //找到的用户名
-                if (foundUsername == null) return InGroupNameCheckResult.Error; //查找失败
+                if (foundUsername == null) return (InGroupNameCheckResult.Error, null); //查找失败
                 if (possibleUsernames.Any(psb =>
                     psb.ToLowerInvariant() == foundUsername.ToLowerInvariant()
-                )) return InGroupNameCheckResult.Qualified; //OK
+                )) return (InGroupNameCheckResult.Qualified, foundUsername); //OK
                 return inGroupName.IndexOf(foundUsername, StringComparison.InvariantCultureIgnoreCase) != -1 ?
-                    InGroupNameCheckResult.IsSubstring :
-                    InGroupNameCheckResult.NotOwner;
+                    (InGroupNameCheckResult.IsSubstring, foundUsername) :
+                    (InGroupNameCheckResult.NotOwner, foundUsername);
             }
             else
             {
-                return InGroupNameCheckResult.NeverBind;
+                return (InGroupNameCheckResult.NeverBind, null);
             }
         }
 
