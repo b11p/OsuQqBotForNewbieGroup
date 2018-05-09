@@ -88,7 +88,7 @@ namespace OsuQqBot.Charts
                 // 括号或结束
                 if (next == null) return;
                 // 入栈
-                else data.Expression.AddLast(next);
+                else data.SmartPush(next);
 
                 // want: value or "("
             }
