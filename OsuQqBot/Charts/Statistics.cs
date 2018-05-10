@@ -41,18 +41,28 @@ namespace OsuQqBot.Charts
         {
             if (string.IsNullOrWhiteSpace(scoreCalculation)) return s => s.Score;
 
-            throw new NotImplementedException("未实现自定义公式计分。");
-            
+            var exp = new Expression<ChartCommit>(scoreCalculation, Operators, Values);
+            return s => exp.Evaluate(s);
         }
-        
-        private static readonly IReadOnlyDictionary<string, (Action<Stack<double>> function, int priority)> Operators
-            = new Dictionary<string, (Action<Stack<double>> function, int priority)>
+
+        private static readonly IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> Operators
+            = new Dictionary<string, (Func<double, double, double> function, int priority)>
             {
-                { "+", ( s => s.Push( s.Pop() + s.Pop()), 1) },
-                { "-", ( s => s.Push( -s.Pop() + s.Pop()), 1) },
-                { "*", ( s => s.Push( s.Pop() * s.Pop()), 2) },
-                { "/", ( s => { double y = s.Pop(), x = s.Pop(); s.Push(x / y); }, 2) },
-                { "^", ( s => { double y = s.Pop(), x = s.Pop(); s.Push(Math.Pow(x, y)); }, 3) },
+                { "+", ((x, y) => x + y, 1) },
+                { "-", ((x, y) => x - y, 1) },
+                { "*", ((x, y) => x * y, 2) },
+                { "/", ((x, y) => x / y, 2) },
+                { "^", ((x, y) => Math.Pow(x, y), 3) },
             };
+
+        private static readonly IReadOnlyDictionary<string, Func<ChartCommit, double>> Values = new Dictionary<string, Func<ChartCommit, double>>
+        {
+            { "acc",  c => c.Accuracy },
+            { "accuracy",  c => c.Accuracy },
+            { "combo",  c => c.Combo },
+            { "score",  c => c.Score },
+            { "pp",  c => c.PPWhenCommit },
+            { "performance",  c => c.PPWhenCommit },
+        };
     }
 }
