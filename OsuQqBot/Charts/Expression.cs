@@ -1,35 +1,91 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OsuQqBot.Charts
 {
-    class Expression<T>
+    public class Expression<T>
     {
         private readonly string _expression;
         private readonly IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> _operatorsMap;
         private readonly IReadOnlyDictionary<string, Func<T, double>> _valuesMap;
+        private readonly IEnumerable<string> _Rpn;
 
         /// <summary>
-        /// 
+        /// 给一个表达式，指定如何处理变量和运算符。
         /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="operatorsMap">不能包括字母、数字、下划线、括号以及空白字符。</param>
-        /// <param name="valuesMap">字母或下划线开头，可以包括字母数字下划线。</param>
-        /// <exception cref="FormatException"></exception>
+        /// <param name="expression">计算的表达式。</param>
+        /// <param name="operatorsMap">操作符。不能包括字母、数字、下划线、括号以及空白字符。</param>
+        /// <param name="valuesMap">值。字母或下划线开头，可以包括字母数字下划线。</param>
+        /// <exception cref="FormatException">表达式出现任何问题都会抛出 <see cref="FormatException"/>。</exception>
         public Expression(string expression, IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> operatorsMap, IReadOnlyDictionary<string, Func<T, double>> valuesMap)
         {
             _expression = expression;
             _operatorsMap = new Dictionary<string, (Func<double, double, double> function, int priority)>(operatorsMap);
             _valuesMap = new Dictionary<string, Func<T, double>>(valuesMap);
-            Init();
+            var data = Init();
+            _Rpn = data.Result;
         }
 
-        private void Init()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <exception cref="InvalidOperationException">如果抛出异常，说明有 bug。</exception>
+        /// <returns></returns>
+        public double Evaluate(T arg) => Evaluate(_Rpn, _operatorsMap, _valuesMap, arg);
+
+        private ProcessingData Init()
         {
             var processingData = new ProcessingData(_operatorsMap, _valuesMap);
             ProcessExpression(_expression, processingData);
+            return processingData;
+        }
+
+        private static double Evaluate(IEnumerable<string> rpn, IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> operatorsMap, IReadOnlyDictionary<string, Func<T, double>> valuesMap, T arg)
+        {
+            var stack = new Stack<double>();
+            foreach (string item in rpn)
+            {
+                if (TryValue(item, valuesMap, arg, out double value))
+                {
+                    stack.Push(value);
+                    continue;
+                }
+                if (TryOperator(item, operatorsMap, out Func<double, double, double> function))
+                {
+                    double y = stack.Pop(), x = stack.Pop(); // Error if there are less than 2 values in stack.
+                    stack.Push(function(x, y));
+                    continue;
+                }
+                throw new InvalidOperationException("Invalid operation.");
+            }
+            double result = stack.Pop();
+            if (stack.TryPop(out _)) throw new InvalidOperationException("Stack should be empty.");
+            return result;
+        }
+
+        private static bool TryValue(string item, IReadOnlyDictionary<string, Func<T, double>> valuesMap, T arg, out double result)
+        {
+            if (double.TryParse(item, out double num))
+            {
+                result = num;
+                return true;
+            }
+            if (valuesMap.TryGetValue(item, out Func<T, double> func))
+            {
+                result = func(arg);
+                return true;
+            }
+            result = default(double);
+            return false;
+        }
+
+        private static bool TryOperator(string item, IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> operatorsMap, out Func<double, double, double> function)
+        {
+            bool success = operatorsMap.TryGetValue(item, out var functionInfo);
+            function = functionInfo.function;
+            return success;
         }
 
         /// <summary>
@@ -170,6 +226,8 @@ namespace OsuQqBot.Charts
                 _operators = operators;
                 _variablesMap = variablesMap;
             }
+
+            public IEnumerable<string> Result => _expression;
 
             /// <summary>
             /// 
