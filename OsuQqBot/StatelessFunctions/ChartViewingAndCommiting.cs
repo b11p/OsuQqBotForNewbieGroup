@@ -115,8 +115,8 @@ namespace OsuQqBot.StatelessFunctions
                 qq.SendMessageAsync(endPoint, "没打图！");
                 return;
             }
-            var result = new List<CommitResult>(recent.Length);
-            var hintResult = new List<string>(recent.Length);
+            var result = new CommitResult[recent.Length];
+            var hintResult = new string[recent.Length];
             for (int i = 0; i < recent.Length; i++)
             {
                 result[i] = NewbieDatabase.Commit(endPoint.GroupId, recent[i], ((Api.User)user[0]).PP, out var commited);

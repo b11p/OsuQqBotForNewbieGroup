@@ -239,7 +239,7 @@ namespace OsuQqBot.Charts
                 // TODO: 阻止操作符数量超过操作数的数量。
                 if (!_operators.TryGetValue(symbol, out var oInfo)) throw new FormatException($"Invalid operator {symbol}.");
                 int newPriority = oInfo.priority;
-                while (_stack.TryPeek(out string top) && _operators[top].priority >= newPriority)
+                while (_stack.TryPeek(out string top) && top != Flag && _operators[top].priority >= newPriority)
                 {
                     _stack.Pop();
                     _expression.AddLast(top);

@@ -2,6 +2,7 @@
 using Bleatingsheep.OsuQqBot.Database;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using OsuQqBot;
+using OsuQqBot.Charts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,10 +57,12 @@ namespace Test
         {
             try
             {
+                ExpressionTest();
+                //ChartTestInNewbieFurther();
                 //var result = await RankAsync(8);
                 //await CachedTest();
                 //await BloodcatTestAsync();
-                await DatabaseTestAsync();
+                //await DatabaseTestAsync();
                 //ApiTest();
             }
             catch (Exception e)
@@ -67,6 +70,34 @@ namespace Test
                 Console.WriteLine(e);
             }
         }
+
+        public static void ExpressionTest()
+        {
+            Expression<ChartCommit> exp;
+            exp = new Expression<ChartCommit>("acc^10*200+combo", Operators, Values);
+            exp = new Expression<ChartCommit>("combo", Operators, Values);
+            exp = new Expression<ChartCommit>("score/15000", Operators, Values);
+        }
+
+        private static readonly IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> Operators
+            = new Dictionary<string, (Func<double, double, double> function, int priority)>
+            {
+                { "+", ((x, y) => x + y, 1) },
+                { "-", ((x, y) => x - y, 1) },
+                { "*", ((x, y) => x * y, 2) },
+                { "/", ((x, y) => x / y, 2) },
+                { "^", ((x, y) => Math.Pow(x, y), 3) },
+            };
+
+        private static readonly IReadOnlyDictionary<string, Func<ChartCommit, double>> Values = new Dictionary<string, Func<ChartCommit, double>>
+        {
+            { "acc",  c => c.Accuracy },
+            { "accuracy",  c => c.Accuracy },
+            { "combo",  c => c.Combo },
+            { "score",  c => c.Score },
+            { "pp",  c => c.PPWhenCommit },
+            { "performance",  c => c.PPWhenCommit },
+        };
 
         public static async Task<IEnumerable<(int uid, double score)>> RankAsync(int chartId)
         {
@@ -109,6 +140,46 @@ namespace Test
         static async Task ChartQueryTestAsync()
         {
             var result = await NewbieDatabase.GetChartWithCommitsAsync(8);
+        }
+
+        static void ChartTestInNewbieFurther()
+        {
+            Chart chart = new Chart();
+            chart.ChartAdministrators = new List<ChartAdministrator>
+            {
+                1239219529,
+                1061566571,
+                546748348,
+                2541721178,
+                2482000231,
+                431600414
+            };
+            chart.Groups.Add(514661057);
+            chart.IsRunning = true;
+            chart.ChartCreator = 962549599;
+            chart.ChartName = "Dalou选了7.2的一个chart。";
+            chart.ChartDescription = "7.2是dalou选的，爽不爽？";
+            chart.Maps.Add(new ChartBeatmap()
+            {
+                BeatmapId = 1580728,
+                Mode = Mode.Standard,
+                ScoreCalculation = "acc^10*200+combo",
+            });
+            chart.Maps.Add(new ChartBeatmap()
+            {
+                BeatmapId = 809513,
+                Mode = Mode.Standard,
+                ScoreCalculation = "combo",
+                AllowsFail = true,
+            });
+            chart.Maps.Add(new ChartBeatmap()
+            {
+                BeatmapId = 545555,
+                Mode = Mode.Standard,
+                ScoreCalculation = "score/15000",
+                AllowsFail = true,
+            });
+            NewbieDatabase.AddChart(chart);
         }
 
         static void DatabaseQueryTest()
