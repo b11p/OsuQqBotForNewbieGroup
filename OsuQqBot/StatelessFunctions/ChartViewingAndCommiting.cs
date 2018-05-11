@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database;
@@ -25,14 +26,14 @@ namespace OsuQqBot.StatelessFunctions
                 api.SendMessageAsync(g, result, true);
                 return true;
             }
-            if (message.ToLowerInvariant() == " commit")
+            if (message.ToLowerInvariant() == " upx")
             {
                 var api = OsuQqBot.QqApi;
                 Task.Run(async () =>
                 {
                     try
                     {
-                        await CommitAsync(g, messageSource);
+                        await CommitXAsync(g, messageSource);
                     }
                     catch (Exception e)
                     {
@@ -85,7 +86,7 @@ namespace OsuQqBot.StatelessFunctions
             api.SendMessageAsync(endPoint, info, true);
         }
 
-        private static async Task CommitAsync(GroupEndPoint endPoint, MessageSource messageSource)
+        private static async Task CommitXAsync(GroupEndPoint endPoint, MessageSource messageSource)
         {
             var osuApi = Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(OsuQqBot.osuApiKey);
             var uid = LocalData.Database.Instance.GetUidFromQq(messageSource.FromQq);
@@ -114,8 +115,14 @@ namespace OsuQqBot.StatelessFunctions
                 qq.SendMessageAsync(endPoint, "没打图！");
                 return;
             }
-            var result = NewbieDatabase.Commit(endPoint.GroupId, recent[0], ((Api.User)user[0]).PP, out var commited);
-            qq.SendMessageAsync(endPoint, ResultHint(result, commited), true);
+            var result = new List<CommitResult>(recent.Length);
+            var hintResult = new List<string>(recent.Length);
+            for (int i = 0; i < recent.Length; i++)
+            {
+                result[i] = NewbieDatabase.Commit(endPoint.GroupId, recent[i], ((Api.User)user[0]).PP, out var commited);
+                hintResult[i] = (i + 1) + "：" + ResultHint(result[i], commited);
+            }
+            qq.SendMessageAsync(endPoint, string.Join(Environment.NewLine, hintResult), true);
         }
 
         private static string ResultHint(CommitResult result, params Chart[] charts)
