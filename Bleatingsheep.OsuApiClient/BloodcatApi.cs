@@ -7,8 +7,7 @@ namespace Bleatingsheep.OsuMixedApi
 {
     public class BloodcatApi
     {
-        private static BloodcatApi client = new BloodcatApi();
-        public static BloodcatApi Client => client;
+        public static BloodcatApi Client { get; } = new BloodcatApi();
 
         private BloodcatApi() { }
 
@@ -21,17 +20,32 @@ namespace Bleatingsheep.OsuMixedApi
         public async Task<BloodcatBeatmapSet[]> SearchRankedByKeywordAsync(string keyword = "", params Mode[] modes)
         {
             if (modes.Length == 0) modes = new Mode[] { Mode.Standard };
-            (string, string)[] para =
-            {
-                ("mod", "json"),
-                ("q", keyword),
-                ("c", "o"),
-                ("s", string.Join(",", new[]{Approved.Ranked, Approved.Approved}.Select(a=>(int)a))),
-                ("m", string.Join(",", modes.Select(m=>(int)m))),
-            };
+            (string, string)[] para = BloodcatParam("o", keyword, modes);
             var response = await HttpMethods
                 .GetJsonArrayDeserializeAsync<BloodcatBeatmapSet>("https://bloodcat.com/osu/", para);
             return response;
+        }
+
+        public async Task<BloodcatBeatmapSet> GetBeatmapAsync(int bid)
+        {
+            (string, string)[] para = BloodcatParam("b", bid.ToString(), (Mode[])Enum.GetValues(typeof(Mode)));
+            var response = await HttpMethods.GetJsonArrayDeserializeAsync<BloodcatBeatmapSet>("https://bloodcat.com/osu/", para);
+            var result = response?.SingleOrDefault();
+            if (result == null) return null;
+            result.Beatmaps = result.Beatmaps.Where(b => b.Bid == bid).ToArray();
+            return result;
+        }
+
+        private static (string, string)[] BloodcatParam(string type, string keyword, Mode[] modes)
+        {
+            return new[]
+            {
+                ("mod", "json"),
+                ("q", keyword),
+                ("c", type),
+                ("s", string.Join(",", new[] { Approved.Ranked, Approved.Approved }.Select(a => (int)a))),
+                ("m", string.Join(",", modes.Select(m => (int)m))),
+            };
         }
     }
 
@@ -84,7 +98,7 @@ namespace Bleatingsheep.OsuMixedApi
         [JsonProperty("id")]
         public int Sid { get; private set; }
         [JsonProperty("beatmaps")]
-        public BloodcatBeatmap[] Beatmaps { get; private set; }
+        public BloodcatBeatmap[] Beatmaps { get; internal set; }
 
         public override string ToString()
         {
@@ -97,7 +111,7 @@ namespace Bleatingsheep.OsuMixedApi
     public class BloodcatBeatmap
     {
         [JsonProperty("id")]
-        public string Bid { get; private set; }
+        public int Bid { get; private set; }
         [JsonProperty("name")]
         public string DifficultyName { get; private set; }
         [JsonProperty("mode")]
@@ -115,7 +129,7 @@ namespace Bleatingsheep.OsuMixedApi
         [JsonProperty("length")]
         public int TotalLength { get; private set; }
         [JsonProperty("star")]
-        public string Stars { get; private set; }
+        public double Stars { get; private set; }
         [JsonProperty("hash_md5")]
         public string FileMD5 { get; private set; }
         [JsonProperty("status")]

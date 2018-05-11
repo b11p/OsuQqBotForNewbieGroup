@@ -230,21 +230,25 @@ namespace OsuQqBot.StatelessFunctions
 
         private static IEnumerable<string> BeatmapInfo(ChartBeatmap[] maps)
         {
-            foreach (var map in maps)
+            string[] infos = new string[maps.Length];
+            Parallel.For(0, infos.Length, i =>
             {
+                ChartBeatmap map = maps[i];
                 var info = new LinkedList<string>();
+                info.AddLast(BloodcatApi.Client.GetBeatmapAsync(map.BeatmapId).Result?.ToString() ?? "标题获取失败");
                 info.AddLast(LinkOf(map));
                 if (!string.IsNullOrEmpty(map.ScoreCalculation))
                     info.AddLast(map.ScoreCalculation);
-                if (map.RequiredMods != Bleatingsheep.OsuMixedApi.Mods.None)
+                if (map.RequiredMods != Mods.None)
                     info.AddLast($"必须开启：{map.RequiredMods.ToString()}");
-                if (map.ForceMods != Bleatingsheep.OsuMixedApi.Mods.None)
+                if (map.ForceMods != Mods.None)
                     info.AddLast($"FM：{map.ForceMods.ToString()}");
-                if (map.BannedMods != Bleatingsheep.OsuMixedApi.Mods.None)
+                if (map.BannedMods != Mods.None)
                     info.AddLast($"禁止：{map.BannedMods.ToString()}");
                 info.AddLast($"允许失败：{(map.AllowsFail ? "是" : "否")}");
-                yield return String.Join(Environment.NewLine, info);
-            }
+                infos[i] = string.Join(Environment.NewLine, info);
+            });
+            return infos;
         }
 
         private static string LinkOf(ChartBeatmap map)
