@@ -15,21 +15,28 @@ namespace OsuQqBot.Charts
             var chart = await NewbieDatabase.GetChartWithCommitsAsync(chartId);
             if (chart == null) return (null, null);
 
-            var maps = chart.Maps.Select(b => (beatmap: b, score: ParseScorer(b.ScoreCalculation)));
+            var results = from p in PlayerFirstPlaces(chart)
+                          let sum = p.Sum(c => (double)c.Score)
+                          orderby sum descending
+                          select (p.Key, sum);
 
-            var results =
+            return (chart.ChartName, results);
+        }
+
+        private static IEnumerable<IGrouping<int, dynamic>> PlayerFirstPlaces(Chart chart)
+        {
+            var maps = chart.Maps.Select(b => new { beatmap = b, score = ParseScorer(b.ScoreCalculation) });
+
+            var commitsGroup =
                 from m in maps
                 from c in m.beatmap.Commits
                 let calcRawScore = m.score(c)
                 let score = double.IsNaN(calcRawScore) ? 0 : calcRawScore
                 group new { commit = c, score } by new { c.Beatmap, c.Uid } into commits // Key 是 map 和 uid，Values 是 Commits。
-                group commits.Max(cm => cm.score) by commits.Key.Uid into highScores // Key 是 uid，Values 是每个图的最高分。
-                //select (uid: highScores.Key, score: highScores.Sum()) into r
-                let r = (uid: highScores.Key, score: highScores.Sum())
-                orderby r.score descending
-                select r;
+                let first = commits.OrderByDescending(c => c.score).First()
+                group new { Score = first.score, Commit = first.commit } by commits.Key.Uid;
 
-            return (chart.ChartName, results);
+            return commitsGroup;
         }
 
         /// <summary>

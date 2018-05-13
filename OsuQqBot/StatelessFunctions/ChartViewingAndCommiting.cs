@@ -196,12 +196,11 @@ namespace OsuQqBot.StatelessFunctions
                 string userInfo;
                 if (!success)
                 {
-                    userInfo = rank[i].uid.ToString();
+                    userInfo = "(" + rank[i].uid.ToString() + ")";
                 }
                 else
                 {
-                    string name = user?.Name ?? "被 ban 用户";
-                    userInfo = $"{name}({rank[i].uid.ToString()})";
+                    userInfo = user?.Name ?? $"被 ban 用户 ({rank[i].uid.ToString()})";
                 }
                 results[i] = $"{userInfo} / {rank[i].score}";
             });
