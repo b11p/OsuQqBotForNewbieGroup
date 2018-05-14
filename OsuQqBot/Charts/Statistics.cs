@@ -1,9 +1,10 @@
-﻿using Bleatingsheep.OsuQqBot.Database;
+﻿using Bleatingsheep.OsuMixedApi;
+using Bleatingsheep.OsuQqBot.Database;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace OsuQqBot.Charts
@@ -22,6 +23,81 @@ namespace OsuQqBot.Charts
 
             return (chart.ChartName, results);
         }
+
+        #region csv
+        public static async Task<string> CsvResultAsync(int chartId)
+        {
+            var chart = await NewbieDatabase.GetChartWithCommitsAsync(chartId);
+            if (chart == null) return null;
+
+            var titles = new Dictionary<ChartBeatmap, int>();
+            for (int i = 0; i < chart.Maps.Count; i++)
+            {
+                titles.Add(chart.Maps[i], i);
+            }
+            var firstPlaces = PlayerFirstPlaces(chart).ToArray();
+            var results = new dynamic[firstPlaces.Length, chart.Maps.Count];
+            var players = new int[firstPlaces.Length];
+            for (int i = 0; i < firstPlaces.Length; i++)
+            {
+                IGrouping<int, dynamic> efforts = firstPlaces[i];
+                players[i] = efforts.Key;
+                foreach (var effort in efforts)
+                {
+                    results[i, titles[effort.Commit.Beatmap]] = effort;
+                }
+            }
+            var completedCsv = Complete(titles, results, players);
+            return completedCsv;
+        }
+
+        private static string Complete(IDictionary<ChartBeatmap, int> titles, dynamic[,] results, int[] players)
+        {
+            int playerCount = players.Length;
+            int mapCount = titles.Count;
+            var sb = new StringBuilder();
+            var sortedTitles = titles.OrderBy(t => t.Value).Select(t => t.Key).ToArray();
+            sb.AppendJoin("\r\n", sortedTitles as IEnumerable<ChartBeatmap>);
+            sb.AppendLine();
+            for (int i = 0; i < mapCount; i++)
+            {
+                sb.AppendLine(sortedTitles[i].BeatmapId.ToString());
+            }
+            sb.AppendLine(Title(mapCount));
+            for (int i = 0; i < playerCount; i++)
+            {
+                sb.Append(players[i].ToString());
+                for (int j = 0; j < mapCount; j++)
+                {
+                    sb.Append(AMap(results[i, j]));
+                }
+                sb.AppendLine();
+            }
+            return sb.ToString();
+        }
+
+        private static string Title(int count)
+        {
+            var sb = new StringBuilder();
+            for (int i = 0; i < count; i++)
+            {
+                sb.Append(",date,pp,mods,combo,acc,score,rank,final");
+            }
+            return sb.ToString();
+        }
+
+        private static string AMap(dynamic single)
+        {
+            ChartCommit effort = single?.Commit;
+            double final = single?.Score ?? 0;
+
+            if (effort == null) return ",,,,,,,,0";
+
+            return $",{DateTimeOffset.FromUnixTimeSeconds(effort.Date).ToOffset(new TimeSpan(8, 0, 0))}" +
+                $",{effort.PPWhenCommit},{effort.Mods.Display()},{effort.Combo},{effort.Accuracy:.##%}" +
+                $",{effort.Score},{effort.Rank},{final}";
+        }
+        #endregion
 
         private static IEnumerable<IGrouping<int, dynamic>> PlayerFirstPlaces(Chart chart)
         {

@@ -57,7 +57,8 @@ namespace Test
         {
             try
             {
-                ExpressionTest();
+                await CsvTest();
+                //ExpressionTest();
                 //ChartTestInNewbieFurther();
                 //var result = await RankAsync(8);
                 //await CachedTest();
@@ -69,6 +70,11 @@ namespace Test
             {
                 Console.WriteLine(e);
             }
+        }
+
+        public static async Task CsvTest()
+        {
+            var result = await OsuQqBot.Charts.Statistics.CsvResultAsync(1);
         }
 
         public static void ExpressionTest()

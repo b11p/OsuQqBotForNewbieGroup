@@ -52,6 +52,10 @@ namespace OsuQqBot.StatelessFunctions
             {
                 return ChartRank(message.Substring(" rank ".Length), g.GroupId);
             }
+            if (message.ToLowerInvariant().StartsWith(" csv "))
+            {
+                return ChartCsv(message.Substring(" csv ".Length), g.GroupId);
+            }
             return false;
         }
 
@@ -157,6 +161,32 @@ namespace OsuQqBot.StatelessFunctions
                 default:
                     return "未知错误";
             }
+        }
+
+        private static bool ChartCsv(string id, long groupId)
+        {
+            bool isInt = int.TryParse(id, out int chartId);
+            if (isInt)
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        var csv = await Charts.Statistics.CsvResultAsync(chartId);
+                        if (csv == null)
+                        {
+                            await OsuQqBot.ApiV2.SendGroupMessageAsync(groupId, "没有找到 Chart");
+                            return;
+                        }
+                        await OsuQqBot.ApiV2.SendGroupMessageAsync(groupId, csv);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogException(e);
+                    }
+                });
+            }
+            return isInt;
         }
 
         private static bool ChartRank(string id, long groupId)
