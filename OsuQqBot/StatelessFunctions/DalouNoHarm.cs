@@ -9,7 +9,7 @@ namespace OsuQqBot.StatelessFunctions
     {
         static readonly ConcurrentQueue<(long group, string message)> queue;
 
-        static readonly IReadOnlyCollection<long> valid = new List<long> { 514661057, 641236878 };
+        static readonly IReadOnlyCollection<long> valid = new List<long> { 514661057, 641236878, 695600319, 614892339, 758120648 };
 
         static readonly ConcurrentDictionary<long, (string message, int num)> cache;
 
@@ -27,7 +27,7 @@ namespace OsuQqBot.StatelessFunctions
                 if (m == message) return (m, ++no);
                 return (message, 1);
             });
-            if (nv.num == 4 && fromQq == OsuQqBot.Daloubot) return true;
+            if (nv.num >= 4 && fromQq == OsuQqBot.Daloubot) return true;
             return false;
         }
 
