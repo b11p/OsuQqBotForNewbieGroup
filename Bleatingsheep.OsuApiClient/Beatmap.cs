@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Bleatingsheep.OsuMixedApi
 {
@@ -90,6 +92,11 @@ namespace Bleatingsheep.OsuMixedApi
         public double Stars { get; set; }
     }
 
+    public static class BeatmapExtensions
+    {
+        public static bool IsInfoFixed(this Beatmap beatmap) => beatmap.Approved.Fixed();
+    }
+
     public enum Approved
     {
         Loved = 4,
@@ -99,6 +106,23 @@ namespace Bleatingsheep.OsuMixedApi
         Pending = 0,
         Wip = -1,
         Graveryard = -2,
+    }
+
+    public static class ApprovedExtensions
+    {
+        private static readonly IReadOnlyCollection<Approved> s_rankedStates = new List<Approved>
+        {
+            Approved.Ranked,
+            Approved.Approved,
+            Approved.Loved,
+        };
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="approved"></param>
+        /// <returns><c>true</c> if the approve state will never change.</returns>
+        public static bool Fixed(this Approved approved) => s_rankedStates.Contains(approved);
     }
 
     public enum Genre

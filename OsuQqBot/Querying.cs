@@ -1,23 +1,31 @@
 ﻿using Bleatingsheep.OsuMixedApi;
+using Bleatingsheep.OsuQqBot.Database;
 using OsuQqBot.Api;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using mixed = Bleatingsheep.OsuMixedApi;
 
 namespace OsuQqBot
 {
     sealed class Querying
     {
-        private string key = null;
+        private readonly string _key = null;
+        private readonly mixed::OsuApiClient _api = null;
         private static Querying instance = null;
 
-        private Querying(string key) => this.key = key;
+        private Querying(string key)
+        {
+            _key = key;
+            _api = mixed::OsuApiClient.ClientUsingKey(key);
+        }
 
         public IReadOnlyCollection<UserInfo> CheckUsername(IEnumerable<string> possibleUsernames, bool requireAllSucceeded = true)
         {
             var userInfos = new System.Collections.Concurrent.ConcurrentBag<UserInfo>();
-            var api = mixed::OsuApiClient.ClientUsingKey(key);
+            var api = _api;
 
             var result = System.Threading.Tasks.Parallel.ForEach(possibleUsernames, (name, state) =>
             {
@@ -34,6 +42,29 @@ namespace OsuQqBot
 
             if (!result.IsCompleted) return null;
             return userInfos;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bid"></param>
+        /// <param name="mode"></param>
+        /// <param name="apiKey"></param>
+        /// <exception cref="System.ArgumentException">API Key 不正确。</exception>
+        /// <returns></returns>
+        public async Task<mixed::Beatmap> GetBeatmapAsync(int bid, mixed::Mode mode, string apiKey)
+        {
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new System.ArgumentException("API Key 不正确。", nameof(apiKey));
+            }
+
+            var map = await NewbieDatabase.GetBeatmapAsync(bid, mode);
+            if (map != null) return map;
+            map = (await _api.GetBeatmapsAsync(bid))?.SingleOrDefault();
+            if (map == null) return null;
+            if (!map.IsInfoFixed()) return map;
+            return await NewbieDatabase.CacheBeatmapAsync(map) ?? map;
         }
 
         public static Querying Instance => instance;

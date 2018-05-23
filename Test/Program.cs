@@ -43,16 +43,7 @@ namespace Test
 
             var user = api.GetUserInfoAsync(9408048, Mode.Ctb).Result;
         }
-
-        static async Task CachedTest()
-        {
-            string key = string.Empty;
-            Console.WriteLine("input key");
-            while (key == string.Empty)
-                key = Console.ReadLine().Trim();
-            var r = await CachedQuerying.GetBeatmapAsync(1493143, Mode.Standard, key);
-        }
-
+        
         static async Task Main(string[] args)
         {
             try
