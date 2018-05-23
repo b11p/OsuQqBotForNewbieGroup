@@ -6,7 +6,7 @@ namespace OsuQqBot.Commands
     /// <summary>
     /// 表示可以接收命令，输出结果的类。
     /// </summary>
-    abstract class CommandBase
+    abstract class CommandBase // 改名为“可以输入输出的东西”是不是更好？
     {
         protected CommandBase() { }
 

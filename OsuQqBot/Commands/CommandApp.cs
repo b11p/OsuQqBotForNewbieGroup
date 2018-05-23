@@ -9,7 +9,7 @@ namespace OsuQqBot.Commands
     {
         protected CommandApp() { }
 
-        protected virtual CommandBase Base { get; }
+        protected virtual CommandBase Base { get; } = null;
 
         protected abstract MessageSource User { get; }
 

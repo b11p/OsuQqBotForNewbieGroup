@@ -38,9 +38,10 @@ namespace OsuQqBot.Commands
         {
             if (string.IsNullOrWhiteSpace(param)) return new Chart(endpoint, user);
 
-            string exeResult = Charts.ChartExecution.Execute(param);
+            throw new NotImplementedException();
+            //string exeResult = Charts.ChartExecution.Execute(param);
 
-            return null;
+            //return null;
         }
     }
 }
