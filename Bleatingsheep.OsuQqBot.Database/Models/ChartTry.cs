@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models
 {
-    public class ChartCommit
+    public class ChartTry
     {
         //public int Id { get; set; }
 
@@ -37,12 +37,12 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         ///     <see cref="ChartBeatmap.BeatmapId"/> 和 <see cref="PlayRecord.Bid"/> 不一致。
         /// </exception>
         /// <returns></returns>
-        public static ChartCommit FromRecord(ChartBeatmap beatmap, PlayRecord record, double performance)
+        public static ChartTry FromRecord(ChartBeatmap beatmap, PlayRecord record, double performance)
         {
             if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
             if (record == null) throw new ArgumentNullException(nameof(record));
             if (beatmap.BeatmapId != record.Bid) throw new InvalidOperationException("beatmap和record的bid不一致");
-            return new ChartCommit
+            return new ChartTry
             {
                 ChartId = beatmap.ChartId,
                 BeatmapId = record.Bid,

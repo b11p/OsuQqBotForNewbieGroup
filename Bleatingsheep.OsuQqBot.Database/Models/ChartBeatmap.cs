@@ -19,7 +19,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public Mods BannedMods { get; set; } = Mods.DoubleTime | Mods.HalfTime;
         public bool AllowsFail { get; set; }
 
-        public List<ChartCommit> Commits { get; set; }
+        public List<ChartTry> Commits { get; set; }
 
         public int ChartId { get; set; }
 

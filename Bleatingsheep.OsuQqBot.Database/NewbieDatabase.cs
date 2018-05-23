@@ -32,7 +32,7 @@ namespace Bleatingsheep.OsuQqBot.Database
             }
         }
 
-        public static (Chart chart, ChartCommit[] commits)[] Commits(long groupId, int uid)
+        public static (Chart chart, ChartTry[] commits)[] Commits(long groupId, int uid)
         {
             using (var context = new NewbieContext())
             {
@@ -128,7 +128,7 @@ namespace Bleatingsheep.OsuQqBot.Database
                     {
                         try
                         {
-                            context.ChartCommits.Add(ChartCommit.FromRecord(beatmaps[chart.ChartId], record, performance));
+                            context.ChartCommits.Add(ChartTry.FromRecord(beatmaps[chart.ChartId], record, performance));
                             context.SaveChanges();
                             //commited++;
                             commited.Add(chart);

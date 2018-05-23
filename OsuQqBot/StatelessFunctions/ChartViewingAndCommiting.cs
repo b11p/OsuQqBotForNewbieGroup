@@ -289,7 +289,7 @@ namespace OsuQqBot.StatelessFunctions
 
         private static string LinkOf(ChartBeatmap map)
             => $"https://osu.ppy.sh/b/{map.BeatmapId}&m={(int)map.Mode}";
-        private static string LinkOf(ChartCommit commit)
+        private static string LinkOf(ChartTry commit)
             => $"https://osu.ppy.sh/b/{commit.BeatmapId}&m={(int)commit.Mode}";
     }
 }

@@ -88,7 +88,7 @@ namespace OsuQqBot.Charts
 
         private static string AMap(dynamic single)
         {
-            ChartCommit effort = single?.Commit;
+            ChartTry effort = single?.Commit;
             double final = single?.Score ?? 0;
 
             if (effort == null) return ",,,,,,,,0";
@@ -120,11 +120,11 @@ namespace OsuQqBot.Charts
         /// </summary>
         /// <param name="scoreCalculation"></param>
         /// <returns></returns>
-        private static Func<ChartCommit, double> ParseScorer(string scoreCalculation)
+        private static Func<ChartTry, double> ParseScorer(string scoreCalculation)
         {
             if (string.IsNullOrWhiteSpace(scoreCalculation)) return s => s.Score;
 
-            var exp = new Expression<ChartCommit>(scoreCalculation, Operators, Values);
+            var exp = new Expression<ChartTry>(scoreCalculation, Operators, Values);
             return s => exp.Evaluate(s);
         }
 
@@ -138,7 +138,7 @@ namespace OsuQqBot.Charts
                 { "^", ((x, y) => Math.Pow(x, y), 3) },
             };
 
-        private static readonly IReadOnlyDictionary<string, Func<ChartCommit, double>> Values = new Dictionary<string, Func<ChartCommit, double>>
+        private static readonly IReadOnlyDictionary<string, Func<ChartTry, double>> Values = new Dictionary<string, Func<ChartTry, double>>
         {
             { "acc",  c => c.Accuracy },
             { "accuracy",  c => c.Accuracy },

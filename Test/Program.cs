@@ -79,10 +79,10 @@ namespace Test
 
         public static void ExpressionTest()
         {
-            Expression<ChartCommit> exp;
-            exp = new Expression<ChartCommit>("acc^10*200+combo", Operators, Values);
-            exp = new Expression<ChartCommit>("combo", Operators, Values);
-            exp = new Expression<ChartCommit>("score/15000", Operators, Values);
+            Expression<ChartTry> exp;
+            exp = new Expression<ChartTry>("acc^10*200+combo", Operators, Values);
+            exp = new Expression<ChartTry>("combo", Operators, Values);
+            exp = new Expression<ChartTry>("score/15000", Operators, Values);
         }
 
         private static readonly IReadOnlyDictionary<string, (Func<double, double, double> function, int priority)> Operators
@@ -95,7 +95,7 @@ namespace Test
                 { "^", ((x, y) => Math.Pow(x, y), 3) },
             };
 
-        private static readonly IReadOnlyDictionary<string, Func<ChartCommit, double>> Values = new Dictionary<string, Func<ChartCommit, double>>
+        private static readonly IReadOnlyDictionary<string, Func<ChartTry, double>> Values = new Dictionary<string, Func<ChartTry, double>>
         {
             { "acc",  c => c.Accuracy },
             { "accuracy",  c => c.Accuracy },
@@ -110,7 +110,7 @@ namespace Test
             var chart = await NewbieDatabase.GetChartWithCommitsAsync(chartId);
             if (chart == null) return null;
 
-            var maps = chart.Maps.Select(b => (beatmap: b, score: (Func<ChartCommit, double>)(s => s.Score)));
+            var maps = chart.Maps.Select(b => (beatmap: b, score: (Func<ChartTry, double>)(s => s.Score)));
 
             var debugResult1 = from m in maps
                                from c in m.beatmap.Commits

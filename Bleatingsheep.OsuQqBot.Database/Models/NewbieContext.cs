@@ -10,7 +10,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<ChartBeatmap> ChartBeatmaps { get; private set; }
         public DbSet<ChartValidGroup> ChartValidGroups { get; private set; }
         public DbSet<ChartAdministrator> ChartAdministrators { get; private set; }
-        public DbSet<ChartCommit> ChartCommits { get; private set; }
+        public DbSet<ChartTry> ChartCommits { get; private set; }
         public DbSet<Beatmap> CachedBeatmaps { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -32,7 +32,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             modelBuilder.Entity<ChartValidGroup>()
                 .HasKey(g => new { g.ChartId, g.GroupId });
 
-            modelBuilder.Entity<ChartCommit>()
+            modelBuilder.Entity<ChartTry>()
                 .HasKey(c => new { c.ChartId, c.BeatmapId, c.Mode, c.Date, c.Uid });
 
             var beatmaps = modelBuilder.Entity<Beatmap>();
