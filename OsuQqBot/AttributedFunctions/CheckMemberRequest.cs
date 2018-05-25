@@ -45,7 +45,7 @@ namespace OsuQqBot.AttributedFunctions
                 return false;
             var content = message.Content;
             if (!content.IsPlaintext) return false;
-            _match = regex.Match(content.Raw);
+            _match = regex.Match(content.Text);
             if (!_match.Success) return false;
             if (GroupId != NewbieGroupId) return false;
             return true;
