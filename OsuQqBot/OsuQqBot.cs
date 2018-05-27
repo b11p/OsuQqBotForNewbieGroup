@@ -655,7 +655,7 @@ where 查询某个osu!玩家
         /// <summary>
         /// 上次检查群名片的时间
         /// </summary>
-        private Dictionary<long, DateTime> lastCheckTime = new Dictionary<long, DateTime>();
+        private System.Collections.Concurrent.ConcurrentDictionary<long, DateTime> lastCheckTime = new System.Collections.Concurrent.ConcurrentDictionary<long, DateTime>();
 
         /// <summary>
         /// 自动绑定，并检测群名片是否包含ID，并且检测PP是否超限
@@ -695,7 +695,7 @@ where 查询某个osu!玩家
                         string inGroupName = this.qq.GetGroupMemberInfo(fromGroup, fromQq)?.InGroupName;
                         if (inGroupName?.StartsWith("【无ID】") ?? false)
                         {
-                            if (!lastCheckTime.TryAdd(fromQq, DateTime.UtcNow)) lastCheckTime[fromQq] = DateTime.UtcNow;
+                            lastCheckTime[fromQq] = DateTime.UtcNow;
                             this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} 你好，请尽快注册，并修改群名片。");
                         }
                         else
@@ -704,7 +704,7 @@ where 查询某个osu!玩家
                 }
                 else
                 {// 已绑定，开始检查
-                    if (!lastCheckTime.TryAdd(fromQq, DateTime.UtcNow)) lastCheckTime[fromQq] = DateTime.UtcNow;
+                    lastCheckTime[fromQq] = DateTime.UtcNow;
 
                     string inGroupName;
                     inGroupName = GetInGroupName(fromGroup, fromQq);
@@ -921,7 +921,9 @@ where 查询某个osu!玩家
             var users = await apiClient.GetUserAsync(uid.ToString(), OsuApiClient.UsernameType.User_id);
             if (users == null || !users.Any()) return;
             if (double.TryParse(users[0].pp_raw, out double pp))
-                if (pp >= 3000)
+            {
+                const int ppLimit = 2500;
+                if (pp >= ppLimit)
                     qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您的PP超限，即将离开本群");
                 //qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您的PP已经超过2600，如果超过3000，将离开本群");
                 else
@@ -933,6 +935,7 @@ where 查询某个osu!玩家
                         this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} 您的BP超限，即将离开本群");
                     }
                 }
+            }
         }
 
         private readonly OsuApiClient apiClient;
