@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using OsuQqBot.QqBot;
 
 namespace OsuQqBot.StatelessFunctions
@@ -9,7 +11,7 @@ namespace OsuQqBot.StatelessFunctions
     {
         private const long group = 614892339;
         private const long bot = 1677323371;
-        private const double limit = 5.5;
+        private const decimal limit = 5.4m;
 
         private const long admin = 962549599;
 
@@ -20,15 +22,16 @@ namespace OsuQqBot.StatelessFunctions
             546748348, // 化学式
             1012621328, // 咪咪
             2482000231, // 杰克王
+            431600414, // 844
+            630060047, // CYCLC
+            1061566571, // dalou（本体）
         };
 
-        private static readonly Random random = new Random();
-
-        private static long RandomManager()
+        private static long s_lastTalkManager = 546748348;
+        private static long LastTalkManager
         {
-            int length = managerList.Count;
-            var wanted = random.Next(length);
-            return managerList[wanted];
+            get => Interlocked.Read(ref s_lastTalkManager);
+            set => Interlocked.Exchange(ref s_lastTalkManager, value);
         }
 
         private static readonly string img = @"C:\Users\Administrator\OneDrive - NTUA\Server\image\我真想禁你言.jpg";
@@ -39,6 +42,8 @@ namespace OsuQqBot.StatelessFunctions
             message = api.AfterReceive(message);
             if (!(endPoint is GroupEndPoint g)) return false;
             if (g.GroupId != group) return false;
+            UpdateLastTalk(messageSource.FromQq);
+
             if (messageSource.FromQq != bot) return false;
             string[] lines = message.Split("\r\n");
             int length = regex.Length;
@@ -72,11 +77,16 @@ namespace OsuQqBot.StatelessFunctions
                     }
                 }
             }
-            if (star >= 5.5m)
+            if (star > limit)
             {
                 NotifyOverstar(g, star);
             }
             return false;
+        }
+
+        private void UpdateLastTalk(long fromQq)
+        {
+            if (managerList.Contains(fromQq)) LastTalkManager = fromQq;
         }
 
         private static void NotifyFail(string message, int i)
@@ -88,14 +98,14 @@ namespace OsuQqBot.StatelessFunctions
 
         private static void NotifyOverstar(GroupEndPoint g, decimal star)
         {
-            int minutes = (int)((star - 5.49m) / 0.01m * 10);
+            int minutes = (int)((star - limit) / 0.01m * 10);
             int hours = minutes / 60;
             minutes %= 60;
             var api = OsuQqBot.QqApi;
             string imgMessage = api.LocalImage(img);
             string hint = (hours != 0 ? hours + "h " : "") + (minutes != 0 ? minutes + "min " : "");
             api.SendMessageAsync(g, imgMessage + api.BeforeSend(hint));
-            api.SendMessageAsync(g, api.At(RandomManager()));
+            api.SendMessageAsync(g, api.At(LastTalkManager));
         }
 
         private static readonly Regex[] regex;
