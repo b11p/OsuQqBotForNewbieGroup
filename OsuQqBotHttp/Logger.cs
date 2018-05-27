@@ -26,7 +26,9 @@ namespace OsuQqBotHttp
                 File.AppendAllText(FilePath, s + Environment.NewLine);
         }
 
-        public static string LogException(Exception e, bool inner = false)
+        public static void LogException(Exception e) => LogException(e, false);
+
+        public static string LogException(Exception e, bool inner)
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(DateTime.Now.ToString());
