@@ -8,5 +8,6 @@ namespace OsuQqBot.AttributedFunctions
     {
         TimeSpan? OnUtc { get; }
         TimeSpan? Every { get; }
+        void Run();
     }
 }

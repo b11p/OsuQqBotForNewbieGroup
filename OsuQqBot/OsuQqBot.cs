@@ -28,6 +28,9 @@ namespace OsuQqBot
         public static HttpApiClient ApiV2 { get => s_apiV2; private set => s_apiV2 = value; }
         wudipost::ApiPostListener _listener;
         LinkedList<IMessageCommandable> _messageCommands = new LinkedList<IMessageCommandable>();
+        private readonly IList<ScheduleInfo> _byIntervalTasks = new List<ScheduleInfo>();
+        private readonly IList<ScheduleInfo> _everyDayTasks = new List<ScheduleInfo>();
+        private readonly Task _plan;
         private static long daloubot;
         public static long Daloubot => daloubot;
 
@@ -68,6 +71,45 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
 
             // 初始化
+            _plan = new Task(() =>
+            {
+                async void Run(ScheduleInfo info)
+                {
+                    Logger.Log(info.Action.GetType().FullName);
+                    info.Next();
+                    await Task.Run(() =>
+                    {
+                        try
+                        {
+                            info.Action.Run();
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogException(e);
+                        }
+                    });
+                }
+                TimeSpan Clear()
+                {
+                    TimeSpan min = TimeSpan.MaxValue;
+                    foreach (var info in _byIntervalTasks.Concat(_everyDayTasks))
+                    {
+                        if (info.ShouldRun())
+                        {
+                            Run(info);
+                        }
+                        TimeSpan wait = info.WaitTime;
+                        if (wait < min) min = wait;
+                    }
+                    return min;
+                }
+                while (true)
+                {
+                    var interval = Clear();
+                    Logger.Log($"Wait for {interval}");
+                    Task.Delay(interval).Wait();
+                }
+            }, TaskCreationOptions.LongRunning);
             Querying.SetKey(config.ApiKey);
             Interlocked.CompareExchange(ref daloubot, config.Daloubot, 0);
 
@@ -88,6 +130,10 @@ namespace OsuQqBot
                 InitType(t);
             }
             _listener.MessageEvent += MessageEvent;
+            if (_byIntervalTasks.Count + _everyDayTasks.Count > 0)
+            {
+                _plan.Start();
+            }
         }
 
         private void InitType(Type t)
@@ -106,6 +152,24 @@ namespace OsuQqBot
                 {
                     _messageCommands.AddLast((IMessageCommandable)lazy.Value);
                 }
+                if (i == typeof(IRegularly))
+                {
+                    InitTask(lazy.Value as IRegularly);
+                }
+            }
+        }
+
+        private void InitTask(IRegularly task)
+        {
+            if (task.Every is TimeSpan every)
+            {
+                var info = new ScheduleInfo(ScheduleType.ByInterval, every, task);
+                _byIntervalTasks.Add(info);
+            }
+            if (task.OnUtc is TimeSpan onUtc)
+            {
+                var info = new ScheduleInfo(ScheduleType.Daily, onUtc, task);
+                _everyDayTasks.Add(info);
             }
         }
 
