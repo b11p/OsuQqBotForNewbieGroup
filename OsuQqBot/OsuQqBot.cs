@@ -77,7 +77,6 @@ namespace OsuQqBot
             {
                 async void Run(ScheduleInfo info)
                 {
-                    Logger.Log(info.Action.GetType().FullName);
                     info.Next();
                     await Task.Run(() =>
                     {
@@ -108,7 +107,6 @@ namespace OsuQqBot
                 while (true)
                 {
                     var interval = Clear();
-                    Logger.Log($"Wait for {interval}");
                     Task.Delay(interval).Wait();
                 }
             }, TaskCreationOptions.LongRunning);

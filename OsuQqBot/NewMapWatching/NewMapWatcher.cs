@@ -27,7 +27,6 @@ namespace OsuQqBot.NewMapWatching
                 Logger.Log("未能从血猫得到新图");
                 return;
             }
-            Logger.Log($"{result?.Count()}个图");
             lock (_lock)
             {
                 if (!(_oldSets is null))
@@ -36,7 +35,6 @@ namespace OsuQqBot.NewMapWatching
                 }
                 _oldSets = result.Select(s => s.Id);
             }
-            Logger.Log($"有{newSets?.Count()}张新图。");
             var osu = OsuApiClient.ClientUsingKey(OsuQqBot.osuApiKey);
             if (!(newSets is null))
             {
