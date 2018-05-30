@@ -101,6 +101,14 @@ namespace Bleatingsheep.OsuMixedApi
         }
         #endregion
 
+        #region Urls
+        public string ThumbOf(int setId) => $"https://b.ppy.sh/thumb/{setId}l.jpg";
+
+        public string PreviewAudioOf(int setId) => $"https://b.ppy.sh/preview/{setId}.mp3";
+
+        public string PageOfSet(int setId) => $"https://osu.ppy.sh/beatmapsets/{setId}";
+        #endregion
+
         #region Utils
         private async Task<T[]> SafeGetArrayAsync<T>(string url, params (string key, string value)[] ps)
         {

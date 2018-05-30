@@ -16,7 +16,7 @@ namespace OsuQqBot
         readonly long GroupId;
 
         /// <summary>
-        /// Bot生效的群们
+        /// 开启新图提醒的群列表。
         /// </summary>
         readonly ISet<long> ValidGroups = new HashSet<long>();
 

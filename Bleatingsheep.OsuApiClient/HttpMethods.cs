@@ -9,6 +9,13 @@ namespace Bleatingsheep.OsuMixedApi
 {
     internal static class HttpMethods
     {
+        /// <summary>
+        /// Get array with specified URL and arguments.
+        /// </summary>
+        /// <typeparam name="T">Type of elements in the array.</typeparam>
+        /// <param name="url">Request URL.</param>
+        /// <param name="ps">Arguments.</param>
+        /// <returns>Required array. <c>null</c> if network failed. Empty if no result.</returns>
         internal static async Task<T[]> GetJsonArrayDeserializeAsync<T>(string url, params (string key, string value)[] ps)
         {
             var (success, result) = await GetJsonDeserializeAsync<T[]>(url, ps);

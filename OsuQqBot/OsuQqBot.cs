@@ -33,6 +33,8 @@ namespace OsuQqBot
         private readonly Task _plan;
         private static long daloubot;
         public static long Daloubot => daloubot;
+        private static IReadOnlyCollection<long> s_notifyGroups;
+        public static IReadOnlyCollection<long> NotifyGroups => s_notifyGroups;
 
         public OsuQqBot(IQqBot qqBot, HttpApiClient apiClientV2, wudipost::ApiPostListener listener)
         {
@@ -48,7 +50,7 @@ namespace OsuQqBot
             {
                 ValidGroups.Add(item);
             }
-
+            Interlocked.CompareExchange(ref s_notifyGroups, ValidGroups as IReadOnlyCollection<long>, null);
             try
             {
                 var ignoreLines = File.ReadAllLines(Paths.IgnoreListPath);

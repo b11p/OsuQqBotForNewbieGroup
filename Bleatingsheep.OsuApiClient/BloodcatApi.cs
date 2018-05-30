@@ -32,7 +32,7 @@ namespace Bleatingsheep.OsuMixedApi
             var response = await HttpMethods.GetJsonArrayDeserializeAsync<BloodcatBeatmapSet>("https://bloodcat.com/osu/", para);
             var result = response?.SingleOrDefault();
             if (result == null) return null;
-            result.Beatmaps = result.Beatmaps.Where(b => b.Bid == bid).ToArray();
+            result.Beatmaps = result.Beatmaps.Where(b => b.Id == bid).ToArray();
             return result;
         }
 
@@ -96,7 +96,7 @@ namespace Bleatingsheep.OsuMixedApi
         [JsonProperty("languageId")]
         public Language Language { get; private set; }
         [JsonProperty("id")]
-        public int Sid { get; private set; }
+        public int Id { get; private set; }
         [JsonProperty("beatmaps")]
         public BloodcatBeatmap[] Beatmaps { get; internal set; }
 
@@ -111,7 +111,7 @@ namespace Bleatingsheep.OsuMixedApi
     public class BloodcatBeatmap
     {
         [JsonProperty("id")]
-        public int Bid { get; private set; }
+        public int Id { get; private set; }
         [JsonProperty("name")]
         public string DifficultyName { get; private set; }
         [JsonProperty("mode")]
