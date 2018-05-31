@@ -43,19 +43,16 @@ namespace Bleatingsheep.OsuMixedApi
             using (var client = new HttpClient())
             {
                 string result = null;
-                int tryTime = 5;
-                while (tryTime > 0)
-                    try
-                    {
-                        result = await client.GetStringAsync(url);
-                        break;
-                    }
-                    catch (HttpRequestException)
-                    {
-                        tryTime--;
-                        if (tryTime == 0) break;
-                        Task.Delay(5100 - tryTime * 1000).Wait();
-                    }
+                try
+                {
+                    result = await client.GetStringAsync(url);
+                }
+                catch (HttpRequestException)
+                {
+                }
+                catch (TaskCanceledException)
+                {
+                }
                 return result;
             }
         }
