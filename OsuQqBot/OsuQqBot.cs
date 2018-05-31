@@ -27,7 +27,8 @@ namespace OsuQqBot
         private static HttpApiClient s_apiV2;
         public static HttpApiClient ApiV2 { get => s_apiV2; private set => s_apiV2 = value; }
         wudipost::ApiPostListener _listener;
-        LinkedList<IMessageCommandable> _messageCommands = new LinkedList<IMessageCommandable>();
+        private readonly LinkedList<IMessageCommandable> _messageCommands = new LinkedList<IMessageCommandable>();
+        private readonly IList<IMessageMonitor> _monitors = new List<IMessageMonitor>();
         private readonly IList<ScheduleInfo> _byIntervalTasks = new List<ScheduleInfo>();
         private readonly IList<ScheduleInfo> _everyDayTasks = new List<ScheduleInfo>();
         private readonly Task _plan;
@@ -156,6 +157,10 @@ namespace OsuQqBot
                 {
                     InitTask(lazy.Value as IRegularly);
                 }
+                if (i == typeof(IMessageMonitor))
+                {
+                    _monitors.Add((IMessageMonitor)lazy.Value);
+                }
             }
         }
 
@@ -173,7 +178,26 @@ namespace OsuQqBot
             }
         }
 
-        private void MessageEvent(HttpApiClient api, wudipost.Message message) => MessageFunctions(message, _messageCommands, api);
+        private void MessageEvent(HttpApiClient api, wudipost.Message message)
+        {
+            MessageMonitors(message, _monitors, api);
+            MessageFunctions(message, _messageCommands, api);
+        }
+
+        private static void MessageMonitors(wudipost::Message message, IEnumerable<IMessageMonitor> monitors, HttpApiClient api)
+        {
+            Parallel.ForEach(monitors, monitor =>
+            {
+                try
+                {
+                    monitor.Create().OnMessage(message, api);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log(e.ToString());
+                }
+            });
+        }
 
         private static void MessageFunctions(wudipost::Message message, IEnumerable<IMessageCommandable> commandables, HttpApiClient api)
         {

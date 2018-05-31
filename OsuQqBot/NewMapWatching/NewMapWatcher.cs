@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace OsuQqBot.NewMapWatching
 {
-    [Function]
+    //[Function]
     class NewMapWatcher : IRegularly
     {
         private readonly object _lock = new object();
