@@ -35,20 +35,20 @@ namespace OsuQqBot
                 }
             }
 
-            if (uid == null)
-            {// 数据库找不到UID，在int的数据库查找
-                uid = await Int100ApiClient.GetOsuUidFromQqAsync(qq);
-                if (uid == null)
-                {
-                    Logger.Log($"找QQ={qq}的绑定信息失败");
-                    return null;
-                }
-                else if (uid.Value != 0)
-                {
-                    isFromApi = true;
-                    fromApi = "int100";
-                }
-            }
+            //if (uid == null)
+            //{// 数据库找不到UID，在int的数据库查找
+            //    uid = await Int100ApiClient.GetOsuUidFromQqAsync(qq);
+            //    if (uid == null)
+            //    {
+            //        Logger.Log($"找QQ={qq}的绑定信息失败");
+            //        return null;
+            //    }
+            //    else if (uid.Value != 0)
+            //    {
+            //        isFromApi = true;
+            //        fromApi = "int100";
+            //    }
+            //}
             // 此时 uid != null
             if (isFromApi) database.Bind(qq, uid.Value, fromApi + " (while running)");
             return uid;

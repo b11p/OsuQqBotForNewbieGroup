@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace OsuQqBot
+﻿namespace OsuQqBot
 {
     sealed class Config
     {
@@ -11,5 +7,6 @@ namespace OsuQqBot
         public long[] ValidGroups { get; set; }
         public string ApiKey { get; set; }
         public long Daloubot { get; set; }
+        public string Int100ApiKey { get; set; }
     }
 }

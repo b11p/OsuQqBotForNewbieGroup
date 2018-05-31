@@ -49,10 +49,14 @@ namespace OsuQqBot.Api
                 // 如果还是调用了，会有日志记录
                 Logger.Log($"为什么妈船还是没有这个人的数据啊。（uid={uid}, mode={mode})");
                 using (var httpClient = new HttpClient())
+                {
                     try
                     { using (await httpClient.GetStreamAsync(GetStatUrl(uid))) { } }
                     catch (HttpRequestException)
                     { }
+                    catch (TaskCanceledException)
+                    { }
+                }
             }
             return Nope;
         }
