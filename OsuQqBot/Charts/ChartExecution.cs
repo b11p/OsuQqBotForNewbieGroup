@@ -1,5 +1,4 @@
-﻿using Bleatingsheep.OsuMixedApi;
-using OsuQqBot.Commands;
+﻿using OsuQqBot.Commands;
 using Sisters.WudiLib.Posts;
 using System;
 using System.Collections.Generic;
@@ -29,43 +28,8 @@ namespace OsuQqBot.Charts
         public static string New(IReadOnlyList<string> param, int index)
         {
             var chartInfo = ChartInfo.New(param, index);
-        }
-    }
 
-    sealed class ChartInfo
-    {
-        private string _name;
-        private string _description;
-        DateTimeOffset? _offset;
-        DateTime? _start;
-        DateTime? _end;
-        double? _ppRecommand;
-        double? _ppMax;
-
-        private ChartInfo() { }
-
-        /// <summary>
-        /// 通过命令创建 chart。
-        /// </summary>
-        /// <param name="param">创建 chart 的命令（第一行是“new”）。</param>
-        /// <param name="index">创建 chart 的命令参数开始行数（“new”之后的一行）的下标。</param>
-        /// <exception cref="IndexOutOfRangeException">只有“new”，没有后续参数。</exception>
-        /// <returns></returns>
-        public static ChartInfo New(IReadOnlyList<string> param, int index)
-        {
-            var info = new ChartInfo();
-            info._name = param[index];
-
-            for (int i = index + 1; i < param.Count; i++)
-            {
-
-            }
-        }
-
-        sealed class ChartBeatmapInfo
-        {
-            public int Bid { get; set; }
-            public Mode Mode { get; set; }
+            throw new NotImplementedException();
         }
     }
 }
