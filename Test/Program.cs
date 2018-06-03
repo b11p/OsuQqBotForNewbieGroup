@@ -65,7 +65,7 @@ namespace Test
 
         public static async Task CsvTest()
         {
-            var result = await OsuQqBot.Charts.Statistics.CsvResultAsync(1);
+            //var result = await OsuQqBot.Charts.Statistics.CsvResultAsync(1);
         }
 
         public static void ExpressionTest()

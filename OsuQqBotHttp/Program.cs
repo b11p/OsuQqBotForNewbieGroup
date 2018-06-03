@@ -2,10 +2,10 @@
 using OsuQqBot.QqBot;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +15,11 @@ namespace OsuQqBotHttp
     {
         static void Main(string[] args)
         {
+            var culture = CultureInfo.GetCultureInfo("zh-CN");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentUICulture = culture;
 
             new PostProcessor(port: 8877, wudiPort: 8876).Listen();
             using (HttpClient client = new HttpClient())
