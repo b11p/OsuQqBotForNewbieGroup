@@ -1,5 +1,4 @@
-﻿using Bleatingsheep.OsuMixedApi;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -13,18 +12,17 @@ namespace OsuQqBot.Charts
         private string _name;
         private bool IsNew => _chartId == default(int);
         private readonly int _chartId;
-        private readonly ChartInfoField<string> _description = new StringInfo();
-        private readonly ChartInfoField<DateTime> _start = new DateTimeInfo();
-        private readonly ChartInfoField<DateTime?> _end = new NullableDateTimeInfo();
-        private readonly ChartInfoField<double> _ppRecommand = new DoubleInfo();
-        private readonly ChartInfoField<double?> _ppMax = new NullableDoubleInfo();
+        private readonly ChartInfoField<string> _description = new StringField();
+        private readonly ChartInfoField<DateTime> _start = new DateTimeField();
+        private readonly ChartInfoField<DateTime?> _end = new NullableDateTimeField();
+        private readonly ChartInfoField<double> _ppRecommand = new DoubleField();
+        private readonly ChartInfoField<double?> _ppMax = new NullableDoubleField();
         private readonly IList<ChartBeatmapInfo> _beatmaps = new List<ChartBeatmapInfo>();
         private ChartBeatmapInfo _currentBeatmap = null;
 
         private ChartInfo(int chartId = default(int))
         {
             _chartId = chartId;
-
         }
 
         private static readonly IReadOnlyDictionary<string, Func<ChartInfo, ChartInfoField>> s_ops;
@@ -46,7 +44,8 @@ namespace OsuQqBot.Charts
         /// <param name="param">创建 chart 的命令（第一行是“new”）。</param>
         /// <param name="index">创建 chart 的命令参数开始行数（“new”之后的一行）的下标。</param>
         /// <exception cref="IndexOutOfRangeException">只有“new”，没有后续参数。</exception>
-        /// <exception cref="FormatException"></exception>
+        /// <exception cref="FormatException">某一行不符合语法。<c>message</c>是这一行的内容。</exception>
+        /// <exception cref="ChartException">解析或执行chart出现错误。</exception>
         /// <returns></returns>
         public static ChartInfo New(IReadOnlyList<string> param, int index)
         {
@@ -54,8 +53,9 @@ namespace OsuQqBot.Charts
             info._name = param[index];
             index++;
             var (field, value, no) = ParseLine(param[index]);
-            if (s_ops[field](info) != info._description) throw new FormatException(param[index]);
+            if (no || s_ops[field](info) != info._description) throw new FormatException(param[index]);
             index++;
+            info.SetInfo(field, value);
             info.ParseInfo(param, index);
             return info;
         }
@@ -65,13 +65,14 @@ namespace OsuQqBot.Charts
         /// </summary>
         /// <param name="args">修改 chart 的命令（第一行是chart编号）。</param>
         /// <param name="index">修改 chart 的命令参数开始行数（chart编号之后的一行）的下标。</param>
-        /// 
+        /// <exception cref="ChartException">解析或执行chart出现错误。</exception>
+        /// <exception cref="FormatException"></exception>
         /// <returns></returns>
         public static ChartInfo Modify(IReadOnlyList<string> args, int index)
         {
             if (!int.TryParse(args[0], out int chartId) || chartId == default(int))
             {
-                throw new ArgumentException("Chart编号不正确。");
+                throw new ChartException("Chart编号不正确。");
             }
             var info = new ChartInfo(chartId);
             info.ParseInfo(args, index);
@@ -99,26 +100,32 @@ namespace OsuQqBot.Charts
         /// </summary>
         /// <param name="args"></param>
         /// <param name="index">第一个描述信息的下标。</param>
-        /// <exception cref="FormatException"></exception>
+        /// <exception cref="ChartException"></exception>
         private void ParseInfo(IReadOnlyList<string> args, int index)
         {
-            throw new NotImplementedException();
-
-            for (int i = index; i < args.Count; i++)
+            int i = index;
+            try
             {
-
+                for (; i < args.Count; i++)
+                {
+                    string current = args[i];
+                    var (field, value, no) = ParseLine(current);
+                    bool result = no ? CancelInfo(field, value) : SetInfo(field, value);
+                    if (!result) throw new ChartException($"第{i + 1}行执行失败。");
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new ChartException($"第{i + 1}行的命令（{args[i]}）无法识别。");
             }
         }
 
-        private void SetInfo(string field, string value)
+        private bool SetInfo(string field, string value)
         {
 
+            return s_ops[field](this).TrySet(value);
         }
 
-        sealed class ChartBeatmapInfo
-        {
-            public int Bid { get; set; }
-            public Mode Mode { get; set; }
-        }
+        private bool CancelInfo(string field, string value) => s_ops[field](this).CanCancel ? s_ops[field](this).Cancel(value) : false;
     }
 }

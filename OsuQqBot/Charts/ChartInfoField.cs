@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace OsuQqBot.Charts
 {
@@ -12,6 +13,10 @@ namespace OsuQqBot.Charts
         public abstract bool Cancel(string arg);
 
         public abstract bool Update(string arg);
+
+        public virtual bool TrySet(string arg) => IsSet ? false : Update(arg);
+
+        public virtual bool TryCancel(string arg) => IsSet ? false : Cancel(arg);
     }
 
     /// <summary>
@@ -20,9 +25,8 @@ namespace OsuQqBot.Charts
     internal abstract class ChartInfoField<T> : ChartInfoField
     {
         private T _value;
-
         private bool _isSet;
-
+        
         public sealed override bool IsSet => _isSet;
 
         public override bool CanCancel => default(T) == null;
@@ -67,7 +71,7 @@ namespace OsuQqBot.Charts
         }
     }
 
-    internal class StringInfo : ChartInfoField<string>
+    internal class StringField : ChartInfoField<string>
     {
         public override bool Update(string arg)
         {
@@ -77,35 +81,35 @@ namespace OsuQqBot.Charts
         }
     }
 
-    internal class DoubleInfo : ChartInfoField<double>
+    internal class DoubleField : ChartInfoField<double>
     {
         public override bool Update(string arg) => ParseDouble(arg, value => Value = value);
     }
 
-    internal class NullableDoubleInfo : ChartInfoField<double?>
+    internal class NullableDoubleField : ChartInfoField<double?>
     {
         public override bool Update(string arg) => ParseDouble(arg, value => Value = value);
     }
 
-    internal class DateTimeInfo : ChartInfoField<DateTime>
+    internal class DateTimeField : ChartInfoField<DateTime>
     {
         public override bool Update(string arg) => ParseDateTime(arg, value => Value = value);
     }
 
-    internal class NullableDateTimeInfo : ChartInfoField<DateTime?>
+    internal class NullableDateTimeField : ChartInfoField<DateTime?>
     {
         public override bool Update(string arg) => ParseDateTime(arg, value => Value = value);
     }
 
-    internal class RangeInfo<T> : ChartInfoField where T : IComparable
+    internal class PerformanceRangeField : ChartInfoField
     {
-        private readonly ChartInfoField<T> _min;
-        private readonly ChartInfoField<T> _max;
+        private readonly ChartInfoField<double?> _min;
+        private readonly ChartInfoField<double?> _max;
 
-        public RangeInfo(ChartInfoField<T> min, ChartInfoField<T> max)
+        public PerformanceRangeField(ChartInfoField<double?> min, ChartInfoField<double?> max)
         {
-            _min = min;
-            _max = max;
+            _min = min ?? throw new ArgumentNullException(nameof(min));
+            _max = max ?? throw new ArgumentNullException(nameof(max));
         }
 
         public override bool IsSet => _min.IsSet || _max.IsSet;
@@ -114,9 +118,24 @@ namespace OsuQqBot.Charts
 
         public override bool Cancel(string arg)
         {
-            throw new NotImplementedException();
+            if (!CanCancel) return false;
+            _min.Cancel(arg);
+            _max.Cancel(arg);
+            return true;
         }
 
-        public override bool Update(string arg) => throw new NotImplementedException();
+        public override bool Update(string arg)
+        {
+            var match = Regex.Match(arg, @"^\s*(.*?)\s*-\s*(.*?)\s*$");
+            if (!match.Success) return false;
+            string lower = match.Groups[1].Value;
+            string higher = match.Groups[2].Value;
+            return UpdateOrCancel(lower, _min) && UpdateOrCancel(higher, _max);
+        }
+
+        private static bool UpdateOrCancel(string arg, ChartInfoField<double?> field)
+        {
+            return string.IsNullOrEmpty(arg) ? field.Cancel(string.Empty) : field.Update(arg);
+        }
     }
 }
