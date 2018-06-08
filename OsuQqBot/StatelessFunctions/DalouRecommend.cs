@@ -93,14 +93,14 @@ namespace OsuQqBot.StatelessFunctions
                         if (needNewLine) stringWriter.Write("\r\n\r\n");
 
                         if (beatmap.HitLength < 150 ||
-                            ps.Any(b => b.hasDT && b.bid == beatmap.Bid) && beatmap.HitLength < 200
+                            ps.Any(b => b.hasDT && b.bid == beatmap.Id) && beatmap.HitLength < 200
                             )
                         {
-                            qq.SendMessageAsync(endPoint, "!banmap " + beatmap.Bid);
-                            if (isPrivate) qq.SendGroupMessageAsync(DebugGroup, "!banmap " + beatmap.Bid);
+                            qq.SendMessageAsync(endPoint, "!banmap " + beatmap.Id);
+                            if (isPrivate) qq.SendGroupMessageAsync(DebugGroup, "!banmap " + beatmap.Id);
                         }
                         stringWriter.WriteLine($"{beatmap.Artist} - {beatmap.Title}[{beatmap.DifficultyName}]");
-                        stringWriter.WriteLine($"https://osu.ppy.sh/b/{beatmap.Bid}");
+                        stringWriter.WriteLine($"https://osu.ppy.sh/b/{beatmap.Id}");
                         stringWriter.WriteLine($"Beatmap by {beatmap.Creator}");
                         stringWriter.Write($"{beatmap.TotalLength}s");
 
@@ -136,7 +136,7 @@ namespace OsuQqBot.StatelessFunctions
                 {
                     foreach (var b in beatmaps)
                     {
-                        if (b.Bid == bid)
+                        if (b.Id == bid)
                             yield return b;
                     }
                 }

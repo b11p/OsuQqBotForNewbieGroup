@@ -108,9 +108,9 @@ namespace OsuQqBot.Charts
                 from c in m.beatmap.Commits
                 let calcRawScore = m.score(c)
                 let score = double.IsNaN(calcRawScore) ? 0 : calcRawScore
-                group new { commit = c, score } by new { c.Beatmap, c.Uid } into commits // Key 是 map 和 uid，Values 是 Commits。
+                group new { commit = c, score } by new { c.Beatmap, c.UserId } into commits // Key 是 map 和 uid，Values 是 Commits。
                 let first = commits.OrderByDescending(c => c.score).First()
-                group new { Score = first.score, Commit = first.commit } by commits.Key.Uid;
+                group new { Score = first.score, Commit = first.commit } by commits.Key.UserId;
 
             return commitsGroup;
         }

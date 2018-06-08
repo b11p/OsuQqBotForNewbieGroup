@@ -38,7 +38,7 @@ namespace Bleatingsheep.OsuMixedApi
         public bool Pass => Rank != "F";
 
         [JsonProperty("beatmap_id")]
-        public int Bid { get; private set; }
+        public int BeatmapId { get; private set; }
         [JsonProperty("score")]
         public long Score { get; private set; }
         [JsonProperty("maxcombo")]
@@ -69,7 +69,7 @@ namespace Bleatingsheep.OsuMixedApi
         [JsonProperty("enabled_mods")]
         public Mods Mods { get; private set; }
         [JsonProperty("user_id")]
-        public int Uid { get; private set; }
+        public int UserId { get; private set; }
 
         [JsonProperty("date")]
 #pragma warning disable CS0649

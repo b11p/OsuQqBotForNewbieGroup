@@ -38,11 +38,11 @@ namespace Bleatingsheep.OsuQqBot.Database
             {
                 var now = DateTimeOffset.Now;
                 var chart_commit = (from chart in context.Charts
-                                    from commit in context.ChartCommits
+                                    from commit in context.ChartTries
                                     where (from g in context.ChartValidGroups
                                            where g.GroupId == groupId
                                            select g.ChartId).Contains(chart.ChartId)
-                                          && commit.Uid == uid
+                                          && commit.UserId == uid
                                           && chart.ChartId == commit.ChartId
                                     group commit by chart).ToArray();
                 return chart_commit
@@ -89,7 +89,7 @@ namespace Bleatingsheep.OsuQqBot.Database
                 beatmaps = chartsInThisGroup.ToDictionary(
                     c => c.ChartId,
                     c => context.ChartBeatmaps.FirstOrDefault(
-                        m => m.ChartId == c.ChartId && m.BeatmapId == record.Bid && m.Mode == record.Mode
+                        m => m.ChartId == c.ChartId && m.BeatmapId == record.BeatmapId && m.Mode == record.Mode
                     )
                 );
             }
@@ -128,13 +128,13 @@ namespace Bleatingsheep.OsuQqBot.Database
                     {
                         try
                         {
-                            context.ChartCommits.Add(ChartTry.FromRecord(beatmaps[chart.ChartId], record, performance));
+                            context.ChartTries.Add(ChartTry.FromRecord(beatmaps[chart.ChartId], record, performance));
                             context.SaveChanges();
                             //commited++;
                             commited.Add(chart);
                         }
                         catch (DbUpdateException e)
-                        when (e.InnerException is Microsoft.Data.Sqlite.SqliteException)
+                        //when (e.InnerException is Microsoft.Data.Sqlite.SqliteException)
                         { }
                     }
                 }
@@ -169,7 +169,7 @@ namespace Bleatingsheep.OsuQqBot.Database
         {
             using (var context = new NewbieContext())
             {
-                return await context.CachedBeatmaps.SingleOrDefaultAsync(b => b.Bid == bid && b.Mode == mode);
+                return await context.CachedBeatmaps.SingleOrDefaultAsync(b => b.Id == bid && b.Mode == mode);
             }
         }
 

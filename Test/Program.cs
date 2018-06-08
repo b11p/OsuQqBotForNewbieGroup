@@ -115,7 +115,7 @@ namespace Test
                 from c in m.beatmap.Commits
                 let calcRawScore = m.score(c)
                 let score = double.IsNaN(calcRawScore) ? 0 : calcRawScore
-                group new { commit = c, score } by new { c.Beatmap, c.Uid } into commits // Key 是 map 和 uid，Values 是 Commits。
+                group new { commit = c, score } by new { c.Beatmap, c.UserId } into commits // Key 是 map 和 uid，Values 是 Commits。
                 group commits.Max(cm => cm.score) by commits.Key.Uid into highScores // Key 是 uid，Values 是每个图的最高分。
                 //select (uid: highScores.Key, score: highScores.Sum()) into r
                 let r = (uid: highScores.Key, score: highScores.Sum())
@@ -142,7 +142,7 @@ namespace Test
         static void ChartTestInNewbieFurther()
         {
             Chart chart = new Chart();
-            chart.ChartAdministrators = new List<ChartAdministrator>
+            chart.Administrators = new List<ChartAdministrator>
             {
                 1239219529,
                 1061566571,
@@ -187,7 +187,7 @@ namespace Test
         static async Task DatabaseTestAsync()
         {
             var chart = new Chart();
-            chart.ChartAdministrators.Add(1004121460);
+            chart.Administrators.Add(1004121460);
             chart.ChartCreator = 962549599;
             chart.ChartName = "新人群第0.1期Chart（Beta）";
             chart.ChartDescription = "这是新人群第0.1期Chart，因为是技术测试，所以暂时没有奖励";

@@ -11,17 +11,13 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<ChartBeatmap> ChartBeatmaps { get; private set; }
         public DbSet<ChartValidGroup> ChartValidGroups { get; private set; }
         public DbSet<ChartAdministrator> ChartAdministrators { get; private set; }
-        public DbSet<ChartTry> ChartCommits { get; private set; }
+        public DbSet<ChartTry> ChartTries { get; private set; }
         public DbSet<Beatmap> CachedBeatmaps { get; private set; }
         public DbSet<OperationHistory> Histories { get; private set; }
         public DbSet<BindingInfo> Bindings { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string desktop = PathUtility.BasePath;
-            string folder = "Sheep Bot Data";
-            string name = "Newbie.db";
-            string fullName = System.IO.Path.Combine(desktop, folder, name);
             optionsBuilder.UseMySql($"server={Server};database={ServerInfo.Database};user={User};pwd={Password};SslMode=Required;");
         }
 
@@ -37,14 +33,14 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
                 .HasKey(g => new { g.ChartId, g.GroupId });
 
             modelBuilder.Entity<ChartTry>()
-                .HasKey(c => new { c.ChartId, c.BeatmapId, c.Mode, c.Date, c.Uid });
+                .HasKey(c => new { c.ChartId, c.BeatmapId, c.Mode, c.Date, c.UserId });
 
             var beatmaps = modelBuilder.Entity<Beatmap>();
             beatmaps
                 .Ignore(b => b.PlayCount)
                 .Ignore(b => b.PassCount);
             beatmaps
-                .HasKey(b => new { b.Bid, b.Mode });
+                .HasKey(b => new { b.Id, b.Mode });
             beatmaps.Property("DifficultyName").IsRequired();
             beatmaps.Property("FileMD5").IsRequired();
             beatmaps.Property("Artist").IsRequired();
@@ -52,6 +48,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             beatmaps.Property("Creator").IsRequired();
             beatmaps.Property("Source").IsRequired();
             beatmaps.Property("Tags").IsRequired();
+            //beatmaps.Property("LastUpdateOffset").HasDefaultValue(DateTimeOffset.MinValue);
         }
     }
 }

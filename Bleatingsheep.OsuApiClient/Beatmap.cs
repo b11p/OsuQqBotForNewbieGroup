@@ -8,9 +8,9 @@ namespace Bleatingsheep.OsuMixedApi
     public class Beatmap
     {
         [JsonProperty("beatmapset_id")]
-        public int Sid { get; set; }
+        public int SetId { get; set; }
         [JsonProperty("beatmap_id")]
-        public int Bid { get; set; }
+        public int Id { get; set; }
         [JsonProperty("approved")]
         public Approved Approved { get; set; }
         [JsonProperty("total_length")]

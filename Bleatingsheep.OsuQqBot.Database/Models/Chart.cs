@@ -19,7 +19,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public double RecommendPerformance { get; set; }
         public double? MaximumPerformance { get; set; }
         public long ChartCreator { get; set; }
-        public List<ChartAdministrator> ChartAdministrators { get; set; } = new List<ChartAdministrator>();
+        public List<ChartAdministrator> Administrators { get; set; } = new List<ChartAdministrator>();
 
         public List<ChartBeatmap> Maps { get; set; } = new List<ChartBeatmap>();
     }

@@ -11,7 +11,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public int ChartId { get; internal set; }
         public int BeatmapId { get; set; }
         public Mode Mode { get; set; }
-        public int Uid { get; set; }
+        public int UserId { get; set; }
 
         public long Date { get; set; }
         public double PPWhenCommit { get; set; }
@@ -34,20 +34,20 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         /// <param name="performance"></param>
         /// <exception cref="ArgumentNullException">beatmap 或 record 为 <c>null</c>。</exception>
         /// <exception cref="InvalidOperationException">
-        ///     <see cref="ChartBeatmap.BeatmapId"/> 和 <see cref="PlayRecord.Bid"/> 不一致。
+        ///     <see cref="ChartBeatmap.BeatmapId"/> 和 <see cref="PlayRecord.BeatmapId"/> 不一致。
         /// </exception>
         /// <returns></returns>
         public static ChartTry FromRecord(ChartBeatmap beatmap, PlayRecord record, double performance)
         {
             if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
             if (record == null) throw new ArgumentNullException(nameof(record));
-            if (beatmap.BeatmapId != record.Bid) throw new InvalidOperationException("beatmap和record的bid不一致");
+            if (beatmap.BeatmapId != record.BeatmapId) throw new InvalidOperationException("beatmap和record的bid不一致");
             return new ChartTry
             {
                 ChartId = beatmap.ChartId,
-                BeatmapId = record.Bid,
+                BeatmapId = record.BeatmapId,
                 Mode = beatmap.Mode,
-                Uid = record.Uid,
+                UserId = record.UserId,
                 Date = record.DateOffset.ToUnixTimeSeconds(),
                 PPWhenCommit = performance,
                 Mods = record.Mods,
