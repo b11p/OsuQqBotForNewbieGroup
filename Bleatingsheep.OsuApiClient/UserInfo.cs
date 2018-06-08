@@ -59,6 +59,7 @@ namespace Bleatingsheep.OsuMixedApi
         public int CountA => DefaultIfNull(countA);
         [JsonProperty("country")]
         public string CountryCode { get; private set; }
+        public string Country => Iso3166.CountryOf(CountryCode);
         [JsonProperty("pp_country_rank")]
         public int CountryRank { get; private set; }
         [JsonProperty("events")]

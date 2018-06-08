@@ -1,6 +1,5 @@
 ﻿using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database;
-using OsuQqBot.Api;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,7 +109,7 @@ namespace OsuQqBot.Query
             byLine[1] = string.Empty;
             byLine[2] = userInfo.Performance + "pp 表现";
             byLine[3] = "#" + userInfo.Rank;
-            byLine[4] = userInfo.Country() + " #" + userInfo.CountryRank;
+            byLine[4] = userInfo.Country + " #" + userInfo.CountryRank;
             byLine[5] = (userInfo.RankedScore).ToString("#,###") + " Ranked谱面总分";
             byLine[6] = displayAcc + " 准确率";
             byLine[7] = userInfo.PlayCount + " 游玩次数";
