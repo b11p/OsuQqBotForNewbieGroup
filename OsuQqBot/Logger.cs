@@ -13,7 +13,7 @@ namespace OsuQqBot
 
         static Logger()
         {
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string desktop = Paths.BasePath;
             Directory.CreateDirectory(Path.Combine(desktop, "Bot Log"));
             FilePath = Path.Combine(desktop, "Bot Log", "Bot Log.txt");
             Log("Logger OK!");

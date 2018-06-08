@@ -15,9 +15,10 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string path = @"Sheep Bot Data\Newbie.db";
-            string fullName = System.IO.Path.Combine(desktop, path);
+            string desktop = PathUtility.BasePath;
+            string folder = "Sheep Bot Data";
+            string name = "Newbie.db";
+            string fullName = System.IO.Path.Combine(desktop, folder, name);
             optionsBuilder.UseSqlite($"Data Source={fullName}");
         }
 

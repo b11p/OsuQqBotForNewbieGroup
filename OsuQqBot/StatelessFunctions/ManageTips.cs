@@ -48,7 +48,7 @@ namespace OsuQqBot.StatelessFunctions
         public static IList<string> DefaultTips => new List<string>(_defaultTips);
 
         // @"C:\Users\Administrator\Desktop\Tips_Image";
-        private static readonly string ImagePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Tips_Image");
+        private static readonly string ImagePath = Path.Combine(Paths.BasePath, "Tips_Image");
 
         private void DoCommond(EndPoint endPoint, string[] commonds)
         {

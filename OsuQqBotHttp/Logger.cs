@@ -11,9 +11,19 @@ namespace OsuQqBotHttp
 
         static readonly object thisLock = new object();
 
+        private static string BasePath
+        {
+            get
+            {
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                if (string.IsNullOrEmpty(desktop)) desktop = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                return desktop;
+            }
+        }
+
         static Logger()
         {
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string desktop = BasePath;
             Directory.CreateDirectory(Path.Combine(desktop, "Bot Log"));
             FilePath = Path.Combine(desktop, "Bot Log", "Socket Log.txt");
             Log("Logger OK!");
