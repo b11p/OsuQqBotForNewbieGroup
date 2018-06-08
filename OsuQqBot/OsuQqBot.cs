@@ -37,6 +37,13 @@ namespace OsuQqBot
         private static IReadOnlyCollection<long> s_notifyGroups;
         public static IReadOnlyCollection<long> NotifyGroups => s_notifyGroups;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="LoadedException"></exception>
+        /// <param name="qqBot"></param>
+        /// <param name="apiClientV2"></param>
+        /// <param name="listener"></param>
         public OsuQqBot(IQqBot qqBot, HttpApiClient apiClientV2, wudipost::ApiPostListener listener)
         {
             // 旧版初始化代码
@@ -74,6 +81,7 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
 
             // 初始化
+            OpenApi.Init(new Data.LegacyBinding());
             _plan = new Task(() =>
             {
                 async void Run(ScheduleInfo info)
@@ -533,7 +541,7 @@ namespace OsuQqBot
             {
                 User u = users[0];
 
-                database.Bind(qq, u.Id, "群员手动执行命令");
+                OpenApi.Instance.Bindings.Bind(qq, (int)u.Id, u.Name, "群员手动执行命令", qq, u.Name);
                 this.qq.SendMessageAsync(sendBack, $"绑定为{u.Name}", true);
             }
         }
@@ -959,7 +967,7 @@ where 查询某个osu!玩家
             else
             {
                 database.CacheUsername(findUid, username);
-                database.Bind(qq, findUid, "Auto");
+                OpenApi.Instance.Bindings.Bind(qq, (int)findUid, username, "Auto", 0, null);
                 //var success = await Int100ApiClient.BindQqAndOsuUid(qq, findUid);
                 Logger.Log("自动绑定" + qq + username);
                 return (true, username, findUid);

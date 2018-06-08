@@ -50,7 +50,7 @@ namespace OsuQqBot
             //    }
             //}
             // 此时 uid != null
-            if (isFromApi) database.Bind(qq, uid.Value, fromApi + " (while running)");
+            if (isFromApi) OpenApi.Instance.Bindings.Bind(qq, (int)uid, null, fromApi + " (while running)", 0, "白菜");
             return uid;
         }
 
