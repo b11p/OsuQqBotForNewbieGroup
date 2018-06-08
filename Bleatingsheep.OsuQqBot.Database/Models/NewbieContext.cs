@@ -1,6 +1,7 @@
 ﻿using Bleatingsheep.OsuMixedApi;
 using Microsoft.EntityFrameworkCore;
 using System;
+using static Bleatingsheep.OsuQqBot.Database.Models.ServerInfo;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models
 {
@@ -13,6 +14,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<ChartTry> ChartCommits { get; private set; }
         public DbSet<Beatmap> CachedBeatmaps { get; private set; }
         public DbSet<OperationHistory> Histories { get; private set; }
+        public DbSet<BindingInfo> Bindings { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -20,7 +22,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             string folder = "Sheep Bot Data";
             string name = "Newbie.db";
             string fullName = System.IO.Path.Combine(desktop, folder, name);
-            optionsBuilder.UseSqlite($"Data Source={fullName}");
+            optionsBuilder.UseMySql($"server={Server};database={ServerInfo.Database};user={User};pwd={Password};SslMode=Required;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
