@@ -12,6 +12,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<ChartAdministrator> ChartAdministrators { get; private set; }
         public DbSet<ChartTry> ChartCommits { get; private set; }
         public DbSet<Beatmap> CachedBeatmaps { get; private set; }
+        public DbSet<OperationHistory> Histories { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

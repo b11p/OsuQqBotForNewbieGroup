@@ -64,6 +64,7 @@ namespace OsuQqBotHttp
 
             apiClient = new Sisters.WudiLib.HttpApiClient();
             apiClient.ApiAddress = "http://127.0.0.1:5700";
+            apiClient.StartClean(60);
 
             _listener = new Sisters.WudiLib.Posts.ApiPostListener();
             _listener.OnException += Logger.LogException;
