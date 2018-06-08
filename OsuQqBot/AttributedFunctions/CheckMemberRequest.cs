@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Bleatingsheep.OsuMixedApi;
+using OsuQqBot.Query;
 using Sisters.WudiLib.Posts;
 
 namespace OsuQqBot.AttributedFunctions
@@ -26,7 +27,7 @@ namespace OsuQqBot.AttributedFunctions
         void IMessageCommandable.Process(Message message, Sisters.WudiLib.HttpApiClient api)
         {
             var names = UsernameUtils.ParseUsername(Message);
-            var valid = Querying.Instance.CheckUsername(names, false);
+            var valid = Query.Querying.Instance.CheckUsername(names, false);
             foreach (var user in valid)
             {
                 try

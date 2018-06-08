@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using mixed = Bleatingsheep.OsuMixedApi;
 
-namespace OsuQqBot
+namespace OsuQqBot.Query
 {
     sealed class Querying
     {
@@ -50,13 +50,13 @@ namespace OsuQqBot
         /// <param name="bid"></param>
         /// <param name="mode"></param>
         /// <param name="apiKey"></param>
-        /// <exception cref="System.ArgumentException">API Key 不正确。</exception>
+        /// <exception cref="ArgumentException">API Key 不正确。</exception>
         /// <returns></returns>
         public async Task<mixed::Beatmap> GetBeatmapAsync(int bid, mixed::Mode mode, string apiKey)
         {
             if (string.IsNullOrWhiteSpace(apiKey))
             {
-                throw new System.ArgumentException("API Key 不正确。", nameof(apiKey));
+                throw new ArgumentException("API Key 不正确。", nameof(apiKey));
             }
 
             var map = await NewbieDatabase.GetBeatmapAsync(bid, mode);

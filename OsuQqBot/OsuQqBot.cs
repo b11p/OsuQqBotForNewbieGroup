@@ -111,7 +111,7 @@ namespace OsuQqBot
                     Task.Delay(interval).Wait();
                 }
             }, TaskCreationOptions.LongRunning);
-            Querying.SetKey(config.ApiKey);
+            Query.Querying.SetKey(config.ApiKey);
             Interlocked.CompareExchange(ref daloubot, config.Daloubot, 0);
 
             v2 = apiClientV2;
