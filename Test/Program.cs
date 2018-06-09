@@ -116,7 +116,7 @@ namespace Test
                 let calcRawScore = m.score(c)
                 let score = double.IsNaN(calcRawScore) ? 0 : calcRawScore
                 group new { commit = c, score } by new { c.Beatmap, c.UserId } into commits // Key 是 map 和 uid，Values 是 Commits。
-                group commits.Max(cm => cm.score) by commits.Key.Uid into highScores // Key 是 uid，Values 是每个图的最高分。
+                group commits.Max(cm => cm.score) by commits.Key.UserId into highScores // Key 是 uid，Values 是每个图的最高分。
                 //select (uid: highScores.Key, score: highScores.Sum()) into r
                 let r = (uid: highScores.Key, score: highScores.Sum())
                 orderby r.score descending

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Bleatingsheep.OsuMixedApi.MotherShip
@@ -19,6 +17,12 @@ namespace Bleatingsheep.OsuMixedApi.MotherShip
 
         private string UserInfoUrl(long qqId) => _host + $"api/v1/user/qq/{qqId}";
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <exception cref="OsuApiFailedException">访问网络失败。</exception>
+        /// <param name="qqId"></param>
+        /// <returns></returns>
         public async Task<MotherShipResponse<MotherShipUserInfo>> GetUserInfoAsync(long qqId)
         {
             var (success, result) = await Execute.Do(async () =>
@@ -27,6 +31,18 @@ namespace Bleatingsheep.OsuMixedApi.MotherShip
             }, "Network error.");
             if (!success) throw new OsuApiFailedException("Network error.");
             return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="qqId"></param>
+        /// <exception cref="访问网络失败。"></exception>
+        /// <returns></returns>
+        public async Task<int?> GetUserBindAsync(long qqId)
+        {
+            var response = await GetUserInfoAsync(qqId);
+            return response.IsSuccessStatusCode() ? (int?)response.Data.OsuId : null;
         }
     }
 }

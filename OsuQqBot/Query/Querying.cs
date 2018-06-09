@@ -1,24 +1,27 @@
 ﻿using Bleatingsheep.OsuMixedApi;
+using Bleatingsheep.OsuMixedApi.MotherShip;
 using Bleatingsheep.OsuQqBot.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using mixed = Bleatingsheep.OsuMixedApi;
 
 namespace OsuQqBot.Query
 {
+    /// <summary>
+    /// 利用各种方法拿到想要的数据，并且负责一定的同步的方法。
+    /// </summary>
     sealed class Querying
     {
         private readonly string _key = null;
-        private readonly mixed::OsuApiClient _api = null;
+        private readonly OsuApiClient _api = null;
         private static Querying instance = null;
 
         private Querying(string key)
         {
             _key = key;
-            _api = mixed::OsuApiClient.ClientUsingKey(key);
+            _api = OsuApiClient.ClientUsingKey(key);
         }
 
         public IReadOnlyCollection<UserInfo> CheckUsername(IEnumerable<string> possibleUsernames, bool requireAllSucceeded = true)
@@ -26,10 +29,10 @@ namespace OsuQqBot.Query
             var userInfos = new System.Collections.Concurrent.ConcurrentBag<UserInfo>();
             var api = _api;
 
-            var result = System.Threading.Tasks.Parallel.ForEach(possibleUsernames, (name, state) =>
+            var result = Parallel.ForEach(possibleUsernames, (name, state) =>
             {
                 if (state.IsStopped) return;
-                var (networkSuccess, userInfo) = api.GetUserInfoAsync(name, mixed::Mode.Standard).Result;
+                var (networkSuccess, userInfo) = api.GetUserInfoAsync(name, Mode.Standard).Result;
                 if (requireAllSucceeded && !networkSuccess)
                 {
                     state.Stop();
@@ -51,7 +54,7 @@ namespace OsuQqBot.Query
         /// <param name="apiKey"></param>
         /// <exception cref="ArgumentException">API Key 不正确。</exception>
         /// <returns></returns>
-        public async Task<mixed::Beatmap> GetBeatmapAsync(int bid, mixed::Mode mode, string apiKey)
+        public async Task<Beatmap> GetBeatmapAsync(int bid, Mode mode, string apiKey)
         {
             if (string.IsNullOrWhiteSpace(apiKey))
             {
@@ -64,6 +67,26 @@ namespace OsuQqBot.Query
             if (map == null) return null;
             if (!map.IsInfoFixed()) return map;
             return await NewbieDatabase.CacheBeatmapAsync(map) ?? map;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="qqId"></param>
+        /// <exception cref="OsuApiFailedException"></exception>
+        /// <returns></returns>
+        public async Task<int?> GetUserBind(long qqId)
+        {
+            var result = OpenApi.Instance.Bindings.UserIdOf(qqId);
+            if (result is int u) return u;
+            var response = await OpenApi.Instance.MotherShipApiClient.GetUserInfoAsync(qqId);
+            if (response.Data is MotherShipUserInfo info)
+            {
+                u = info.OsuId;
+                OpenApi.Instance.Bindings.Bind(qqId, info.OsuId, info.Name, "Mother Ship (while running)", 0, null);
+                return u;
+            }
+            return null;
         }
 
         public static Querying Instance => instance;
@@ -105,7 +128,7 @@ namespace OsuQqBot.Query
                 displayAcc = userInfo.Accuracy.ToString();
             }
 
-            byLine[0] = userInfo.Name + "的个人信息" + (userInfo.Mode == mixed::Mode.Standard && !showMode ? "" : "—" + userInfo.Mode.GetModeString());
+            byLine[0] = userInfo.Name + "的个人信息" + (userInfo.Mode == Mode.Standard && !showMode ? "" : "—" + userInfo.Mode.GetModeString());
             byLine[1] = string.Empty;
             byLine[2] = userInfo.Performance + "pp 表现";
             byLine[3] = "#" + userInfo.Rank;
@@ -121,17 +144,17 @@ namespace OsuQqBot.Query
 
     static class ModeExtends
     {
-        public static string GetModeString(this mixed::Mode mode)
+        public static string GetModeString(this Mode mode)
         {
             switch (mode)
             {
-                case mixed::Mode.Standard:
+                case Mode.Standard:
                     return "osu!";
-                case mixed::Mode.Taiko:
+                case Mode.Taiko:
                     return "taiko";
-                case mixed::Mode.Ctb:
+                case Mode.Ctb:
                     return "catch";
-                case mixed::Mode.Mania:
+                case Mode.Mania:
                     return "mania";
                 default:
                     return null;

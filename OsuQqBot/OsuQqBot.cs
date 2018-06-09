@@ -81,7 +81,7 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
 
             // 初始化
-            OpenApi.Init(new Data.LegacyBinding());
+            OpenApi.Init(new Data.LegacyBinding(), new Bleatingsheep.OsuMixedApi.MotherShip.MotherShipApiClient(Bleatingsheep.OsuMixedApi.MotherShip.MotherShipApiClient.BleatingsheepCdnHost));
             _plan = new Task(() =>
             {
                 async void Run(ScheduleInfo info)
@@ -236,7 +236,7 @@ namespace OsuQqBot
             if (e.GroupId == GroupId)
             {
                 long newUser = e.UserId;
-                long uid = FindUid(newUser).Result ?? 0;
+                long uid = Query.Querying.Instance.GetUserBind(newUser).Result ?? 0;
                 string username = null;
                 string welcome;
                 if (uid != 0)
@@ -275,7 +275,7 @@ namespace OsuQqBot
             if (group == GroupId && !ignoreList.Contains(qq))
                 if (message.Contains($"[CQ:at,qq={CurrentQq}]"))
                 {
-                    var uid = await FindUid(qq);
+                    var uid = await Query.Querying.Instance.GetUserBind(qq);
                     if (!uid.HasValue)
                     {
                         this.qq.SendGroupMessageAsync(group, "网络错误，请再试一次");
@@ -524,7 +524,7 @@ namespace OsuQqBot
             IList<string> uname = UsernameUtils.ParseUsername(username);
             if (!(uname.Count == 1 && uname[0] == username)) return;
 
-            long? find = await FindUid(qq);
+            long? find = await Query.Querying.Instance.GetUserBind(qq);
             UserRaw[] users = await apiClient.GetUserAsync(username, OsuApiClient.UsernameType.Username);
 
             // 判断网络、判断已绑定。
@@ -648,7 +648,7 @@ where 查询某个osu!玩家
                 }
                 await Task.Run(async () =>
                 {
-                    long? aimUid = await FindUid(long.Parse(atMatch.Groups[1].Value));
+                    long? aimUid = await Query.Querying.Instance.GetUserBind(long.Parse(atMatch.Groups[1].Value));
                     if (aimUid.HasValue)
                         if (aimUid.Value != 0)
                             await SendQueryMessage(group, aimUid.Value, atMatch.Groups[2].Value);
@@ -731,7 +731,7 @@ where 查询某个osu!玩家
 
         private async Task<string> QueryFromQq(long qq, string param = "")
         {
-            long? aimUid = await FindUid(qq);
+            long? aimUid = await Query.Querying.Instance.GetUserBind(qq);
             if (aimUid.HasValue)
                 if (aimUid.Value != 0)
                     return (await ProcessQuery(aimUid.Value, param)).info;
@@ -769,7 +769,7 @@ where 查询某个osu!玩家
             {
                 if (ignoreList.Contains(fromQq)) return;
 
-                long? uid = await FindUid(fromQq);
+                long? uid = await Query.Querying.Instance.GetUserBind(fromQq);
                 if (!uid.HasValue) return;
 
                 if (uid.Value == 0)

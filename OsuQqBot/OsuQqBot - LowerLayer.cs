@@ -26,7 +26,7 @@ namespace OsuQqBot
                     qq.SendMessageAsync(endPoint, "不查，浪费资源");
                     return;
                 }
-                var uid = FindUid(source.FromQq).Result;
+                var uid = Query.Querying.Instance.GetUserBind(source.FromQq).Result;
                 if (uid == null)
                 {
                     qq.SendMessageAsync(endPoint, "网络异常");

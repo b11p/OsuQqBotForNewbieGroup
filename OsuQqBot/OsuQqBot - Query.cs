@@ -7,53 +7,6 @@ namespace OsuQqBot
 {
     public partial class OsuQqBot
     {
-
-        /// <summary>
-        /// 从 qq 号查找 uid
-        /// </summary>
-        /// <param name="qq">QQ号</param>
-        /// <param name="forceUpdate">强制通过 int100 的API查找</param>
-        /// <returns>找不到返回0，网络异常返回null</returns>
-        private async Task<long?> FindUid(long qq, bool forceUpdate = false)
-        {
-            long? uid = null;
-            bool isFromApi = false; // 成功从别人的 API 处找到绑定信息
-            string fromApi = string.Empty;
-            if (!forceUpdate)
-                uid = database.GetUidFromQq(qq);
-            if (uid == null)
-            {
-                uid = await MotherShipApi.GetOsuUidFromQqAsync(qq);
-                if (uid == null)
-                {
-                    Logger.Log($"从妈船找QQ={qq}的绑定信息失败（网络问题）");
-                }
-                else if (uid.Value != 0)
-                {
-                    isFromApi = true;
-                    fromApi = "Mother Ship";
-                }
-            }
-
-            //if (uid == null)
-            //{// 数据库找不到UID，在int的数据库查找
-            //    uid = await Int100ApiClient.GetOsuUidFromQqAsync(qq);
-            //    if (uid == null)
-            //    {
-            //        Logger.Log($"找QQ={qq}的绑定信息失败");
-            //        return null;
-            //    }
-            //    else if (uid.Value != 0)
-            //    {
-            //        isFromApi = true;
-            //        fromApi = "int100";
-            //    }
-            //}
-            // 此时 uid != null
-            if (isFromApi) OpenApi.Instance.Bindings.Bind(qq, (int)uid, null, fromApi + " (while running)", 0, "白菜");
-            return uid;
-        }
-
         /// <summary>
         /// 从uid查找用户名
         /// </summary>

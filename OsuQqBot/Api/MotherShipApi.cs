@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace OsuQqBot.Api
@@ -95,7 +93,6 @@ namespace OsuQqBot.Api
                     }
                     catch (TaskCanceledException)
                     {
-                        Logger.Log("抓到TaskCanceledException了");
                         //Task.Delay(123).Wait();
                         tryTime--;
                     }

@@ -113,7 +113,7 @@ namespace OsuQqBot
             var members = this.qq.GetGroupMemberList(group);
             var ignore = ignoreList.Union(ignorePPList).Distinct();
 
-            var unbind = members.Where(m => !ignore.Contains(m.Qq) && FindUid(m.Qq).Result == 0);
+            var unbind = members.Where(m => !ignore.Contains(m.Qq) && Query.Querying.Instance.GetUserBind(m.Qq).Result == 0);
 
             var sb = new StringBuilder();
             foreach (var item in unbind)
