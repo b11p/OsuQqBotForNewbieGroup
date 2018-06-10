@@ -7,6 +7,8 @@ namespace OsuQqBot
     {
         private class ScheduleInfo
         {
+            private static readonly TimeSpan Close = new TimeSpan(0, 0, 1);
+
             public ScheduleType Type { get; }
             public TimeSpan Time { get; }
             public IRegularly Action { get; }
@@ -39,7 +41,7 @@ namespace OsuQqBot
                 }
             }
 
-            public bool ShouldRun() => NextRun < DateTime.UtcNow;
+            public bool ShouldRun() => NextRun - DateTime.UtcNow < Close;
 
             public void Next()
             {

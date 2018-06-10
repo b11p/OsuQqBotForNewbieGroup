@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Bleatingsheep.OsuMixedApi.MotherShip;
+using Newtonsoft.Json;
 using OsuQqBot.Api;
 using OsuQqBot.AttributedFunctions;
 using OsuQqBot.QqBot;
@@ -81,7 +82,7 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
 
             // 初始化
-            OpenApi.Init(new Data.LegacyBinding(), new Bleatingsheep.OsuMixedApi.MotherShip.MotherShipApiClient(Bleatingsheep.OsuMixedApi.MotherShip.MotherShipApiClient.BleatingsheepCdnHost));
+            OpenApi.Init(new Data.LegacyBinding(), new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost), Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey));
             _plan = new Task(() =>
             {
                 async void Run(ScheduleInfo info)
@@ -119,13 +120,12 @@ namespace OsuQqBot
                     Task.Delay(interval).Wait();
                 }
             }, TaskCreationOptions.LongRunning);
-            Query.Querying.SetKey(config.ApiKey);
             Interlocked.CompareExchange(ref daloubot, config.Daloubot, 0);
 
             v2 = apiClientV2;
             Interlocked.CompareExchange(ref s_apiV2, v2, null);
             _listener = listener;
-            _listener.FriendRequestEvent += wudipost.ApiPostListener.ApproveAllFriendRequests;
+            _listener.FriendRequestEvent += wudipost::ApiPostListener.ApproveAllFriendRequests;
 
             Init();
         }
