@@ -11,6 +11,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long UserId { get; set; }
+        [ConcurrencyCheck]
         public int OsuId { get; set; }
         [Required]
         public string Source { get; set; }

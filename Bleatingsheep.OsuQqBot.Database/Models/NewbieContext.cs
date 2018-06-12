@@ -18,7 +18,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql($"server={Server};database={ServerInfo.Database};user={User};pwd={Password};SslMode=Required;");
+            optionsBuilder.UseMySql($"server={Server};port={Port};database={ServerInfo.Database};user={User};pwd={Password};SslMode=Required;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
