@@ -32,7 +32,7 @@ namespace OsuQqBot
                         NextRun = DateTime.UtcNow;
                         break;
                     case ScheduleType.Daily:
-                        DateTime next = DateTime.UtcNow;
+                        DateTime next = DateTime.UtcNow.Date + time;
                         if (next.TimeOfDay < Time) next = next.AddDays(1);
                         NextRun = next;
                         break;
