@@ -11,35 +11,7 @@ namespace OsuQqBot.Api
         {
             if (mode == Mode.Unspecified) mode = Mode.Std;
             var Nope = await CallApi<MotherShipUserData>($"http://www.mothership.top:8080/api/v1/userinfo/nearest/{uid}?mode={(int)mode}");
-            if (Nope == null)
-            {   // 如果没找到记录，就访问妈船API让白菜开始记录
-                // 实际应该调用不到了
-                // 如果还是调用了，会有日志记录
-                Logger.Log($"为什么妈船还是没有这个人的数据啊。（uid={uid}, mode={mode})");
-                using (var httpClient = new HttpClient())
-                {
-                    try
-                    { using (await httpClient.GetStreamAsync(GetStatUrl(uid))) { } }
-                    catch (HttpRequestException)
-                    { }
-                    catch (TaskCanceledException)
-                    { }
-                }
-            }
             return Nope;
-        }
-
-        public static string GetStatUrl(long uid, Mode mode = Mode.Std)
-        {
-            if (mode == Mode.Unspecified) mode = Mode.Std;
-            return $"http://www.mothership.top:8080/api/v1/stat/{uid}?mode={(int)mode}";
-        }
-
-        private class MotherShipReturns
-        {
-            public int code { get; set; }
-            public string status { get; set; }
-            public Binding data { get; set; }
         }
 
         private static async Task<T> CallApi<T>(string url) where T : class
@@ -80,26 +52,7 @@ namespace OsuQqBot.Api
             public string status { get; set; }
             public T data { get; set; }
         }
-
-        private class Binding
-        {
-            public long userId { get; set; }
-            public string role { get; set; }
-            public long qq { get; set; }
-            public string legacyUname { get; set; }
-            public string currentUname { get; set; }
-            public bool banned { get; set; }
-            public int repeatCount { get; set; }
-            public int speakingCount { get; set; }
-        }
     }
-
-    //public class MotherShipUserHistoryResponse
-    //{
-    //    public int code { get; set; }
-    //    public string status { get; set; }
-    //    public MotherShipUserData[] data { get; set; }
-    //}
 
     public class MotherShipUserData
     {
@@ -114,7 +67,7 @@ namespace OsuQqBot.Api
         private int Count50 { get; set; }
 
         [JsonIgnore]
-        public long Tth => Count300 + Count100 + Count50;
+        public long Tth => (long)Count300 + Count100 + Count50;
 
         [JsonProperty("playcount")]
         public int PlayCount { get; private set; }

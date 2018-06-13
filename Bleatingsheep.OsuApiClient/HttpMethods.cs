@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.Diagnostics;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Bleatingsheep.OsuMixedApi
 {
@@ -43,16 +42,17 @@ namespace Bleatingsheep.OsuMixedApi
             using (var client = new HttpClient())
             {
                 string result = null;
+                var stopwatch = Stopwatch.StartNew();
+                Exception exception = null;
                 try
                 {
                     result = await client.GetStringAsync(url);
                 }
-                catch (HttpRequestException)
+                catch (Exception e)
                 {
+                    exception = e;
                 }
-                catch (TaskCanceledException)
-                {
-                }
+                Diagnostics.FinishRequest(url, stopwatch.ElapsedMilliseconds, exception);
                 return result;
             }
         }

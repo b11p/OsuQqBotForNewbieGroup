@@ -76,6 +76,7 @@ namespace OsuQqBot.Query
         /// </summary>
         /// <param name="qqId"></param>
         /// <exception cref="OsuApiFailedException"></exception>
+        /// <exception cref="NewbieDbException"></exception>
         /// <returns></returns>
         public async Task<int?> GetUserBind(long qqId)
         {

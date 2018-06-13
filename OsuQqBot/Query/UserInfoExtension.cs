@@ -19,7 +19,7 @@ namespace OsuQqBot.Query
                 displayAcc = userInfo.Accuracy.ToString();
             }
 
-            byLine[0] = userInfo.Name + "的个人信息" + (userInfo.Mode == Mode.Standard && !showMode ? "" : "—" + userInfo.Mode.GetModeString());
+            byLine[0] = userInfo.Name + "的个人信息" + (userInfo.Mode == Mode.Standard && !showMode ? "" : "—" + userInfo.Mode.GetShortModeString());
             byLine[1] = string.Empty;
             byLine[2] = userInfo.Performance + "pp 表现";
             byLine[3] = "#" + userInfo.Rank;

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using OsuQqBot.Api;
-using OsuQqBot.LocalData;
-using OsuQqBot.QqBot;
+﻿using OsuQqBot.QqBot;
+using OsuQqBot.Query;
 
 namespace OsuQqBot.StatelessFunctions
 {
@@ -14,9 +10,9 @@ namespace OsuQqBot.StatelessFunctions
             message = message.Trim();
             if (message == "妈船？" || message == "妈船?")
             {
-                long? uid = Query.Querying.Instance.GetUserBind(messageSource.FromQq).Result;
+                long? uid = Querying.Instance.GetUserBind(messageSource.FromQq).Result;
                 if (!uid.HasValue) return true;
-                string url = MotherShipApi.GetStatUrl(uid.Value);
+                string url = OpenApi.Instance.MotherShipApiClient.GetStatUrl((int)uid);
                 var api = OsuQqBot.QqApi;
                 string content = api.OnlineImage(url, true);
                 api.SendMessageAsync(endPoint, content);
