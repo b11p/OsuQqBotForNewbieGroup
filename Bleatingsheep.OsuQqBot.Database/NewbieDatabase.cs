@@ -10,6 +10,36 @@ namespace Bleatingsheep.OsuQqBot.Database
 {
     public static class NewbieDatabase
     {
+        private static T TryUsingContext<T>(Func<NewbieContext, T> func)
+        {
+            try
+            {
+                using (var context = new NewbieContext())
+                {
+                    return func(context);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new NewbieDbException(e.Message, e);
+            }
+        }
+
+        private static async Task<T> TryUsingContextAsync<T>(Func<NewbieContext, Task<T>> func)
+        {
+            try
+            {
+                using (var context = new NewbieContext())
+                {
+                    return await func(context);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new NewbieDbException(e.Message, e);
+            }
+        }
+
         public static Chart AddChart(Chart chart)
         {
             using (var context = new NewbieContext())
@@ -215,6 +245,24 @@ namespace Bleatingsheep.OsuQqBot.Database
             {
                 throw new NewbieDbException(e.Message, e);
             }
+        }
+
+        /// <summary>
+        /// 获取绑定信息。
+        /// </summary>
+        /// <param name="qq">QQ 号。</param>
+        /// <returns>绑定信息。如果没绑定，则为 <c>null</c>。</returns>
+        public static async Task<BindingInfo> GetBindingInfoAsync(long qq)
+        {
+            return await TryUsingContextAsync(async context =>
+            {
+                return await context.Bindings.SingleOrDefaultAsync(b => b.UserId == qq);
+            });
+        }
+
+        public static async Task<int?> GetBindingIdAsync(long qq)
+        {
+            return (await GetBindingInfoAsync(qq))?.OsuId;
         }
 
         public static async Task<Beatmap> GetBeatmapAsync(int bid, Mode mode)

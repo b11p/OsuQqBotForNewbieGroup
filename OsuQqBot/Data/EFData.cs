@@ -1,18 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
+using Bleatingsheep.OsuQqBot.Database;
 using Bleatingsheep.OsuQqBot.Database.Models;
 
 namespace OsuQqBot.Data
 {
-    class EFData : IBindings
+    class EFData : IBindingsAsync
     {
-        public int? Bind(long qq, int osuId, string osuName, string source, long operatorId, string operatorName)
+        public async Task<int?> BindAsync(long qq, int osuId, string osuName, string source, long operatorId, string operatorName)
         {
-            throw new NotImplementedException();
+            return await NewbieDatabase.BindAsync(qq, osuId, osuName, source, operatorId, operatorName);
         }
 
-        public BindingInfo GetBindingInfo(long qq) => throw new NotImplementedException();
-        public int? UserIdOf(long qq) => throw new NotImplementedException();
+        public async Task<BindingInfo> GetBindingInfoAsync(long qq)
+        {
+            return await NewbieDatabase.GetBindingInfoAsync(qq);
+        }
+
+        public async Task<int?> GetBindingIdAsync(long qq)
+        {
+            return await NewbieDatabase.GetBindingIdAsync(qq);
+        }
     }
 }

@@ -79,13 +79,13 @@ namespace OsuQqBot.Query
         /// <returns></returns>
         public async Task<int?> GetUserBind(long qqId)
         {
-            var result = OpenApi.Instance.Bindings.UserIdOf(qqId);
+            var result = await OpenApi.Instance.Bindings.GetBindingIdAsync(qqId);
             if (result is int u) return u;
             var response = await OpenApi.Instance.MotherShipApiClient.GetUserInfoAsync(qqId);
             if (response.Data is MotherShipUserInfo info)
             {
                 u = info.OsuId;
-                OpenApi.Instance.Bindings.Bind(qqId, info.OsuId, info.Name, "Mother Ship (while running)", 0, null);
+                await OpenApi.Instance.Bindings.BindAsync(qqId, info.OsuId, info.Name, "Mother Ship (while running)", 0, null);
                 return u;
             }
             return null;

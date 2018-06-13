@@ -1,13 +1,14 @@
 ﻿using Bleatingsheep.OsuQqBot.Database.Models;
+using System.Threading.Tasks;
 
 namespace OsuQqBot.Data
 {
-    interface IBindings
+    interface IBindingsAsync
     {
-        int? Bind(long qq, int osuId, string osuName, string source, long operatorId, string operatorName);
+        Task<int?> BindAsync(long qq, int osuId, string osuName, string source, long operatorId, string operatorName);
 
-        int? UserIdOf(long qq);
+        Task<int?> GetBindingIdAsync(long qq);
 
-        BindingInfo GetBindingInfo(long qq);
+        Task<BindingInfo> GetBindingInfoAsync(long qq);
     }
 }

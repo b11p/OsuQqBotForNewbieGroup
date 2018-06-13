@@ -1,14 +1,21 @@
 ﻿using Bleatingsheep.OsuQqBot.Database.Models;
+using System.Threading.Tasks;
 
 namespace OsuQqBot.Data
 {
-    class LegacyBinding : IBindings
+    class LegacyBinding : IBindingsAsync
     {
-        public int? Bind(long qq, int osuId, string osuName, string source, long operatorId, string operatorName) => (int?)LocalData.Database.Instance.Bind(qq, osuId, source);
-
-        public BindingInfo GetBindingInfo(long qq)
+        public async Task<int?> BindAsync(long qq, int osuId, string osuName, string source, long operatorId, string operatorName)
         {
-            var queried = LocalData.Database.Instance.GetUidFromQq(qq);
+            return await Task.Run(() =>
+            {
+                return (int?)LocalData.Database.Instance.Bind(qq, osuId, source);
+            });
+        }
+
+        public async Task<BindingInfo> GetBindingInfoAsync(long qq)
+        {
+            var queried = await Task.Run(() => LocalData.Database.Instance.GetUidFromQq(qq));
             if (queried is long osuId)
             {
                 return new BindingInfo { UserId = qq, OsuId = (int)osuId };
@@ -16,9 +23,9 @@ namespace OsuQqBot.Data
             return null;
         }
 
-        public int? UserIdOf(long qq)
+        public async Task<int?> GetBindingIdAsync(long qq)
         {
-            var queried = LocalData.Database.Instance.GetUidFromQq(qq);
+            var queried = await Task.Run(() => LocalData.Database.Instance.GetUidFromQq(qq));
             if (queried is long osuId)
             {
                 return (int)osuId;

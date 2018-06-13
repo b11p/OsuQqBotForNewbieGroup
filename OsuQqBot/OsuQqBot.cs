@@ -82,7 +82,7 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
 
             // 初始化
-            OpenApi.Init(new Data.LegacyBinding(), new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost), Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey));
+            OpenApi.Init(new Data.EFData(), new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost), Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey));
             _plan = new Task(() =>
             {
                 async void Run(ScheduleInfo info)
@@ -541,7 +541,7 @@ namespace OsuQqBot
             {
                 User u = users[0];
 
-                OpenApi.Instance.Bindings.Bind(qq, (int)u.Id, u.Name, "群员手动执行命令", qq, u.Name);
+                await OpenApi.Instance.Bindings.BindAsync(qq, (int)u.Id, u.Name, "群员手动执行命令", qq, u.Name);
                 this.qq.SendMessageAsync(sendBack, $"绑定为{u.Name}", true);
             }
         }
@@ -967,7 +967,7 @@ where 查询某个osu!玩家
             else
             {
                 database.CacheUsername(findUid, username);
-                OpenApi.Instance.Bindings.Bind(qq, (int)findUid, username, "Auto", 0, null);
+                await OpenApi.Instance.Bindings.BindAsync(qq, (int)findUid, username, "Auto", 0, null);
                 //var success = await Int100ApiClient.BindQqAndOsuUid(qq, findUid);
                 Logger.Log("自动绑定" + qq + username);
                 return (true, username, findUid);
