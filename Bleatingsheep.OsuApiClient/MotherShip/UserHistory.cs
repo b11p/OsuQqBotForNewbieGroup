@@ -3,6 +3,7 @@ using System;
 
 namespace Bleatingsheep.OsuMixedApi.MotherShip
 {
+#pragma warning disable CS0649
     [JsonObject(MemberSerialization.OptIn)]
     public class UserHistory
     {
@@ -59,5 +60,5 @@ namespace Bleatingsheep.OsuMixedApi.MotherShip
         public int Day { get; private set; }
         public DateTime Date => new DateTime(Year, Month, Day);
     }
-
+#pragma warning restore CS0649
 }
