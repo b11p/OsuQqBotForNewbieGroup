@@ -6,6 +6,7 @@ using OsuQqBot.Charts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Test
@@ -43,12 +44,37 @@ namespace Test
 
             var user = api.GetUserInfoAsync(9408048, Mode.Ctb).Result;
         }
-        
+
+        static async Task DataTransAsync()
+        {
+            string line;
+            var sb = new StringBuilder();
+            while ((line = Console.ReadLine()) is string)
+            {
+                sb.AppendLine(line);
+            }
+            string json = sb.ToString();
+            var dic = Newtonsoft.Json.JsonConvert.DeserializeObject<IDictionary<long, dynamic>>(json);
+
+            foreach (var item in dic)
+            {
+                long qq = item.Key;
+                int osu = item.Value.Uid;
+                string source = item.Value.Source;
+                var old = await NewbieDatabase.BindAsync(qq, osu, string.Empty, source, 0, string.Empty);
+                if (old is int)
+                {
+                    Console.WriteLine("no");
+                }
+            }
+        }
+
         static async Task Main(string[] args)
         {
             try
             {
-                await CsvTest();
+                await DataTransAsync();
+                //await CsvTest();
                 //ExpressionTest();
                 //ChartTestInNewbieFurther();
                 //var result = await RankAsync(8);
