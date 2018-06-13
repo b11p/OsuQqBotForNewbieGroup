@@ -5,7 +5,7 @@ namespace OsuQqBot.Data
 {
     interface IBindingsAsync
     {
-        Task<int?> BindAsync(long qq, int osuId, string osuName, string source, long operatorId, string operatorName);
+        Task<int?> BindAsync(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName);
 
         Task<int?> GetBindingIdAsync(long qq);
 

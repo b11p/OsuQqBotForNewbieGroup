@@ -206,7 +206,7 @@ namespace Bleatingsheep.OsuQqBot.Database
         /// <param name="operatorName">操作者名字。记录在日志里。</param>
         /// <exception cref="NewbieDbException">绑定过程出现异常。</exception>
         /// <returns>以前的 osu! UID。</returns>
-        public static async Task<int?> BindAsync(long qq, int osuId, string osuName, string source, long operatorId, string operatorName)
+        public static async Task<int?> BindAsync(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName)
         {
             try
             {

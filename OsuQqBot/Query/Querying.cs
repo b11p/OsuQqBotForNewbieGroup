@@ -85,7 +85,7 @@ namespace OsuQqBot.Query
             if (response.Data is MotherShipUserInfo info)
             {
                 u = info.OsuId;
-                await OpenApi.Instance.Bindings.BindAsync(qqId, info.OsuId, info.Name, "Mother Ship (while running)", 0, null);
+                await OpenApi.Instance.Bindings.BindAsync(qqId, info.OsuId, info.Name, "Mother Ship (while running)", null, null);
                 return u;
             }
             return null;

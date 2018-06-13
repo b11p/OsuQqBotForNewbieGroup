@@ -967,7 +967,7 @@ where 查询某个osu!玩家
             else
             {
                 database.CacheUsername(findUid, username);
-                await OpenApi.Instance.Bindings.BindAsync(qq, (int)findUid, username, "Auto", 0, null);
+                await OpenApi.Instance.Bindings.BindAsync(qq, (int)findUid, username, "Auto", null, null);
                 //var success = await Int100ApiClient.BindQqAndOsuUid(qq, findUid);
                 Logger.Log("自动绑定" + qq + username);
                 return (true, username, findUid);

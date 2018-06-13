@@ -6,7 +6,7 @@ namespace OsuQqBot.Data
 {
     class EFData : IBindingsAsync
     {
-        public async Task<int?> BindAsync(long qq, int osuId, string osuName, string source, long operatorId, string operatorName)
+        public async Task<int?> BindAsync(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName)
         {
             return await NewbieDatabase.BindAsync(qq, osuId, osuName, source, operatorId, operatorName);
         }

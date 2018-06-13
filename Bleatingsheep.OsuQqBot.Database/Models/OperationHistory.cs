@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models
 {
@@ -10,7 +11,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public long UserId { get; set; }
         public string User { get; set; }
         public Operation Operation { get; set; }
-        public long OperatorId { get; set; }
+        public long? OperatorId { get; set; }
         public string Operator { get; set; }
 
         public DateTime Date
@@ -19,6 +20,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             set => _date = value.ToUniversalTime();
         }
 
+        [Required]
         public string Remark { get; set; }
     }
 
