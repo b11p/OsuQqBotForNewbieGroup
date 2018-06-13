@@ -63,7 +63,7 @@ namespace OsuQqBot.StatelessFunctions
         {
             var api = OsuQqBot.QqApi;
 
-            var uid = LocalData.Database.Instance.GetUidFromQq(messageSource.FromQq);
+            var uid = Query.Querying.Instance.GetUserBind(messageSource.FromQq).Result;
             if (uid == null)
             {
                 api.SendMessageAsync(endPoint, "未绑定");
@@ -93,7 +93,7 @@ namespace OsuQqBot.StatelessFunctions
         private static async Task CommitXAsync(GroupEndPoint endPoint, MessageSource messageSource)
         {
             var osuApi = Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(OsuQqBot.osuApiKey);
-            var uid = LocalData.Database.Instance.GetUidFromQq(messageSource.FromQq);
+            var uid = await Query.Querying.Instance.GetUserBind(messageSource.FromQq);
             var qq = OsuQqBot.QqApi;
             if (!uid.HasValue)
             {

@@ -14,7 +14,7 @@ namespace OsuQqBot.StatelessFunctions
             message = message.Trim();
             if (message == "妈船？" || message == "妈船?")
             {
-                long? uid = Database.Instance.GetUidFromQq(messageSource.FromQq);
+                long? uid = Query.Querying.Instance.GetUserBind(messageSource.FromQq).Result;
                 if (!uid.HasValue) return true;
                 string url = MotherShipApi.GetStatUrl(uid.Value);
                 var api = OsuQqBot.QqApi;

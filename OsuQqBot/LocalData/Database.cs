@@ -34,16 +34,6 @@ namespace OsuQqBot.LocalData
                 this.basePath = basePath;
                 Directory.CreateDirectory(BindPath);
                 Directory.CreateDirectory(NicknamePath);
-                string bindData = "";
-                try
-                {
-                    bindData = File.ReadAllText(BindFilename);
-                }
-                catch (FileNotFoundException)
-                {
-                    bindData = "";
-                }
-                BindData = DeserializeObject<Dictionary<long, BindingData>>(bindData) ?? new Dictionary<long, BindingData>();
                 string cachedData = "";
                 try
                 {
@@ -82,7 +72,6 @@ namespace OsuQqBot.LocalData
         /// 存储 QQ 与 osu!ID 的绑定数据
         /// </summary>
         string BindPath => Path.Combine(basePath, "Binding Data");
-        string BindFilename => Path.Combine(BindPath, "Bind.json");
 
         /// <summary>
         /// 存储缓存数据的文件名
@@ -102,7 +91,6 @@ namespace OsuQqBot.LocalData
         string TipsPath => Path.Combine(basePath, "tips.json");
         #endregion
 
-        IDictionary<long, BindingData> BindData { get; set; }
         IDictionary<long, CachedData> CachedData { get; set; }
         IDictionary<string, long> NicknameData { get; set; }
         DataHolder<ISet<long>> Administrators { get; set; }
@@ -113,39 +101,6 @@ namespace OsuQqBot.LocalData
         {
             get => _tipsCache ?? (_tipsCache = Tips.Read(t => t.Values.ToArray()));
             set => _tipsCache = value;
-        }
-
-        public long? Bind(long QQ, long uid, string source)
-        {
-            long? previous;
-            lock (BindData)
-            {
-                try
-                {
-                    previous = BindData[QQ].Uid;
-                    BindData[QQ] = new BindingData(uid, source);
-                }
-                catch (KeyNotFoundException)
-                {
-                    previous = null;
-                    BindData.Add(QQ, new BindingData(uid, source));
-                }
-            }
-            CommitBind();
-            return previous;
-        }
-
-        public long? GetUidFromQq(long QQ)
-        {
-            lock (BindData)
-            {
-                return BindData.TryGetValue(QQ, out var bindingData) ? (long?)bindingData.Uid : null;
-                //try
-                //{
-                //    return BindData[QQ].Uid;
-                //}
-                //catch (KeyNotFoundException) { return null; }
-            }
         }
 
         public string GetUsername(long uid)
@@ -269,14 +224,6 @@ namespace OsuQqBot.LocalData
         #endregion
 
         #region commit (old)
-        private void CommitBind()
-        {
-            lock (BindData)
-            {
-                File.WriteAllText(BindFilename, SerializeObject(BindData, Formatting.Indented));
-            }
-        }
-
         private void CommitCache()
         {
             lock (CachedData)
