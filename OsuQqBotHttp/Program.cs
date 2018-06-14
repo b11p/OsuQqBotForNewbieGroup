@@ -22,33 +22,6 @@ namespace OsuQqBotHttp
             CultureInfo.CurrentUICulture = culture;
 
             new PostProcessor(port: 8877, wudiPort: 8876).Listen();
-            using (HttpClient client = new HttpClient())
-            {
-
-                client.GetStringAsync("http://127.0.0.1:5700/send_private_msg?user_id=962549599&message=hello%20HTTP/1.1").Wait();
-                string json = JsonConvert.SerializeObject(new
-                {
-                    user_id = 962549599,
-                    message = "hello"
-                });
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var t = client.PostAsync("http://127.0.0.1:5700/send_private_msg/", content);
-                t.Wait();
-                var r = t.Result;
-                Console.WriteLine(r.Content.ReadAsStringAsync().Result);
-
-                json = JsonConvert.SerializeObject(new
-                {
-                    group_id = 614892339,
-                    user_id = 2930081217
-                });
-                content = new StringContent(json, Encoding.UTF8, "application/json");
-                t = client.PostAsync("http://127.0.0.1:5700/get_group_member_info", content);
-                t.Wait();
-                r = t.Result;
-                Console.WriteLine(r.Content.ReadAsStringAsync().Result);
-            }
-            Console.Read();
         }
     }
 
@@ -63,13 +36,13 @@ namespace OsuQqBotHttp
             Port = port;
 
             apiClient = new Sisters.WudiLib.HttpApiClient();
-            apiClient.ApiAddress = "http://127.0.0.1:5700";
+            apiClient.ApiAddress = "http://cq:5700";
             apiClient.StartClean(60);
 
             _listener = new Sisters.WudiLib.Posts.ApiPostListener();
             _listener.OnException += Logger.LogException;
             _listener.ApiClient = apiClient;
-            _listener.PostAddress = $"http://127.0.0.1:{wudiPort}/";
+            _listener.PostAddress = $"http://+:{wudiPort}/";
             _listener.ForwardTo = $"http://127.0.0.1:{port}/";
             _listener.StartListen();
 

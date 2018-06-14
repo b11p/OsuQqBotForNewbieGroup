@@ -11,7 +11,7 @@ namespace OsuQqBotHttp
 {
     class QqBot : IQqBot
     {
-        static readonly string server = "http://127.0.0.1:5700";
+        static readonly string server = "http://cq:5700";
         static readonly string privatePath = "/send_private_msg_async";
         static readonly string groupPath = "/send_group_msg_async";
         static readonly string discussPath = "/send_discuss_msg_async";
@@ -247,7 +247,7 @@ namespace OsuQqBotHttp
         public string BeforeSend(string message) => message.Replace("&", "&amp;").Replace("[", "&#91;").Replace("]", "&#93;").Replace(",", "&#44;");
         public string AfterReceive(string message) => message.Replace("&#44;", ",").Replace("&#91;", "[").Replace("&#93;", "]").Replace("&amp;", "&");
         public string At(long qq) => $"[CQ:at,qq={qq}]";
-        public string LocalImage(string path) => $"[CQ:image,file=file://{path}]";
+        public string LocalImage(string path) => $"[CQ:image,file=base64://{Convert.ToBase64String(File.ReadAllBytes(path), Base64FormattingOptions.None)}]";
         public string OnlineImage(string url) => $"[CQ:image,file={url}]";
         public string OnlineImage(string url, bool noCache) => $"[CQ:image,{(noCache ? "cache=0," : "")}file={url}]";
     }
