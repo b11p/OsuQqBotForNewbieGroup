@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -34,7 +34,7 @@ namespace OsuQqBot.StatelessFunctions
             set => Interlocked.Exchange(ref s_lastTalkManager, value);
         }
 
-        private static readonly string img = @"C:\Users\Administrator\OneDrive - NTUA\Server\image\我真想禁你言.jpg";
+        private static readonly string img = Path.Combine(Paths.BasePath, "我真想禁你言.jpg");
 
         public bool ProcessMessage(EndPoint endPoint, MessageSource messageSource, string message)
         {
