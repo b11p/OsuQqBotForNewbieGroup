@@ -82,7 +82,7 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
 
             // 初始化
-            OpenApi.Init(new Data.EFData(), new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost), Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey));
+            OpenApi.Init(new Data.EFData(), new Data.LegacyGroup(), new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost), Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey));
             _plan = new Task(() =>
             {
                 async void Run(ScheduleInfo info)

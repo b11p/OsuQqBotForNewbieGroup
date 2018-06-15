@@ -15,6 +15,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<Beatmap> CachedBeatmaps { get; private set; }
         public DbSet<OperationHistory> Histories { get; private set; }
         public DbSet<BindingInfo> Bindings { get; private set; }
+        public DbSet<MemberInfo> Members { get; private set; }
+        public DbSet<MemberGroup> Groups { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -34,6 +36,9 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
             modelBuilder.Entity<ChartTry>()
                 .HasKey(c => new { c.ChartId, c.BeatmapId, c.Mode, c.Date, c.UserId });
+
+            modelBuilder.Entity<GroupMemberInfo>()
+                .HasKey(mg => new { mg.GroupName, mg.UserId });
 
             var beatmaps = modelBuilder.Entity<Beatmap>();
             beatmaps
