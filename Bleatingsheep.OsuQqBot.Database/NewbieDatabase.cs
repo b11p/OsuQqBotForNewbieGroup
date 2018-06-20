@@ -10,6 +10,7 @@ namespace Bleatingsheep.OsuQqBot.Database
 {
     public static class NewbieDatabase
     {
+        /// <exception cref="NewbieDbException"></exception>
         private static T TryUsingContext<T>(Func<NewbieContext, T> func)
         {
             try
@@ -25,6 +26,7 @@ namespace Bleatingsheep.OsuQqBot.Database
             }
         }
 
+        /// <exception cref="NewbieDbException"></exception>
         private static async Task<T> TryUsingContextAsync<T>(Func<NewbieContext, Task<T>> func)
         {
             try
@@ -251,6 +253,7 @@ namespace Bleatingsheep.OsuQqBot.Database
         /// 获取绑定信息。
         /// </summary>
         /// <param name="qq">QQ 号。</param>
+        /// <exception cref="NewbieDbException"></exception>
         /// <returns>绑定信息。如果没绑定，则为 <c>null</c>。</returns>
         public static async Task<BindingInfo> GetBindingInfoAsync(long qq)
         {
