@@ -21,6 +21,8 @@ namespace OsuQqBot.Data
 
         private readonly object _thisLock = new object();
 
+        public long HardcodedSA => 962549599;
+
         public LegacyGroup()
         {
             var ignoreLines = File.ReadAllLines(Paths.IgnoreListPath);

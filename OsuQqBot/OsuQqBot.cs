@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using OsuQqBot.Api;
 using OsuQqBot.AttributedFunctions;
+using OsuQqBot.Data;
 using OsuQqBot.QqBot;
 using Sisters.WudiLib;
 using System;
@@ -60,19 +61,6 @@ namespace OsuQqBot
                 ValidGroups.Add(item);
             }
             Interlocked.CompareExchange(ref s_notifyGroups, ValidGroups as IReadOnlyCollection<long>, null);
-            try
-            {
-                var ignoreLines = File.ReadAllLines(Paths.IgnoreListPath);
-                if (ignoreLines.Length == 2)
-                {
-                    ignoreList = JsonConvert.DeserializeObject<HashSet<long>>(ignoreLines[0]);
-                    ignorePPList = JsonConvert.DeserializeObject<HashSet<long>>(ignoreLines[1]);
-                }
-            }
-            catch (FileNotFoundException)
-            { }
-            if (ignoreList == null) ignoreList = new HashSet<long>();
-            if (ignorePPList == null) ignorePPList = new HashSet<long>();
 
             osuApiKey = config.ApiKey;
             apiClient = new OsuApiClient(config.ApiKey);
@@ -272,7 +260,7 @@ namespace OsuQqBot
         /// <param name="context"></param>
         internal async Task<bool> UpdateUserBandingAsync(long group, long qq, string message)
         {
-            if (group == GroupId && !ignoreList.Contains(qq))
+            if (group == GroupId && !await OpenApi.Instance.Groups.ShouldIgnoreCardAsync(qq))
                 if (message.Contains($"[CQ:at,qq={CurrentQq}]"))
                 {
                     var uid = await Query.Querying.Instance.GetUserBind(qq);
@@ -767,7 +755,7 @@ where 查询某个osu!玩家
 
             try
             {
-                if (ignoreList.Contains(fromQq)) return;
+                if (await OpenApi.Instance.Groups.ShouldIgnoreCardAsync(fromQq)) return;
 
                 long? uid = await Query.Querying.Instance.GetUserBind(fromQq);
                 if (!uid.HasValue) return;
@@ -836,7 +824,7 @@ where 查询某个osu!玩家
                             hisUsername + "，您好。" + this.qq.BeforeSend(hint));
                     }
 
-                    if (!ignorePPList.Contains(fromQq))
+                    if (!await OpenApi.Instance.Groups.ShouldIgnorePerformanceAsync(fromQq))
                     {
                         await CheckIfPPOverLimit(fromGroup, fromQq, uid.Value);
                     }
@@ -881,29 +869,7 @@ where 查询某个osu!玩家
                 return null;
             }
         }
-
-        /// <summary>
-        /// 不检查群名片和PP的列表
-        /// </summary>
-        private readonly HashSet<long> ignoreList = null;
-
-        /// <summary>
-        /// 不检查PP的列表
-        /// </summary>
-        private readonly HashSet<long> ignorePPList = null;
-
-        private void SaveIgnoreList()
-        {
-            var ignoreArray = ignoreList.ToArray();
-            var ignoreString = Newtonsoft.Json.JsonConvert.SerializeObject(ignoreArray, Newtonsoft.Json.Formatting.None);
-            var ignorePPArray = ignorePPList.ToArray();
-            var ignorePPString = Newtonsoft.Json.JsonConvert.SerializeObject(ignorePPArray, Newtonsoft.Json.Formatting.None);
-            File.WriteAllLines(Paths.IgnoreListPath, new string[]{
-                ignoreString,
-                ignorePPString
-            });
-        }
-
+        
         /// <summary>
         /// 检查群名片是否包含osu的名字
         /// </summary>
