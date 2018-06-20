@@ -6,5 +6,6 @@
         public const string Admin = "admin";
         public const string TipManager = "tip_manager";
         public const string Bot = "bot";
+        public const string SA = "sa";
     }
 }

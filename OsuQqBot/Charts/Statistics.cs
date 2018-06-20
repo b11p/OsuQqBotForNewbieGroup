@@ -119,8 +119,9 @@ namespace OsuQqBot.Charts
         /// 将分数表达式转换为计算委托。
         /// </summary>
         /// <param name="scoreCalculation"></param>
+        /// <exception cref="FormatException"></exception>
         /// <returns></returns>
-        private static Func<ChartTry, double> ParseScorer(string scoreCalculation)
+        public static Func<ChartTry, double> ParseScorer(string scoreCalculation)
         {
             if (string.IsNullOrWhiteSpace(scoreCalculation)) return s => s.Score;
 
