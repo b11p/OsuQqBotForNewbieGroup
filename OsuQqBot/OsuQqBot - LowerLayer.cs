@@ -113,14 +113,9 @@ Stars {beatmap.Stars.ToString(".##")}";
             }
             else
             {
-                bool done = false;
                 switch (endPoint)
                 {
                     case PrivateEndPoint p:
-                        done = ProcessPrivateMessage(p, source, message);
-                        if (!done)
-                            Task.Run(() =>
-                                done = PrivateStatefulFunctions(p, source, message));
                         break;
                     case GroupEndPoint g:
                         ProcessGroupMessage(g, source, message);
@@ -130,12 +125,7 @@ Stars {beatmap.Stars.ToString(".##")}";
                 }
             }
         }
-
-        public bool ProcessPrivateMessage(PrivateEndPoint endPoint, MessageSource source, string message)
-        {
-            return PrivateManage(endPoint.UserId, message);
-        }
-
+        
         public void ProcessGroupMessage(GroupEndPoint endPoint, MessageSource source, string message)
         {
             Task.Run(async () =>
@@ -144,7 +134,6 @@ Stars {beatmap.Stars.ToString(".##")}";
                 {
                     if (await UpdateUserBandingAsync(endPoint.GroupId, source.FromQq, message)) return;
                     if (await WhirIsBestAsync(endPoint.GroupId, source.FromQq, message)) return;
-                    if (ListUnbind(endPoint.GroupId, source.FromQq, message)) return;
                     await TestInGroupNameAsync(endPoint.GroupId, source.FromQq, message);
                 }
                 catch (Exception e)
