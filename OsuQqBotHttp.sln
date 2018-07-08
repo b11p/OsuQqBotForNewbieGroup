@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.OsuQqBot.Data
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sisters.WudiLib", "..\Sisters.WudiLib\Sisters.WudiLib\Sisters.WudiLib.csproj", "{2B999C5F-99E7-45B2-AA35-02BCE594AED6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bleatingsheep.NewHydrant.Data", "Bleatingsheep.NewHydrant.Data\Bleatingsheep.NewHydrant.Data.csproj", "{F46D6CBD-C9F2-4BAB-8FE1-C881AC49AB2E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{2B999C5F-99E7-45B2-AA35-02BCE594AED6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B999C5F-99E7-45B2-AA35-02BCE594AED6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B999C5F-99E7-45B2-AA35-02BCE594AED6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F46D6CBD-C9F2-4BAB-8FE1-C881AC49AB2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F46D6CBD-C9F2-4BAB-8FE1-C881AC49AB2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F46D6CBD-C9F2-4BAB-8FE1-C881AC49AB2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F46D6CBD-C9F2-4BAB-8FE1-C881AC49AB2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

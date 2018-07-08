@@ -62,15 +62,12 @@ namespace OsuQqBot.Data
 
         public async Task<bool> DeleteAsync(long qq, string group) => await Task.Run(() => false);
 
-        public async Task<bool> IsAsync(long qq, string group)
+        public bool Is(long qq, string group)
         {
-            return await Task.Run(() =>
+            lock (_thisLock)
             {
-                lock (this._thisLock)
-                {
-                    return Is(qq);
-                }
-            });
+                return Is(qq);
+            }
         }
 
         private bool Is(long qq) => ignoreList.Contains(qq) || ignorePPList.Contains(qq);

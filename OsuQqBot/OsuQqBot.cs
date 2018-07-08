@@ -260,7 +260,7 @@ namespace OsuQqBot
         /// <param name="context"></param>
         internal async Task<bool> UpdateUserBandingAsync(long group, long qq, string message)
         {
-            if (group == GroupId && !await OpenApi.Instance.Groups.ShouldIgnoreCardAsync(qq))
+            if (group == GroupId && !OpenApi.Instance.Groups.ShouldIgnoreCard(qq))
                 if (message.Contains($"[CQ:at,qq={CurrentQq}]"))
                 {
                     var uid = await Query.Querying.Instance.GetUserBind(qq);
@@ -755,7 +755,7 @@ where 查询某个osu!玩家
 
             try
             {
-                if (await OpenApi.Instance.Groups.ShouldIgnoreCardAsync(fromQq)) return;
+                if (OpenApi.Instance.Groups.ShouldIgnoreCard(fromQq)) return;
 
                 long? uid = await Query.Querying.Instance.GetUserBind(fromQq);
                 if (!uid.HasValue) return;
@@ -824,7 +824,7 @@ where 查询某个osu!玩家
                             hisUsername + "，您好。" + this.qq.BeforeSend(hint));
                     }
 
-                    if (!await OpenApi.Instance.Groups.ShouldIgnorePerformanceAsync(fromQq))
+                    if (!OpenApi.Instance.Groups.ShouldIgnorePerformance(fromQq))
                     {
                         await CheckIfPPOverLimit(fromGroup, fromQq, uid.Value);
                     }
@@ -869,7 +869,7 @@ where 查询某个osu!玩家
                 return null;
             }
         }
-        
+
         /// <summary>
         /// 检查群名片是否包含osu的名字
         /// </summary>
