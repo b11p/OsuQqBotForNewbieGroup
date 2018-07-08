@@ -263,6 +263,7 @@ namespace Bleatingsheep.OsuQqBot.Database
             });
         }
 
+        /// <exception cref="NewbieDbException"></exception>
         public static async Task<int?> GetBindingIdAsync(long qq)
         {
             return (await GetBindingInfoAsync(qq))?.OsuId;
