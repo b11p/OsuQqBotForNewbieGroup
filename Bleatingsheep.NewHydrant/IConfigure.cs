@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Bleatingsheep.NewHydrant
+﻿namespace Bleatingsheep.NewHydrant
 {
-    interface IConfigure
+    public interface IConfigure
     {
         string ApiKey { get; }
         long SuperAdmin { get; }
