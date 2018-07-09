@@ -5,8 +5,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
 {
     public interface INewbieDatabase
     {
-        Task<BindingInfo> GetBindingInfoAsync(long qq);
+        Task<IExecutingResult<BindingInfo>> GetBindingInfoAsync(long qq);
 
-        Task<int?> GetBindingIdAsync(long qq);
+        Task<IExecutingResult<int?>> GetBindingIdAsync(long qq);
     }
 }
