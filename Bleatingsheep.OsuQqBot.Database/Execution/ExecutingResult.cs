@@ -28,16 +28,16 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
 
         IExecutingResult<T> IExecutingResult<T>.EnsureSuccess() => EnsureSuccess();
 
-        public T TryGetResult(out bool success)
+        public bool TryGetResult(out T result)
         {
-            success = Success;
-            return Success ? _result : default(T);
+            result = Success ? _result : default(T);
+            return Success;
         }
 
-        public TResult TryGet<TResult>(Func<T, TResult> func, out bool success)
+        public bool TryGet<TResult>(Func<T, TResult> func, out TResult result)
         {
-            success = Success;
-            return Success ? func(Result) : default(TResult);
+            result = Success ? func(Result) : default(TResult);
+            return Success;
         }
 
         public ExecutingResult<TResult> TryGet<TResult>(Func<T, TResult> func)

@@ -10,7 +10,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
 
         IExecutingResult<T> EnsureSuccess();
         IExecutingResult<TResult> TryGet<TResult>(Func<T, TResult> func);
-        TResult TryGet<TResult>(Func<T, TResult> func, out bool success);
-        T TryGetResult(out bool success);
+        bool TryGet<TResult>(Func<T, TResult> func, out TResult result);
     }
 }
