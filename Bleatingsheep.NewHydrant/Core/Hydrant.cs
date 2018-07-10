@@ -41,7 +41,7 @@ namespace Bleatingsheep.NewHydrant.Core
 
             if (old != null) throw new InvalidOperationException();
 
-
+            Init();
         }
 
         #region 执行期间各种事件处理器集合
@@ -53,6 +53,8 @@ namespace Bleatingsheep.NewHydrant.Core
         {
             var types = Assembly.GetExecutingAssembly().GetTypes()
                 .Where(t => t.GetCustomAttributes<FunctionAttribute>().Any());
+
+            types.ForEach(InitType);
 
             _listener.MessageEvent += (api, message) =>
             {
@@ -70,6 +72,11 @@ namespace Bleatingsheep.NewHydrant.Core
                     // TODO
                 }
             };
+
+            // 添加必要的事件处理。
+            _listener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
+            _listener.GroupRequestEvent += (api, e) => e.UserId == SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
+            _listener.GroupInviteEvent += (api, e) => e.UserId == SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
         }
 
         internal void InitType(Type t)
