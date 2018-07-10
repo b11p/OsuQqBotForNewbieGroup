@@ -2,11 +2,15 @@
 
 namespace Bleatingsheep.OsuQqBot.Database.Execution
 {
-    public interface IExecutingResult<out T>
+    public interface IExecutingResult
     {
         Exception Exception { get; }
-        T Result { get; }
         bool Success { get; }
+    }
+
+    public interface IExecutingResult<out T> : IExecutingResult
+    {
+        T Result { get; }
 
         IExecutingResult<T> EnsureSuccess();
         IExecutingResult<TResult> TryGet<TResult>(Func<T, TResult> func);

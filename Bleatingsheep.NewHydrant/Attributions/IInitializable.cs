@@ -1,7 +1,9 @@
-﻿namespace Bleatingsheep.NewHydrant.Attributions
+﻿using System.Threading.Tasks;
+
+namespace Bleatingsheep.NewHydrant.Attributions
 {
     /// <summary>
-    /// 实现此接口的功能会自动调用<see cref="Initialize"/>方法。并可能在需要的时候多次调用<see cref="Initialize"/>方法重新初始化。
+    /// 实现此接口的功能会自动调用<see cref="InitializeAsync"/>方法。并可能在需要的时候多次调用<see cref="InitializeAsync"/>方法重新初始化。
     /// </summary>
     internal interface IInitializable
     {
@@ -10,6 +12,10 @@
         /// </summary>
         string Name { get; }
 
-        bool Initialize();
+        /// <summary>
+        /// 初始化，或者重新初始化。
+        /// </summary>
+        /// <returns>是否成功。</returns>
+        Task<bool> InitializeAsync();
     }
 }
