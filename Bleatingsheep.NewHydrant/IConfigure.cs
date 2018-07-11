@@ -6,5 +6,6 @@
         long SuperAdmin { get; }
         string Listen { get; }
         string ApiAddress { get; }
+        string Name { get; }
     }
 }

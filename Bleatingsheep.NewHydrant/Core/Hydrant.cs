@@ -77,6 +77,7 @@ namespace Bleatingsheep.NewHydrant.Core
             _listener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
             _listener.GroupRequestEvent += (api, e) => e.UserId == SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
             _listener.GroupInviteEvent += (api, e) => e.UserId == SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
+            _listener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
         }
 
         internal void InitType(Type t)
