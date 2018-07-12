@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.OsuMixedApi;
+using Bleatingsheep.OsuMixedApi.MotherShip;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
@@ -36,6 +37,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 Database = _database,
                 Qq = _qq,
                 OsuApi = OsuApiClient.ClientUsingKey(_configure.ApiKey),
+                MotherShipApi = new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost),
             };
             var old = Interlocked.CompareExchange(ref s_executingInfo, _executingInfo, default(ExecutingInfo));
 
