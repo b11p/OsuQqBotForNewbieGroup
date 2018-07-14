@@ -88,8 +88,8 @@ namespace Bleatingsheep.NewHydrant.Irc
 
         }
 
-        private static readonly TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("China Standard Time");
-        private static DateTime Now => TimeZoneInfo.ConvertTime(DateTime.Now, timeZoneInfo);
+        private static readonly TimeSpan offset = new TimeSpan(8, 0, 0);
+        private static DateTime Now => DateTimeOffset.Now.ToOffset(offset).DateTime;
         private static void NormalLog(string username, string beatmapId, long costMilliseconds) => Log($"{Now}|{username}|{beatmapId}|{costMilliseconds}");
 
         private static void LogException(Exception e) => Log(e);
