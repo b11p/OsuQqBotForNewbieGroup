@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -33,8 +34,12 @@ namespace Bleatingsheep.NewHydrant.Irc
 
                 ircClient.OnQueryAction += (sender, e) =>
                 {
+                    string username = null; // 用户名
+                    string query = null; // 查询 id
+                    long costTime = long.MinValue; // 查询时间
                     try
                     {
+                        username = e.Data.Nick; // for logging
                         string message = e.Data.Message;
                         var match = regex.Match(message);
                         if (!match.Success)
@@ -43,8 +48,14 @@ namespace Bleatingsheep.NewHydrant.Irc
                             e.Data.Irc.SendMessage(SendType.Message, e.Data.Nick, "请问您想查询什么呢？");
                             return;
                         }
-                        int beatmapId = int.Parse(match.Groups[1].Value);
+                        query = match.Groups[1].Value; // for logging
+                        int beatmapId = int.Parse(query);
+
+                        // 统计 PP+ 的查询时间
+                        var sw = Stopwatch.StartNew();
                         var beatmap = spider.GetBeatmapPlusAsync(beatmapId).Result;
+                        costTime = sw.ElapsedMilliseconds;
+
                         if (beatmap == null)
                         {// 没查到数据
                             e.Data.Irc.SendMessage(SendType.Message, e.Data.Nick, "您查询的不是一张 *Ranked* 图。");
@@ -53,7 +64,7 @@ namespace Bleatingsheep.NewHydrant.Irc
                         string result = $"Stars: {beatmap.Stars} | Aim (Total/Jump/Flow): {beatmap.AimTotal}*/{beatmap.AimJump}*/{beatmap.AimFlow}* | Precision: {beatmap.Precision}* | Speed: {beatmap.Speed}* | Stamina: {beatmap.Stamina}* | Accuracy: {beatmap.Accuracy}*";
                         e.Data.Irc.SendMessage(SendType.Message, e.Data.Nick, result);
                     }
-                    catch (ExceptionPlus)
+                    catch (AggregateException ex) when (ex.InnerException is ExceptionPlus)
                     {
                         e.Data.Irc.SendMessage(SendType.Message, e.Data.Nick, "访问 PP+ 网站失败。");
                     }
@@ -62,6 +73,10 @@ namespace Bleatingsheep.NewHydrant.Irc
                         string message = e?.Data?.Message;
                         Log(message);
                         LogException(ex);
+                    }
+                    finally
+                    {
+                        NormalLog(username, query, costTime);
                     }
                 };
                 ircClient.Listen();
@@ -73,13 +88,17 @@ namespace Bleatingsheep.NewHydrant.Irc
 
         }
 
+        private static readonly TimeZoneInfo timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("China Standard Time");
+        private static DateTime Now => TimeZoneInfo.ConvertTime(DateTime.Now, timeZoneInfo);
+        private static void NormalLog(string username, string beatmapId, long costMilliseconds) => Log($"{Now}|{username}|{beatmapId}|{costMilliseconds}");
+
         private static void LogException(Exception e) => Log(e);
 
         private static void Log<T>(T e)
         {
             var file = Assembly.GetExecutingAssembly().Location;
             var logFile = Path.Combine(new FileInfo(file).DirectoryName, "log.txt");
-            File.AppendAllText(logFile, e?.ToString());
+            File.AppendAllText(logFile, e?.ToString() + Environment.NewLine);
         }
     }
 }
