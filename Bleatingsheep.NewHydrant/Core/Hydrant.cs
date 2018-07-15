@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Logging;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuMixedApi.MotherShip;
 using Bleatingsheep.OsuQqBot.Database.Execution;
@@ -19,6 +21,7 @@ namespace Bleatingsheep.NewHydrant.Core
         private readonly IConfigure _configure;
         private readonly INewbieDatabase _database;
         private readonly ExecutingInfo _executingInfo;
+        private readonly ILogger _logger;
         private long SuperAdmin => _configure.SuperAdmin;
 
         public Hydrant(IConfigure configure, HttpApiClient httpApiClient, ApiPostListener listener)
@@ -35,6 +38,11 @@ namespace Bleatingsheep.NewHydrant.Core
                 OsuApi = OsuApiClient.ClientUsingKey(_configure.ApiKey),
                 MotherShipApi = new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost),
             };
+
+            // 配置日志
+            var executingFile = Assembly.GetExecutingAssembly().Location;
+            var logFile = Path.Combine(Path.GetDirectoryName(executingFile), "log.txt");
+            _logger = new FileLogger(logFile);
 
             Init();
         }
@@ -64,7 +72,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 catch (Exception e) when (!(e is ApiAccessException))
                 {
                     api.SendMessageAsync(message.Endpoint, "有一些不好的事发生了").Wait();
-                    // TODO
+                    _logger.LogException(e);
                 }
             };
 
