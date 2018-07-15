@@ -14,10 +14,6 @@ namespace Bleatingsheep.NewHydrant.Core
 {
     public sealed class Hydrant
     {
-        private static ExecutingInfo s_executingInfo;
-        public static INewbieDatabase Database => s_executingInfo?.Database;
-        public static OsuApiClient OsuApiClient => s_executingInfo?.OsuApi;
-
         private readonly HttpApiClient _qq;
         private readonly ApiPostListener _listener;
         private readonly IConfigure _configure;
@@ -39,9 +35,6 @@ namespace Bleatingsheep.NewHydrant.Core
                 OsuApi = OsuApiClient.ClientUsingKey(_configure.ApiKey),
                 MotherShipApi = new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost),
             };
-            var old = Interlocked.CompareExchange(ref s_executingInfo, _executingInfo, default(ExecutingInfo));
-
-            if (old != null) throw new InvalidOperationException();
 
             Init();
         }
