@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Logging;
 using Bleatingsheep.OsuMixedApi;
@@ -50,6 +51,7 @@ namespace Bleatingsheep.NewHydrant.Core
         #region 执行期间各种事件处理器集合
         private readonly IList<IInitializable> _initializableList = new List<IInitializable>();
         private readonly IList<IMessageCommand> _messageCommandList = new List<IMessageCommand>();
+        private readonly IList<IMessageMonitor> _messageMonitorList = new List<IMessageMonitor>();
         #endregion
 
         private void Init()
@@ -59,6 +61,20 @@ namespace Bleatingsheep.NewHydrant.Core
 
             types.ForEach(InitType);
 
+            _listener.MessageEvent += async (api, message) =>
+            {
+                await _messageMonitorList.ForEachAsync(async m =>
+                {
+                    try
+                    {
+                        await m.OnMessageAsync(message, api);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogException(e);
+                    }
+                });
+            };
             _listener.MessageEvent += (api, message) =>
             {
                 try
@@ -107,6 +123,10 @@ namespace Bleatingsheep.NewHydrant.Core
             if (t == typeof(IMessageCommand))
             {
                 _messageCommandList.Add(lazy.Value as IMessageCommand ?? throw new InvalidCastException());
+            }
+            if (t == typeof(IMessageMonitor))
+            {
+                _messageMonitorList.Add(lazy.Value as IMessageMonitor ?? throw new InvalidCastException());
             }
         }
     }
