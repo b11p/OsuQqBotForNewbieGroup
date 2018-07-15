@@ -30,13 +30,13 @@ namespace Bleatingsheep.NewHydrant.Osu
                 return;
             }
 
-            var reply = new List<string> { "本功能免费试用，将来可能作为 Chart 奖励。" };
+            var reply = new List<string> { "/np 给 bleatingsheep，查询更方便！" };
             try
             {
                 var ppBeatmap = await s_spider.GetBeatmapPlusAsync(recent.BeatmapId);
                 if (ppBeatmap == null)
                 {
-                    reply.Add("PP+ 可能更改了网页布局，无法获取到谱面信息。");
+                    reply.Add("很抱歉，无法查询 Loved 图。也有可能是 PP+ 没有这张图的数据。");
                     return;
                 }
                 reply.Add($"https://syrin.me/pp+/b/{ppBeatmap.Id}/");
