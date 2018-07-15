@@ -16,8 +16,7 @@ namespace Bleatingsheep.NewHydrant.Data
             var exec = await _executingInfo.Database.GetBindingIdAsync(qq);
             if (!exec.Success)
             {
-                // TODO
-                //OnException?.Invoke(exec.Exception);
+                OnException?.Invoke(exec.Exception);
                 return (false, default(int?));
             }
             var result = exec.Result;
