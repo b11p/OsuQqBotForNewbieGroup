@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Bleatingsheep.NewHydrant.Core;
-using Sisters.WudiLib;
+using Bleatingsheep.OsuMixedApi;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
     internal class DataProvider : IDataProvider
     {
-        private readonly ExecutingInfo _executingInfo;
+        private readonly IDataSource _source;
 
-        public DataProvider(ExecutingInfo executingInfo) => _executingInfo = executingInfo;
+        public DataProvider(IDataSource dataSource) => _source = dataSource;
 
         public async Task<(bool success, int? result)> GetBindingIdAsync(long qq)
         {
-            var exec = await _executingInfo.Database.GetBindingIdAsync(qq);
+            var exec = await _source.Database.GetBindingIdAsync(qq);
             if (!exec.Success)
             {
                 OnException?.Invoke(exec.Exception);
@@ -25,21 +24,21 @@ namespace Bleatingsheep.NewHydrant.Data
             // database no data
             try
             {
-                result = await _executingInfo.MotherShipApi.GetUserBindAsync(qq);
+                result = await _source.MotherShipApi.GetUserBindAsync(qq);
                 if (result == null) return (true, result);
             }
-            catch (ApiAccessException)
+            catch (OsuApiFailedException)
             {
                 // TODO
                 return (false, default(int?));
             }
 
             // has mother ship result
-            var (success, userInfo) = await _executingInfo.OsuApi.GetUserInfoAsync(result.Value, OsuMixedApi.Mode.Standard);
+            var (success, userInfo) = await _source.OsuApi.GetUserInfoAsync(result.Value, Mode.Standard);
             if (!success) return (false, default(int?)); // osu! api fail
             var username = userInfo?.Name; // 
             if (string.IsNullOrEmpty(username)) return (true, null);
-            var bindExec = await _executingInfo.Database.AddNewBindAsync(qq, result.Value, username, "Mother Ship", null, null);
+            var bindExec = await _source.Database.AddNewBindAsync(qq, result.Value, username, "Mother Ship", null, null);
             return (bindExec.Success, result);
         }
 
