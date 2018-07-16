@@ -44,6 +44,7 @@ namespace Bleatingsheep.NewHydrant.Core
             var executingFile = Assembly.GetExecutingAssembly().Location;
             var logFile = Path.Combine(Path.GetDirectoryName(executingFile), "log.txt");
             _logger = new FileLogger(logFile);
+            _executingInfo.Logger = _logger;
 
             Init();
         }
