@@ -20,7 +20,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         {
             long id = message.UserId;
             var exec = await executingInfo.Database.GetBindingIdAsync(id);
-            if (!await exec.SendIfFailOrNoBindAsync(api, message.Endpoint)) throw new AggregateException(exec.Exception);
+            if (!await exec.SendIfFailOrNoBindAsync(api, message.Endpoint)) return;
 
             var osuId = exec.Result.Value;
             var recent = (await executingInfo.OsuApi.GetRecentlyAsync(osuId, OsuMixedApi.Mode.Standard, 1)).FirstOrDefault();

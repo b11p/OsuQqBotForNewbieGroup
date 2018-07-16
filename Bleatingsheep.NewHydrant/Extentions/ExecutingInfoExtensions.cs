@@ -8,11 +8,11 @@ namespace Bleatingsheep.NewHydrant.Extentions
 {
     internal static class ExecutingInfoExtensions
     {
-        public static async Task<bool> SendIfFailAsync<T>(this IExecutingResult<T> executingResult, HttpApiClient httpApiClient, Endpoint endpoint)
+        public static async Task<bool> SendIfFailAsync(this IExecutingResult executingResult, HttpApiClient httpApiClient, Endpoint endpoint)
         {
             if (executingResult.Success) return true;
 
-            await httpApiClient.SendMessageAsync(endpoint, "访问数据库失败");
+            await httpApiClient.SendMessageAsync(endpoint, "访问数据库失败。");
             return false;
         }
 
