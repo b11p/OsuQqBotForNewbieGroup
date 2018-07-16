@@ -57,7 +57,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 isBotRepeat = Bots.Contains(g.UserId) && _messages.ContainsKey(g.RawMessage);
 
                 // 清除过旧的消息，防止内存泄露。
-                _messages.Where(p => p.Value < DateTimeOffset.Now.ToUnixTimeSeconds() - 800).Select(p => p.Key)
+                _messages.Where(p => p.Value < DateTimeOffset.Now.ToUnixTimeSeconds() - 800).Select(p => p.Key).ToList()
                     .ForEach(k => _messages.Remove(k));
             }
 
