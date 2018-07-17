@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
+using Bleatingsheep.Osu.PerformancePlus;
+using Sisters.WudiLib;
+using Sisters.WudiLib.Posts;
+
+namespace Bleatingsheep.NewHydrant.Osu
+{
+    [Function("pp+")]
+    internal class PerformancePlusUser : IMessageCommand
+    {
+        private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
+
+        public IMessageCommand Create() => new PerformancePlusUser();
+        private string queryUser;
+        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        {
+            if (!string.IsNullOrWhiteSpace(queryUser))
+            {
+                await api.SendMessageAsync(message.Endpoint, "很抱歉，暂不支持查询其他人的数据。");
+                return;
+            }
+            var (success, userId) = await executingInfo.Data.GetBindingIdAsync(message.UserId);
+            if (!success)
+            {
+                await api.SendMessageAsync(message.Endpoint, "查询绑定账号失败。");
+                return;
+            }
+            if (userId == null)
+            {
+                await api.SendMessageAsync(message.Endpoint, "未绑定。请发送“绑定”后跟你的用户名进行绑定。");
+                return;
+            }
+            try
+            {
+                var userPlus = await s_spider.GetUserPlusAsync(userId.Value);
+                if (userPlus == null)
+                {
+                    await api.SendMessageAsync(message.Endpoint, string.IsNullOrWhiteSpace(queryUser) ? "被办了。" : "查无此人。");
+                    return;
+                }
+                await api.SendMessageAsync(message.Endpoint, $@"{userPlus.Name} 的 PP+ 数据
+Performance: {userPlus.Performance}
+Aim (Jump): {userPlus.AimJump}
+Aim (Flow): {userPlus.AimFlow}
+Precision: {userPlus.Precision}
+Speed: {userPlus.Speed}
+Stamina: {userPlus.Stamina}
+Accuracy: {userPlus.Accuracy}");
+            }
+            catch (ExceptionPlus)
+            {
+                await api.SendMessageAsync(message.Endpoint, "查询PP+失败。");
+                return;
+            }
+        }
+
+        public bool ShouldResponse(Sisters.WudiLib.Posts.Message message)
+        {
+            if (!message.Content.IsPlaintext) return false;
+            string text = message.Content.Text.Trim();
+            if (text.StartsWith("+", StringComparison.Ordinal))
+            {
+                queryUser = text.Substring("+".Length).Trim();
+                return true;
+            }
+            return false;
+        }
+    }
+}
