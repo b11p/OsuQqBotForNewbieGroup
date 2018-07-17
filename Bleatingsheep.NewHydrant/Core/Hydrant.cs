@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Logging;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuMixedApi.MotherShip;
@@ -39,6 +40,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 OsuApi = OsuApiClient.ClientUsingKey(_configure.ApiKey),
                 MotherShipApi = new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost),
             };
+            _executingInfo.Data = new DataProvider(_executingInfo);
 
             // 配置日志
             var executingFile = Assembly.GetExecutingAssembly().Location;
