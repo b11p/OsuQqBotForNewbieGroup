@@ -9,7 +9,7 @@ using Sisters.WudiLib.Posts;
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
     [Function("no_repeat")]
-    internal class NoRepeat : IMessageMonitor
+    internal class NoRepeat : 啥玩意儿啊Base, IMessageMonitor
     {
         private readonly object _thisLock = new object();
         private string _currentMessage;
@@ -19,6 +19,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
         {
             2839098896,
             1394932996,
+            3082577334,
         };
 
         public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
@@ -29,8 +30,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             isBotRepeat = IsBotRepeat(g);
             if (isBotRepeat)
             {
-                await api.RecallMessageAsync(g.MessageId);
-                await api.BanGroupMember(g.GroupId, g.UserId, 3000);
+                await RecallAndBan(api, g);
             }
         }
 
