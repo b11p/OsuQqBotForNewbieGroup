@@ -48,6 +48,51 @@ namespace Bleatingsheep.NewHydrant.Core
             _logger = new FileLogger(logFile);
             _executingInfo.Logger = _logger;
 
+            // 配置定期任务
+            _plan = new Task(() =>
+            {
+                async void Run(ScheduleInfo info)
+                {
+                    info.Next();
+                    await Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await info.Action.RunAsync(_qq, _executingInfo);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogException(e);
+                        }
+                    });
+                }
+                var limit = new TimeSpan(0, 1, 0);
+                var minus = new TimeSpan(0, 0, 10);
+                var delay = new TimeSpan(0, 0, 1);
+                TimeSpan Clear()
+                {
+                    //TimeSpan min = TimeSpan.MaxValue;
+                    //foreach (var info in _regularTasks)
+                    //{
+                    //    if (info.ShouldRun())
+                    //    {
+                    //        Run(info);
+                    //    }
+                    //    TimeSpan wait = info.WaitTime;
+                    //    if (wait < min) min = wait;
+                    //}
+                    _regularTasks.Where(info => info.ShouldRun()).ForEach(Run);
+                    var min = _regularTasks.Min(info => info.WaitTime);
+                    min = min > limit ? min - minus : min + delay;
+                    return min;
+                }
+                while (true)
+                {
+                    var interval = Clear();
+                    Task.Delay(interval).Wait();
+                }
+            }, TaskCreationOptions.LongRunning);
+
             Init();
         }
 
@@ -55,6 +100,11 @@ namespace Bleatingsheep.NewHydrant.Core
         private readonly IList<IInitializable> _initializableList = new List<IInitializable>();
         private readonly IList<IMessageCommand> _messageCommandList = new List<IMessageCommand>();
         private readonly IList<IMessageMonitor> _messageMonitorList = new List<IMessageMonitor>();
+        #endregion
+
+        #region 定期任务
+        private readonly IList<ScheduleInfo> _regularTasks = new List<ScheduleInfo>();
+        private readonly Task _plan;
         #endregion
 
         private void Init()
@@ -100,6 +150,12 @@ namespace Bleatingsheep.NewHydrant.Core
             _listener.GroupRequestEvent += (api, e) => e.UserId == SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
             _listener.GroupInviteEvent += (api, e) => e.UserId == SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
             _listener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
+
+            // 跑定期任务
+            if (_regularTasks.Count > 0)
+            {
+                _plan.Start();
+            }
         }
 
         internal void InitType(Type t)
@@ -131,6 +187,18 @@ namespace Bleatingsheep.NewHydrant.Core
             {
                 _messageMonitorList.Add(lazy.Value as IMessageMonitor ?? throw new InvalidCastException());
             }
+            if (t == typeof(IRegularAsync))
+            {
+                InitTask(lazy.Value as IRegularAsync);
+            }
+        }
+
+        private void InitTask(IRegularAsync task)
+        {
+            if (task.Every is TimeSpan every)
+                _regularTasks.Add(new ScheduleInfo(ScheduleType.ByInterval, every, task));
+            if (task.OnUtc is TimeSpan onUtc)
+                _regularTasks.Add(new ScheduleInfo(ScheduleType.Daily, onUtc, task));
         }
     }
 }
