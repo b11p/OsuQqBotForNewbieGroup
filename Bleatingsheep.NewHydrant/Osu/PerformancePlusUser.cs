@@ -66,7 +66,7 @@ Accuracy: {userPlus.Accuracy}");
             if (text.StartsWith("+", StringComparison.Ordinal))
             {
                 queryUser = text.Substring("+".Length).Trim();
-                return true;
+                return string.IsNullOrEmpty(queryUser) || OsuHelper.IsUsername(queryUser);
             }
             return false;
         }
