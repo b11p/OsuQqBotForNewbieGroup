@@ -13,7 +13,8 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
     {
         public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
-            if (message.UserId == 122866607 && message is GroupMessage g && g.GroupId == 641236878)
+            if (message.UserId == 122866607 && message is GroupMessage g && g.GroupId == 641236878
+                && message.Content.IsPlaintext && message.Content.Text == "打断")
             {
                 await api.RecallMessageAsync(message.MessageId);
             }
