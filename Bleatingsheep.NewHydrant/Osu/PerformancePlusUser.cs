@@ -43,14 +43,39 @@ namespace Bleatingsheep.NewHydrant.Osu
                     await api.SendMessageAsync(message.Endpoint, string.IsNullOrWhiteSpace(queryUser) ? "被办了。" : "查无此人。");
                     return;
                 }
-                await api.SendMessageAsync(message.Endpoint, $@"{userPlus.Name} 的 PP+ 数据
+
+                var oldQuery = await executingInfo.Database.GetRecentPlusHistory(userPlus.Id);
+                if (!oldQuery.Success)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "无法找到历史数据。");
+                    executingInfo.Logger.LogException(oldQuery.Exception);
+                }
+
+                var old = oldQuery.Result;
+
+                await api.SendMessageAsync(message.Endpoint, old == null
+                    ? $@"{userPlus.Name} 的 PP+ 数据
 Performance: {userPlus.Performance}
 Aim (Jump): {userPlus.AimJump}
 Aim (Flow): {userPlus.AimFlow}
 Precision: {userPlus.Precision}
 Speed: {userPlus.Speed}
 Stamina: {userPlus.Stamina}
-Accuracy: {userPlus.Accuracy}");
+Accuracy: {userPlus.Accuracy}"
+                    : $@"{userPlus.Name} 的 PP+ 数据
+Performance: {userPlus.Performance}{userPlus.Performance - old.Performance:(+#);(-#); ;}
+Aim (Jump): {userPlus.AimJump}{userPlus.AimJump - old.AimJump:(+#);(-#); ;}
+Aim (Flow): {userPlus.AimFlow}{userPlus.AimFlow - old.AimFlow:(+#);(-#); ;}
+Precision: {userPlus.Precision}{userPlus.Precision - old.Precision:(+#);(-#); ;}
+Speed: {userPlus.Speed}{userPlus.Speed - old.Speed:(+#);(-#); ;}
+Stamina: {userPlus.Stamina}{userPlus.Stamina - old.Stamina:(+#);(-#); ;}
+Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy:(+#);(-#); ;}");
+
+                if (old == null)
+                {
+                    var addResult = await executingInfo.Database.AddPlusHistoryAsync(userPlus);
+                    if (!addResult.Success) executingInfo.Logger.LogException(addResult.Exception);
+                }
             }
             catch (ExceptionPlus)
             {
