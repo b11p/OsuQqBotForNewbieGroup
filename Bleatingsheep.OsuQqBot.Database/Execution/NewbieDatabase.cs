@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Bleatingsheep.Osu.PerformancePlus;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,7 +43,26 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
             });
         }
 
+        public override async Task<IExecutingResult> AddPlusHistoryAsync(UserPlus userPlus)
+        {
+            return await TryExecuteAsync(async context =>
+            {
+                await context.PlusHistories.AddAsync(new PlusHistory(userPlus));
+                await context.SaveChangesAsync();
+                return (object)null;
+            });
+        }
+
         public override async Task<IExecutingResult<BindingInfo>> GetBindingInfoAsync(long qq)
             => await TryExecuteAsync(async context => await context.Bindings.SingleOrDefaultAsync(b => b.UserId == qq));
+        public override async Task<IExecutingResult<PlusHistory>> GetRecentPlusHistory(int osuId)
+        {
+            return await TryExecuteAsync(
+                async context => await context.PlusHistories
+                    .Where(ph => ph.Id == osuId)
+                    .OrderByDescending(ph => ph.Date)
+                    .FirstOrDefaultAsync()
+            );
+        }
     }
 }
