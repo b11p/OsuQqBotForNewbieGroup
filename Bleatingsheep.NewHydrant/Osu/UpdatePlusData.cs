@@ -30,6 +30,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             }
 
             IEnumerable<int> todo = result.Result;
+            int retry = 10;
             do
             {
                 var failed = new ConcurrentBag<int>();
@@ -55,7 +56,9 @@ namespace Bleatingsheep.NewHydrant.Osu
                 }
 
                 todo = failed.ToList();
-            } while (todo.Any());
+                await Task.Delay(600_000);
+                retry--;
+            } while (todo.Any() && retry > 0);
 
 
         }
