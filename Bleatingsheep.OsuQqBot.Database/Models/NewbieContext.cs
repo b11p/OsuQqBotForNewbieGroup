@@ -17,6 +17,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<BindingInfo> Bindings { get; private set; }
         public DbSet<MemberInfo> Members { get; private set; }
         public DbSet<MemberGroup> Groups { get; private set; }
+        public DbSet<PlusHistory> PlusHistories { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -54,6 +55,18 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             beatmaps.Property("Source").IsRequired();
             beatmaps.Property("Tags").IsRequired();
             //beatmaps.Property("LastUpdateOffset").HasDefaultValue(DateTimeOffset.MinValue);
+
+            //modelBuilder.Entity<PlusHistory>()
+            //    .Property(ph => ph.Date)
+            //    .HasConversion(
+            //        ph => ph.ToUnixTimeSeconds(),
+            //        t => DateTimeOffset.FromUnixTimeSeconds(t)
+            //    );
+            modelBuilder.Entity<PlusHistory>()
+                .HasKey(ph => new { ph.Id, ph.Date });
+            modelBuilder.Entity<PlusHistory>()
+                .Property(ph => ph.Name)
+                .IsRequired();
         }
     }
 }
