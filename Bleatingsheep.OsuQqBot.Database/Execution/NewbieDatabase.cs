@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.Osu.PerformancePlus;
@@ -43,7 +44,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
             });
         }
 
-        public override async Task<IExecutingResult> AddPlusHistoryAsync(UserPlus userPlus)
+        public override async Task<IExecutingResult> AddPlusHistoryAsync(IUserPlus userPlus)
         {
             return await TryExecuteAsync(async context =>
             {
@@ -53,8 +54,21 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
             });
         }
 
+        public override async Task<IExecutingResult> AddPlusHistoryRangeAsync(IEnumerable<IUserPlus> userPluses)
+        {
+            return await TryExecuteAsync(async context =>
+            {
+                await context.PlusHistories.AddRangeAsync(userPluses.Select(up => new PlusHistory(up)));
+                await context.SaveChangesAsync();
+                return (object)null;
+            });
+        }
+
         public override async Task<IExecutingResult<BindingInfo>> GetBindingInfoAsync(long qq)
             => await TryExecuteAsync(async context => await context.Bindings.SingleOrDefaultAsync(b => b.UserId == qq));
+        public override async Task<IExecutingResult<IList<int>>> GetPlusRecordedUsersAsync()
+            => await TryExecuteAsync(async context => await context.PlusHistories.Select(ph => ph.Id).Distinct().ToListAsync());
+
         public override async Task<IExecutingResult<PlusHistory>> GetRecentPlusHistory(int osuId)
         {
             return await TryExecuteAsync(
