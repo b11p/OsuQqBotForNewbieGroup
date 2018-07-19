@@ -1,6 +1,3 @@
-# Ignore migrations
-/Bleatingsheep.OsuQqBot.Database/Migrations/
-
 # Ignore server information
 /Bleatingsheep.OsuQqBot.Database/Models/ServerInfo.cs
 

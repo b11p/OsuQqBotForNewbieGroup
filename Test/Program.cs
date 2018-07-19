@@ -73,7 +73,8 @@ namespace Test
         {
             try
             {
-                await DataTransAsync();
+                var id = await new Bleatingsheep.OsuQqBot.Database.Execution.NewbieDatabase().GetBindingIdAsync(962549599);
+                //await DataTransAsync();
                 //await CsvTest();
                 //ExpressionTest();
                 //ChartTestInNewbieFurther();
