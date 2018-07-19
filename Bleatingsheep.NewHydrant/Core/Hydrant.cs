@@ -40,13 +40,16 @@ namespace Bleatingsheep.NewHydrant.Core
                 OsuApi = OsuApiClient.ClientUsingKey(_configure.ApiKey),
                 MotherShipApi = new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost),
             };
-            _executingInfo.Data = new DataProvider(_executingInfo);
+            var dataProvider = new DataProvider(_executingInfo);
+            _executingInfo.Data = dataProvider;
+
 
             // 配置日志
             var executingFile = Assembly.GetExecutingAssembly().Location;
             var logFile = Path.Combine(Path.GetDirectoryName(executingFile), "log.txt");
             _logger = new FileLogger(logFile);
             _executingInfo.Logger = _logger;
+            dataProvider.OnException += _logger.LogException;
 
             // 配置定期任务
             _plan = new Task(() =>
