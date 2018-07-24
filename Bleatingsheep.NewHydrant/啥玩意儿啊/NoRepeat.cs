@@ -15,6 +15,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
         private string _currentMessage;
         private int _count;
         private readonly IDictionary<string, long> _messages = new Dictionary<string, long>();
+        private const long GroupId = 641236878;
         private static readonly ISet<long> Bots = new HashSet<long>
         {
             2839098896,
@@ -24,7 +25,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 
         public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
-            if (!(message is GroupMessage g)) return;
+            if (!(message is GroupMessage g && g.GroupId == GroupId)) return;
 
             bool isBotRepeat;
             isBotRepeat = IsBotRepeat(g);

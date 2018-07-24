@@ -63,13 +63,13 @@ Speed: {userPlus.Speed}
 Stamina: {userPlus.Stamina}
 Accuracy: {userPlus.Accuracy}"
                     : $@"{userPlus.Name} 的 PP+ 数据
-Performance: {userPlus.Performance}{userPlus.Performance - old.Performance:(+#);(-#); ;}
-Aim (Jump): {userPlus.AimJump}{userPlus.AimJump - old.AimJump:(+#);(-#); ;}
-Aim (Flow): {userPlus.AimFlow}{userPlus.AimFlow - old.AimFlow:(+#);(-#); ;}
-Precision: {userPlus.Precision}{userPlus.Precision - old.Precision:(+#);(-#); ;}
-Speed: {userPlus.Speed}{userPlus.Speed - old.Speed:(+#);(-#); ;}
-Stamina: {userPlus.Stamina}{userPlus.Stamina - old.Stamina:(+#);(-#); ;}
-Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy:(+#);(-#); ;}");
+Performance: {userPlus.Performance}{userPlus.Performance - old.Performance: (+#); (-#); ;}
+Aim (Jump): {userPlus.AimJump}{userPlus.AimJump - old.AimJump: (+#); (-#); ;}
+Aim (Flow): {userPlus.AimFlow}{userPlus.AimFlow - old.AimFlow: (+#); (-#); ;}
+Precision: {userPlus.Precision}{userPlus.Precision - old.Precision: (+#); (-#); ;}
+Speed: {userPlus.Speed}{userPlus.Speed - old.Speed: (+#); (-#); ;}
+Stamina: {userPlus.Stamina}{userPlus.Stamina - old.Stamina: (+#); (-#); ;}
+Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}");
 
                 if (old == null)
                 {

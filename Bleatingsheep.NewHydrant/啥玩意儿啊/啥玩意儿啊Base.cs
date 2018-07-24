@@ -9,7 +9,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
         protected static async Task RecallAndBan(HttpApiClient api, GroupMessage g)
         {
             await api.RecallMessageAsync(g.MessageId);
-            await api.BanGroupMember(g.GroupId, g.UserId, 3000);
+            await api.BanGroupMember(g.GroupId, g.UserId, 43200);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Bleatingsheep.NewHydrant.Core;
 
 namespace Bleatingsheep.NewHydrant.Attributions
 {
@@ -16,6 +17,6 @@ namespace Bleatingsheep.NewHydrant.Attributions
         /// 初始化，或者重新初始化。
         /// </summary>
         /// <returns>是否成功。</returns>
-        Task<bool> InitializeAsync();
+        Task<bool> InitializeAsync(ExecutingInfo executingInfo);
     }
 }

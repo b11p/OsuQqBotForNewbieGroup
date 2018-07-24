@@ -177,7 +177,7 @@ namespace Bleatingsheep.NewHydrant.Core
             {
                 var init = lazy.Value as IInitializable;
 
-                var success = init.InitializeAsync().Result;
+                var success = init.InitializeAsync(_executingInfo).Result;
                 if (!success) throw new AggregateException();
 
                 if (!string.IsNullOrEmpty(init.Name)) _initializableList.Add(init);
