@@ -16,10 +16,11 @@ namespace Bleatingsheep.NewHydrant.Admin
 
         public IMessageCommand Create() => new Rebind();
 
-        public Task<bool> InitializeAsync(ExecutingInfo executingInfo)
+        public async Task<bool> InitializeAsync(ExecutingInfo executingInfo)
         {
             Verifier = new AdminVerifier(executingInfo);
-            return new Task<bool>(() => true);
+            await Task.Yield();
+            return true;
         }
 
         private long _qq;

@@ -22,6 +22,6 @@ namespace Bleatingsheep.NewHydrant.Admin
         {
         }
 
-        public Task<bool> IsAdminAsync(long qq) => new Task<bool>(() => AdminCollection.Contains(qq));
+        public Task<bool> IsAdminAsync(long qq) => Task.Run(() => AdminCollection.Contains(qq));
     }
 }
