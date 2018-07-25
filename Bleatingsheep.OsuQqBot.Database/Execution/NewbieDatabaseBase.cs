@@ -14,5 +14,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
         public abstract Task<IExecutingResult<BindingInfo>> GetBindingInfoAsync(long qq);
         public abstract Task<IExecutingResult<IList<int>>> GetPlusRecordedUsersAsync();
         public abstract Task<IExecutingResult<PlusHistory>> GetRecentPlusHistory(int osuId);
+        public abstract Task<IExecutingResult<int?>> ResetBindingAsync(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName);
     }
 }

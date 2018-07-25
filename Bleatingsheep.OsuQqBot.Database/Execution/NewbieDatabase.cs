@@ -29,20 +29,28 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
         {
             return await TryExecuteAsync(async context =>
             {
-                var bindResult = await context.Bindings.AddAsync(new BindingInfo { UserId = qq, OsuId = osuId, Source = source });
-                var history = await context.Histories.AddAsync(new OperationHistory
-                {
-                    Operation = Operation.Binding,
-                    UserId = qq,
-                    User = osuName,
-                    OperatorId = operatorId,
-                    Operator = operatorName,
-                    Remark = $"osu! ID: {osuId}; source: {source}",
-                });
+                BindingInfo binding = CreateBindingInfo(qq, osuId, source);
+                var bindResult = await context.Bindings.AddAsync(binding);
+                var history = await context.Histories.AddAsync(CreateBindingHistory(qq, osuId, osuName, source, operatorId, operatorName));
                 await context.SaveChangesAsync();
                 return (object)null;
             });
         }
+
+        private static OperationHistory CreateBindingHistory(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName)
+        {
+            return new OperationHistory
+            {
+                Operation = Operation.Binding,
+                UserId = qq,
+                User = osuName,
+                OperatorId = operatorId,
+                Operator = operatorName,
+                Remark = $"osu! ID: {osuId}; source: {source}",
+            };
+        }
+
+        private static BindingInfo CreateBindingInfo(long qq, int osuId, string source) => new BindingInfo { UserId = qq, OsuId = osuId, Source = source };
 
         public override async Task<IExecutingResult> AddPlusHistoryAsync(IUserPlus userPlus)
         {
@@ -77,6 +85,29 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
                     .OrderByDescending(ph => ph.Date)
                     .FirstOrDefaultAsync()
             );
+        }
+
+        public override async Task<IExecutingResult<int?>> ResetBindingAsync(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName)
+        {
+            return await TryExecuteAsync(async context =>
+            {
+                var binding = await context.Bindings.Where(bi => bi.UserId == qq).SingleOrDefaultAsync();
+                bool add;
+                var oldUid = binding?.OsuId;
+                if (add = binding == null)
+                {
+                    binding = CreateBindingInfo(qq, osuId, source);
+                    await context.Bindings.AddAsync(binding);
+                }
+                else
+                {
+                    binding.OsuId = osuId;
+                    context.Bindings.Update(binding);
+                }
+                var historyEntry = await context.Histories.AddAsync(CreateBindingHistory(qq, osuId, osuName, source, operatorId, operatorName));
+                await context.SaveChangesAsync();
+                return oldUid;
+            });
         }
     }
 }
