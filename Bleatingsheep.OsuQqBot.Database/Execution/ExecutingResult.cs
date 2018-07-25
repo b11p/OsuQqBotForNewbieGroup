@@ -20,13 +20,17 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
 
         public bool Success { get; }
 
-        public T Result => Success ? _result : throw new AggregateException(Exception);
+        public T Result => Success ? _result : throw new DatabaseFailException(null, Exception);
 
         public Exception Exception { get; }
 
-        public ExecutingResult<T> EnsureSuccess() => Success ? this : throw new AggregateException(Exception);
+        public ExecutingResult<T> EnsureSuccess() => Success ? this : throw new DatabaseFailException(null, Exception);
 
         IExecutingResult<T> IExecutingResult<T>.EnsureSuccess() => EnsureSuccess();
+
+        public ExecutingResult<T> EnsureSuccess(string message) => Success ? this : throw new DatabaseFailException(message, Exception);
+
+        IExecutingResult<T> IExecutingResult<T>.EnsureSuccess(string message) => EnsureSuccess(message);
 
         public bool TryGetResult(out T result)
         {

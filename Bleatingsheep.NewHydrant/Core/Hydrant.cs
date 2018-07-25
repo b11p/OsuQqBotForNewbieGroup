@@ -11,6 +11,7 @@ using Bleatingsheep.NewHydrant.Logging;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuMixedApi.MotherShip;
 using Bleatingsheep.OsuQqBot.Database.Execution;
+using Microsoft.EntityFrameworkCore;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
@@ -140,6 +141,14 @@ namespace Bleatingsheep.NewHydrant.Core
                         .FirstOrDefault(c => c.ShouldResponse(message))
                         ?.ProcessAsync(message, api, _executingInfo)
                         .Wait();
+                }
+                catch (DatabaseFailException e)
+                {
+                    api.SendMessageAsync(
+                        endpoint: message.Endpoint,
+                        message: e.Message ?? (e.InnerException is DbUpdateConcurrencyException ? "数据库太忙。" : "数据库访问失败。")
+                    ).Wait();
+                    _logger.LogException(e);
                 }
                 catch (Exception e) when (!(e is ApiAccessException))
                 {
