@@ -81,8 +81,9 @@ namespace Bleatingsheep.NewHydrant.Irc
                 };
                 ircClient.Listen();
             }
-            catch (Exception e)
+            catch (Exception e) when (!(e is PlatformNotSupportedException))
             {
+                Log(Now);
                 LogException(e);
             }
 
