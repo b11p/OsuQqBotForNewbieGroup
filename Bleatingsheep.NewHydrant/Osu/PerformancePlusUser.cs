@@ -19,25 +19,29 @@ namespace Bleatingsheep.NewHydrant.Osu
         private string queryUser;
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
         {
+            dynamic query;
             if (!string.IsNullOrWhiteSpace(queryUser))
             {
-                await api.SendMessageAsync(message.Endpoint, "很抱歉，暂不支持查询其他人的数据。");
-                return;
+                query = queryUser;
             }
-            var (success, userId) = await executingInfo.Data.GetBindingIdAsync(message.UserId);
-            if (!success)
+            else
             {
-                await api.SendMessageAsync(message.Endpoint, "查询绑定账号失败。");
-                return;
-            }
-            if (userId == null)
-            {
-                await api.SendMessageAsync(message.Endpoint, "未绑定。请发送“绑定”后跟你的用户名进行绑定。");
-                return;
+                var (success, userId) = await executingInfo.Data.GetBindingIdAsync(message.UserId);
+                if (!success)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "查询绑定账号失败。");
+                    return;
+                }
+                if (userId == null)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "未绑定。请发送“绑定”后跟你的用户名进行绑定。");
+                    return;
+                }
+                query = userId.Value;
             }
             try
             {
-                var userPlus = await s_spider.GetUserPlusAsync(userId.Value);
+                var userPlus = await s_spider.GetUserPlusAsync(query);
                 if (userPlus == null)
                 {
                     await api.SendMessageAsync(message.Endpoint, string.IsNullOrWhiteSpace(queryUser) ? "被办了。" : "查无此人。");
