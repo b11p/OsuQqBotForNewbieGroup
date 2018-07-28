@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Bleatingsheep.OsuMixedApi;
+using Bleatingsheep.OsuQqBot.Database.Execution;
+using Bleatingsheep.OsuQqBot.Database.Models;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
@@ -10,36 +12,43 @@ namespace Bleatingsheep.NewHydrant.Data
 
         public DataProvider(IDataSource dataSource) => _source = dataSource;
 
-        public async Task<(bool success, int? result)> GetBindingIdAsync(long qq)
+        public async Task<(bool success, BindingInfo result)> GetBindingInfoAsync(long qq)
         {
-            var exec = await _source.Database.GetBindingIdAsync(qq);
+            var exec = await _source.Database.GetBindingInfoAsync(qq);
             if (!exec.Success)
             {
                 OnException?.Invoke(exec.Exception);
-                return (false, default(int?));
+                return (false, default(BindingInfo));
             }
-            var result = exec.Result;
-            if (result.HasValue) return (true, result);
+            var dbResult = exec.Result;
+            if (dbResult != null) return (true, dbResult);
 
             // database no data
+            int? idFromMotherShip;
             try
             {
-                result = await _source.MotherShipApi.GetUserBindAsync(qq);
-                if (result == null) return (true, result);
+                idFromMotherShip = await _source.MotherShipApi.GetUserBindAsync(qq);
+                if (idFromMotherShip == null) return (true, default(BindingInfo));
             }
             catch (OsuApiFailedException)
             {
                 // TODO
-                return (false, default(int?));
+                return (false, default(BindingInfo));
             }
 
             // has mother ship result
-            var (success, userInfo) = await _source.OsuApi.GetUserInfoAsync(result.Value, Mode.Standard);
-            if (!success) return (false, default(int?)); // osu! api fail
+            var (success, userInfo) = await _source.OsuApi.GetUserInfoAsync(idFromMotherShip.Value, Mode.Standard);
+            if (!success) return (false, default(BindingInfo)); // osu! api fail
             var username = userInfo?.Name; // 
             if (string.IsNullOrEmpty(username)) return (true, null);
-            var bindExec = await _source.Database.AddNewBindAsync(qq, result.Value, username, "Mother Ship", null, null);
-            return (bindExec.Success, result);
+            var bindExec = await _source.Database.AddNewBindAsync(qq, idFromMotherShip.Value, username, "Mother Ship", null, null);
+            return (bindExec.TryGetResult(out var bindResult), bindResult);
+        }
+
+        public async Task<(bool success, int? result)> GetBindingIdAsync(long qq)
+        {
+            var (success, bi) = await GetBindingInfoAsync(qq);
+            return (success, bi?.OsuId);
         }
 
         public event Action<Exception> OnException;

@@ -25,7 +25,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
             }
         }
 
-        public override async Task<IExecutingResult> AddNewBindAsync(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName)
+        public override async Task<IExecutingResult<BindingInfo>> AddNewBindAsync(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName)
         {
             return await TryExecuteAsync(async context =>
             {
@@ -33,7 +33,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
                 var bindResult = await context.Bindings.AddAsync(binding);
                 var history = await context.Histories.AddAsync(CreateBindingHistory(qq, osuId, osuName, source, operatorId, operatorName));
                 await context.SaveChangesAsync();
-                return (object)null;
+                return binding;
             });
         }
 
