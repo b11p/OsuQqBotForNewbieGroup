@@ -142,17 +142,24 @@ namespace Bleatingsheep.NewHydrant.Core
                         ?.ProcessAsync(message, api, _executingInfo);
                     if (task != null) await task;
                 }
+                catch (ExecutingException e)
+                {
+                    await api.SendMessageAsync(
+                        endpoint: message.Endpoint,
+                        message: e.Message
+                    );
+                }
                 catch (DatabaseFailException e)
                 {
-                    api.SendMessageAsync(
+                    await api.SendMessageAsync(
                         endpoint: message.Endpoint,
                         message: e.Message ?? (e.InnerException is DbUpdateConcurrencyException ? "数据库太忙。" : "数据库访问失败。")
-                    ).Wait();
+                    );
                     _logger.LogException(e);
                 }
                 catch (Exception e) when (!(e is ApiAccessException))
                 {
-                    api.SendMessageAsync(message.Endpoint, "有一些不好的事发生了").Wait();
+                    await api.SendMessageAsync(message.Endpoint, "有一些不好的事发生了");
                     _logger.LogException(e);
                 }
             };

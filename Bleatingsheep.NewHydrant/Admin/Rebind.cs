@@ -47,11 +47,7 @@ namespace Bleatingsheep.NewHydrant.Admin
                 await api.SendMessageAsync(message.Endpoint, "网络访问失败。");
                 return;
             }
-            if (newUser == null)
-            {
-                await api.SendMessageAsync(message.Endpoint, "没有这个用户。");
-                return;
-            }
+            ExecutingException.Cannot(newUser == null, "没有这个用户。");
 
             // 绑定。
             var oldBind = (await executingInfo.Database.ResetBindingAsync(
