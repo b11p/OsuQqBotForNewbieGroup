@@ -2,7 +2,7 @@
 
 namespace Bleatingsheep.NewHydrant.Data
 {
-    interface IDataProvider
+    public interface IDataProvider
     {
         Task<(bool success, int? result)> GetBindingIdAsync(long qq);
     }

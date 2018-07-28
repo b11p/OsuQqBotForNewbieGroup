@@ -6,7 +6,7 @@ using Bleatingsheep.OsuQqBot.Database.Models;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
-    internal class DataProvider : IDataProvider
+    public class DataProvider : IDataProvider
     {
         private readonly IDataSource _source;
 

@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Sisters.WudiLib\Sisters.WudiLib\Sisters.WudiLib.csproj" />
+    <ProjectReference Include="..\Bleatingsheep.NewHydrant.Data\Bleatingsheep.NewHydrant.Data.csproj" />
     <ProjectReference Include="..\Bleatingsheep.OsuQqBot.Database\Bleatingsheep.OsuQqBot.Database.csproj" />
   </ItemGroup>
 
