@@ -132,15 +132,15 @@ namespace Bleatingsheep.NewHydrant.Core
                     }
                 });
             };
-            _listener.MessageEvent += (api, message) =>
+            _listener.MessageEvent += async (api, message) =>
             {
                 try
                 {
-                    _messageCommandList
+                    var task = _messageCommandList
                         .Select(c => c.Create())
                         .FirstOrDefault(c => c.ShouldResponse(message))
-                        ?.ProcessAsync(message, api, _executingInfo)
-                        .Wait();
+                        ?.ProcessAsync(message, api, _executingInfo);
+                    if (task != null) await task;
                 }
                 catch (DatabaseFailException e)
                 {
