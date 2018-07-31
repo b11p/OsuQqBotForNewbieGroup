@@ -112,6 +112,10 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
                     binding = CreateBindingInfo(qq, osuId, source);
                     await context.Bindings.AddAsync(binding);
                 }
+                else if (binding.OsuId == osuId)
+                {
+                    return binding.OsuId;
+                }
                 else
                 {
                     binding.OsuId = osuId;

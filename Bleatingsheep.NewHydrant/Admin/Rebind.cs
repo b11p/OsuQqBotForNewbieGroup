@@ -62,6 +62,8 @@ namespace Bleatingsheep.NewHydrant.Admin
                 reason: _reason
             )).EnsureSuccess("绑定失败，数据库访问出错。");
 
+            ExecutingException.Cannot(oldBind.Result == newUser.Id, "未更改绑定，因为已经绑定了该账号。");
+
             SendingMessage message1 = new SendingMessage("将") + SendingMessage.At(_qq) + new SendingMessage($"绑定为{newUser.Name}。");
             if (oldBind.Result == null)
             {
