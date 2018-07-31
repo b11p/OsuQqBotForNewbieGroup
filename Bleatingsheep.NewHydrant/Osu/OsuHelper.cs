@@ -15,11 +15,15 @@ namespace Bleatingsheep.NewHydrant.Osu
         /// <summary>
         /// 可以匹配到用户名的模式。
         /// </summary>
-        private const string UsernamePattern = "[0-9A-Za-z_\\-\\[\\]][0-9A-Za-z_\\-\\[\\] ]{1,13}[0-9A-Za-z_\\-\\[\\]]"; // 匹配ID中可以使用的字符，其中ID的长度是3-15
+        public const string UsernamePattern = "[0-9A-Za-z_\\-\\[\\]][0-9A-Za-z_\\-\\[\\] ]{1,13}[0-9A-Za-z_\\-\\[\\]]"; // 匹配ID中可以使用的字符，其中ID的长度是3-15
         /// <summary>
         /// 判断是不是用户名的模式。
         /// </summary>
         private const string IsUsernamePattern = "^" + UsernamePattern + "$";
+        /// <summary>
+        /// 表示用户名边界的模式。
+        /// </summary>
+        private const string BorderPattern = "[^0-9A-Za-z_\\-\\[\\]]";
         private static readonly Regex IsUsernameRegex = new Regex(IsUsernamePattern, RegexOptions.Compiled);
         private static readonly Regex DiscoverRegex = new Regex(DiscoverPattern, RegexOptions.Compiled);
 

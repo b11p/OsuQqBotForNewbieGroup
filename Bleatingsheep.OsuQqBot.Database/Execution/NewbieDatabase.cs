@@ -50,6 +50,19 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
             };
         }
 
+        private static OperationHistory CreateBindingHistory(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName, string reason)
+        {
+            return new OperationHistory
+            {
+                Operation = Operation.Binding,
+                UserId = qq,
+                User = osuName,
+                OperatorId = operatorId,
+                Operator = operatorName,
+                Remark = $"osu! ID: {osuId}; source: {source}; reason: {reason}",
+            };
+        }
+
         private static BindingInfo CreateBindingInfo(long qq, int osuId, string source) => new BindingInfo { UserId = qq, OsuId = osuId, Source = source };
 
         public override async Task<IExecutingResult> AddPlusHistoryAsync(IUserPlus userPlus)
@@ -87,7 +100,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
             );
         }
 
-        public override async Task<IExecutingResult<int?>> ResetBindingAsync(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName)
+        public override async Task<IExecutingResult<int?>> ResetBindingAsync(long qq, int osuId, string osuName, string source, long? operatorId, string operatorName, string reason)
         {
             return await TryExecuteAsync(async context =>
             {
@@ -102,9 +115,10 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
                 else
                 {
                     binding.OsuId = osuId;
+                    binding.Source = source;
                     context.Bindings.Update(binding);
                 }
-                var historyEntry = await context.Histories.AddAsync(CreateBindingHistory(qq, osuId, osuName, source, operatorId, operatorName));
+                var historyEntry = await context.Histories.AddAsync(CreateBindingHistory(qq, osuId, osuName, source, operatorId, operatorName, reason));
                 await context.SaveChangesAsync();
                 return oldUid;
             });

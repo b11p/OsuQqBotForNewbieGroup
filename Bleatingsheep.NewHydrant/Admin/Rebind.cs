@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
@@ -26,6 +27,7 @@ namespace Bleatingsheep.NewHydrant.Admin
         private long _qq;
         private string _username;
         private long _operator;
+        private string _reason;
 
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
         {
@@ -56,7 +58,8 @@ namespace Bleatingsheep.NewHydrant.Admin
                 osuName: newUser.Name,
                 source: "由管理员修改",
                 operatorId: _operator,
-                operatorName: operatorName
+                operatorName: operatorName,
+                reason: _reason
             )).EnsureSuccess("绑定失败，数据库访问出错。");
 
             SendingMessage message1 = new SendingMessage("将") + SendingMessage.At(_qq) + new SendingMessage($"绑定为{newUser.Name}。");
@@ -86,10 +89,17 @@ namespace Bleatingsheep.NewHydrant.Admin
             if (contentList[0].TryGetText(out string p1)
                 && "绑定".Equals(p1?.Trim(), StringComparison.InvariantCultureIgnoreCase)
                 && contentList[1].TryGetAtMember(out _qq)
-                && contentList[2].TryGetText(out _username))
+                && contentList[2].TryGetText(out string rebindInfo))
             {
-                _username = _username.Trim();
-                return OsuHelper.IsUsername(_username);
+                rebindInfo = rebindInfo.Trim();
+                var match = Regex.Match(
+                    input: rebindInfo,
+                    pattern: "^(" + OsuHelper.UsernamePattern + @")\s*[:：]\s*(.+?)\s*$"
+                );
+                if (!match.Success) return false;
+                _username = match.Groups[1].Value;
+                _reason = match.Groups[2].Value;
+                return true;
             }
             return false;
         }
