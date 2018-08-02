@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Core;
 using Sisters.WudiLib;
@@ -39,11 +40,19 @@ namespace Bleatingsheep.NewHydrant
                 Task.Delay(5000).Wait();
             } while (true);
 
-            var apiPostListener = new ApiPostListener(configure.Listen);
-            apiPostListener.ApiClient = httpApiClient;
-            apiPostListener.StartListen();
+            try
+            {
+                var apiPostListener = new ApiPostListener(configure.Listen);
+                apiPostListener.ApiClient = httpApiClient;
+                apiPostListener.StartListen();
 
-            var hydrant = new Hydrant(new HardcodedConfigure(), httpApiClient, apiPostListener);
+                var hydrant = new Hydrant(new HardcodedConfigure(), httpApiClient, apiPostListener);
+            }
+            catch (Exception e)
+            {
+                var logPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "fatal.log");
+                new Logging.FileLogger(logPath).LogException(e);
+            }
 
             Task.Delay(-1).Wait();
         }
