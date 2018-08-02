@@ -136,10 +136,19 @@ namespace Bleatingsheep.NewHydrant.Core
             {
                 try
                 {
-                    var task = _messageCommandList
+                    IMessageCommand hit;
+                    try
+                    {
+                        hit = _messageCommandList
                         .Select(c => c.Create())
-                        .FirstOrDefault(c => c.ShouldResponse(message))
-                        ?.ProcessAsync(message, api, _executingInfo);
+                        .FirstOrDefault(c => c.ShouldResponse(message));
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogException(e);
+                        return;
+                    }
+                    var task = hit?.ProcessAsync(message, api, _executingInfo);
                     if (task != null) await task;
                 }
                 catch (ExecutingException e)
