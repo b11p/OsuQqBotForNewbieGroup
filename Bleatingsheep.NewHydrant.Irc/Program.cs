@@ -13,6 +13,8 @@ namespace Bleatingsheep.NewHydrant.Irc
     {
         static void Main(string[] args)
         {
+            string lastMessage = string.Empty;
+
             try
             {
                 #region 区域设置
@@ -39,6 +41,8 @@ namespace Bleatingsheep.NewHydrant.Irc
                     long costTime = long.MinValue; // 查询时间
                     try
                     {
+                        lastMessage = e.Data.RawMessage; // for logging unexpected exception
+
                         username = e.Data.Nick; // for logging
                         string message = e.Data.Message;
                         var match = regex.Match(message);
@@ -81,12 +85,15 @@ namespace Bleatingsheep.NewHydrant.Irc
                 };
                 ircClient.Listen();
             }
-            catch (Exception e) when (!(e is PlatformNotSupportedException))
+            catch (Exception e)
             {
-                Log(Now);
-                LogException(e);
+                Log(lastMessage);
+                if (!(e is PlatformNotSupportedException))
+                {
+                    Log(Now);
+                    LogException(e);
+                }
             }
-
         }
 
         private static readonly TimeSpan offset = new TimeSpan(8, 0, 0);
