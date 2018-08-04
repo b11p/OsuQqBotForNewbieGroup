@@ -23,7 +23,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             3082577334,
             3527783823,
             2308394636,
-            1131545658
+            1131545658,
+            2680306741, // interbot2
         };
 
         private static readonly HashSet<long> IgnorePerformanceListBase = new HashSet<long>
