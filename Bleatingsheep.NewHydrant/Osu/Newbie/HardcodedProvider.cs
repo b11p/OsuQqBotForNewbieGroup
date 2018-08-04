@@ -11,19 +11,17 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
     {
         private static readonly HashSet<long> IgnoreList = new HashSet<long>
         {
-            2478057279,
-            405622418,
-            2930081217,
-            1677323371,
-            1376729907,
-            1394932996,
-            1587912578,
-            2762388263,
-            1061566571,
-            3082577334,
-            3527783823,
-            2308394636,
-            1131545658,
+            2478057279, // BanchooBot by int100
+            405622418, // 大号
+            1677323371, // interBot
+            1376729907, // 松花蛋
+            1394932996, // Sayobot
+            1587912578, // Yamiko
+            2762388263, // Yumli_Bot
+            3082577334, // DalouBot
+            3527783823, // nodebot
+            2308394636, // yimoQWQ
+            1131545658, // 消防栓 beta
             2680306741, // interbot2
         };
 

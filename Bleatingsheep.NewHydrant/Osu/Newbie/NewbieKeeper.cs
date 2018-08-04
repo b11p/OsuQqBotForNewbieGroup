@@ -56,13 +56,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             // 获取游戏账号信息。
             UserInfo userInfo;
             (success, userInfo) = await executingInfo.OsuApi.GetUserInfoAsync(osuId.Value, Mode.Standard);
+            ExecutingException.Ensure(string.Empty, success);
 
             // 获取群员信息。
             var groupMember = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);
 
             // 检查用户名。
-            await CheckGroupCard(api, groupMember, g, userInfo.Name);
+            await CheckGroupCard(api, groupMember, g, userInfo?.Name ?? (await executingInfo.MotherShipApi.GetUserInfoAsync(g.UserId)).Data.Name);
 
+            ExecutingException.Ensure(userInfo != null, string.Empty);
             // 检查 PP。
             await CheckPerformance(api, groupMember, g, userInfo);
 
@@ -106,7 +108,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             {
                 hint = "为了方便其他人认出您，请修改群名片，必须包括正确的 osu! 用户名。";
             }
-            await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($" {name}，您好。" + hint));
+            await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
         }
 
         private static async Task<string> AutoBind(HttpApiClient api, ExecutingInfo executingInfo, GroupMessage g, bool success)
