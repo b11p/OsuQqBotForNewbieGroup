@@ -104,7 +104,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
             else
             {
-                hint = "为了方便其他人认出您，请修改群名片，必须包括正确的osu!用户名。";
+                hint = "为了方便其他人认出您，请修改群名片，必须包括正确的 osu! 用户名。";
             }
             await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($" {name}，您好。" + hint));
         }
