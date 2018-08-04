@@ -23,7 +23,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         private readonly object _thisLock = new object();
         private IEnumerable<int> _oldSets;
-        private DateTimeOffset _noMapAfter = DateTimeOffset.MinValue;
+        private DateTimeOffset _noBeatmapAfter = DateTimeOffset.MinValue;
 
         public async Task RunAsync(HttpApiClient api, ExecutingInfo executingInfo)
         {
@@ -31,17 +31,23 @@ namespace Bleatingsheep.NewHydrant.Osu
             var result = await BloodcatApi.Client.SearchRankedByKeywordAsync();
             lock (_thisLock)
             {
+                var logger = executingInfo.Logger;
+                logger.LogInBackground($"取到 {result.Count()} 个");
+                logger.LogInBackground($"日期晚于最新：{result.Where(s => s.ApprovedDateOffset > _noBeatmapAfter).Count()} 个");
                 if (!(_oldSets is null))
                 {
-                    newSets = result.Take(_oldSets.Count()).Concat(result.Where(s => s.ApprovedDateOffset > _noMapAfter))
-                        .SkipWhile(s => _oldSets.Contains(s.Id))
+                    logger.LogInBackground($"提取前 {_oldSets.Count()} 个");
+                    newSets = result.Take(_oldSets.Count()).Concat(result.Where(s => s.ApprovedDateOffset > _noBeatmapAfter))
+                        .Where(s => !_oldSets.Contains(s.Id))
                         .Distinct()
                         .ToList();// 避免延迟求值
+                    logger.LogInBackground($"发送 {newSets.Count()} 个");
                 }
-                _oldSets = result.Select(s => s.Id);
-                if (_noMapAfter < result.Max(s => s.ApprovedDateOffset))
+                _oldSets = result.Select(s => s.Id).ToHashSet();
+                if (_noBeatmapAfter < result.Max(s => s.ApprovedDateOffset))
                 {
-                    _noMapAfter = result.Max(s => s.ApprovedDateOffset);
+                    _noBeatmapAfter = result.Max(s => s.ApprovedDateOffset);
+                    logger.LogInBackground($"日期更新为 {_noBeatmapAfter}");
                 }
             }
             var osu = executingInfo.OsuApi;
@@ -50,14 +56,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var qq = executingInfo.Qq;
                 foreach (var set in newSets)
                 {
-                    int setId = set.Id;
-                    string info = string.Empty;
-                    info += set.Beatmaps.Max(b => b.TotalLength) + "s, ";
-                    if (set.Beatmaps.Length > 1) info += $"{set.Beatmaps.Min(b => b.Stars):0.##}* - {set.Beatmaps.Max(b => b.Stars):0.##}*";
-                    else info += $"{set.Beatmaps.Single()?.Stars:0.##}*";
-                    info += "\r\n" + $"by {set.Creator}";
-                    if (!string.IsNullOrEmpty(set.Source)) info += "\r\n" + $"From {set.Source}";
-                    Message message = SendingMessage.MusicCustom(osu.PageOfSet(setId), osu.PreviewAudioOf(setId), $"{set.Artist} - {set.Title}", info, osu.ThumbOf(setId));
+                    Message message = BloodcatUtilities.GetMusicMessage(osu, set);
                     foreach (long group in s_groups)
                     {
                         await qq.SendGroupMessageAsync(group, message);
