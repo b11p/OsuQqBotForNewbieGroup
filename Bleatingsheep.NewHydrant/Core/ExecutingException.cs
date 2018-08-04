@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
@@ -11,6 +12,11 @@ namespace Bleatingsheep.NewHydrant.Core
         protected ExecutingException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        public static void Ensure(string onFalse, params bool[] success)
+        {
+            if (success.Contains(false)) throw new ExecutingException(onFalse);
+        }
 
         public static void Ensure(bool success, string onFalse)
         {

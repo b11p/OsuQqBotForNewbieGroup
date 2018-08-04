@@ -124,7 +124,11 @@ namespace Bleatingsheep.NewHydrant.Core
                 {
                     try
                     {
-                        await m.OnMessageAsync(message, api);
+                        await m.OnMessageAsync(message, api, _executingInfo);
+                    }
+                    catch (ExecutingException)
+                    {
+                        // ignored
                     }
                     catch (Exception e)
                     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
@@ -23,7 +24,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             3082577334,
         };
 
-        public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
+        public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
         {
             if (!(message is GroupMessage g && g.GroupId == GroupId)) return;
 
