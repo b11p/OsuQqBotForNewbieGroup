@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.3.1" />
+    <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.3.2" />
     <PackageReference Include="Bleatingsheep.Osu.ApiV2" Version="0.1.0.1" />
   </ItemGroup>
 
