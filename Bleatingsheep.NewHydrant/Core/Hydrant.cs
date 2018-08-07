@@ -157,10 +157,11 @@ namespace Bleatingsheep.NewHydrant.Core
                 }
                 catch (ExecutingException e)
                 {
-                    await api.SendMessageAsync(
-                        endpoint: message.Endpoint,
-                        message: e.Message
-                    );
+                    if (!string.IsNullOrEmpty(e.Message))
+                        await api.SendMessageAsync(
+                            endpoint: message.Endpoint,
+                            message: e.Message
+                        );
                     if (e.InnerException != null)
                     {
                         _logger.LogException(e.InnerException);

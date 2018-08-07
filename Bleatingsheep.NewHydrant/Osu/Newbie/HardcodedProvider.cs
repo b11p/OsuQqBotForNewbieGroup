@@ -23,6 +23,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             2308394636, // yimoQWQ
             1131545658, // 消防栓 beta
             2680306741, // interbot2
+            2639140005, // 小taolex
         };
 
         private static readonly HashSet<long> IgnorePerformanceListBase = new HashSet<long>
@@ -53,7 +54,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             1149483077,
             962549599,
             1208604740,
-            1061566571,
+            1061566571, // dalou
+            178039743, // whir
         };
 
         private const long NewbieGroupId = 614892339;
