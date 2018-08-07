@@ -52,7 +52,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             2429299722,
             1149483077,
             962549599,
-            1208604740
+            1208604740,
+            1061566571,
         };
 
         private const long NewbieGroupId = 614892339;

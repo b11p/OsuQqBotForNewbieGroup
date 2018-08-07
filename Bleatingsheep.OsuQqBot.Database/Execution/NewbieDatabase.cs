@@ -127,5 +127,39 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
                 return oldUid;
             });
         }
+
+        public override async Task<IExecutingResult<int?>> AddOrUpdateRelationship(long qq, string relationship, int userId)
+        {
+            return await TryExecuteAsync(async context =>
+            {
+                var oldRelationship = await context.Relationships.Where(r => r.UserId == qq && r.Relationship == relationship).SingleOrDefaultAsync();
+                int? oldId = null;
+                if (oldRelationship != null)
+                {
+                    oldId = oldRelationship.Target;
+                    oldRelationship.Target = userId;
+                    context.Relationships.Update(oldRelationship);
+                }
+                else
+                {
+                    await context.Relationships.AddAsync(new RelationshipInfo
+                    {
+                        UserId = qq,
+                        Relationship = relationship,
+                        Target = userId,
+                    });
+                }
+                await context.SaveChangesAsync();
+                return oldId;
+            });
+        }
+
+        public override async Task<IExecutingResult<RelationshipInfo>> GetRelationshipAsync(long qq, string relationship)
+        {
+            return await TryExecuteAsync(async context =>
+            {
+                return await context.Relationships.Where(r => r.UserId == qq && r.Relationship == relationship).SingleOrDefaultAsync();
+            });
+        }
     }
 }

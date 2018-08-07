@@ -269,3 +269,4 @@ paket-files/
 __pycache__/
 *.pyc
 /Bleatingsheep.NewHydrant.Irc/Password.cs
+/Bleatingsheep.NewHydrant/秘密功能

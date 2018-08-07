@@ -60,6 +60,10 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var messages = newSets.Take(limit).Select(s => BloodcatUtilities.GetMusicMessage(osu, s)).ToList();
                 foreach (long group in s_groups)
                 {
+                    if (newSets.Count() > 0)
+                    {
+                        await qq.SendGroupMessageAsync(group, $"发现 {newSets.Count()} 张新 rank 图。");
+                    }
                     foreach (Message message in messages)
                     {
                         await qq.SendGroupMessageAsync(group, message);

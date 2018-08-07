@@ -18,6 +18,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<MemberInfo> Members { get; private set; }
         public DbSet<MemberGroup> Groups { get; private set; }
         public DbSet<PlusHistory> PlusHistories { get; private set; }
+        public DbSet<RelationshipInfo> Relationships { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -67,6 +68,9 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             modelBuilder.Entity<PlusHistory>()
                 .Property(ph => ph.Name)
                 .IsRequired();
+
+            modelBuilder.Entity<RelationshipInfo>()
+                .HasKey(r => new { r.UserId, r.Relationship });
         }
     }
 }

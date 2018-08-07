@@ -15,7 +15,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             else info += $"{set.Beatmaps.Single()?.Stars:0.##}*";
             info += "\r\n" + $"by {set.Creator}";
             if (!string.IsNullOrEmpty(set.Source)) info += "\r\n" + $"From {set.Source}";
-            Message message = SendingMessage.MusicCustom(osuApi.PageOfSet(setId), osuApi.PreviewAudioOf(setId), $"{set.Artist} - {set.Title}", info, osuApi.ThumbOf(setId));
+            Message message = SendingMessage.MusicCustom(osuApi.PageOfSet(setId), osuApi.PreviewAudioOf(setId), $"{set.Title}/{set.Artist}", info, osuApi.ThumbOf(setId));
             return message;
         }
     }
