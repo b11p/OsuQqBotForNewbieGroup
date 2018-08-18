@@ -8,6 +8,5 @@ namespace Bleatingsheep.NewHydrant.Attributions
     {
         bool ShouldResponse(Message message);
         Task ProcessAsync(Message message, Sisters.WudiLib.HttpApiClient api, ExecutingInfo executingInfo);
-        IMessageCommand Create();
     }
 }

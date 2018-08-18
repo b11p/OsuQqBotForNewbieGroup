@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Bleatingsheep.NewHydrant.Addon;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Logging;
@@ -144,7 +145,7 @@ namespace Bleatingsheep.NewHydrant.Core
                     try
                     {
                         hit = _messageCommandList
-                        .Select(c => c.Create())
+                        .Select(c => c.GetType().CreateInstance<IMessageCommand>())
                         .FirstOrDefault(c => c.ShouldResponse(message));
                     }
                     catch (Exception e)
@@ -153,7 +154,8 @@ namespace Bleatingsheep.NewHydrant.Core
                         return;
                     }
                     var task = hit?.ProcessAsync(message, api, _executingInfo);
-                    if (task != null) await task;
+                    if (task != null)
+                        await task;
                 }
                 catch (ExecutingException e)
                 {
@@ -216,9 +218,11 @@ namespace Bleatingsheep.NewHydrant.Core
                 var init = lazy.Value as IInitializable;
 
                 var success = init.InitializeAsync(_executingInfo).Result;
-                if (!success) throw new AggregateException();
+                if (!success)
+                    throw new AggregateException();
 
-                if (!string.IsNullOrEmpty(init.Name)) _initializableList.Add(init);
+                if (!string.IsNullOrEmpty(init.Name))
+                    _initializableList.Add(init);
             }
             if (t == typeof(IMessageCommand))
             {

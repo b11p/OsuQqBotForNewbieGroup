@@ -15,12 +15,13 @@ namespace Bleatingsheep.NewHydrant.Osu
         public TimeSpan? OnUtc => null;
         public TimeSpan? Every { get; } = new TimeSpan(0, 15, 0);
 
-        private static IEnumerable<long> s_groups = new List<long>
+        private static readonly IEnumerable<long> s_groups = new List<long>
         {
-            72318078,
+            //72318078,
             672076603, // HTTP 机器人。
             514661057, // 后花园。
             308419061, // Steam。
+            838187450, // 歪爱抚。
         };
 
         private readonly object _thisLock = new object();
