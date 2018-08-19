@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu.PerformancePlus;
 using Meebey.SmartIrc4net;
 using static System.Globalization.CultureInfo;
@@ -57,7 +58,7 @@ namespace Bleatingsheep.NewHydrant.Irc
 
                         // 统计 PP+ 的查询时间
                         var sw = Stopwatch.StartNew();
-                        var beatmap = spider.GetBeatmapPlusAsync(beatmapId).Result;
+                        var beatmap = spider.GetCachedBeatmapPlusAsync(beatmapId).Result;
                         costTime = sw.ElapsedMilliseconds;
 
                         if (beatmap == null)
@@ -77,6 +78,7 @@ namespace Bleatingsheep.NewHydrant.Irc
                         string message = e?.Data?.Message;
                         Log(message);
                         LogException(ex);
+                        e.Data.Irc.SendMessage(SendType.Message, e.Data.Nick, "查询失败。");
                     }
                     finally
                     {
@@ -87,10 +89,10 @@ namespace Bleatingsheep.NewHydrant.Irc
             }
             catch (Exception e)
             {
+                Log($"于 {Now} 崩溃。");
                 Log(lastMessage);
                 if (!(e is PlatformNotSupportedException))
                 {
-                    Log(Now);
                     LogException(e);
                 }
             }

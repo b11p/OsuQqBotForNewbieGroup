@@ -23,6 +23,8 @@ namespace Bleatingsheep.NewHydrant.Data
             return await new PerformancePlusSpider().GetCachedBeatmapPlusAsync(beatmapId);
         }
 
+        /// <exception cref="DbUpdateException">数据库查询失败。</exception>
+        /// <exception cref="ExceptionPlus">查询 PP+ 失败。</exception>
         public static async Task<IBeatmapPlus> GetCachedBeatmapPlusAsync(this PerformancePlusSpider ppp, int id)
         {
             var fromDb = await GetFromDbAsync(c => c.BeatmapPlusCache, b => b.Id == id);
