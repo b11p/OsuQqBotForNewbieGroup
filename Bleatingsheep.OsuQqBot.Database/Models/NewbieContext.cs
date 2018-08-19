@@ -1,11 +1,11 @@
-﻿using Bleatingsheep.OsuMixedApi;
+﻿using Bleatingsheep.Osu.PerformancePlus;
+using Bleatingsheep.OsuMixedApi;
 using Microsoft.EntityFrameworkCore;
-using System;
 using static Bleatingsheep.OsuQqBot.Database.Models.ServerInfo;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models
 {
-    internal class NewbieContext : DbContext
+    public class NewbieContext : DbContext
     {
         public DbSet<Chart> Charts { get; private set; }
         public DbSet<ChartBeatmap> ChartBeatmaps { get; private set; }
@@ -19,6 +19,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<MemberGroup> Groups { get; private set; }
         public DbSet<PlusHistory> PlusHistories { get; private set; }
         public DbSet<RelationshipInfo> Relationships { get; private set; }
+        public DbSet<BeatmapPlus> BeatmapPlusCache { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -71,6 +72,11 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
             modelBuilder.Entity<RelationshipInfo>()
                 .HasKey(r => new { r.UserId, r.Relationship });
+
+            //modelBuilder.Entity<BeatmapPlus>()
+            //    .HasKey(bp => bp.Id);
+
+            modelBuilder.Entity<BeatmapPlus>().Property(bp => bp.Id).ValueGeneratedNever();
         }
     }
 }
