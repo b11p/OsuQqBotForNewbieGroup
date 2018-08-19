@@ -56,7 +56,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             beatmaps.Property("Creator").IsRequired();
             beatmaps.Property("Source").IsRequired();
             beatmaps.Property("Tags").IsRequired();
-            //beatmaps.Property("LastUpdateOffset").HasDefaultValue(DateTimeOffset.MinValue);
+            beatmaps.HasIndex(b => b.FileMD5).HasName("index_md5");
 
             //modelBuilder.Entity<PlusHistory>()
             //    .Property(ph => ph.Date)

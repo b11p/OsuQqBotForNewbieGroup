@@ -60,6 +60,14 @@ namespace Bleatingsheep.OsuMixedApi
             return result;
         }
 
+        public async Task<Beatmap[]> GetBeatmapAsync(byte[] md5)
+        {
+            string md5String = BitConverter.ToString(md5).Replace("-", string.Empty, StringComparison.Ordinal);
+            return await GetBeatmapAsync(md5String);
+        }
+
+        public async Task<Beatmap[]> GetBeatmapAsync(string md5) => await SafeGetArrayAsync<Beatmap>(BeatmapUrl, ("k", apiKey), ("h", md5));
+
         public async Task<BestPerformance[]> GetBestPerformancesAsync(int uid, Mode mode, int limit = 10)
         {
             var result = await GetBestPerformancesAsync(uid.ToString(), "u", mode, limit);
@@ -87,7 +95,8 @@ namespace Bleatingsheep.OsuMixedApi
         public async Task<(bool networkSuccess, UserInfo)> GetUserInfoAsync(int uid, Mode mode)
         {
             var result = await GetUserInfoAsync(uid.ToString(), "u", mode);
-            if (result == null) return (false, null);
+            if (result == null)
+                return (false, null);
             var filter = result.Where(u => u.Id == uid);
             return (true, filter.SingleOrDefault());
         }
@@ -95,7 +104,8 @@ namespace Bleatingsheep.OsuMixedApi
         public async Task<(bool networkSuccess, UserInfo)> GetUserInfoAsync(string username, Mode mode)
         {
             var result = await GetUserInfoAsync(username, "string", mode);
-            if (result == null) return (false, null);
+            if (result == null)
+                return (false, null);
             var filter = result.Where(u => string.Compare(u.Name, username, true) == 0);
             return (true, filter.SingleOrDefault());
         }
