@@ -6,6 +6,7 @@ using Bleatingsheep.Osu.PerformancePlus;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
@@ -17,6 +18,7 @@ namespace Bleatingsheep.NewHydrant.Data
         /// <param name="beatmapId"></param>
         /// <exception cref="DbUpdateException">数据库查询失败。</exception>
         /// <exception cref="ExceptionPlus">查询 PP+ 失败。</exception>
+        /// <exception cref="MySqlException"></exception>
         /// <returns></returns>
         public static async Task<IBeatmapPlus> GetBeatmapPlusAsync(int beatmapId)
         {
@@ -25,6 +27,7 @@ namespace Bleatingsheep.NewHydrant.Data
 
         /// <exception cref="DbUpdateException">数据库查询失败。</exception>
         /// <exception cref="ExceptionPlus">查询 PP+ 失败。</exception>
+        /// <exception cref="MySqlException"></exception>
         public static async Task<IBeatmapPlus> GetCachedBeatmapPlusAsync(this PerformancePlusSpider ppp, int id)
         {
             var fromDb = await GetFromDbAsync(c => c.BeatmapPlusCache, b => b.Id == id);
@@ -59,7 +62,8 @@ namespace Bleatingsheep.NewHydrant.Data
             }
             return fromApi;
         }
-
+        
+        /// <exception cref="MySqlException"></exception>
         private static async Task<T> GetFromDbAsync<T>(Func<NewbieContext, DbSet<T>> table, Expression<Func<T, bool>> predicate) where T : class
         {
             using (var context = new NewbieContext())

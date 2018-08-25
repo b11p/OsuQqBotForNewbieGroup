@@ -36,12 +36,13 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var failed = new ConcurrentBag<int>();
                 var results = new ConcurrentBag<IUserPlus>();
 
-                Parallel.ForEach(todo, userId =>
+                todo.AsParallel().ForAll(userId =>
                 {
                     try
                     {
                         var user = s_spider.GetUserPlusAsync(userId).Result;
-                        if (user != null) results.Add(user);
+                        if (user != null)
+                            results.Add(user);
                     }
                     catch (Exception)
                     {

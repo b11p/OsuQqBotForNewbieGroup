@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Bleatingsheep.OsuMixedApi;
+using Bleatingsheep.OsuMixedApi.MotherShip;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Bleatingsheep.OsuQqBot.Database.Models;
 
@@ -8,27 +9,33 @@ namespace Bleatingsheep.NewHydrant.Data
 {
     public class DataProvider : IDataProvider
     {
-        private readonly IDataSource _source;
+        private readonly OsuApiClient _api;
+        private readonly MotherShipApiClient _motherShipApi = new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost);
+        private readonly NewbieDatabase _database = new NewbieDatabase();
 
-        public DataProvider(IDataSource dataSource) => _source = dataSource;
+        public DataProvider(IDataSource dataSource) => _api = dataSource.OsuApi;
+
+        public DataProvider(OsuApiClient api) => _api = api;
 
         public async Task<(bool success, BindingInfo result)> GetBindingInfoAsync(long qq)
         {
-            var exec = await _source.Database.GetBindingInfoAsync(qq);
+            var exec = await _database.GetBindingInfoAsync(qq);
             if (!exec.Success)
             {
                 OnException?.Invoke(exec.Exception);
                 return (false, default(BindingInfo));
             }
             var dbResult = exec.Result;
-            if (dbResult != null) return (true, dbResult);
+            if (dbResult != null)
+                return (true, dbResult);
 
             // database no data
             int? idFromMotherShip;
             try
             {
-                idFromMotherShip = await _source.MotherShipApi.GetUserBindAsync(qq);
-                if (idFromMotherShip == null) return (true, default(BindingInfo));
+                idFromMotherShip = await _motherShipApi.GetUserBindAsync(qq);
+                if (idFromMotherShip == null)
+                    return (true, default(BindingInfo));
             }
             catch (OsuApiFailedException)
             {
@@ -37,11 +44,13 @@ namespace Bleatingsheep.NewHydrant.Data
             }
 
             // has mother ship result
-            var (success, userInfo) = await _source.OsuApi.GetUserInfoAsync(idFromMotherShip.Value, Mode.Standard);
-            if (!success) return (false, default(BindingInfo)); // osu! api fail
+            var (success, userInfo) = await _api.GetUserInfoAsync(idFromMotherShip.Value, Mode.Standard);
+            if (!success)
+                return (false, default(BindingInfo)); // osu! api fail
             var username = userInfo?.Name; // 
-            if (string.IsNullOrEmpty(username)) return (true, null);
-            var bindExec = await _source.Database.AddNewBindAsync(qq, idFromMotherShip.Value, username, "Mother Ship", null, null);
+            if (string.IsNullOrEmpty(username))
+                return (true, null);
+            var bindExec = await _database.AddNewBindAsync(qq, idFromMotherShip.Value, username, "Mother Ship", null, null);
             return (bindExec.TryGetResult(out var bindResult), bindResult);
         }
 
