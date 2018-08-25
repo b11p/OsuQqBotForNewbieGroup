@@ -49,7 +49,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             {// 在没有绑定的情况下尝试自动绑定。
                 string response;
                 response = await AutoBind(api, executingInfo, g, success);
-                await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage("您好，" + response));
+                await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage("\r\n您好，" + response));
                 return;
             }
 

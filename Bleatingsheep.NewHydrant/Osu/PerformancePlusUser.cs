@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
@@ -41,7 +39,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             }
             try
             {
-                var userPlus = await s_spider.GetUserPlusAsync(query);
+                var userPlus = (UserPlus)await s_spider.GetUserPlusAsync(query);
                 if (userPlus == null)
                 {
                     await api.SendMessageAsync(message.Endpoint, string.IsNullOrWhiteSpace(queryUser) ? "被办了。" : "查无此人。");
@@ -55,9 +53,9 @@ namespace Bleatingsheep.NewHydrant.Osu
                     executingInfo.Logger.LogException(oldQuery.Exception);
                 }
 
-                var old = oldQuery.Result;
+                var old = oldQuery.EnsureSuccess().Result;
 
-                await api.SendMessageAsync(message.Endpoint, old == null
+                var responseMessage = old == null
                     ? $@"{userPlus.Name} 的 PP+ 数据
 Performance: {userPlus.Performance}
 Aim (Jump): {userPlus.AimJump}
@@ -73,12 +71,18 @@ Aim (Flow): {userPlus.AimFlow}{userPlus.AimFlow - old.AimFlow: (+#); (-#); ;}
 Precision: {userPlus.Precision}{userPlus.Precision - old.Precision: (+#); (-#); ;}
 Speed: {userPlus.Speed}{userPlus.Speed - old.Speed: (+#); (-#); ;}
 Stamina: {userPlus.Stamina}{userPlus.Stamina - old.Stamina: (+#); (-#); ;}
-Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}");
+Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
+                if (message is GroupMessage g && g.GroupId == 758120648)
+                {
+                    responseMessage += $"\r\n化学式没付钱指数：{Mp5.CostOf(userPlus):0.0}";
+                }
+                await api.SendMessageAsync(message.Endpoint, responseMessage);
 
                 if (old == null)
                 {
                     var addResult = await executingInfo.Database.AddPlusHistoryAsync(userPlus);
-                    if (!addResult.Success) executingInfo.Logger.LogException(addResult.Exception);
+                    if (!addResult.Success)
+                        executingInfo.Logger.LogException(addResult.Exception);
                 }
             }
             catch (ExceptionPlus)
@@ -90,7 +94,8 @@ Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}")
 
         public bool ShouldResponse(Sisters.WudiLib.Posts.Message message)
         {
-            if (!message.Content.IsPlaintext) return false;
+            if (!message.Content.IsPlaintext)
+                return false;
             string text = message.Content.Text.Trim();
             if (text.StartsWith("+", StringComparison.Ordinal))
             {
