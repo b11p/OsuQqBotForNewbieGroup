@@ -56,6 +56,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             1208604740,
             1061566571, // dalou
             178039743, // whir
+            820773512, // 亚森
         };
 
         private const long NewbieGroupId = 614892339;

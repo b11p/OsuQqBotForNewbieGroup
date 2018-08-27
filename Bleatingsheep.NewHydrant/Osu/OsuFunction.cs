@@ -35,5 +35,13 @@ namespace Bleatingsheep.NewHydrant.Osu
             ExecutingException.Ensure(result != null, "没绑定！");
             return result.Value;
         }
+
+        protected async Task<UserInfo> EnsureGetUserInfo(string name, Mode mode)
+        {
+            var (success, result) = await Api.GetUserInfoAsync(name, mode);
+            ExecutingException.Ensure(success, "网络错误。");
+            ExecutingException.Ensure(result != null, "无此用户！");
+            return result;
+        }
     }
 }

@@ -52,6 +52,7 @@ namespace Bleatingsheep.NewHydrant.Core
             _logger = new FileLogger(logFile);
             _executingInfo.Logger = _logger;
             dataProvider.OnException += _logger.LogException;
+            listener.OnException += _logger.LogException;
 
             // 配置定期任务
             _plan = new Task(() =>
