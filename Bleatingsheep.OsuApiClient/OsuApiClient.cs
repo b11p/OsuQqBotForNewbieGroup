@@ -160,7 +160,8 @@ namespace Bleatingsheep.OsuMixedApi
                 ("m", ((int)m).ToString()),
                 ("event_days", event_days.ToString()),
                 ("type", type));
-            Array.ForEach(result, user => user.Mode = m);
+            if (result != null)
+                Array.ForEach(result, user => user.Mode = m);
             return result;
         }
         #endregion
