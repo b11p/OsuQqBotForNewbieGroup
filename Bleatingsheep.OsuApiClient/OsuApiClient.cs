@@ -117,6 +117,8 @@ namespace Bleatingsheep.OsuMixedApi
         public string PreviewAudioOf(int setId) => $"https://b.ppy.sh/preview/{setId}.mp3";
 
         public string PageOfSet(int setId) => $"https://osu.ppy.sh/beatmapsets/{setId}";
+
+        public string PageOfSetOld(int setId) => $"https://osu.ppy.sh/s/{setId}";
         #endregion
 
         #region Utils
