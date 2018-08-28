@@ -51,7 +51,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 #{stat.Rank?.Global}
 {stat.Accuracy:0.00%} 准确率
 {stat.PlayCount} 游玩次数
-{stat.PlayTime.Days * 24 + stat.PlayTime.Hours} 小时 {stat.PlayTime.Minutes} 分钟 {stat.PlayTime.Seconds} 秒游戏时间
+{PlayTimeQuery.GetDisplayTime(stat.PlayTime)}游戏时间
 {stat.TotalHits:#,###} 总命中次数"
                 : $@"{userInfo.Username} 的个人信息。
 我没钱氪酷Q Pro了，原来的代码跑不了，只能查这些（暗示）
@@ -59,7 +59,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 #{stat.Rank?.Global}
 {stat.Accuracy:0.00%} 准确率
 {stat.PlayCount} 游玩次数
-{stat.PlayTime.Days * 24 + stat.PlayTime.Hours} 小时 {stat.PlayTime.Minutes} 分钟 {stat.PlayTime.Seconds} 秒游戏时间
+{PlayTimeQuery.GetDisplayTime(stat.PlayTime)}游戏时间
 {stat.TotalHits:#,###} 总命中次数";
 
             await api.SendMessageAsync(message.Endpoint, response);

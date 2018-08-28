@@ -24,7 +24,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             await api.SendMessageAsync(message.Endpoint, replyContent);
         }
 
-        private static string GetDisplayTime(TimeSpan playTime)
+        public static string GetDisplayTime(TimeSpan playTime)
         {
             var result = string.Empty;
 
