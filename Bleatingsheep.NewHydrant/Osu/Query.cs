@@ -16,10 +16,10 @@ namespace Bleatingsheep.NewHydrant.Osu
     internal class Query : OsuFunction, IMessageCommand
     {
         private static Regex Parser { get; } = new Regex(
-            pattern: @"^\s*[~～∼]\s*[,，]?\s*(\S*)\s*$",
+            pattern: @"^\s*新[~～∼]\s*[,，]?\s*(\S*)\s*$",
             options: RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static Regex WhereParser { get; } = new Regex(
-            pattern: $@"^\s*WHERE\s+({OsuHelper.UsernamePattern})\s*[,，]?\s*(\S*)\s*$",
+            pattern: $@"^\s*新WHERE\s+({OsuHelper.UsernamePattern})\s*[,，]?\s*(\S*)\s*$",
             options: RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private string _username;

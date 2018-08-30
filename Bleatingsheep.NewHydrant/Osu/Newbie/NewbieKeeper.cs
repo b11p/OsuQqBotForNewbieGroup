@@ -35,12 +35,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             lock (_thisLock)
             {
                 var hasChecked = _lastCheckTime.TryGetValue((g.GroupId, g.UserId), out var lastCheck);
-                if (hasChecked && DateTime.Now - lastCheck < CheckInterval) return;
+                if (hasChecked && DateTime.Now - lastCheck < CheckInterval)
+                    return;
                 _lastCheckTime[(g.GroupId, g.UserId)] = DateTime.Now;
             }
 
             // 检查是否在忽略列表里。
-            if (await IgnoreListProvider.ShouldIgnoreAsync(g.UserId)) return;
+            if (await IgnoreListProvider.ShouldIgnoreAsync(g.UserId))
+                return;
 
             // 获取绑定的 osu! 游戏账号。
             var (success, osuId) = await executingInfo.Data.GetBindingIdAsync(g.UserId);
@@ -136,7 +138,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             else
             {
                 (await executingInfo.Database.AddNewBindAsync(g.UserId, validUsers[0].Id, validUsers[0].Name, "Auto", null, null) as IExecutingResult<object>).EnsureSuccess();
-                response = $"已成功绑定 osu! 游戏账号 {validUsers[0].Name}。";
+                response = $"欢迎来到新人群，已自动绑定 osu! 游戏账号 {validUsers[0].Name}。";
             }
 
             return response;
