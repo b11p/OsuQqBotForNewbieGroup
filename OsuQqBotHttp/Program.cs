@@ -32,7 +32,8 @@ namespace OsuQqBotHttp
     {
         public PostProcessor(int port, int wudiPort)
         {
-            if (port <= 0 || port >= 65536) throw new ArgumentException(nameof(port));
+            if (port <= 0 || port >= 65536)
+                throw new ArgumentException(nameof(port));
             Port = port;
 
             apiClient = new Sisters.WudiLib.HttpApiClient();
@@ -43,7 +44,7 @@ namespace OsuQqBotHttp
             _listener.OnException += Logger.LogException;
             _listener.ApiClient = apiClient;
             _listener.PostAddress = $"http://+:{wudiPort}/";
-            _listener.ForwardTo = $"http://127.0.0.1:{port}/";
+            _listener.ForwardTo = $"http://[::1]:{port}/";
             _listener.StartListen();
 
             osuBot = new OsuQqBot.OsuQqBot(_qq, apiClient, _listener);
@@ -175,35 +176,42 @@ namespace OsuQqBotHttp
             {
                 using (var listener = new HttpListener())
                 {
-                    listener.Prefixes.Add($"http://127.0.0.1:{Port}/");
+                    listener.Prefixes.Add($"http://[::1]:{Port}/");
                     listener.Start();
                     while (true)
                     {
-                        var context = listener.GetContext();
-                        //if (!IPAddress.IsLoopback(context.Request.RemoteEndPoint.Address)) continue;
-                        var sw = Stopwatch.StartNew();
-                        using (var inputStream = context.Request.InputStream)
-                        using (var sr = new StreamReader(inputStream))
+                        try
                         {
-                            string message;
-                            try
+                            var context = listener.GetContext();
+                            //if (!IPAddress.IsLoopback(context.Request.RemoteEndPoint.Address)) continue;
+                            var sw = Stopwatch.StartNew();
+                            using (var inputStream = context.Request.InputStream)
+                            using (var sr = new StreamReader(inputStream))
                             {
-                                message = sr.ReadToEnd();
+                                string message;
+                                try
+                                {
+                                    message = sr.ReadToEnd();
+                                }
+                                catch (HttpListenerException e)
+                                {
+                                    Logger.LogException(e);
+                                    continue;
+                                }
+                                Console.WriteLine(message);
+                                ProcessPost(message);
+                                using (context.Response)
+                                { }
                             }
-                            catch (HttpListenerException e)
-                            {
-                                Logger.LogException(e);
-                                continue;
-                            }
-                            Console.WriteLine(message);
-                            ProcessPost(message);
-                            using (context.Response) { }
+                            Console.WriteLine(sw.Elapsed);
                         }
-                        Console.WriteLine(sw.Elapsed);
+                        catch (Exception e)
+                        {
+                            Logger.LogException(e);
+                        }
                     }
                 }
             }
-            catch (HttpListenerException e) { Logger.LogException(e); }
             catch (Exception e)
             {
                 Logger.LogException(e);
