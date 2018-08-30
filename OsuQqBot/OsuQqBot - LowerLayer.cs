@@ -48,20 +48,6 @@ namespace OsuQqBot
                     });
                 }
             }
-            else if (message.Trim().StartsWith("绑定"))
-            {
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        await BindAsync(endPoint, source.FromQq, message.Trim().Substring(2).Trim());
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogException(e);
-                    }
-                });
-            }
             else if (message.Trim().ToLowerInvariant().StartsWith("where"))
             {
                 Task.Run(async () =>
@@ -136,8 +122,6 @@ Stars {beatmap.Stars.ToString(".##")}";
             {
                 try
                 {
-                    if (await UpdateUserBandingAsync(endPoint.GroupId, source.FromQq, message))
-                        return;
                     if (await WhirIsBestAsync(endPoint.GroupId, source.FromQq, message))
                         return;
                 }

@@ -19,7 +19,6 @@ namespace OsuQqBot
         public static OpenApi Instance => s_instance;
 
         public IBindingsAsync Bindings { get; private set; }
-        public IUserGroupAsync Groups { get; private set; }
         public MotherShipApiClient MotherShipApiClient { get; private set; }
         public OsuApiClient OsuApiClient { get; private set; }
 
@@ -28,12 +27,11 @@ namespace OsuQqBot
         /// </summary>
         /// <exception cref="LoadedException"></exception>
         /// <param name="bindings"></param>
-        public static void Init(IBindingsAsync bindings, IUserGroupAsync groups, MotherShipApiClient motherShipApiClient, OsuApiClient osuApiClient)
+        public static void Init(IBindingsAsync bindings, MotherShipApiClient motherShipApiClient, OsuApiClient osuApiClient)
         {
             var instance = new OpenApi
             {
                 Bindings = bindings,
-                Groups = groups,
                 MotherShipApiClient = motherShipApiClient,
                 OsuApiClient = osuApiClient,
             };

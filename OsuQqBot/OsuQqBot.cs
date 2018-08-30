@@ -36,8 +36,6 @@ namespace OsuQqBot
         private readonly Task _plan;
         private static long daloubot;
         public static long Daloubot => daloubot;
-        private static IReadOnlyCollection<long> s_notifyGroups;
-        public static IReadOnlyCollection<long> NotifyGroups => s_notifyGroups;
 
         /// <summary>
         /// 
@@ -56,11 +54,6 @@ namespace OsuQqBot
             id_Kamisama = config.Kamisama;
             IdWhoLovesInt100Best = id_Kamisama;
             GroupId = config.MainGroup;
-            foreach (var item in config.ValidGroups)
-            {
-                ValidGroups.Add(item);
-            }
-            Interlocked.CompareExchange(ref s_notifyGroups, ValidGroups as IReadOnlyCollection<long>, null);
 
             osuApiKey = config.ApiKey;
             apiClient = new OsuApiClient(config.ApiKey);
@@ -70,7 +63,7 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
 
             // 初始化
-            OpenApi.Init(new Data.EFData(), new Data.LegacyGroup(), new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost), Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey));
+            OpenApi.Init(new Data.EFData(), new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost), Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey));
             _plan = new Task(() =>
             {
                 async void Run(ScheduleInfo info)
@@ -253,44 +246,7 @@ namespace OsuQqBot
             sender.SendGroupMessageAsync(e.GroupId, message);
             e.Handled = true;
         }
-
-        /// <summary>
-        /// 被At时升级用户数据
-        /// </summary>
-        /// <param name="context"></param>
-        internal async Task<bool> UpdateUserBandingAsync(long group, long qq, string message)
-        {
-            if (group == GroupId && !OpenApi.Instance.Groups.ShouldIgnoreCard(qq))
-                if (message.Contains($"[CQ:at,qq={CurrentQq}]"))
-                {
-                    var uid = await Query.Querying.Instance.GetUserBind(qq);
-                    if (!uid.HasValue)
-                    {
-                        this.qq.SendGroupMessageAsync(group, "网络错误，请再试一次");
-                        return false;
-                    }
-                    else if (uid.Value == 0)
-                    {
-                        this.qq.SendGroupMessageAsync(group, "爷爷并没有绑定，无法更新");
-                        return false;
-                    }
-                    var username = await FindUsername(uid.Value, true);
-                    if (username == null)
-                    {
-                        this.qq.SendGroupMessageAsync(group, "网络错误，请再试一次");
-                        return true;
-                    }
-                    if (string.IsNullOrEmpty(username)) this.qq.SendGroupMessageAsync(group, "咦？爷爷被办了？");
-                    else this.qq.SendGroupMessageAsync(group, $"用户名更新为{username}");
-
-                    //this.qq.SendPrivateMessageAsync(id_Kamisama, group.ToString() + " " + qq.ToString());
-                    return true;
-                }
-            return false;
-        }
-
-
-
+        
         // 暂不支持
         private void SendQueryMessage(EndPoint endPoint, string username)
         {
@@ -506,34 +462,7 @@ namespace OsuQqBot
         }
 
         Random random = new Random();
-
-        private async Task BindAsync(EndPoint sendBack, long qq, string username)
-        {
-            IList<string> uname = UsernameUtils.ParseUsername(username);
-            if (!(uname.Count == 1 && uname[0] == username)) return;
-
-            long? find = await Query.Querying.Instance.GetUserBind(qq);
-            UserRaw[] users = await apiClient.GetUserAsync(username, OsuApiClient.UsernameType.Username);
-
-            // 判断网络、判断已绑定。
-            if (!find.HasValue || users == null) this.qq.SendMessageAsync(sendBack, "网络错误");
-            else if (find.Value != 0)
-            {
-                this.qq.SendMessageAsync(sendBack, "在已绑定的情况下不允许修改，如需修改请联系 bleatingsheep。");
-            }
-            else if (users.Length == 0)
-            {
-                this.qq.SendMessageAsync(sendBack, "找不到用户，未更改绑定。");
-            }
-            else
-            {
-                User u = users[0];
-
-                await OpenApi.Instance.Bindings.BindAsync(qq, (int)u.Id, u.Name, "群员手动执行命令", qq, u.Name);
-                this.qq.SendMessageAsync(sendBack, $"绑定为{u.Name}", true);
-            }
-        }
-
+        
         /// <summary>
         /// 显示帮助
         /// </summary>
@@ -735,271 +664,7 @@ where 查询某个osu!玩家
             }
             throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// 上次检查群名片的时间
-        /// </summary>
-        private System.Collections.Concurrent.ConcurrentDictionary<long, DateTime> lastCheckTime = new System.Collections.Concurrent.ConcurrentDictionary<long, DateTime>();
-
-        /// <summary>
-        /// 自动绑定，并检测群名片是否包含ID，并且检测PP是否超限
-        /// </summary>
-        /// <param name="context"></param>
-        internal async Task TestInGroupNameAsync(long fromGroup, long fromQq, string message)
-        {
-            if (!checkSwitch) return;
-            if (fromGroup != GroupId) return;
-            if (DateTime.UtcNow -
-                lastCheckTime.GetValueOrDefault(fromQq, new DateTime(2018, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc))
-                <= new TimeSpan(8, 0, 0)) return;
-
-            try
-            {
-                if (OpenApi.Instance.Groups.ShouldIgnoreCard(fromQq)) return;
-
-                long? uid = await Query.Querying.Instance.GetUserBind(fromQq);
-                if (!uid.HasValue) return;
-
-                if (uid.Value == 0)
-                {// 未绑定，开始自动绑定
-                    (bool? success, string username, long _uid) = await AutoBind(fromGroup, fromQq);
-                    if (!success.HasValue) return;
-                    if (success.Value)
-                    {
-                        this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} " + Environment.NewLine +
-                            $"{username}，你好！" + Environment.NewLine +
-                            $"欢迎来到osu!新人群。请发送“~”查询信息。如果你不是{username}，请联系bleatingsheep。"
-                        );
-                        (bool queryOK, string query) = await ProcessQuery(_uid);
-                        if (queryOK) query += Environment.NewLine + Environment.NewLine + "此号数据卓越，同分段中的王者！——interBot";
-                        this.qq.SendGroupMessageAsync(fromGroup, query, true);
-                    }
-                    else
-                    {
-                        string inGroupName = this.qq.GetGroupMemberInfo(fromGroup, fromQq)?.InGroupName;
-                        if (inGroupName?.StartsWith("【无ID】") ?? false)
-                        {
-                            lastCheckTime[fromQq] = DateTime.UtcNow;
-                            this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} 你好，请尽快注册，并修改群名片。");
-                        }
-                        else
-                            this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} 你好，请将群名片改为osu!中的名字，以便互相认识。如果暂时没有 ID，请保证群名片以“【无ID】”开头。");
-                    }
-                }
-                else
-                {// 已绑定，开始检查
-                    lastCheckTime[fromQq] = DateTime.UtcNow;
-
-                    string inGroupName;
-                    inGroupName = GetInGroupName(fromGroup, fromQq);
-                    if (inGroupName == null) return;
-
-                    var (result, hisUsername) = await CheckInGroupName(inGroupName, uid.Value);
-
-                    string hint = string.Empty;
-                    switch (result)
-                    {
-                        case InGroupNameCheckResult.NeverBind:
-                            break;
-                        case InGroupNameCheckResult.Error:
-                            break;
-                        case InGroupNameCheckResult.NotContains:
-                            hint = $"为了方便其他人认出您，请修改群名片，必须包括osu!用户名。";
-                            break;
-                        case InGroupNameCheckResult.NotOwner:
-                            hint = $"为了方便其他人认出您，请修改群名片，必须包括正确的osu!用户名。";
-                            break;
-                        case InGroupNameCheckResult.IsSubstring:
-                            hint = "建议修改群名片，不要在用户名前后添加可以被用做用户名的字符，以免混淆。";
-                            hint += Environment.NewLine + "建议群名片：" + RecommendCard(inGroupName, hisUsername);
-                            break;
-                        case InGroupNameCheckResult.Qualified:
-                            break;
-                        default:
-                            break;
-                    }
-                    if (!string.IsNullOrEmpty(hint))
-                    {
-                        this.qq.SendGroupMessageAsync(fromGroup, At(fromQq) + Environment.NewLine +
-                            hisUsername + "，您好。" + this.qq.BeforeSend(hint));
-                    }
-
-                    if (!OpenApi.Instance.Groups.ShouldIgnorePerformance(fromQq))
-                    {
-                        await CheckIfPPOverLimit(fromGroup, fromQq, uid.Value);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogException(e);
-                Logger.Log("throw");
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 根据群名片和用户名推荐群名片
-        /// </summary>
-        /// <param name="card"></param>
-        /// <param name="username"></param>
-        /// <returns></returns>
-        private static string RecommendCard(string card, string username)
-        {
-            int firstIndex = card.IndexOf(username, StringComparison.InvariantCultureIgnoreCase);
-            if (firstIndex != -1)
-            {
-                string recommendCard = card.Substring(0, firstIndex);
-                if (firstIndex != 0)
-                    recommendCard += "|";
-                recommendCard += username;
-                if (firstIndex + username.Length < card.Length)
-                {
-                    recommendCard += "|" + card.Substring(firstIndex + username.Length);
-                }
-                return recommendCard;
-            }
-            else
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("无法给出推荐名片");
-                sb.AppendLine("群名：" + card);
-                sb.AppendLine("用户名：" + username);
-                Logger.Log(sb.ToString());
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 检查群名片是否包含osu的名字
-        /// </summary>
-        /// <param name="fromGroup">来自群组</param>
-        /// <param name="fromQq">来自QQ</param>
-        /// <param name="uid">osu! uid，如果未绑定，则为0</param>
-        /// <returns></returns>
-        private async Task<(InGroupNameCheckResult, string)> CheckInGroupName(string inGroupName, long uid)
-        {
-            var possibleUsernames = UsernameUtils.ParseUsername(inGroupName);
-            if (possibleUsernames.Count == 0)
-            {
-                return (InGroupNameCheckResult.NotContains, null);
-            }
-
-            if (uid != 0)
-            {
-                string foundUsername = await FindUsername(uid); //找到的用户名
-                if (foundUsername == null) return (InGroupNameCheckResult.Error, null); //查找失败
-                if (possibleUsernames.Any(psb =>
-                    psb.ToLowerInvariant() == foundUsername.ToLowerInvariant()
-                )) return (InGroupNameCheckResult.Qualified, foundUsername); //OK
-                return inGroupName.IndexOf(foundUsername, StringComparison.InvariantCultureIgnoreCase) != -1 ?
-                    (InGroupNameCheckResult.IsSubstring, foundUsername) :
-                    (InGroupNameCheckResult.NotOwner, foundUsername);
-            }
-            else
-            {
-                return (InGroupNameCheckResult.NeverBind, null);
-            }
-        }
-
-        /// <summary>
-        /// 通过群名片自动绑定
-        /// </summary>
-        /// <param name="qq"></param>
-        /// <param name="inGroupName"></param>
-        /// <returns>是否成功；如果因为群名片不好返回<c>false</c>；网络问题返回<c>null</c></returns>
-        private async Task<(bool? success, string username, long uid)> AutoBind(long group, long qq)
-        {
-            string inGroupName;
-            var memberInfo = this.qq.GetGroupMemberInfo(group, qq);
-            if (memberInfo == null)
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("找不到群员信息");
-                sb.AppendLine(group.ToString() + ", " + qq.ToString());
-                Logger.Log(sb.ToString());
-                return (null, null, 0);
-            }
-            inGroupName = memberInfo.InGroupName;
-
-            var possibleUsernames = UsernameUtils.ParseUsername(inGroupName);
-
-            (string username, long findUid) = await CheckUsername(possibleUsernames);
-            if (username == null) return (null, null, 0);
-            if (username == string.Empty)
-            {
-                return (false, username, 0);
-            }
-            else
-            {
-                database.CacheUsername(findUid, username);
-                await OpenApi.Instance.Bindings.BindAsync(qq, (int)findUid, username, "Auto", null, null);
-                //var success = await Int100ApiClient.BindQqAndOsuUid(qq, findUid);
-                Logger.Log("自动绑定" + qq + username);
-                return (true, username, findUid);
-            }
-        }
-
-        /// <summary>
-        /// 群名片检查结果
-        /// </summary>
-        private enum InGroupNameCheckResult
-        {
-            /// <summary>
-            /// 此人从未绑定过osu!ID
-            /// </summary>
-            NeverBind = 5,
-            /// <summary>
-            /// 检查过程中出现错误
-            /// </summary>
-            Error = 0,
-            /// <summary>
-            /// 不包含任何合法群名片
-            /// </summary>
-            NotContains = 1,
-            /// <summary>
-            /// 包含至少一个合法的群名片，但是没有他正在使用的
-            /// </summary>
-            NotOwner = 2,
-            /// <summary>
-            /// 包含群名片，但是前后有其他字符
-            /// </summary>
-            IsSubstring = 3,
-            /// <summary>
-            /// 合格，或者自动绑定后合格
-            /// </summary>
-            Qualified = 4
-        }
-
-        /// <summary>
-        /// （执行）检查PP
-        /// </summary>
-        /// <param name="fromGroup"></param>
-        /// <param name="fromQq"></param>
-        /// <param name="uid"></param>
-        /// <returns></returns>
-        private async Task CheckIfPPOverLimit(long fromGroup, long fromQq, long uid)
-        {
-            var users = await apiClient.GetUserAsync(uid.ToString(), OsuApiClient.UsernameType.User_id);
-            if (users == null || !users.Any()) return;
-            if (double.TryParse(users[0].pp_raw, out double pp))
-            {
-                const int ppLimit = 2500;
-                if (pp >= ppLimit)
-                    qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您的PP超限，即将离开本群");
-                //qq.SendGroupMessageAsync(fromGroup, $"[CQ:at,qq={fromQq}] 您的PP已经超过2600，如果超过3000，将离开本群");
-                else
-                {
-                    var bp = await apiClient.GetBestPerformanceAsync(uid, 1);
-                    double bpLimit = 185;
-                    if (bp?.Length > 0 && bp[0]?.PP >= bpLimit)
-                    {
-                        this.qq.SendGroupMessageAsync(fromGroup, $"{At(fromQq)} 您的BP超限，即将离开本群");
-                    }
-                }
-            }
-        }
-
+        
         private readonly OsuApiClient apiClient;
         public static string osuApiKey { get; private set; }
 
