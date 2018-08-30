@@ -9,16 +9,14 @@ namespace OsuQqBot
     {
         public void ProcessMessage(EndPoint endPoint, MessageSource source, string message)
         {
-            if (new StatelessFunctions.ManageTips().ProcessMessage(endPoint, source, message)) return;
-            if (new StatelessFunctions.CannotOverStar().ProcessMessage(endPoint, source, message)) return;
-            //if (new StatelessFunctions.IntIsMeimei().ProcessMessage(endPoint, source, message)) return;
-            //if (new StatelessFunctions.Rinima().ProcessMessage(endPoint, source, message)) return;
-            if (new StatelessFunctions.MaChuanA().ProcessMessage(endPoint, source, message)) return;
-            if (new StatelessFunctions.DalouRecommend().ProcessMessage(endPoint, source, message)) return;
-            if (new StatelessFunctions.Konachan().ProcessMessage(endPoint, source, message)) return;
-            //if (new StatelessFunctions.KjMeimeiTime().ProcessMessage(endPoint, source, message)) return;
-            if (new StatelessFunctions.ChartViewingAndCommiting().ProcessMessage(endPoint, source, message)) return;
-            if (new StatelessFunctions.DalouNoHarm().ProcessMessage(endPoint, source, message)) return;
+            if (new StatelessFunctions.ManageTips().ProcessMessage(endPoint, source, message))
+                return;
+            if (new StatelessFunctions.MaChuanA().ProcessMessage(endPoint, source, message))
+                return;
+            if (new StatelessFunctions.Konachan().ProcessMessage(endPoint, source, message))
+                return;
+            if (new StatelessFunctions.ChartViewingAndCommiting().ProcessMessage(endPoint, source, message))
+                return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～") || message.Trim().StartsWith("∼"))
             {
                 if (source.FromQq == 1677323371)
@@ -72,7 +70,8 @@ namespace OsuQqBot
                     {
                         string uNameToQuery = message.Trim().Substring("where".Length).Trim();
                         uNameToQuery = qq.AfterReceive(uNameToQuery);
-                        if (string.IsNullOrEmpty(uNameToQuery)) return;
+                        if (string.IsNullOrEmpty(uNameToQuery))
+                            return;
                         const string pattern = @"^qq\s*=\s*(\d+)$";
                         var match = Regex.Match(uNameToQuery, pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                         if (match.Success)
@@ -92,18 +91,23 @@ namespace OsuQqBot
             }
             else if (!string.IsNullOrWhiteSpace(message) && message.Split()[0] == "帮助")
             {
-                if (message.Split().Length > 1) ShowHelp(endPoint, message.Split()[1]);
-                else ShowHelp(endPoint);
+                if (message.Split().Length > 1)
+                    ShowHelp(endPoint, message.Split()[1]);
+                else
+                    ShowHelp(endPoint);
             }
             else if (message.Trim().StartsWith("bid"))
             {
                 var match = Regex.Match(message.Trim(), "^bid (\\d+)$");
-                if (!match.Success) return;
+                if (!match.Success)
+                    return;
                 string bidString = match.Groups[1].Value;
-                if (!int.TryParse(bidString, out int bid)) return;
+                if (!int.TryParse(bidString, out int bid))
+                    return;
                 var api = Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(osuApiKey);
                 var beatmaps = api.GetBeatmapsAsync(bid).Result;
-                if (beatmaps?.Length != 1) return;
+                if (beatmaps?.Length != 1)
+                    return;
                 var beatmap = beatmaps[0];
                 var result = $@"Beatmap {bid}
 {beatmap.Artist} - {beatmap.Title}[{beatmap.DifficultyName}]
@@ -125,16 +129,17 @@ Stars {beatmap.Stars.ToString(".##")}";
                 }
             }
         }
-        
+
         public void ProcessGroupMessage(GroupEndPoint endPoint, MessageSource source, string message)
         {
             Task.Run(async () =>
             {
                 try
                 {
-                    if (await UpdateUserBandingAsync(endPoint.GroupId, source.FromQq, message)) return;
-                    if (await WhirIsBestAsync(endPoint.GroupId, source.FromQq, message)) return;
-                    await TestInGroupNameAsync(endPoint.GroupId, source.FromQq, message);
+                    if (await UpdateUserBandingAsync(endPoint.GroupId, source.FromQq, message))
+                        return;
+                    if (await WhirIsBestAsync(endPoint.GroupId, source.FromQq, message))
+                        return;
                 }
                 catch (Exception e)
                 {
