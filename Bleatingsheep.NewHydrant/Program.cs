@@ -21,6 +21,7 @@ namespace Bleatingsheep.NewHydrant
 
             var configure = new HardcodedConfigure();
 
+            HttpApiClient.AccessToken = configure.AccessToken;
             var httpApiClient = new HttpApiClient();
             httpApiClient.ApiAddress = configure.ApiAddress;
             do
@@ -29,7 +30,8 @@ namespace Bleatingsheep.NewHydrant
                 {
                     Console.WriteLine("访问..");
                     var li = httpApiClient.GetLoginInfoAsync().Result;
-                    if (li?.UserId != default(long)) break;
+                    if ((li?.UserId ?? 0) != default(long))
+                        break;
                 }
                 catch (Exception e)
                 {
@@ -43,6 +45,7 @@ namespace Bleatingsheep.NewHydrant
             try
             {
                 var apiPostListener = new ApiPostListener(configure.Listen);
+                apiPostListener.SetSecret(configure.Secret);
                 apiPostListener.ApiClient = httpApiClient;
                 apiPostListener.StartListen();
 
