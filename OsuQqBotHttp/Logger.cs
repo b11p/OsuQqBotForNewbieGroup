@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace OsuQqBotHttp
@@ -15,9 +15,8 @@ namespace OsuQqBotHttp
         {
             get
             {
-                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                if (string.IsNullOrEmpty(desktop)) desktop = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                return desktop;
+                var executingFile = Assembly.GetExecutingAssembly().Location;
+                return Path.GetDirectoryName(Path.GetDirectoryName(executingFile));
             }
         }
 
@@ -42,7 +41,8 @@ namespace OsuQqBotHttp
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(DateTime.Now.ToString());
-            if (!inner && e is AggregateException) stringBuilder.AppendLine("------Start Aggregate------");
+            if (!inner && e is AggregateException)
+                stringBuilder.AppendLine("------Start Aggregate------");
             stringBuilder.AppendLine(e.GetType().ToString());
             stringBuilder.AppendLine(e.Message);
             stringBuilder.AppendLine(e.Source);
@@ -62,7 +62,8 @@ namespace OsuQqBotHttp
                     File.AppendAllText(FilePath, stringBuilder.ToString());
                 return null;
             }
-            else return stringBuilder.ToString();
+            else
+                return stringBuilder.ToString();
         }
     }
 }

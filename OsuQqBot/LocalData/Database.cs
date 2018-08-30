@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-using OsuQqBot.LocalData.DataTypes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using Newtonsoft.Json;
 using static Newtonsoft.Json.JsonConvert;
 
 namespace OsuQqBot.LocalData
@@ -18,7 +16,7 @@ namespace OsuQqBot.LocalData
          * 务必保证线程安全
          */
 
-        string basePath;
+        private readonly string basePath;
 
         private static Database single;
         public static Database Instance => single;
@@ -34,16 +32,6 @@ namespace OsuQqBot.LocalData
                 this.basePath = basePath;
                 Directory.CreateDirectory(BindPath);
                 Directory.CreateDirectory(NicknamePath);
-                string cachedData = "";
-                try
-                {
-                    cachedData = File.ReadAllText(CachedFilename);
-                }
-                catch (FileNotFoundException)
-                {
-                    cachedData = "";
-                }
-                CachedData = DeserializeObject<Dictionary<long, CachedData>>(cachedData) ?? new Dictionary<long, CachedData>();
                 string nickData = string.Empty;
                 try
                 {
@@ -59,7 +47,8 @@ namespace OsuQqBot.LocalData
                     new Dictionary<string, string>(StatelessFunctions.ManageTips.DefaultTips
                         .Select(tip => new KeyValuePair<string, string>(tip.ToLowerInvariant(), tip))));
 
-                if (single == null) single = this;
+                if (single == null)
+                    single = this;
             }
             catch (Exception e)
             {
@@ -72,12 +61,7 @@ namespace OsuQqBot.LocalData
         /// 存储 QQ 与 osu!ID 的绑定数据
         /// </summary>
         string BindPath => Path.Combine(basePath, "Binding Data");
-
-        /// <summary>
-        /// 存储缓存数据的文件名
-        /// </summary>
-        string CachedFilename => Path.Combine(BindPath, "Cached.json");
-
+        
         #region Paths
         /// <summary>
         /// 存储昵称的目录
@@ -91,7 +75,6 @@ namespace OsuQqBot.LocalData
         string TipsPath => Path.Combine(basePath, "tips.json");
         #endregion
 
-        IDictionary<long, CachedData> CachedData { get; set; }
         IDictionary<string, long> NicknameData { get; set; }
         DataHolder<ISet<long>> Administrators { get; set; }
         DictionaryHolder<string, string> Tips { get; set; }
@@ -101,50 +84,6 @@ namespace OsuQqBot.LocalData
         {
             get => _tipsCache ?? (_tipsCache = Tips.Read(t => t.Values.ToArray()));
             set => _tipsCache = value;
-        }
-
-        public string GetUsername(long uid)
-        {
-            lock (CachedData)
-            {
-                if (CachedData.TryGetValue(uid, out var cachedData))
-                {
-                    if (DateTime.UtcNow - cachedData.LastUpdate >
-                        new TimeSpan(3, 0, 0, 0)) return null;
-                    return cachedData.Username;
-                }
-                else return null;
-
-                //try
-                //{
-                //    return CachedData[uid].Username;
-                //    CachedData.TryGetValue
-                //}
-                //catch (KeyNotFoundException)
-                //{
-                //    return null;
-                //}
-            }
-        }
-
-        public string CacheUsername(long uid, string username)
-        {
-            string previous;
-            lock (CachedData)
-            {
-                try
-                {
-                    previous = CachedData[uid].Username;
-                    CachedData[uid] = new CachedData(username);
-                }
-                catch (KeyNotFoundException)
-                {
-                    previous = null;
-                    CachedData.Add(uid, new CachedData(username));
-                }
-            }
-            CommitCache();
-            return previous;
         }
 
         ///// <summary>
@@ -224,14 +163,6 @@ namespace OsuQqBot.LocalData
         #endregion
 
         #region commit (old)
-        private void CommitCache()
-        {
-            lock (CachedData)
-            {
-                File.WriteAllText(CachedFilename, SerializeObject(CachedData, Formatting.Indented));
-            }
-        }
-
         private void CommitNick()
         {
             lock (NicknameData)

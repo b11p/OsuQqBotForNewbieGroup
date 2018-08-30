@@ -221,8 +221,8 @@ namespace OsuQqBot
                 string username = null;
                 string welcome;
                 if (uid != 0)
-                    username = FindUsername(uid).Result;
-                welcome = username != null ? (username == "" ? "被ban的朋友，" : (username + "，")) : "";
+                    username = apiClient.GetUsernameAsync(uid).Result;
+                welcome = username != null ? (username.Length == 0 ? "被ban的朋友，" : (username + "，")) : "";
                 welcome += "你好，欢迎来到新人群";
                 sender.SendGroupMessageAsync(e.GroupId, welcome, true);
             }

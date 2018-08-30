@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
+using System.Reflection;
 
 namespace OsuQqBot
 {
@@ -14,9 +12,8 @@ namespace OsuQqBot
         {
             get
             {
-                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                if (string.IsNullOrEmpty(desktop)) desktop = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                return desktop;
+                var executingFile = Assembly.GetExecutingAssembly().Location;
+                return Path.GetDirectoryName(Path.GetDirectoryName(executingFile));
             }
         }
 
