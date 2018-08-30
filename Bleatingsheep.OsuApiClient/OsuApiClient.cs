@@ -68,31 +68,51 @@ namespace Bleatingsheep.OsuMixedApi
 
         public async Task<Beatmap[]> GetBeatmapAsync(string md5) => await SafeGetArrayAsync<Beatmap>(BeatmapUrl, ("k", apiKey), ("h", md5));
 
+        //[Obsolete]
         public async Task<BestPerformance[]> GetBestPerformancesAsync(int uid, Mode mode, int limit = 10)
+            => await GetBestPerformancesAsync(uid, (Osu.Mode)mode, limit);
+
+        public async Task<BestPerformance[]> GetBestPerformancesAsync(int uid, Osu.Mode mode, int limit = 10)
         {
             var result = await GetBestPerformancesAsync(uid.ToString(), "u", mode, limit);
             return result;
         }
 
+        //[Obsolete]
         public async Task<BestPerformance[]> GetBestPerformancesAsync(string username, Mode mode, int limit = 10)
+            => await GetBestPerformancesAsync(username, (Osu.Mode)mode, limit);
+
+        public async Task<BestPerformance[]> GetBestPerformancesAsync(string username, Osu.Mode mode, int limit = 10)
         {
             var result = await GetBestPerformancesAsync(username, "string", mode, limit);
             return result;
         }
 
+        //[Obsolete]
         public async Task<PlayRecord[]> GetRecentlyAsync(int uid, Mode mode, int limit = 10)
+            => await GetRecentlyAsync(uid, (Osu.Mode)mode, limit);
+
+        public async Task<PlayRecord[]> GetRecentlyAsync(int uid, Osu.Mode mode, int limit = 10)
         {
             var result = await GetRecentlyAsync(uid.ToString(), "u", mode, limit);
             return result;
         }
 
+        //[Obsolete]
         public async Task<PlayRecord[]> GetRecentlyAsync(string username, Mode mode, int limit = 10)
+            => await GetRecentlyAsync(username, (Osu.Mode)mode, limit);
+
+        public async Task<PlayRecord[]> GetRecentlyAsync(string username, Osu.Mode mode, int limit = 10)
         {
             var result = await GetRecentlyAsync(username, "string", mode, limit);
             return result;
         }
 
+        //[Obsolete]
         public async Task<(bool networkSuccess, UserInfo)> GetUserInfoAsync(int uid, Mode mode)
+            => await GetUserInfoAsync(uid, (Osu.Mode)mode);
+
+        public async Task<(bool networkSuccess, UserInfo)> GetUserInfoAsync(int uid, Osu.Mode mode)
         {
             var result = await GetUserInfoAsync(uid.ToString(), "u", mode);
             if (result == null)
@@ -101,7 +121,11 @@ namespace Bleatingsheep.OsuMixedApi
             return (true, filter.SingleOrDefault());
         }
 
+        //[Obsolete]
         public async Task<(bool networkSuccess, UserInfo)> GetUserInfoAsync(string username, Mode mode)
+            => await GetUserInfoAsync(username, (Osu.Mode)mode);
+
+        public async Task<(bool networkSuccess, UserInfo)> GetUserInfoAsync(string username, Osu.Mode mode)
         {
             var result = await GetUserInfoAsync(username, "string", mode);
             if (result == null)
@@ -130,7 +154,7 @@ namespace Bleatingsheep.OsuMixedApi
             return result;
         }
 
-        private async Task<PlayRecord[]> GetRecentlyAsync(string u, string type, Mode m, int limit)
+        private async Task<PlayRecord[]> GetRecentlyAsync(string u, string type, Osu.Mode m, int limit)
         {
             var result = await SafeGetArrayAsync<PlayRecord>(RecentlyPlayedUrl,
                 ("k", apiKey),
@@ -138,11 +162,12 @@ namespace Bleatingsheep.OsuMixedApi
                 ("m", ((int)m).ToString()),
                 ("limit", limit.ToString()),
                 ("type", type));
-            Array.ForEach(result, recent => recent.Mode = m);
+            if (result != null)
+                Array.ForEach(result, recent => recent.Mode = (Mode)m);
             return result;
         }
 
-        private async Task<BestPerformance[]> GetBestPerformancesAsync(string u, string type, Mode m, int limit)
+        private async Task<BestPerformance[]> GetBestPerformancesAsync(string u, string type, Osu.Mode m, int limit)
         {
             var result = await SafeGetArrayAsync<BestPerformance>(BestPerformanceUrl,
                ("k", apiKey),
@@ -150,11 +175,12 @@ namespace Bleatingsheep.OsuMixedApi
                ("m", ((int)m).ToString()),
                ("limit", limit.ToString()),
                ("type", type));
-            Array.ForEach(result, bp => bp.Mode = m);
+            if (result != null)
+                Array.ForEach(result, bp => bp.Mode = (Mode)m);
             return result;
         }
 
-        private async Task<UserInfo[]> GetUserInfoAsync(string u, string type, Mode m, int event_days = 1)
+        private async Task<UserInfo[]> GetUserInfoAsync(string u, string type, Osu.Mode m, int event_days = 1)
         {
             var result = await SafeGetArrayAsync<UserInfo>(UserUrl,
                 ("k", apiKey),
@@ -163,7 +189,7 @@ namespace Bleatingsheep.OsuMixedApi
                 ("event_days", event_days.ToString()),
                 ("type", type));
             if (result != null)
-                Array.ForEach(result, user => user.Mode = m);
+                Array.ForEach(result, user => user.Mode = (Mode)m);
             return result;
         }
         #endregion
