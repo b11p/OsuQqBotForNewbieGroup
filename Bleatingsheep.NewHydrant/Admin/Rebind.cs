@@ -86,7 +86,7 @@ namespace Bleatingsheep.NewHydrant.Admin
             _operator = message.UserId;
 
             var content = message.Content;
-            var contentList = content.GetSections();
+            var contentList = content.Sections;
             if (contentList.Count < 3) return false;
             if (contentList[0].TryGetText(out string p1)
                 && "绑定".Equals(p1?.Trim(), StringComparison.InvariantCultureIgnoreCase)

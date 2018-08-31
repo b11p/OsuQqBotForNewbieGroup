@@ -63,7 +63,11 @@ namespace OsuQqBot
             qq.GroupMemberIncrease += OnGroupMemberIncreased;
 
             // 初始化
-            OpenApi.Init(new Data.EFData(), new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost), Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey));
+            OpenApi.Init(
+                bindings: new EFData(),
+                motherShipApiClient: new MotherShipApiClient(MotherShipApiClient.DefaultHost),
+                osuApiClient: Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey)
+            );
             _plan = new Task(() =>
             {
                 async void Run(ScheduleInfo info)
@@ -91,7 +95,8 @@ namespace OsuQqBot
                             Run(info);
                         }
                         TimeSpan wait = info.WaitTime;
-                        if (wait < min) min = wait;
+                        if (wait < min)
+                            min = wait;
                     }
                     return min;
                 }
@@ -246,7 +251,7 @@ namespace OsuQqBot
             sender.SendGroupMessageAsync(e.GroupId, message);
             e.Handled = true;
         }
-        
+
         // 暂不支持
         private void SendQueryMessage(EndPoint endPoint, string username)
         {
@@ -281,14 +286,20 @@ namespace OsuQqBot
             string message;
             var mode = Mode.Unspecified;
             var paras = para.Split();
-            if (paras.Any(p => p == "0" || p.ToLowerInvariant() == "std")) mode = Mode.Std;
-            else if (paras.Any(p => p == "1" || p.ToLowerInvariant() == "taiko")) mode = Mode.Taiko;
-            else if (paras.Any(p => p == "2" || p.ToLowerInvariant() == "ctb" || p.ToLowerInvariant() == "catch")) mode = Mode.Ctb;
-            else if (paras.Any(p => p == "3" || p.ToLowerInvariant() == "mania")) mode = Mode.Mania;
+            if (paras.Any(p => p == "0" || p.ToLowerInvariant() == "std"))
+                mode = Mode.Std;
+            else if (paras.Any(p => p == "1" || p.ToLowerInvariant() == "taiko"))
+                mode = Mode.Taiko;
+            else if (paras.Any(p => p == "2" || p.ToLowerInvariant() == "ctb" || p.ToLowerInvariant() == "catch"))
+                mode = Mode.Ctb;
+            else if (paras.Any(p => p == "3" || p.ToLowerInvariant() == "mania"))
+                mode = Mode.Mania;
 
             var users = await apiClient.GetUserAsync(uid.ToString(), OsuApiClient.UsernameType.User_id, mode);
-            if (users == null) { success = false; message = "网络错误"; }
-            else if (!users.Any()) { success = false; message = "没这个人！"; }
+            if (users == null)
+            { success = false; message = "网络错误"; }
+            else if (!users.Any())
+            { success = false; message = "没这个人！"; }
             else
             {
                 try
@@ -319,8 +330,10 @@ namespace OsuQqBot
         {
             // 和重载 ProcessQuery(long uid, string para = "") 有重复代码，必须择日重构
             var users = await apiClient.GetUserAsync(username, OsuApiClient.UsernameType.Username);
-            if (users == null) return (false, "网络错误");
-            else if (users.Length == 0) return (false, "没这个人！");
+            if (users == null)
+                return (false, "网络错误");
+            else if (users.Length == 0)
+                return (false, "没这个人！");
             else
             {
                 try
@@ -387,22 +400,30 @@ namespace OsuQqBot
 
             if (history != null)
             {
-                if (history.PP < user.PP) byLine[2] += " (+" + (user.PP - history.PP).ToString(".##") + ")";
-                else if (history.PP > user.PP) byLine[2] += " (-" + (history.PP - user.PP).ToString(".##") + ")";
-                if (history.Rank > user.Rank) byLine[3] += " (↑" + (history.Rank - user.Rank) + ")";
-                else if (history.Rank < user.Rank) byLine[3] += " (↓" + (user.Rank - history.Rank) + ")";
+                if (history.PP < user.PP)
+                    byLine[2] += " (+" + (user.PP - history.PP).ToString(".##") + ")";
+                else if (history.PP > user.PP)
+                    byLine[2] += " (-" + (history.PP - user.PP).ToString(".##") + ")";
+                if (history.Rank > user.Rank)
+                    byLine[3] += " (↑" + (history.Rank - user.Rank) + ")";
+                else if (history.Rank < user.Rank)
+                    byLine[3] += " (↓" + (user.Rank - history.Rank) + ")";
                 //if(history.RankedScore)
                 // 98.96934509277344 98.969345
                 // 99.02718353271484 99.02718
                 if (Math.Abs(user.Accuracy - history.Accuracy) > 0.000_005)
                 {
                     string displayAccChange = (user.Accuracy > history.Accuracy ? "+" : "") + (user.Accuracy - history.Accuracy).ToString(".##");
-                    if (displayAccChange == "") displayAccChange = "-";
-                    if (char.IsDigit(displayAccChange.Last())) displayAccChange += "%";
+                    if (displayAccChange == "")
+                        displayAccChange = "-";
+                    if (char.IsDigit(displayAccChange.Last()))
+                        displayAccChange += "%";
                     byLine[6] += " (" + displayAccChange + ")";
                 }
-                if (history.PlayCount < user.PlayCount) byLine[7] += " (+" + (user.PlayCount - history.PlayCount) + ")";
-                if (history.Tth < user.Tth) byLine[8] += " (+" + (user.Tth - history.Tth).ToString("#,###") + ")";
+                if (history.PlayCount < user.PlayCount)
+                    byLine[7] += " (+" + (user.PlayCount - history.PlayCount) + ")";
+                if (history.Tth < user.Tth)
+                    byLine[8] += " (+" + (user.Tth - history.Tth).ToString("#,###") + ")";
             }
 
             return string.Join(Environment.NewLine, byLine);
@@ -456,13 +477,18 @@ namespace OsuQqBot
         //this.Tips[this.random.Next(this.Tips.Count)] :
         //string.Empty;
         {
-            if (group != 514661057 && group != 614892339) return string.Empty;
+            if (group != 514661057 && group != 614892339)
+                return string.Empty;
             var tips = database.ListTips();
-            return tips[this.random.Next(tips.Length)];
+            lock (_randomLock)
+            {
+                return tips[this.random.Next(tips.Length)];
+            }
         }
 
+        private readonly object _randomLock = new object();
         Random random = new Random();
-        
+
         /// <summary>
         /// 显示帮助
         /// </summary>
@@ -470,7 +496,8 @@ namespace OsuQqBot
         /// <param name="commonds">要显示哪个命令的帮助</param>
         private void ShowHelp(EndPoint endPoint, params string[] commonds)
         {
-            if (commonds.Length == 0) TellInstructions(endPoint);
+            if (commonds.Length == 0)
+                TellInstructions(endPoint);
             else //if (commonds[0] == "帮助")
             {
                 string help = "";
@@ -569,7 +596,8 @@ where 查询某个osu!玩家
                     if (aimUid.HasValue)
                         if (aimUid.Value != 0)
                             await SendQueryMessage(group, aimUid.Value, atMatch.Groups[2].Value);
-                        else this.qq.SendGroupMessageAsync(group, "此人未绑定 id");
+                        else
+                            this.qq.SendGroupMessageAsync(group, "此人未绑定 id");
                 });
                 return true;
             }
@@ -652,7 +680,8 @@ where 查询某个osu!玩家
             if (aimUid.HasValue)
                 if (aimUid.Value != 0)
                     return (await ProcessQuery(aimUid.Value, param)).info;
-                else return "此人未绑定id";
+                else
+                    return "此人未绑定id";
             return "网络错误";
         }
 
@@ -664,7 +693,7 @@ where 查询某个osu!玩家
             }
             throw new NotImplementedException();
         }
-        
+
         private readonly OsuApiClient apiClient;
         public static string osuApiKey { get; private set; }
 

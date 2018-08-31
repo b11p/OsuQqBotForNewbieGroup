@@ -44,7 +44,7 @@ namespace OsuQqBotHttp
             _listener.OnException += Logger.LogException;
             _listener.ApiClient = apiClient;
             _listener.PostAddress = $"http://+:{wudiPort}/";
-            _listener.ForwardTo = $"http://[::1]:{port}/";
+            _listener.ForwardTo = $"http://localhost:{port}/";
             _listener.StartListen();
 
             osuBot = new OsuQqBot.OsuQqBot(_qq, apiClient, _listener);
@@ -176,7 +176,7 @@ namespace OsuQqBotHttp
             {
                 using (var listener = new HttpListener())
                 {
-                    listener.Prefixes.Add($"http://[::1]:{Port}/");
+                    listener.Prefixes.Add($"http://localhost:{Port}/");
                     listener.Start();
                     while (true)
                     {

@@ -40,7 +40,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 Database = _database,
                 Qq = _qq,
                 OsuApi = OsuApiClient.ClientUsingKey(_configure.ApiKey),
-                MotherShipApi = new MotherShipApiClient(MotherShipApiClient.BleatingsheepCdnHost),
+                MotherShipApi = new MotherShipApiClient(MotherShipApiClient.DefaultHost),
             };
             var dataProvider = new DataProvider(_executingInfo);
             _executingInfo.Data = dataProvider;

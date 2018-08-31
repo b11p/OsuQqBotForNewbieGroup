@@ -47,6 +47,7 @@ namespace Bleatingsheep.NewHydrant
                 var apiPostListener = new ApiPostListener(configure.Listen);
                 apiPostListener.SetSecret(configure.Secret);
                 apiPostListener.ApiClient = httpApiClient;
+                apiPostListener.ForwardTo = "http://oldbot:8876";
                 apiPostListener.StartListen();
 
                 var hydrant = new Hydrant(new HardcodedConfigure(), httpApiClient, apiPostListener);

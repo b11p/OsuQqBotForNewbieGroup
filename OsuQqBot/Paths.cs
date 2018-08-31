@@ -26,7 +26,5 @@ namespace OsuQqBot
         /// json配置文件所在路径
         /// </summary>
         internal static string JsonConfigPath => Path.Combine(DataPath, "config.json");
-
-        internal static string IgnoreListPath => Path.Combine(DataPath, "ignore.txt");
     }
 }

@@ -7,7 +7,7 @@ namespace OsuQqBot
 {
     static class Logger
     {
-        static readonly string FilePath;// = @"C:\Users\yinmi\Desktop\新建文本文档.txt";
+        static readonly string FilePath;
 
         static readonly object thisLock = new object();
 
