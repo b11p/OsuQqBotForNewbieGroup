@@ -192,7 +192,7 @@ namespace Bleatingsheep.NewHydrant.Core
             // 添加必要的事件处理。
             _listener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
             _listener.GroupRequestEvent += (api, e) => e.UserId == SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
-            _listener.GroupInviteEvent += (api, e) => e.UserId == SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
+            _listener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
             _listener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
 
             // 跑定期任务

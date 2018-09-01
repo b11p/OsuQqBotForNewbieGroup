@@ -64,7 +64,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var groupMember = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);
 
             // 检查用户名。
-            await CheckGroupCard(api, groupMember, g, userInfo?.Name ?? (await executingInfo.MotherShipApi.GetUserInfoAsync(g.UserId)).Data.Name);
+            var mother = await executingInfo.MotherShipApi.GetUserInfoAsync(g.UserId);
+            if (mother?.Data != null)
+                await CheckGroupCard(api, groupMember, g, userInfo?.Name ?? mother.Data.Name);
 
             ExecutingException.Ensure(userInfo != null, string.Empty);
             // 检查 PP。

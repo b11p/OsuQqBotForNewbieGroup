@@ -49,7 +49,6 @@ namespace OsuQqBot
             // 旧版初始化代码
             qq = qqBot;
             QqApi = qq;
-            CurrentQq = qq.GetLoginQq();
             Config config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(Paths.JsonConfigPath));
             id_Kamisama = config.Kamisama;
             IdWhoLovesInt100Best = id_Kamisama;
@@ -696,7 +695,5 @@ where 查询某个osu!玩家
 
         private readonly OsuApiClient apiClient;
         public static string osuApiKey { get; private set; }
-
-        private readonly long CurrentQq;
     }
 }
