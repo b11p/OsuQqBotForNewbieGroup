@@ -48,7 +48,7 @@ namespace OsuQqBot.AttributedFunctions
             if (!content.IsPlaintext) return false;
             _match = regex.Match(content.Text);
             if (!_match.Success) return false;
-            if (GroupId != NewbieGroupId) return false;
+            //if (GroupId != NewbieGroupId) return false;
             return true;
         }
     }
