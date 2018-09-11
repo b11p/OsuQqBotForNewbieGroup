@@ -15,6 +15,8 @@ namespace OsuQqBot
                 return;
             if (new StatelessFunctions.Konachan().ProcessMessage(endPoint, source, message))
                 return;
+            if (new StatelessFunctions.Yandere().ProcessMessage(endPoint, source, message))
+                return;
             if (new StatelessFunctions.ChartViewingAndCommiting().ProcessMessage(endPoint, source, message))
                 return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～") || message.Trim().StartsWith("∼"))
