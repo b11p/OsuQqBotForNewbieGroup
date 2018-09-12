@@ -27,6 +27,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
             if (osuId == null)
                 await api.SendMessageAsync(message.Endpoint, "这个人没绑定。其余信息的查询正在施工。");
+            else
+                await api.SendMessageAsync(message.Endpoint, $"这个人绑定的 uid 是 {osuId}。\r\n（正在施工）");
         }
 
         public bool ShouldResponse(Sisters.WudiLib.Posts.Message message)

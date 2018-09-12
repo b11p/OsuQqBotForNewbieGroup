@@ -7,9 +7,8 @@ namespace OsuQqBot.AttributedFunctions
     [Function]
     class StatusReport : IRegularly
     {
-        private static readonly TimeSpan TS16 = new TimeSpan(16, 0, 1);
-        //public TimeSpan? OnUtc => TS16;
-        public TimeSpan? OnUtc => null;
+        private static readonly TimeSpan ZeroInChina = new TimeSpan(0, 16, 0, 0, 1);
+        public TimeSpan? OnUtc => ZeroInChina;
         private static readonly TimeSpan TS8 = new TimeSpan(8, 0, 0);
         public TimeSpan? Every => TS8;
 
