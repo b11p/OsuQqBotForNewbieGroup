@@ -32,6 +32,9 @@ namespace Bleatingsheep.NewHydrant.Osu
         {
             IEnumerable<BloodcatBeatmapSet> newSets = null;
             var result = await BloodcatApi.Client.SearchRankedByKeywordAsync();
+            if (result == null)
+                return;
+
             lock (_thisLock)
             {
                 //var logger = executingInfo.Logger;
