@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bleatingsheep.Osu.Enums" Version="0.2.0" />
-    <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.3.2" />
+    <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.4.1" />
     <PackageReference Include="Bleatingsheep.Osu.ApiV2" Version="0.2.0" />
   </ItemGroup>
 

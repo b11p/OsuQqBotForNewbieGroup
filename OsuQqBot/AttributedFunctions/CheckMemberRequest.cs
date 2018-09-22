@@ -27,7 +27,7 @@ namespace OsuQqBot.AttributedFunctions
         void IMessageCommandable.Process(Message message, Sisters.WudiLib.HttpApiClient api)
         {
             var names = UsernameUtils.ParseUsername(Message);
-            var valid = Query.Querying.Instance.CheckUsername(names, false);
+            var valid = Querying.Instance.CheckUsername(names, false);
             foreach (var user in valid)
             {
                 try
@@ -45,11 +45,10 @@ namespace OsuQqBot.AttributedFunctions
             if (groupMessage.GroupId != ManagingGroupId || groupMessage.Source.IsAnonymous || groupMessage.Source.UserId != ReporterId)
                 return false;
             var content = message.Content;
-            if (!content.IsPlaintext) return false;
+            if (!content.IsPlaintext)
+                return false;
             _match = regex.Match(content.Text);
-            if (!_match.Success) return false;
-            //if (GroupId != NewbieGroupId) return false;
-            return true;
+            return _match.Success;
         }
     }
 }
