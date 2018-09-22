@@ -41,7 +41,7 @@ namespace OsuQqBotHttp
             apiClient.StartClean(60);
 
             _listener = new Sisters.WudiLib.Posts.ApiPostListener();
-            _listener.OnException += Logger.LogException;
+            _listener.OnExceptionWithRawContent += (e, c) => { Logger.LogException(e); Logger.Log(c); };
             _listener.ApiClient = apiClient;
             _listener.PostAddress = $"http://+:{wudiPort}/";
             _listener.ForwardTo = $"http://localhost:{port}/";
