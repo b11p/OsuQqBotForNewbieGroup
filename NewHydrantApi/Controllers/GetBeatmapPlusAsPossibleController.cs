@@ -84,8 +84,8 @@ namespace NewHydrantApi.Controllers
                     if (s_requestQueue.Count > QueueLimit)
                         break;
                     s_requestQueue.Enqueue(id);
-                    CacheBeatmaps();
                 }
+                CacheBeatmaps();
                 return result;
             }
         }
