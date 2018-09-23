@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
+using Bleatingsheep.NewHydrant.Data;
+using Bleatingsheep.Osu.PerformancePlus;
 using Bleatingsheep.OsuMixedApi;
 using Sisters.WudiLib;
 
@@ -75,6 +77,19 @@ namespace Bleatingsheep.NewHydrant.Osu
                     if (newSets.Count() > limit)
                     {
                         await qq.SendGroupMessageAsync(group, $"共有 {newSets.Count()} 张新图，只显示前 {limit} 张。");
+                    }
+                }
+
+                // 读取并缓存 PP+ 数据。
+                var plus = new PerformancePlusSpider();
+                foreach (var id in newSets.SelectMany(s => s.Beatmaps.Select(b => b.Id)))
+                {
+                    try
+                    {
+                        await plus.GetCachedBeatmapPlusAsync(id);
+                    }
+                    catch (Exception)
+                    {
                     }
                 }
             }
