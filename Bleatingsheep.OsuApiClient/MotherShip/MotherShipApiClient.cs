@@ -11,7 +11,8 @@ namespace Bleatingsheep.OsuMixedApi.MotherShip
 
         public MotherShipApiClient(string host)
         {
-            if (!host?.EndsWith('/') ?? throw new ArgumentNullException(nameof(host))) host += '/';
+            if (!host?.EndsWith("/", StringComparison.Ordinal) ?? throw new ArgumentNullException(nameof(host)))
+                host += '/';
             _host = host;
         }
 
@@ -32,7 +33,8 @@ namespace Bleatingsheep.OsuMixedApi.MotherShip
             {
                 return await HttpMethods.GetJsonDeserializeAsync<MotherShipResponse<MotherShipUserInfo>>(UserInfoUrl(qqId));
             }, "Network error.");
-            if (!success) throw new OsuApiFailedException("Network error.");
+            if (!success)
+                throw new OsuApiFailedException("Network error.");
             return result;
         }
 
@@ -48,7 +50,8 @@ namespace Bleatingsheep.OsuMixedApi.MotherShip
             {
                 return await HttpMethods.GetJsonDeserializeAsync<MotherShipResponse<UserHistory>>(UserYesterdayInfoUrl(osuId));
             }, "Network error.");
-            if (!success) throw new OsuApiFailedException("Network error.");
+            if (!success)
+                throw new OsuApiFailedException("Network error.");
             return result;
         }
 

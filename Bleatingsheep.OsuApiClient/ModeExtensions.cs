@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Bleatingsheep.OsuMixedApi
@@ -23,14 +24,14 @@ namespace Bleatingsheep.OsuMixedApi
 
             IEnumerable<KeyValuePair<string, Mode>> maps = new Dictionary<string, Mode>();
 
-            var aliases = ModeInfo.ToUpperInvariant().Split("\r\n");
+            var aliases = ModeInfo.ToUpperInvariant().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
             for (int i = 0; i < aliases.Length; i++)
             {
                 ConcatLine(aliases[i], (Mode)i, ref maps);
             }
 
-            pairs = new Dictionary<string, Mode>(maps);
+            pairs = new ReadOnlyDictionary<string, Mode>(maps.ToDictionary(p => p.Key, p => p.Value));
         }
 
         /// <summary>

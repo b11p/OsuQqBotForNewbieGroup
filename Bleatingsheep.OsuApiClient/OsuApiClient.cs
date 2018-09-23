@@ -62,7 +62,7 @@ namespace Bleatingsheep.OsuMixedApi
 
         public async Task<Beatmap[]> GetBeatmapAsync(byte[] md5)
         {
-            string md5String = BitConverter.ToString(md5).Replace("-", string.Empty, StringComparison.Ordinal);
+            string md5String = BitConverter.ToString(md5).Replace("-", string.Empty);
             return await GetBeatmapAsync(md5String);
         }
 
@@ -130,7 +130,7 @@ namespace Bleatingsheep.OsuMixedApi
             var result = await GetUserInfoAsync(username, "string", mode);
             if (result == null)
                 return (false, null);
-            var filter = result.Where(u => string.Compare(u.Name, username, true) == 0);
+            var filter = result.Where(u => string.Equals(u.Name, username, StringComparison.OrdinalIgnoreCase));
             return (true, filter.SingleOrDefault());
         }
         #endregion

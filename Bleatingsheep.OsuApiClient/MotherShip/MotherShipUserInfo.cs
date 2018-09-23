@@ -11,7 +11,7 @@ namespace Bleatingsheep.OsuMixedApi.MotherShip
         public int OsuId { get; private set; }
         [JsonProperty("role")]
         private string role;
-        public string[] Roles => role.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        public string[] Roles => role.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         [JsonProperty("qq")]
         public long QqId { get; private set; }
         [JsonProperty("legacyUname")]
