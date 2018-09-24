@@ -79,15 +79,21 @@ namespace NewHydrantApi.Controllers
             {
                 var result = context.BeatmapPlusCache.Where(p => queryBeatmaps.Contains(p.Id)).ToList();
                 var notInCache = queryBeatmaps.Except(result.Select(b => b.Id));
-                foreach (var id in notInCache)
-                {
-                    if (s_requestQueue.Count > QueueLimit)
-                        break;
-                    s_requestQueue.Enqueue(id);
-                }
-                CacheBeatmaps();
+                AddToCacheAsync(notInCache);
                 return result;
             }
+        }
+
+        private static async void AddToCacheAsync(IEnumerable<int> notInCache)
+        {
+            await Task.Yield();
+            foreach (var id in notInCache)
+            {
+                if (s_requestQueue.Count > QueueLimit)
+                    break;
+                s_requestQueue.Enqueue(id);
+            }
+            CacheBeatmaps();
         }
     }
 }
