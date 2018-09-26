@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
-using OsuQqBot.QqBot;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
-using System.Linq;
+using Newtonsoft.Json;
+using OsuQqBot.QqBot;
 
 namespace OsuQqBotHttp
 {
     class QqBot : IQqBot
     {
-        static readonly string server = "http://cq:5700";
+        static readonly string server = new Bleatingsheep.NewHydrant.HardcodedConfigure().ApiAddress;
         static readonly string privatePath = "/send_private_msg_async";
         static readonly string groupPath = "/send_group_msg_async";
         static readonly string discussPath = "/send_discuss_msg_async";
@@ -177,6 +177,12 @@ namespace OsuQqBotHttp
         {
             using (HttpClient client = new HttpClient())
             {
+                var token = new Bleatingsheep.NewHydrant.HardcodedConfigure().AccessToken;
+                if (!string.IsNullOrEmpty(token))
+                {
+                    //content.Headers.Add("Authorization", "Token " + HttpApiClient.AccessToken);
+                    client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse("Token " + token);
+                }
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 string message;
                 try

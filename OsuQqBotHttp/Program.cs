@@ -37,7 +37,8 @@ namespace OsuQqBotHttp
             Port = port;
 
             apiClient = new Sisters.WudiLib.HttpApiClient();
-            apiClient.ApiAddress = "http://cq:5700";
+            apiClient.ApiAddress = new Bleatingsheep.NewHydrant.HardcodedConfigure().ApiAddress;
+            Sisters.WudiLib.HttpApiClient.AccessToken = new Bleatingsheep.NewHydrant.HardcodedConfigure().AccessToken;
             apiClient.StartClean(60);
 
             _listener = new Sisters.WudiLib.Posts.ApiPostListener();
