@@ -52,9 +52,9 @@ namespace Bleatingsheep.NewHydrant.Osu
                     //logger.LogInBackground($"发送 {newSets.Count()} 个");
                 }
                 _oldSets = result.Select(s => s.Id).ToHashSet();
-                if (_noBeatmapAfter < result.Max(s => s.ApprovedDateOffset))
+                if (_noBeatmapAfter < result.Max(s => s.ApprovedDateOffset.Value))
                 {
-                    _noBeatmapAfter = result.Max(s => s.ApprovedDateOffset);
+                    _noBeatmapAfter = result.Max(s => s.ApprovedDateOffset.Value);
                     //logger.LogInBackground($"日期更新为 {_noBeatmapAfter}");
                 }
             }
