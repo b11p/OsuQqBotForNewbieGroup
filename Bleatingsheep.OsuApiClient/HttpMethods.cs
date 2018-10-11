@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using Newtonsoft.Json;
 
 namespace Bleatingsheep.OsuMixedApi
@@ -36,7 +37,7 @@ namespace Bleatingsheep.OsuMixedApi
             char needed = '?';
             foreach (var (key, value) in ps)
             {
-                url += needed + key + "=" + value;
+                url += needed + key + "=" + HttpUtility.UrlEncode(value);
                 needed = '&';
             }
             using (var client = new HttpClient())

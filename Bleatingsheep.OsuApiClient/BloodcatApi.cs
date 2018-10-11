@@ -19,11 +19,23 @@ namespace Bleatingsheep.OsuMixedApi
         /// <returns></returns>
         public async Task<BloodcatBeatmapSet[]> SearchRankedByKeywordAsync(string keyword = "", params Mode[] modes)
         {
-            if (modes.Length == 0) modes = new Mode[] { Mode.Standard };
+            if (modes == null)
+            {
+                throw new ArgumentNullException(nameof(modes));
+            }
+
+            if (modes.Length == 0)
+                modes = new Mode[] { Mode.Standard };
             (string, string)[] para = BloodcatParam("o", keyword, modes);
             var response = await HttpMethods
                 .GetJsonArrayDeserializeAsync<BloodcatBeatmapSet>("https://bloodcat.com/osu/", para);
             return response;
+        }
+
+        public async Task<BloodcatBeatmap[]> SearchRankedByMd5Async(string md5)
+        {
+            var response = await HttpMethods.GetJsonArrayDeserializeAsync<BloodcatBeatmapSet>("https://bloodcat.com/osu/", ("q", $"md5={md5}"), ("mod", "json"));
+            return response?.SelectMany(s => s.Beatmaps).Where(b => string.Equals(b.FileMD5, md5, StringComparison.OrdinalIgnoreCase)).ToArray();
         }
 
         public async Task<BloodcatBeatmapSet> GetBeatmapAsync(int bid)
@@ -31,7 +43,8 @@ namespace Bleatingsheep.OsuMixedApi
             (string, string)[] para = BloodcatParam("b", bid.ToString(), (Mode[])Enum.GetValues(typeof(Mode)));
             var response = await HttpMethods.GetJsonArrayDeserializeAsync<BloodcatBeatmapSet>("https://bloodcat.com/osu/", para);
             var result = response?.SingleOrDefault();
-            if (result == null) return null;
+            if (result == null)
+                return null;
             result.Beatmaps = result.Beatmaps.Where(b => b.Id == bid).ToArray();
             return result;
         }
@@ -44,7 +57,7 @@ namespace Bleatingsheep.OsuMixedApi
                 ("q", keyword),
                 ("c", type),
                 ("s", string.Join(",", new[] { Approved.Ranked, Approved.Approved }.Select(a => (int)a))),
-                ("m", string.Join(",", modes.Select(m => (int)m))),
+                ("m", string.Join(",", modes?.Select(m => (int)m))),
             };
         }
     }
@@ -84,9 +97,9 @@ namespace Bleatingsheep.OsuMixedApi
         [JsonProperty("creator")]
         public string Creator { get; private set; }
         [JsonProperty("rankedAt")]
-        private DateTime rankedAt;
+        private DateTime? rankedAt;
         [JsonIgnore]
-        public DateTimeOffset ApprovedDateOffset => new DateTimeOffset(rankedAt, Kst);
+        public DateTimeOffset? ApprovedDateOffset => rankedAt.HasValue ? new DateTimeOffset(rankedAt.Value, Kst) : (DateTimeOffset?)null;
         [JsonProperty("tags")]
         public string Tags { get; private set; }
         [JsonProperty("source")]
@@ -102,7 +115,8 @@ namespace Bleatingsheep.OsuMixedApi
 
         public override string ToString()
         {
-            if (!string.IsNullOrEmpty(Source)) return $"{Source} ({Artist}) - {Title}";
+            if (!string.IsNullOrEmpty(Source))
+                return $"{Source} ({Artist}) - {Title}";
             return $"{Artist} - {Title}";
         }
 #pragma warning restore CS0649
