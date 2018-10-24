@@ -1,18 +1,16 @@
-﻿using Bleatingsheep.OsuMixedApi.MotherShip;
-using Newtonsoft.Json;
-using OsuQqBot.Api;
-using OsuQqBot.AttributedFunctions;
-using OsuQqBot.Data;
-using OsuQqBot.QqBot;
-using Sisters.WudiLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Bleatingsheep.OsuMixedApi.MotherShip;
+using Newtonsoft.Json;
+using OsuQqBot.Api;
+using OsuQqBot.AttributedFunctions;
+using OsuQqBot.QqBot;
+using Sisters.WudiLib;
 using wudipost = Sisters.WudiLib.Posts;
 
 namespace OsuQqBot
@@ -63,7 +61,6 @@ namespace OsuQqBot
 
             // 初始化
             OpenApi.Init(
-                bindings: new EFData(),
                 motherShipApiClient: new MotherShipApiClient(MotherShipApiClient.DefaultHost),
                 osuApiClient: Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey)
             );

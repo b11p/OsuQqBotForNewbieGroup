@@ -17,8 +17,6 @@ namespace OsuQqBot
                 return;
             if (new StatelessFunctions.Yandere().ProcessMessage(endPoint, source, message))
                 return;
-            if (new StatelessFunctions.ChartViewingAndCommiting().ProcessMessage(endPoint, source, message))
-                return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～") || message.Trim().StartsWith("∼"))
             {
                 if (source.FromQq == 1677323371)
@@ -26,7 +24,7 @@ namespace OsuQqBot
                     qq.SendMessageAsync(endPoint, "不查，浪费资源");
                     return;
                 }
-                var uid = Query.Querying.Instance.GetUserBind(source.FromQq).Result;
+                var uid = Query.Querying.Instance.GetUserBind(source.FromQq).GetAwaiter().GetResult();
                 if (uid == null)
                 {
                     qq.SendMessageAsync(endPoint, "网络异常");

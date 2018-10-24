@@ -1,18 +1,16 @@
-﻿using Bleatingsheep.OsuMixedApi;
-using Bleatingsheep.OsuMixedApi.MotherShip;
-using Bleatingsheep.OsuQqBot.Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Bleatingsheep.OsuMixedApi;
+using Newtonsoft.Json;
 
 namespace OsuQqBot.Query
 {
     /// <summary>
     /// 利用各种方法拿到想要的数据，并且负责一定的同步的方法。
     /// </summary>
-    sealed class Querying
+    public sealed class Querying
     {
         static Querying()
         {
@@ -47,49 +45,29 @@ namespace OsuQqBot.Query
             if (!result.IsCompleted) return null;
             return userInfos;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bid"></param>
-        /// <param name="mode"></param>
-        /// <param name="apiKey"></param>
-        /// <exception cref="ArgumentException">API Key 不正确。</exception>
-        /// <returns></returns>
-        public async Task<Beatmap> GetBeatmapAsync(int bid, Mode mode, string apiKey)
-        {
-            if (string.IsNullOrWhiteSpace(apiKey))
-            {
-                throw new ArgumentException("API Key 不正确。", nameof(apiKey));
-            }
-
-            var map = await NewbieDatabase.GetBeatmapAsync(bid, mode);
-            if (map != null) return map;
-            map = (await _api.GetBeatmapsAsync(bid))?.SingleOrDefault();
-            if (map == null) return null;
-            if (!map.IsInfoFixed()) return map;
-            return await NewbieDatabase.CacheBeatmapAsync(map) ?? map;
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="qqId"></param>
         /// <exception cref="OsuApiFailedException"></exception>
-        /// <exception cref="NewbieDbException"></exception>
         /// <returns></returns>
         public async Task<int?> GetUserBind(long qqId)
         {
-            var result = await OpenApi.Instance.Bindings.GetBindingIdAsync(qqId);
-            if (result is int u) return u;
-            var response = await OpenApi.Instance.MotherShipApiClient.GetUserInfoAsync(qqId);
-            if (response.Data is MotherShipUserInfo info)
+            try
             {
-                u = info.OsuId;
-                await OpenApi.Instance.Bindings.BindAsync(qqId, info.OsuId, info.Name, "Mother Ship (while running)", null, null);
-                return u;
+                using (var httpClient = new HttpClient())
+                {
+                    var httpResponse = await httpClient.GetAsync($"https://api.bleatingsheep.org/api/binding/{qqId}");
+                    return httpResponse.StatusCode == System.Net.HttpStatusCode.NotFound
+                        ? null
+                        : (int?)JsonConvert.DeserializeObject<dynamic>(await httpResponse.Content.ReadAsStringAsync()).osuId;
+                }
             }
-            return null;
+            catch (Exception)
+            {
+                throw new OsuApiFailedException();
+            }
         }
     }
 }
