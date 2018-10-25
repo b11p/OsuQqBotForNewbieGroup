@@ -31,27 +31,27 @@ namespace OsuQqBot.Query
 
             var result = Parallel.ForEach(possibleUsernames, (name, state) =>
             {
-                if (state.IsStopped) return;
+                if (state.IsStopped)
+                    return;
                 var (networkSuccess, userInfo) = api.GetUserInfoAsync(name, Mode.Standard).Result;
                 if (requireAllSucceeded && !networkSuccess)
                 {
                     state.Stop();
                     return;
                 }
-                if (userInfo == null) return;
+                if (userInfo == null)
+                    return;
                 userInfos.Add(userInfo);
             });
 
-            if (!result.IsCompleted) return null;
-            return userInfos;
+            return result.IsCompleted ? userInfos : null;
         }
-        
+
         /// <summary>
-        /// 
+        /// 通过 API (https://api.bleatingsheep.org/api/binding/{qqId}) 查找 QQ 号绑定的 osu! 账号。
         /// </summary>
-        /// <param name="qqId"></param>
-        /// <exception cref="OsuApiFailedException"></exception>
-        /// <returns></returns>
+        /// <exception cref="OsuApiFailedException">访问 API 时出现异常。</exception>
+        /// <returns>绑定 osu! 账号的 User ID；如果未绑定，则为 <c>null</c>。</returns>
         public async Task<int?> GetUserBind(long qqId)
         {
             try

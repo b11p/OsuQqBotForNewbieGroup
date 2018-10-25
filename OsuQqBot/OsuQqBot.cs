@@ -590,10 +590,9 @@ where 查询某个osu!玩家
                 {
                     long? aimUid = await Query.Querying.Instance.GetUserBind(long.Parse(atMatch.Groups[1].Value));
                     if (aimUid.HasValue)
-                        if (aimUid.Value != 0)
-                            await SendQueryMessage(group, aimUid.Value, atMatch.Groups[2].Value);
-                        else
-                            this.qq.SendGroupMessageAsync(group, "此人未绑定 id");
+                        await SendQueryMessage(group, aimUid.Value, atMatch.Groups[2].Value);
+                    else
+                        this.qq.SendGroupMessageAsync(group, "此人未绑定 id");
                 });
                 return true;
             }
@@ -673,12 +672,7 @@ where 查询某个osu!玩家
         private async Task<string> QueryFromQq(long qq, string param = "")
         {
             long? aimUid = await Query.Querying.Instance.GetUserBind(qq);
-            if (aimUid.HasValue)
-                if (aimUid.Value != 0)
-                    return (await ProcessQuery(aimUid.Value, param)).info;
-                else
-                    return "此人未绑定id";
-            return "网络错误";
+            return aimUid.HasValue ? (await ProcessQuery(aimUid.Value, param)).info : "此人未绑定id";
         }
 
         private async Task<bool> Where(EndPoint endPoint, string where)

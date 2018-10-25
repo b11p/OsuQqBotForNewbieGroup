@@ -27,10 +27,6 @@ namespace OsuQqBot
                 var uid = Query.Querying.Instance.GetUserBind(source.FromQq).GetAwaiter().GetResult();
                 if (uid == null)
                 {
-                    qq.SendMessageAsync(endPoint, "网络异常");
-                }
-                else if (uid.Value == 0)
-                {
                     qq.SendMessageAsync(endPoint, "未绑定，请使用绑定<你的账号>命令绑定");
                 }
                 else
