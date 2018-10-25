@@ -24,6 +24,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             1131545658, // 消防栓 beta
             2680306741, // interbot2
             2639140005, // 小taolex
+            2636027237,
         };
 
         private static readonly HashSet<long> IgnorePerformanceListBase = new HashSet<long>

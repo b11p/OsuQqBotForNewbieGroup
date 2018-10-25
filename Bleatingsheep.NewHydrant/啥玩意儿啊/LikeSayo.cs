@@ -16,7 +16,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             {
                 if (message.Content.IsPlaintext)
                 {
-                    if (message.Content.Text == "人类的本质是？" || message.Content.Text.Contains("你群已经复读了", StringComparison.Ordinal))
+                    if (message.Content.Text == "人类的本质是？" || message.Content.Text.Contains("复读", StringComparison.Ordinal))
                     {
                         await RecallAndBan(api, g);
                     }
