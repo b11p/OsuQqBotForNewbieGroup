@@ -13,6 +13,7 @@ using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuMixedApi.MotherShip;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
@@ -178,13 +179,17 @@ namespace Bleatingsheep.NewHydrant.Core
                     );
                     _logger.LogException(e);
                 }
-                catch (Exception e) when (!(e is ApiAccessException))
+                catch (MySqlException)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "无法访问 MySQL 数据库。");
+                }
+                catch (ApiAccessException)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "查询 API 失败。");
+                }
+                catch (Exception e)
                 {
                     await api.SendMessageAsync(message.Endpoint, "有一些不好的事发生了。");
-                    _logger.LogException(e);
-                }
-                catch (ApiAccessException e)
-                {
                     _logger.LogException(e);
                 }
             };
