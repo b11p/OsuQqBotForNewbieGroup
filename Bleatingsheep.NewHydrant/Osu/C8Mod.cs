@@ -18,11 +18,11 @@ namespace Bleatingsheep.NewHydrant.Osu
         /// <returns></returns>
         public static double CostOf(IUserPlus plus)
         {
-            return 10 * Sqrt((Atan((2 * plus.AimJump - (1700 + 1300)) / (1700 - 1300)) + PI / 2 + 8) * (Atan((2 * plus.AimFlow - (450 + 200)) / (450 - 200)) + PI / 2 + 3))
-+ (Atan((2 * plus.Precision - (400 + 200)) / (400 - 200)) + PI / 2)
-+ 7 * (Atan((2 * plus.Speed - (1250 + 950)) / (1250 - 950)) + PI / 2)
-+ 3 * (Atan((2 * plus.Stamina - (1000 + 600)) / (1000 - 600)) + PI / 2)
-+ 10 * (Atan((2 * plus.Accuracy - (1200 + 600)) / (1200 - 600)) + PI / 2);
+            return 10 * Sqrt((Atan((2 * plus.AimJump - (1700 + 1300)) / (double)(1700 - 1300)) + PI / 2 + 8) * (Atan((2 * plus.AimFlow - (450 + 200)) / (double)(450 - 200)) + PI / 2 + 3))
++ (Atan((2 * plus.Precision - (400 + 200)) / (double)(400 - 200)) + PI / 2)
++ 7 * (Atan((2 * plus.Speed - (1250 + 950)) / (double)(1250 - 950)) + PI / 2)
++ 3 * (Atan((2 * plus.Stamina - (1000 + 600)) / (double)(1000 - 600)) + PI / 2)
++ 10 * (Atan((2 * plus.Accuracy - (1200 + 600)) / (double)(1200 - 600)) + PI / 2);
         }
         
         /// <summary>
