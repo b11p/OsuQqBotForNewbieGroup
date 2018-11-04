@@ -74,7 +74,8 @@ Stamina: {userPlus.Stamina}{userPlus.Stamina - old.Stamina: (+#); (-#); ;}
 Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
                 if (message is GroupMessage g && g.GroupId == 758120648)
                 {
-                    responseMessage += $"\r\n化学式没付钱指数：{Mp5.CostOf(userPlus):0.0}";
+                    //responseMessage += $"\r\n化学式没付钱指数：{C8Mod.CostOf(userPlus):0.0}";
+                    responseMessage = C8Mod.ModPerformancePlus(responseMessage, old, userPlus);
                 }
                 await api.SendMessageAsync(message.Endpoint, responseMessage);
 
