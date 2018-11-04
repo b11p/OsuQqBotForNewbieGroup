@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Sisters.WudiLib;
-using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
@@ -26,8 +24,12 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
             "all_male",
             "see_through",
             "ass",
-            "barefoot",
             "underboob",
+            "swimsuit",
+            "barefoot",
+            "pantyhose",
+            "garter_belt",
+            "bodysuit",
         };
 
         public async Task ProcessAsync(Message message, HttpApiClient api, ExecutingInfo executingInfo)
@@ -44,7 +46,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
             }
         }
 
-        public bool ShouldResponse(Sisters.WudiLib.Posts.Message message)
+        public bool ShouldResponse(Message message)
         {
             return message.Content.Text.StartsWith("健康konachan", StringComparison.InvariantCultureIgnoreCase);
         }
