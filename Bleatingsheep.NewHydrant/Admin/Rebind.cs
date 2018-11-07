@@ -82,7 +82,7 @@ namespace Bleatingsheep.NewHydrant.Admin
 
         public bool ShouldResponse(Sisters.WudiLib.Posts.Message message)
         {
-            if (!Verifier.IsAdminAsync(message.UserId).Result) return false;
+            if (!Verifier.IsAdminAsync(message.UserId).GetAwaiter().GetResult()) return false;
             _operator = message.UserId;
 
             var content = message.Content;
@@ -96,7 +96,7 @@ namespace Bleatingsheep.NewHydrant.Admin
                 rebindInfo = rebindInfo.Trim();
                 var match = Regex.Match(
                     input: rebindInfo,
-                    pattern: "^(" + OsuHelper.UsernamePattern + @")\s*[:：]\s*(.+?)\s*$"
+                    pattern: "^(" + OsuHelper.UsernamePattern + @")\s*[:：]\s*(.+?)$"
                 );
                 if (!match.Success) return false;
                 _username = match.Groups[1].Value;
