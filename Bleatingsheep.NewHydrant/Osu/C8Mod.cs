@@ -32,18 +32,24 @@ namespace Bleatingsheep.NewHydrant.Osu
             //计算第二高的段位
             double max2 = -2;
             for (i = 0; i < 6; i++)
+                if (max1 == n[1, i])
+                {
+                    n[1, i] = -2;
+                    break;
+                }
+            for (i = 0; i < 6; i++)
                 if (max1 - max2 > max1 - n[1, i])
                     max2 = n[1, i];
             //针对一般群员
             if (max2 < 1)
                 return 10 * Sqrt((Atan((2.0 * plus.AimJump - (1700 + 1300)) / (1700 - 1300)) + PI / 2 + 8) * (Atan((2.0 * plus.AimFlow - (450 + 200)) / (450 - 200)) + PI / 2 + 3))
-  + (Atan((2.0 * plus.Precision - (400 + 200)) / (400 - 200)) + PI / 2)
-  + 7 * (Atan((2.0 * plus.Speed - (1250 + 950)) / (1250 - 950)) + PI / 2)
-  + 3 * (Atan((2.0 * plus.Stamina - (1000 + 600)) / (1000 - 600)) + PI / 2)
-  + 10 * (Atan((2.0 * plus.Accuracy - (1200 + 600)) / (1200 - 600)) + PI / 2);
++ (Atan((2.0 * plus.Precision - (400 + 200)) / (400 - 200)) + PI / 2)
++ 7 * (Atan((2.0 * plus.Speed - (1250 + 950)) / (1250 - 950)) + PI / 2)
++ 3 * (Atan((2.0 * plus.Stamina - (1000 + 600)) / (1000 - 600)) + PI / 2)
++ 10 * (Atan((2.0 * plus.Accuracy - (1200 + 600)) / (1200 - 600)) + PI / 2);
             //针对高分人
             else
-                return suml + (max1 < 5 ? (max2 * 6 - 4) / 100.0 : 999 - suml);
+                return suml + (max1 < 5 ? (max2 * 6 - 4) / (max2 > 2 ? 100.0 : 10.0) : 999.99 - suml) * (suml < 0 ? -1 : 1);
         }
 
         /// <summary>
