@@ -3,11 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu.PerformancePlus;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Bleatingsheep.NewHydrant.Data;
 
 namespace NewHydrantApi.Controllers
 {
@@ -73,11 +73,11 @@ namespace NewHydrantApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult<List<BeatmapPlus>> GetExistedBeatmaps(int[] queryBeatmaps)
+        public async Task<ActionResult<List<BeatmapPlus>>> GetExistedBeatmaps([FromBody] int[] queryBeatmaps)
         {
             using (var context = new NewbieContext())
             {
-                var result = context.BeatmapPlusCache.Where(p => queryBeatmaps.Contains(p.Id)).ToList();
+                var result = await context.BeatmapPlusCache.Where(p => queryBeatmaps.Contains(p.Id)).ToListAsync();
                 var notInCache = queryBeatmaps.Except(result.Select(b => b.Id));
                 AddToCacheAsync(notInCache);
                 return result;
