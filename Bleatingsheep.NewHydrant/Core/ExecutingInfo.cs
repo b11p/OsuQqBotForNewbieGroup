@@ -7,7 +7,7 @@ using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
-    internal sealed class ExecutingInfo : IDataSource
+    public sealed class ExecutingInfo : IDataSource
     {
         public HttpApiClient Qq { get; set; }
         public INewbieDatabase Database { get; set; }

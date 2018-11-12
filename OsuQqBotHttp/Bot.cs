@@ -41,7 +41,8 @@ namespace OsuQqBotHttp
             foreach (var handler in groupAdminChange)
             {
                 handler.Invoke(this, args);
-                if (args.Handled) break;
+                if (args.Handled)
+                    break;
             }
         }
 
@@ -51,7 +52,8 @@ namespace OsuQqBotHttp
             foreach (var handler in groupMemberIncrease)
             {
                 handler.Invoke(this, args);
-                if (args.Handled) break;
+                if (args.Handled)
+                    break;
             }
         }
 
@@ -71,7 +73,8 @@ namespace OsuQqBotHttp
                 no_cache = true
             });
             var resultStr = Post(GroupMemberInfoUrl, json).Result;
-            if (resultStr == null) return null;
+            if (resultStr == null)
+                return null;
             var response = JsonConvert.DeserializeObject<GroupMemberInfoResponse>(resultStr);
             return response.data;
         }
@@ -83,9 +86,11 @@ namespace OsuQqBotHttp
                 group_id = group
             });
             string resultStr = Post(GroupMemberListUrl, json).Result;
-            if (resultStr == null) return null;
+            if (resultStr == null)
+                return null;
             var response = JsonConvert.DeserializeObject<GroupMemberListResponse>(resultStr);
-            if (response == null || response.retcode != 0) return null;
+            if (response == null || response.retcode != 0)
+                return null;
             var result = new LinkedList<OsuQqBot.QqBot.GroupMemberInfo>();
             foreach (var info in response.data)
             {
@@ -210,7 +215,8 @@ namespace OsuQqBotHttp
                 }
                 catch (HttpRequestException e)
                 {
-                    Logger.Log(json);
+                    //Logger.Log(json);
+                    Logger.Log("由于网络错误，API 访问失败。");
                     Logger.LogException(e);
                     message = null;
                 }

@@ -10,7 +10,7 @@ using OsuQqBot.QqBot;
 
 namespace OsuQqBot.StatelessFunctions
 {
-    class ChartViewingAndCommiting : IStatelessFunction
+    class ChartViewingAndCommiting// : IStatelessFunction
     {
         public bool ProcessMessage(EndPoint endPoint, MessageSource messageSource, string message)
         {

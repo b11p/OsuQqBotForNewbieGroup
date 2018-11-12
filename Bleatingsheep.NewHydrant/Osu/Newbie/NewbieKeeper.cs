@@ -63,6 +63,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             // 获取群员信息。
             var groupMember = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);
 
+            if (groupMember == null)
+                return;
+
             // 检查用户名。
             var mother = await executingInfo.MotherShipApi.GetUserInfoAsync(g.UserId);
             if (mother?.Data != null)

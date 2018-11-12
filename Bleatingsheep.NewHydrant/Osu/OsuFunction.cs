@@ -10,7 +10,7 @@ using Bleatingsheep.OsuMixedApi;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Function("osu_init")]
-    internal class OsuFunction : IInitializable
+    public class OsuFunction : IInitializable
     {
         protected static OsuApiClient Api { get; private set; }
 

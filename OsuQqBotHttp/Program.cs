@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json;
-using OsuQqBot.QqBot;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using Bleatingsheep.OsuMixedApi;
+using Newtonsoft.Json;
+using OsuQqBot.QqBot;
 
 namespace OsuQqBotHttp
 {
@@ -81,6 +80,9 @@ namespace OsuQqBotHttp
                         default:
                             break;
                     }
+                }
+                catch (OsuApiFailedException)
+                {
                 }
                 catch (Exception e)
                 {
