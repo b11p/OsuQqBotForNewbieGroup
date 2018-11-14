@@ -12,8 +12,4 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NewHydrantApi\NewHydrantApi.csproj" />
-  </ItemGroup>
-
 </Project>
