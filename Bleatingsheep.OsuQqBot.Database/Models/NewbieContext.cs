@@ -20,6 +20,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<PlusHistory> PlusHistories { get; private set; }
         public DbSet<RelationshipInfo> Relationships { get; private set; }
         public DbSet<BeatmapPlus> BeatmapPlusCache { get; private set; }
+        public DbSet<WebLog> WebLogs { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
