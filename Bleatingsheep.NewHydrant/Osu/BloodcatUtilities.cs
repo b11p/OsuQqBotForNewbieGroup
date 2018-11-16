@@ -21,7 +21,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             var bpms = set.Beatmaps.Select(b => b.Bpm).Distinct().ToList();
             if (bpms.Count == 1)
             {
-                info += $" | ♩{bpms.First()}";
+                info += $" ♩{bpms.First():#.##}";
             }
 
             if (!string.IsNullOrEmpty(set.Source))

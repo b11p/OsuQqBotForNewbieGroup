@@ -17,6 +17,8 @@ namespace OsuQqBot
                 return;
             if (new StatelessFunctions.Yandere().ProcessMessage(endPoint, source, message))
                 return;
+            if (new StatelessFunctions.DalouRecommend().ProcessMessage(endPoint, source, message))
+                return;
             if (message.Trim().StartsWith("~") || message.Trim().StartsWith("～") || message.Trim().StartsWith("∼"))
             {
                 if (source.FromQq == 1677323371)

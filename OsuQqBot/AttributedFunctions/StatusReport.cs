@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace OsuQqBot.AttributedFunctions
 {
-    [Function]
+    //[Function]
     class StatusReport : IRegularly
     {
         private static readonly TimeSpan ZeroInChina = new TimeSpan(0, 16, 0, 0, 1);

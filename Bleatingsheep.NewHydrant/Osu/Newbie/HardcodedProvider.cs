@@ -77,7 +77,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         public string Name => "ignore";
 
-        public IEnumerable<long> MonitoredGroups { get; } = new List<long> { NewbieGroupId, NewbieGroup2Id }.AsReadOnly();
+        public IEnumerable<long> MonitoredGroups { get; } = new List<long> { NewbieGroupId, NewbieGroup2Id, 885984366 }.AsReadOnly();
 
         public async Task<bool> InitializeAsync(ExecutingInfo executingInfo)
         {

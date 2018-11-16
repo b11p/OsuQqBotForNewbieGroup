@@ -31,6 +31,9 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
             "garter_belt",
             "bodysuit",
             "onsen",
+            "nopan",
+            "white",
+            "sideboob",
         };
 
         public async Task ProcessAsync(Message message, HttpApiClient api, ExecutingInfo executingInfo)
