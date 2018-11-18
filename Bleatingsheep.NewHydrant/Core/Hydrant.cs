@@ -27,10 +27,22 @@ namespace Bleatingsheep.NewHydrant.Core
         private readonly INewbieDatabase _database;
         private readonly ExecutingInfo _executingInfo;
         private readonly ILogger _logger;
-        private long SuperAdmin => _configure.SuperAdmin;
 
-        public Hydrant(IConfigure configure, HttpApiClient httpApiClient, ApiPostListener listener)
+        /// <exception cref="ArgumentException">Some of elements in <c>assemblies</c> was <c>null</c>.</exception>
+        public Hydrant(IConfigure configure, HttpApiClient httpApiClient, ApiPostListener listener, params Assembly[] assemblies)
         {
+            if (assemblies == null)
+            {
+                throw new ArgumentNullException(nameof(assemblies));
+            }
+
+            var assemblyCopy = assemblies.Clone() as Assembly[];
+
+            if (assemblyCopy.Any(a => a is null))
+            {
+                throw new ArgumentException("No assembly avalible.", nameof(assemblies));
+            }
+
             _qq = httpApiClient;
             _listener = listener;
             _configure = configure;
@@ -100,7 +112,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 }
             }, TaskCreationOptions.LongRunning);
 
-            Init();
+            Init(assemblyCopy);
         }
 
         #region 执行期间各种事件处理器集合
@@ -114,10 +126,10 @@ namespace Bleatingsheep.NewHydrant.Core
         private readonly Task _plan;
         #endregion
 
-        private void Init()
+        private void Init(IEnumerable<Assembly> assemblies)
         {
-            var types = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.GetCustomAttributes<FunctionAttribute>().Any());
+            var types = assemblies.SelectMany(a => a.GetTypes()
+                .Where(t => t.GetCustomAttributes<FunctionAttribute>().Any()));
 
             types.ForEach(InitType);
 
@@ -193,12 +205,6 @@ namespace Bleatingsheep.NewHydrant.Core
                     _logger.LogException(e);
                 }
             };
-
-            // 添加必要的事件处理。
-            _listener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
-            _listener.GroupRequestEvent += (api, e) => e.UserId == SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
-            _listener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
-            _listener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
 
             // 跑定期任务
             if (_regularTasks.Count > 0)

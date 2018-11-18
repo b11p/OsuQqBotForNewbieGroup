@@ -15,6 +15,7 @@ namespace Bleatingsheep.NewHydrant.Addon
         }
 
         /// <exception cref="InvalidCastException"></exception>
+        /// <exception cref="ArgumentNullException"/>
         public static T CreateInstance<T>(this Type type) => (T)type.CreateInstance();
     }
 }

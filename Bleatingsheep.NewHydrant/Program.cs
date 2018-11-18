@@ -50,7 +50,13 @@ namespace Bleatingsheep.NewHydrant
                 apiPostListener.ForwardTo = "http://oldbot:8876";
                 apiPostListener.StartListen();
 
-                var hydrant = new Hydrant(new HardcodedConfigure(), httpApiClient, apiPostListener);
+                // 添加必要的事件处理。
+                apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
+                apiPostListener.GroupRequestEvent += (api, e) => e.UserId == configure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
+                apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
+                //apiPostListener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
+
+                var hydrant = new Hydrant(configure, httpApiClient, apiPostListener, Assembly.GetExecutingAssembly());
             }
             catch (Exception e)
             {
