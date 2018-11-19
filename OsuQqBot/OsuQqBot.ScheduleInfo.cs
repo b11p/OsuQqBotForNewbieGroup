@@ -32,9 +32,9 @@ namespace OsuQqBot
                         NextRun = DateTime.UtcNow;
                         break;
                     case ScheduleType.Daily:
-                        DateTime next = DateTime.UtcNow.Date + time;
-                        if (ShouldRun()) next = next.AddDays(1);
-                        NextRun = next;
+                        NextRun = DateTime.UtcNow.Date + time;
+                        if (ShouldRun())
+                            NextRun = NextRun.AddDays(1);
                         break;
                     default:
                         throw new ArgumentException("类型不对", nameof(type));
