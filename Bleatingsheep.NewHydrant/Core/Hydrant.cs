@@ -25,6 +25,8 @@ namespace Bleatingsheep.NewHydrant.Core
         private readonly ApiPostListener _listener;
         private readonly ExecutingInfo _executingInfo;
         private readonly ILogger _logger;
+        private readonly Assembly[] _assemblies;
+        private int _isInitialized = 0;
 
         /// <exception cref="ArgumentException">Some of elements in <c>assemblies</c> was <c>null</c>.</exception>
         public Hydrant(IConfigure configure, HttpApiClient httpApiClient, ApiPostListener listener, params Assembly[] assemblies)
@@ -34,16 +36,16 @@ namespace Bleatingsheep.NewHydrant.Core
                 throw new ArgumentNullException(nameof(assemblies));
             }
 
-            var assemblyCopy = assemblies.Clone() as Assembly[];
+            _assemblies = assemblies.Clone() as Assembly[];
 
-            if (assemblyCopy.Any(a => a is null))
+            if (_assemblies.Any(a => a is null))
             {
                 throw new ArgumentException("No assembly avalible.", nameof(assemblies));
             }
 
             _qq = httpApiClient;
             _listener = listener;
-            
+
             _executingInfo = new ExecutingInfo
             {
                 Database = new NewbieDatabase(),
@@ -106,8 +108,6 @@ namespace Bleatingsheep.NewHydrant.Core
                     Task.Delay(interval).Wait();
                 }
             }, TaskCreationOptions.LongRunning);
-
-            Init(assemblyCopy);
         }
 
         #region 执行期间各种事件处理器集合
@@ -120,6 +120,14 @@ namespace Bleatingsheep.NewHydrant.Core
         private readonly IList<ScheduleInfo> _regularTasks = new List<ScheduleInfo>();
         private readonly Task _plan;
         #endregion
+
+        public void Init()
+        {
+            if (Interlocked.Exchange(ref _isInitialized, 1) == 0)
+            {
+                Init(_assemblies);
+            }
+        }
 
         private void Init(IEnumerable<Assembly> assemblies)
         {
@@ -148,9 +156,9 @@ namespace Bleatingsheep.NewHydrant.Core
             };
             _listener.MessageEvent += async (api, message) =>
             {
+                IMessageCommand hit = default;
                 try
                 {
-                    IMessageCommand hit;
                     try
                     {
                         hit = _messageCommandList
@@ -176,6 +184,18 @@ namespace Bleatingsheep.NewHydrant.Core
                     if (e.InnerException != null)
                     {
                         _logger.LogException(e.InnerException);
+                    }
+                }
+                catch (Exception e) when (_isInitialized == 0) // 暂时不会执行。
+                {
+                    try
+                    {
+                        var attr = hit.GetType().GetCustomAttribute<FunctionAttribute>();
+                        OnCommandException?.Invoke(attr.Name, e, api, message);
+                    }
+                    catch (Exception)
+                    {
+                        // ignore exception on handling
                     }
                 }
                 catch (DatabaseFailException e)
@@ -252,5 +272,11 @@ namespace Bleatingsheep.NewHydrant.Core
             if (task.OnUtc is TimeSpan onUtc)
                 _regularTasks.Add(new ScheduleInfo(ScheduleType.Daily, onUtc, task));
         }
+
+        #region ExceptionEvent
+
+        public event Action<string, Exception, HttpApiClient, Sisters.WudiLib.Posts.Message> OnCommandException;
+
+        #endregion
     }
 }

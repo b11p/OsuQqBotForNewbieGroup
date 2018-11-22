@@ -57,6 +57,11 @@ namespace Bleatingsheep.NewHydrant
                 //apiPostListener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
 
                 var hydrant = new Hydrant(configure, httpApiClient, apiPostListener, Assembly.GetExecutingAssembly());
+
+                // 添加异常处理
+                hydrant.OnCommandException += Hydrant_OnCommandExceptionAsync;
+
+                hydrant.Init();
             }
             catch (Exception e)
             {
@@ -65,6 +70,10 @@ namespace Bleatingsheep.NewHydrant
             }
 
             Task.Delay(-1).Wait();
+        }
+
+        private static async void Hydrant_OnCommandExceptionAsync(string funName, Exception exception, HttpApiClient api, Sisters.WudiLib.Posts.Message message)
+        {
         }
     }
 }
