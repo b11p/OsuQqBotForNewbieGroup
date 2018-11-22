@@ -23,8 +23,6 @@ namespace Bleatingsheep.NewHydrant.Core
     {
         private readonly HttpApiClient _qq;
         private readonly ApiPostListener _listener;
-        private readonly IConfigure _configure;
-        private readonly INewbieDatabase _database;
         private readonly ExecutingInfo _executingInfo;
         private readonly ILogger _logger;
 
@@ -45,14 +43,11 @@ namespace Bleatingsheep.NewHydrant.Core
 
             _qq = httpApiClient;
             _listener = listener;
-            _configure = configure;
-
-            _database = new NewbieDatabase();
+            
             _executingInfo = new ExecutingInfo
             {
-                Database = _database,
-                Qq = _qq,
-                OsuApi = OsuApiClient.ClientUsingKey(_configure.ApiKey),
+                Database = new NewbieDatabase(),
+                OsuApi = OsuApiClient.ClientUsingKey(configure.ApiKey),
                 MotherShipApi = new MotherShipApiClient(MotherShipApiClient.DefaultHost),
             };
             var dataProvider = new DataProvider(_executingInfo);
@@ -197,7 +192,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 }
                 catch (ApiAccessException)
                 {
-                    await api.SendMessageAsync(message.Endpoint, "查询 API 失败。");
+                    // 酷 Q 失败。
                 }
                 catch (Exception e)
                 {

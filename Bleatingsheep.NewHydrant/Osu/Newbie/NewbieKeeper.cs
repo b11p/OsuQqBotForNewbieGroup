@@ -61,7 +61,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             ExecutingException.Ensure(string.Empty, success);
 
             // 获取群员信息。
-            var groupMember = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);
+            GroupMemberInfo groupMember = null;
+            try
+            {
+                groupMember = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);
+            }
+            catch (ApiAccessException)
+            {
+                return;
+            }
 
             if (groupMember == null)
                 return;
@@ -122,6 +130,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         {
             string response;
             var memberInfo = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);
+
+            if (memberInfo == null)
+                // TODO
+                ExecutingException.Ensure(false, "");
+
             var card = memberInfo.InGroupName;
             var usernames = OsuHelper.DiscoverUsernames(card);
             var validUsers = new List<UserInfo>();

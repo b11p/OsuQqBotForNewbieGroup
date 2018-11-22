@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.Core;
-using Sisters.WudiLib.Responses;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
-    internal class HardcodedProvider : INewbieInfoProvider, IInitializable
+    internal class HardcodedProvider : INewbieInfoProvider
     {
         private static readonly HashSet<long> IgnoreList = new HashSet<long>
         {
@@ -62,35 +58,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         };
 
         private const long NewbieGroupId = 614892339;
-        private static HashSet<long> s_ignorePerformanceNewbie = new HashSet<long>();
 
         private const long NewbieGroup2Id = 758120648;
-        private static HashSet<long> s_ignorePerformanceNewbie2 = new HashSet<long>();
-
-        private static readonly HashSet<GroupMemberInfo.GroupMemberAuthority> AcceptedIgnore = new HashSet<GroupMemberInfo.GroupMemberAuthority>
-        {
-            GroupMemberInfo.GroupMemberAuthority.Leader,
-            GroupMemberInfo.GroupMemberAuthority.Manager
-        };
-
+        
         public static INewbieInfoProvider GetProvider() => new HardcodedProvider();
 
         public string Name => "ignore";
 
         public IEnumerable<long> MonitoredGroups { get; } = new List<long> { NewbieGroupId, NewbieGroup2Id, 885984366 }.AsReadOnly();
-
-        public async Task<bool> InitializeAsync(ExecutingInfo executingInfo)
-        {
-            var qq = executingInfo.Qq;
-            var listTask2 = qq.GetGroupMemberListAsync(NewbieGroup2Id);
-            var list1 = await qq.GetGroupMemberListAsync(NewbieGroupId);
-            var list2 = await listTask2;
-            s_ignorePerformanceNewbie = list1.Where(mi => AcceptedIgnore.Contains(mi.Authority)).Select(mi => mi.UserId).ToHashSet();
-            s_ignorePerformanceNewbie2 = list2.Where(mi => AcceptedIgnore.Contains(mi.Authority)).Select(mi => mi.UserId).ToHashSet();
-
-            return true;
-        }
-
+        
 #pragma warning disable CS1998
         public async Task<bool> ShouldIgnoreAsync(long qq) => IgnoreList.Contains(qq);
         public async Task<bool> ShouldIgnorePerformanceAsync(long group, long qq) => group == NewbieGroupId ? IgnorePerformanceListBase.Contains(qq) : false;

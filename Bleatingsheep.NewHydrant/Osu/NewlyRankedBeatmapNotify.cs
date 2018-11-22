@@ -61,7 +61,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             var osu = executingInfo.OsuApi;
             if (newSets != null)
             {
-                var qq = executingInfo.Qq;
+                var qq = api;
                 const int limit = 5;
                 var messages = newSets.Take(limit).Select(s => BloodcatUtilities.GetMusicMessage(osu, s)).ToList();
                 foreach (long group in s_groups)
