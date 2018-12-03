@@ -10,7 +10,9 @@
     <PackageReference Include="Bleatingsheep.Osu.Enums" Version="0.2.0" />
     <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.4.1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.2" />
-    <PackageReference Include="WebApiClient.AOT" Version="0.2.7" />
+    <PackageReference Include="PuppeteerSharp" Version="1.10.0" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="4.5.0" />
+    <PackageReference Include="WebApiClient.AOT" Version="0.2.8" />
   </ItemGroup>
 
   <ItemGroup>
