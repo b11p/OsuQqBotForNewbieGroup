@@ -27,7 +27,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var g = message as GroupMessage;
             // 检查群是否要监视。
             ExecutingException.Ensure(string.Empty,
-                message is GroupMessage
+                g != null
                 && IgnoreListProvider.MonitoredGroups.Contains(g.GroupId)
             );
 
@@ -132,10 +132,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var memberInfo = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);
 
             if (memberInfo == null)
+            {
                 // TODO
                 ExecutingException.Ensure(false, "");
+            }
 
-            var card = memberInfo.InGroupName;
+            var card = string.IsNullOrEmpty(memberInfo.InGroupName) ? memberInfo.Nickname : memberInfo.InGroupName;
             var usernames = OsuHelper.DiscoverUsernames(card);
             var validUsers = new List<UserInfo>();
             foreach (var username in usernames)
@@ -143,7 +145,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 UserInfo info;
                 (success, info) = await executingInfo.OsuApi.GetUserInfoAsync(username, Mode.Standard);
                 ExecutingException.Ensure(success, string.Empty);
-                validUsers.Add(info);
+                if (info != null)
+                    validUsers.Add(info);
             }
             if (validUsers.Count > 1)
             {
