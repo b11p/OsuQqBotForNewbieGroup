@@ -137,7 +137,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 ExecutingException.Ensure(false, "");
             }
 
-            var card = string.IsNullOrEmpty(memberInfo.InGroupName) ? memberInfo.Nickname : memberInfo.InGroupName;
+            var card = memberInfo.InGroupName;
+            if (card == null)
+                card = string.Empty;
             var usernames = OsuHelper.DiscoverUsernames(card);
             var validUsers = new List<UserInfo>();
             foreach (var username in usernames)
