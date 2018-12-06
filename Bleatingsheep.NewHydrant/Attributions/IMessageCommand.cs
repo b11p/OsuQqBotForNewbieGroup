@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Core;
-using Sisters.WudiLib.Posts;
+using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Attributions
 {
     interface IMessageCommand
     {
-        bool ShouldResponse(Message message);
-        Task ProcessAsync(Message message, Sisters.WudiLib.HttpApiClient api, ExecutingInfo executingInfo);
+        bool ShouldResponse(MessageContext context);
+        Task ProcessAsync(MessageContext context, Sisters.WudiLib.HttpApiClient api, ExecutingInfo executingInfo);
     }
 }
