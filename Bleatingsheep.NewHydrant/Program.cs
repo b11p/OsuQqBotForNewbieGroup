@@ -21,8 +21,8 @@ namespace Bleatingsheep.NewHydrant
 
             var configure = new HardcodedConfigure();
 
-            HttpApiClient.AccessToken = configure.AccessToken;
             var httpApiClient = new HttpApiClient();
+            httpApiClient.AccessToken = configure.AccessToken;
             httpApiClient.ApiAddress = configure.ApiAddress;
             do
             {

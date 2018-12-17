@@ -52,7 +52,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 OsuApi = OsuApiClient.ClientUsingKey(configure.ApiKey),
                 MotherShipApi = new MotherShipApiClient(MotherShipApiClient.DefaultHost),
             };
-            var dataProvider = new DataProvider(_executingInfo);
+            var dataProvider = new DataProvider(_executingInfo.OsuApi);
             _executingInfo.Data = dataProvider;
 
 

@@ -12,9 +12,7 @@ namespace Bleatingsheep.NewHydrant.Data
         private readonly OsuApiClient _api;
         private readonly MotherShipApiClient _motherShipApi = new MotherShipApiClient(MotherShipApiClient.DefaultHost);
         private readonly NewbieDatabase _database = new NewbieDatabase();
-
-        public DataProvider(IDataSource dataSource) => _api = dataSource.OsuApi;
-
+        
         public DataProvider(OsuApiClient api) => _api = api;
 
         public async Task<(bool success, BindingInfo result)> GetBindingInfoAsync(long qq)
