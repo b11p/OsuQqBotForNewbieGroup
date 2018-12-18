@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Newtonsoft.Json;
 using static Newtonsoft.Json.JsonConvert;
 
@@ -30,7 +31,6 @@ namespace OsuQqBot.LocalData
             try
             {
                 this.basePath = basePath;
-                Directory.CreateDirectory(BindPath);
                 Directory.CreateDirectory(NicknamePath);
                 string nickData = string.Empty;
                 try
@@ -47,8 +47,7 @@ namespace OsuQqBot.LocalData
                     new Dictionary<string, string>(StatelessFunctions.ManageTips.DefaultTips
                         .Select(tip => new KeyValuePair<string, string>(tip.ToLowerInvariant(), tip))));
 
-                if (single == null)
-                    single = this;
+                Interlocked.CompareExchange(ref single, this, null);
             }
             catch (Exception e)
             {
@@ -56,11 +55,6 @@ namespace OsuQqBot.LocalData
                 throw;
             }
         }
-
-        /// <summary>
-        /// 存储 QQ 与 osu!ID 的绑定数据
-        /// </summary>
-        string BindPath => Path.Combine(basePath, "Binding Data");
         
         #region Paths
         /// <summary>

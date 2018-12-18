@@ -36,8 +36,9 @@ namespace OsuQqBotHttp
             Port = port;
 
             apiClient = new Sisters.WudiLib.HttpApiClient();
-            apiClient.ApiAddress = new Bleatingsheep.NewHydrant.HardcodedConfigure().ApiAddress;
-            Sisters.WudiLib.HttpApiClient.AccessToken = new Bleatingsheep.NewHydrant.HardcodedConfigure().AccessToken;
+            var hardcodedConfigure = new Bleatingsheep.NewHydrant.HardcodedConfigure();
+            apiClient.ApiAddress = hardcodedConfigure.ApiAddress;
+            apiClient.AccessToken = hardcodedConfigure.AccessToken;
             apiClient.StartClean(60);
 
             _listener = new Sisters.WudiLib.Posts.ApiPostListener();
@@ -45,6 +46,7 @@ namespace OsuQqBotHttp
             _listener.ApiClient = apiClient;
             _listener.PostAddress = $"http://+:{wudiPort}/";
             _listener.ForwardTo = $"http://localhost:{port}/";
+            _listener.SetSecret(hardcodedConfigure.Secret);
             _listener.StartListen();
 
             osuBot = new OsuQqBot.OsuQqBot(_qq, apiClient, _listener);

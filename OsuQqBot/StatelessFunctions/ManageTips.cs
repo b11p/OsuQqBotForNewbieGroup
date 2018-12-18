@@ -48,7 +48,7 @@ namespace OsuQqBot.StatelessFunctions
         public static IList<string> DefaultTips => new List<string>(_defaultTips);
 
         // @"C:\Users\Administrator\Desktop\Tips_Image";
-        private static readonly string ImagePath = Path.Combine(Paths.BasePath, "Tips_Image");
+        //private static readonly string ImagePath = Path.Combine(Paths.BasePath, "Tips_Image");
 
         private void DoCommond(EndPoint endPoint, string[] commonds)
         {
@@ -67,12 +67,12 @@ namespace OsuQqBot.StatelessFunctions
                     if (commonds.Length < 3) return;
                     DeleteTip(endPoint, OsuQqBot.QqApi.AfterReceive(commonds[2]));
                     break;
-                case "img":
-                    if (commonds.Length < 3) return;
-                    string fullname = Path.Combine(ImagePath, commonds[2]);
-                    string imageCode = OsuQqBot.QqApi.LocalImage(fullname);
-                    AddTip(endPoint, imageCode);
-                    break;
+                //case "img":
+                //    if (commonds.Length < 3) return;
+                //    string fullname = Path.Combine(ImagePath, commonds[2]);
+                //    string imageCode = OsuQqBot.QqApi.LocalImage(fullname);
+                //    AddTip(endPoint, imageCode);
+                //    break;
                 default:
                     break;
             }
