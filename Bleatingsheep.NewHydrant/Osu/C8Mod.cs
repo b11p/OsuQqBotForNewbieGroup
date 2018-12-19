@@ -30,7 +30,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             for (i = 0; i < 6; i++)
             {
                 for (j = 0; j < 13; j++) if (n[0, i] > db[i, j]) n[1, i]++;
-                if (n[1, i] == -1) n[1, i] -= 1; suml += n[1, i];
+                if (n[1, i] == -1) n[1, i] -= 1;
                 if (n[1, i] > max1) max1 = n[1, i];
             }
             //计算第二高段位
@@ -40,6 +40,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 if (n[1, i] > max2 && n[1, i] != max1) max2 = n[1, i];
                 if (n[1, i] == max1) max2t += 1;
                 if (n[1, i] == 11) n[1, i] = (int)Math.Ceiling(n[0, i] / db[i, 11] * 10);
+                suml += n[1, i];
                 dn[11] += (n[1, i] + " ");
             }
             if (max2t > 1) max2 = max1;
