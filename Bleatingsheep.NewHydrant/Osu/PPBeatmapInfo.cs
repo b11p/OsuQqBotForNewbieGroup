@@ -11,7 +11,7 @@ using Sisters.WudiLib.Posts;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Function("pp_stars")]
-    internal class PPBeatmapInfo : IMessageCommand
+    internal class PPBeatmapInfo : OsuFunction, IMessageCommand
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
 
@@ -24,7 +24,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             ExecutingException.Ensure(osuResult != null, "未绑定 osu! 游戏账号。");
 
             var osuId = osuResult.Value;
-            var recent = (await executingInfo.OsuApi.GetRecentlyAsync(osuId, OsuMixedApi.Mode.Standard, 1)).FirstOrDefault();
+            var recent = (await OsuApi.GetRecentlyAsync(osuId, OsuMixedApi.Mode.Standard, 1)).FirstOrDefault();
             if (recent == null)
             {
                 await api.SendMessageAsync(message.Endpoint, "没打图！");

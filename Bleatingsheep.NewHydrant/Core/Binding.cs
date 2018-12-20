@@ -14,7 +14,7 @@ namespace Bleatingsheep.NewHydrant.Core
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
         {
             // TODO 验证用户名是否合法
-            var (success, userInfo) = await executingInfo.OsuApi.GetUserInfoAsync(_userName, OsuMixedApi.Mode.Standard);
+            var (success, userInfo) = await OsuApi.GetUserInfoAsync(_userName, OsuMixedApi.Mode.Standard);
             if (!success)
             {
                 await api.SendMessageAsync(message.Endpoint, "网络错误。");

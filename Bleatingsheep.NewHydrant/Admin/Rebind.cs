@@ -22,7 +22,7 @@ namespace Bleatingsheep.NewHydrant.Admin
 
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
         {
-            var osuApi = Api;
+            var osuApi = OsuApi;
 
             // 获取操作者信息。
             var operatorBind = await Database.GetBindingIdAsync(_operator);

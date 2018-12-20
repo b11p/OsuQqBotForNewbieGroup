@@ -57,7 +57,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
             // 获取游戏账号信息。
             UserInfo userInfo;
-            (success, userInfo) = await executingInfo.OsuApi.GetUserInfoAsync(osuId.Value, Mode.Standard);
+            (success, userInfo) = await OsuApi.GetUserInfoAsync(osuId.Value, Mode.Standard);
             ExecutingException.Ensure(string.Empty, success);
 
             // 获取群员信息。
@@ -145,7 +145,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             foreach (var username in usernames)
             {
                 UserInfo info;
-                (success, info) = await executingInfo.OsuApi.GetUserInfoAsync(username, Mode.Standard);
+                (success, info) = await OsuApi.GetUserInfoAsync(username, Mode.Standard);
                 ExecutingException.Ensure(success, string.Empty);
                 if (info != null)
                     validUsers.Add(info);

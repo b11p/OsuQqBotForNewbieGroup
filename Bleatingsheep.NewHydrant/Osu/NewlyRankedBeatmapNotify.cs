@@ -12,7 +12,7 @@ using Sisters.WudiLib;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Function("newly_ranked")]
-    internal class NewlyRankedBeatmapNotify : IRegularAsync
+    internal class NewlyRankedBeatmapNotify : OsuFunction, IRegularAsync
     {
         public TimeSpan? OnUtc => null;
         public TimeSpan? Every { get; } = new TimeSpan(0, 15, 0);
@@ -58,7 +58,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                     //logger.LogInBackground($"日期更新为 {_noBeatmapAfter}");
                 }
             }
-            var osu = executingInfo.OsuApi;
+            var osu = OsuApi;
             if (newSets != null)
             {
                 var qq = api;

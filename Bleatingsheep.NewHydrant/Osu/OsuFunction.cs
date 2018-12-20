@@ -10,7 +10,7 @@ namespace Bleatingsheep.NewHydrant.Osu
     [Function("osu_init")]
     public class OsuFunction
     {
-        protected static OsuApiClient Api { get; private set; }
+        protected static OsuApiClient OsuApi { get; private set; }
 
         private static DataProvider s_data;
 
@@ -18,8 +18,8 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public static void SetApiKey(string apiKey)
         {
-            Api = OsuApiClient.ClientUsingKey(apiKey);
-            s_data = new DataProvider(Api);
+            OsuApi = OsuApiClient.ClientUsingKey(apiKey);
+            s_data = new DataProvider(OsuApi);
         }
 
         /// <exception cref="ExecutingException"></exception>
@@ -33,7 +33,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         protected async Task<UserInfo> EnsureGetUserInfo(string name, Mode mode)
         {
-            var (success, result) = await Api.GetUserInfoAsync(name, mode);
+            var (success, result) = await OsuApi.GetUserInfoAsync(name, mode);
             ExecutingException.Ensure(success, "网络错误。");
             ExecutingException.Ensure(result != null, "无此用户！");
             return result;
