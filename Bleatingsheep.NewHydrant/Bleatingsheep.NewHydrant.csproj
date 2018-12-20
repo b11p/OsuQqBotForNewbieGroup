@@ -8,11 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Bleatingsheep.Osu.Enums" Version="0.2.0" />
+    <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
     <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.4.1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.2" />
-    <PackageReference Include="PuppeteerSharp" Version="1.10.0" />
+    <PackageReference Include="PuppeteerSharp" Version="1.11.1" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="4.5.0" />
-    <PackageReference Include="WebApiClient.AOT" Version="0.2.8" />
+    <PackageReference Include="WebApiClient.AOT" Version="0.2.9" />
   </ItemGroup>
 
   <ItemGroup>

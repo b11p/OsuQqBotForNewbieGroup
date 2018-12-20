@@ -54,6 +54,8 @@ namespace OsuQqBot
                     {
                         string uNameToQuery = message.Trim().Substring("where".Length).Trim();
                         uNameToQuery = qq.AfterReceive(uNameToQuery);
+                        if (!Bleatingsheep.Osu.Helper.UserNameHelper.IsUserName(uNameToQuery))
+                            return;
                         if (string.IsNullOrEmpty(uNameToQuery))
                             return;
                         const string pattern = @"^qq\s*=\s*(\d+)$";

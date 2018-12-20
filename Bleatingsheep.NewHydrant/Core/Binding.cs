@@ -12,9 +12,8 @@ namespace Bleatingsheep.NewHydrant.Core
         public IMessageCommand Create() => new Bind();
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
         {
-            string username = _trimed.Substring(StartCommand.Length).Trim();
             // TODO 验证用户名是否合法
-            var (success, userInfo) = await executingInfo.OsuApi.GetUserInfoAsync(username, OsuMixedApi.Mode.Standard);
+            var (success, userInfo) = await executingInfo.OsuApi.GetUserInfoAsync(_userName, OsuMixedApi.Mode.Standard);
             if (!success)
             {
                 await api.SendMessageAsync(message.Endpoint, "网络错误。");
@@ -43,12 +42,17 @@ namespace Bleatingsheep.NewHydrant.Core
 
         private const string StartCommand = "绑定";
         private string _trimed;
+        private string _userName;
         public bool ShouldResponse(Sisters.WudiLib.Posts.Message message)
         {
             if (message.Content.IsPlaintext)
             {
                 _trimed = message.Content.Text.TrimStart();
-                return _trimed.StartsWith(StartCommand, StringComparison.InvariantCultureIgnoreCase);
+                if (_trimed.StartsWith(StartCommand, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _userName = _trimed.Substring(StartCommand.Length).Trim();
+                    return Bleatingsheep.Osu.Helper.UserNameHelper.IsUserName(_userName);
+                }
             }
             return false;
         }
