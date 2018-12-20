@@ -48,7 +48,6 @@ namespace Bleatingsheep.NewHydrant.Core
 
             _executingInfo = new ExecutingInfo
             {
-                Database = new NewbieDatabase(),
                 OsuApi = OsuApiClient.ClientUsingKey(configure.ApiKey),
                 MotherShipApi = new MotherShipApiClient(MotherShipApiClient.DefaultHost),
             };

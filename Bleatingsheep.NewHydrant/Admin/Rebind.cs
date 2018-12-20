@@ -9,20 +9,11 @@ using Sisters.WudiLib;
 namespace Bleatingsheep.NewHydrant.Admin
 {
     [Function("rebind")]
-    class Rebind : IInitializable, IMessageCommand
+    class Rebind : OsuFunction, IMessageCommand
     {
-        private static IVerifier Verifier;
-
-        public string Name { get; } = null;
+        private static IVerifier Verifier { get; } = new AdminVerifier();
 
         public IMessageCommand Create() => new Rebind();
-
-        public async Task<bool> InitializeAsync(ExecutingInfo executingInfo)
-        {
-            Verifier = new AdminVerifier(executingInfo);
-            await Task.Yield();
-            return true;
-        }
 
         private long _qq;
         private string _username;
@@ -31,10 +22,10 @@ namespace Bleatingsheep.NewHydrant.Admin
 
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
         {
-            var osuApi = executingInfo.OsuApi;
+            var osuApi = Api;
 
             // 获取操作者信息。
-            var operatorBind = await executingInfo.Database.GetBindingIdAsync(_operator);
+            var operatorBind = await Database.GetBindingIdAsync(_operator);
             if (!operatorBind.Success)
             {
                 await api.SendMessageAsync(message.Endpoint, "查询数据库失败，无法记录日志。");
@@ -52,7 +43,7 @@ namespace Bleatingsheep.NewHydrant.Admin
             ExecutingException.Cannot(newUser == null, "没有这个用户。");
 
             // 绑定。
-            var oldBind = (await executingInfo.Database.ResetBindingAsync(
+            var oldBind = (await Database.ResetBindingAsync(
                 qq: _qq,
                 osuId: newUser.Id,
                 osuName: newUser.Name,

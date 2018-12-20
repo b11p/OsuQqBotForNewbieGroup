@@ -19,7 +19,7 @@ namespace Bleatingsheep.NewHydrant.Admin
             447503971, // 白季
         };
 
-        public AdminVerifier(ExecutingInfo executingInfo)
+        public AdminVerifier()
         {
         }
 

@@ -8,7 +8,6 @@ namespace Bleatingsheep.NewHydrant.Core
 {
     public sealed class ExecutingInfo : IDataSource
     {
-        public INewbieDatabase Database { get; set; }
         public OsuApiClient OsuApi { get; set; }
         public MotherShipApiClient MotherShipApi { get; set; }
         public ILogger Logger { get; set; }

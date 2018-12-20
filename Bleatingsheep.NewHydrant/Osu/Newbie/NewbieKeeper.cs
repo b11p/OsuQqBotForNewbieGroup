@@ -13,7 +13,7 @@ using Sisters.WudiLib.Responses;
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
     [Function("newbie_keeper")]
-    internal class NewbieKeeper : IMessageMonitor
+    internal class NewbieKeeper : OsuFunction, IMessageMonitor
     {
         private static TimeSpan CheckInterval { get; } = new TimeSpan(10, 53, 31);
 
@@ -160,7 +160,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
             else
             {
-                (await executingInfo.Database.AddNewBindAsync(g.UserId, validUsers[0].Id, validUsers[0].Name, "Auto", null, null) as IExecutingResult<object>).EnsureSuccess();
+                (await Database.AddNewBindAsync(g.UserId, validUsers[0].Id, validUsers[0].Name, "Auto", null, null) as IExecutingResult<object>).EnsureSuccess();
                 response = $"欢迎来到新人群，已自动绑定 osu! 游戏账号 {validUsers[0].Name}。";
             }
 

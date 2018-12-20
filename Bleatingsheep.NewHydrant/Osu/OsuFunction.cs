@@ -1,31 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuMixedApi;
+using Bleatingsheep.OsuQqBot.Database.Execution;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Function("osu_init")]
-    public class OsuFunction : IInitializable
+    public class OsuFunction
     {
         protected static OsuApiClient Api { get; private set; }
 
         private static DataProvider s_data;
 
-        public string Name { get; } = "osu";
+        protected static INewbieDatabase Database { get; } = new NewbieDatabase();
 
-#pragma warning disable CS1998
-        public async Task<bool> InitializeAsync(ExecutingInfo executingInfo)
+        public static void SetApiKey(string apiKey)
         {
-            Api = executingInfo.OsuApi;
+            Api = OsuApiClient.ClientUsingKey(apiKey);
             s_data = new DataProvider(Api);
-            return true;
         }
-#pragma warning restore CS1998
 
         /// <exception cref="ExecutingException"></exception>
         protected async Task<int> EnsureGetBindingIdAsync(long qq)

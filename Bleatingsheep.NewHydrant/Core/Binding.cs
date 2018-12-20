@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Osu;
 using Microsoft.EntityFrameworkCore;
 using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
     [Function("bind")]
-    internal class Bind : IMessageCommand
+    internal class Bind : OsuFunction, IMessageCommand
     {
         public IMessageCommand Create() => new Bind();
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
@@ -24,7 +25,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 await api.SendMessageAsync(message.Endpoint, "没有此用户。");
                 return;
             }
-            var dbResult = await executingInfo.Database.AddNewBindAsync(message.UserId, userInfo.Id, userInfo.Name, "自己绑定", message.UserId, userInfo.Name);
+            var dbResult = await Database.AddNewBindAsync(message.UserId, userInfo.Id, userInfo.Name, "自己绑定", message.UserId, userInfo.Name);
             if (dbResult.Success)
             {
                 await api.SendMessageAsync(message.Endpoint, $"成功绑定为{userInfo.Name}。");

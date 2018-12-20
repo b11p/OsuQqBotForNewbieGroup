@@ -11,7 +11,7 @@ using Sisters.WudiLib;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Function("pp+_update")]
-    internal class UpdatePlusData : IRegularAsync
+    internal class UpdatePlusData : OsuFunction, IRegularAsync
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
 
@@ -21,7 +21,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public async Task RunAsync(HttpApiClient api, ExecutingInfo executingInfo)
         {
-            var result = await executingInfo.Database.GetPlusRecordedUsersAsync();
+            var result = await Database.GetPlusRecordedUsersAsync();
             if (!result.Success)
             {
                 executingInfo.Logger.LogInBackground("更新 PP+ 数据时访问数据库失败。");
@@ -49,7 +49,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                         failed.Add(userId);
                     }
                 });
-                var addResult = await executingInfo.Database.AddPlusHistoryRangeAsync(results);
+                var addResult = await Database.AddPlusHistoryRangeAsync(results);
                 if (!addResult.Success)
                 {
                     executingInfo.Logger.LogInBackground("添加新的 PP+ 数据失败。");

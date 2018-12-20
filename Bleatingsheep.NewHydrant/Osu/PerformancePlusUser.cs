@@ -9,7 +9,7 @@ using Sisters.WudiLib.Posts;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Function("pp+")]
-    internal class PerformancePlusUser : IMessageCommand
+    internal class PerformancePlusUser : OsuFunction, IMessageCommand
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
 
@@ -46,7 +46,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                     return;
                 }
 
-                var oldQuery = await executingInfo.Database.GetRecentPlusHistory(userPlus.Id);
+                var oldQuery = await Database.GetRecentPlusHistory(userPlus.Id);
                 if (!oldQuery.Success)
                 {
                     await api.SendMessageAsync(message.Endpoint, "无法找到历史数据。");
@@ -81,7 +81,7 @@ Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
 
                 if (old == null)
                 {
-                    var addResult = await executingInfo.Database.AddPlusHistoryAsync(userPlus);
+                    var addResult = await Database.AddPlusHistoryAsync(userPlus);
                     if (!addResult.Success)
                         executingInfo.Logger.LogException(addResult.Exception);
                 }
