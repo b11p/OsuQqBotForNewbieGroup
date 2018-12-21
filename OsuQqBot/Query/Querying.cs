@@ -64,9 +64,9 @@ namespace OsuQqBot.Query
                         : (int?)JsonConvert.DeserializeObject<dynamic>(await httpResponse.Content.ReadAsStringAsync()).osuId;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new OsuApiFailedException();
+                throw new OsuApiFailedException("Something was wrong while finding binding.", e);
             }
         }
     }
