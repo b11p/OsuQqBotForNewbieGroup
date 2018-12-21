@@ -60,6 +60,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             (success, userInfo) = await OsuApi.GetUserInfoAsync(osuId.Value, Mode.Standard);
             ExecutingException.Ensure(string.Empty, success);
 
+            // TODO: 处理被 ban 的情况。
+            if (userInfo is null) return;
+
             // 获取群员信息。
             GroupMemberInfo groupMember = null;
             try
@@ -75,9 +78,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 return;
 
             // 检查用户名。
-            var mother = await executingInfo.MotherShipApi.GetUserInfoAsync(g.UserId);
-            if (mother?.Data != null)
-                await CheckGroupCard(api, groupMember, g, userInfo?.Name ?? mother.Data.Name);
+            await CheckGroupCard(api, groupMember, g, userInfo.Name);
 
             ExecutingException.Ensure(userInfo != null, string.Empty);
             // 检查 PP。
