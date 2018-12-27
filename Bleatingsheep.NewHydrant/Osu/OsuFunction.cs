@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuMixedApi;
@@ -7,25 +6,24 @@ using Bleatingsheep.OsuQqBot.Database.Execution;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
-    [Function("osu_init")]
     public class OsuFunction
     {
         protected static OsuApiClient OsuApi { get; private set; }
 
-        private static DataProvider s_data;
+        protected static IDataProvider DataProvider { get; private set; }
 
         protected static INewbieDatabase Database { get; } = new NewbieDatabase();
 
         public static void SetApiKey(string apiKey)
         {
             OsuApi = OsuApiClient.ClientUsingKey(apiKey);
-            s_data = new DataProvider(OsuApi);
+            DataProvider = new DataProvider(OsuApi);
         }
 
         /// <exception cref="ExecutingException"></exception>
         protected async Task<int> EnsureGetBindingIdAsync(long qq)
         {
-            var (success, result) = await s_data.GetBindingIdAsync(qq);
+            var (success, result) = await DataProvider.GetBindingIdAsync(qq);
             ExecutingException.Ensure(success, "哎，获取绑定信息失败了。");
             ExecutingException.Ensure(result != null, "没绑定！");
             return result.Value;
