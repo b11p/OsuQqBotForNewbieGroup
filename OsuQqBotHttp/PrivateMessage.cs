@@ -23,8 +23,6 @@ namespace OsuQqBotHttp
 
     public sealed class GroupMessage : Message
     {
-        public string anonymous { get; set; }
-        public string anonymous_flag { get; set; }
         public int font { get; set; }
         public long group_id { get; set; }
         public string message { get; set; }
