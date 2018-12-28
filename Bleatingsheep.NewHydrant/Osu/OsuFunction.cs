@@ -25,7 +25,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         {
             var (success, result) = await DataProvider.GetBindingIdAsync(qq);
             ExecutingException.Ensure(success, "哎，获取绑定信息失败了。");
-            ExecutingException.Ensure(result != null, "没绑定！");
+            ExecutingException.Ensure(result != null, "没有绑定 osu! 账号。见https://github.com/bltsheep/OsuQqBotForNewbieGroup/wiki/%E5%B0%86-QQ-%E5%8F%B7%E4%B8%8E-osu!-%E8%B4%A6%E5%8F%B7%E7%BB%91%E5%AE%9A");
             return result.Value;
         }
 
