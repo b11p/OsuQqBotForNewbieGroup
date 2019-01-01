@@ -24,8 +24,8 @@ namespace Bleatingsheep.NewHydrant.Osu
             var result = await Database.GetPlusRecordedUsersAsync();
             if (!result.Success)
             {
-                executingInfo.Logger.LogInBackground("更新 PP+ 数据时访问数据库失败。");
-                executingInfo.Logger.LogException(result.Exception);
+                Logger.LogInBackground("更新 PP+ 数据时访问数据库失败。");
+                Logger.LogException(result.Exception);
                 return;
             }
 
@@ -52,8 +52,8 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var addResult = await Database.AddPlusHistoryRangeAsync(results);
                 if (!addResult.Success)
                 {
-                    executingInfo.Logger.LogInBackground("添加新的 PP+ 数据失败。");
-                    executingInfo.Logger.LogException(addResult.Exception);
+                    Logger.LogInBackground("添加新的 PP+ 数据失败。");
+                    Logger.LogException(addResult.Exception);
                 }
 
                 todo = failed.ToList();

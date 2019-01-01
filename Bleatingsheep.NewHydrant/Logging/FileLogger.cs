@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bleatingsheep.NewHydrant.Logging
@@ -12,6 +14,15 @@ namespace Bleatingsheep.NewHydrant.Logging
         private readonly object _thisLock = new object();
         public FileLogger(string file) => _file = file;
         public FileLogger(string file, TimeSpan offset) : this(file) => _offset = offset;
+
+        private static readonly Lazy<ILogger> s_instance = new Lazy<ILogger>(() =>
+        {
+            var executingFile = Assembly.GetExecutingAssembly().Location;
+            var logFile = Path.Combine(Path.GetDirectoryName(executingFile), "log.txt");
+            return new FileLogger(logFile);
+        }, LazyThreadSafetyMode.ExecutionAndPublication);
+
+        public static ILogger Default => s_instance.Value;
 
         public void LogException(Exception exception) => LogLinesInBackground(DateTimeOffset.Now.ToOffset(_offset).DateTime, exception);
 

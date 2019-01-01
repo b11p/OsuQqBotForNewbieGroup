@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
+using Bleatingsheep.NewHydrant.Logging;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 
@@ -13,6 +14,8 @@ namespace Bleatingsheep.NewHydrant.Osu
         protected static IDataProvider DataProvider { get; private set; }
 
         protected static INewbieDatabase Database { get; } = new NewbieDatabase();
+
+        protected static ILogger Logger => FileLogger.Default;
 
         public static void SetApiKey(string apiKey)
         {

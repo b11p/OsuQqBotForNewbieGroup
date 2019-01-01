@@ -50,7 +50,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 if (!oldQuery.Success)
                 {
                     await api.SendMessageAsync(message.Endpoint, "无法找到历史数据。");
-                    executingInfo.Logger.LogException(oldQuery.Exception);
+                    Logger.LogException(oldQuery.Exception);
                 }
 
                 var old = oldQuery.EnsureSuccess().Result;
@@ -83,7 +83,7 @@ Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
                 {
                     var addResult = await Database.AddPlusHistoryAsync(userPlus);
                     if (!addResult.Success)
-                        executingInfo.Logger.LogException(addResult.Exception);
+                        Logger.LogException(addResult.Exception);
                 }
             }
             catch (ExceptionPlus)

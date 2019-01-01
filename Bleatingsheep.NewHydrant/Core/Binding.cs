@@ -37,7 +37,7 @@ namespace Bleatingsheep.NewHydrant.Core
             else
             {
                 await api.SendMessageAsync(message.Endpoint, "数据库访问错误。");
-                executingInfo.Logger.LogException(dbResult.Exception);
+                Logger.LogException(dbResult.Exception);
             }
         }
 

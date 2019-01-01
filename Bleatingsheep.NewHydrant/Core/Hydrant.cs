@@ -54,10 +54,7 @@ namespace Bleatingsheep.NewHydrant.Core
 
 
             // 配置日志
-            var executingFile = Assembly.GetExecutingAssembly().Location;
-            var logFile = Path.Combine(Path.GetDirectoryName(executingFile), "log.txt");
-            _logger = new FileLogger(logFile);
-            _executingInfo.Logger = _logger;
+            _logger = FileLogger.Default;
             dataProvider.OnException += _logger.LogException;
             listener.OnException += _logger.LogException;
 
