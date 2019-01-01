@@ -20,7 +20,9 @@ namespace Bleatingsheep.NewHydrant.Osu
         public static void SetApiKey(string apiKey)
         {
             OsuApi = OsuApiClient.ClientUsingKey(apiKey);
-            DataProvider = new DataProvider(OsuApi);
+            var dataProvider = new DataProvider(OsuApi);
+            dataProvider.OnException += Logger.LogException;
+            DataProvider = dataProvider;
         }
 
         /// <exception cref="ExecutingException"></exception>

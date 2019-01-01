@@ -60,7 +60,7 @@ namespace Bleatingsheep.NewHydrant
                 // 配置 osu
                 OsuFunction.SetApiKey(configure.ApiKey);
 
-                var hydrant = new Hydrant(configure, httpApiClient, apiPostListener, Assembly.GetExecutingAssembly());
+                var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly());
 
                 // 添加异常处理
                 hydrant.OnCommandException += Hydrant_OnCommandExceptionAsync;

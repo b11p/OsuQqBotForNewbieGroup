@@ -19,7 +19,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         public async Task ProcessAsync(Message message, Sisters.WudiLib.HttpApiClient api, ExecutingInfo executingInfo)
         {
             long id = message.UserId;
-            var (networkSuccess, osuResult) = await executingInfo.Data.GetBindingIdAsync(id);
+            var (networkSuccess, osuResult) = await DataProvider.GetBindingIdAsync(id);
             ExecutingException.Ensure(networkSuccess, "无法查询绑定账号。");
             ExecutingException.Ensure(osuResult != null, "未绑定 osu! 游戏账号。");
 

@@ -45,7 +45,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 return;
 
             // 获取绑定的 osu! 游戏账号。
-            var (success, osuId) = await executingInfo.Data.GetBindingIdAsync(g.UserId);
+            var (success, osuId) = await DataProvider.GetBindingIdAsync(g.UserId);
             ExecutingException.Ensure(success, string.Empty);
             if (osuId == null)
             {// 在没有绑定的情况下尝试自动绑定。

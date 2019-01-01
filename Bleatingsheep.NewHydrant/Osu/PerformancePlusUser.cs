@@ -24,7 +24,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             }
             else
             {
-                var (success, userId) = await executingInfo.Data.GetBindingIdAsync(message.UserId);
+                var (success, userId) = await DataProvider.GetBindingIdAsync(message.UserId);
                 if (!success)
                 {
                     await api.SendMessageAsync(message.Endpoint, "查询绑定账号失败。");

@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Addon;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Logging;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuMixedApi.MotherShip;
@@ -29,7 +28,7 @@ namespace Bleatingsheep.NewHydrant.Core
         private int _isInitialized = 0;
 
         /// <exception cref="ArgumentException">Some of elements in <c>assemblies</c> was <c>null</c>.</exception>
-        public Hydrant(IConfigure configure, HttpApiClient httpApiClient, ApiPostListener listener, params Assembly[] assemblies)
+        public Hydrant(HttpApiClient httpApiClient, ApiPostListener listener, params Assembly[] assemblies)
         {
             if (assemblies == null)
             {
@@ -49,13 +48,9 @@ namespace Bleatingsheep.NewHydrant.Core
             _executingInfo = new ExecutingInfo
             {
             };
-            var dataProvider = new DataProvider(OsuApiClient.ClientUsingKey(configure.ApiKey));
-            _executingInfo.Data = dataProvider;
-
 
             // 配置日志
             _logger = FileLogger.Default;
-            dataProvider.OnException += _logger.LogException;
             listener.OnException += _logger.LogException;
 
             // 配置定期任务
