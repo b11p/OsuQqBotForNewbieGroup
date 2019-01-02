@@ -30,7 +30,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         private IEnumerable<int> _oldSets;
         private DateTimeOffset _noBeatmapAfter = DateTimeOffset.MinValue;
 
-        public async Task RunAsync(HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task RunAsync(HttpApiClient api)
         {
             IEnumerable<BloodcatBeatmapSet> newSets = null;
             var result = await BloodcatApi.Client.SearchRankedByKeywordAsync();

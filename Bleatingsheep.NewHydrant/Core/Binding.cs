@@ -11,7 +11,7 @@ namespace Bleatingsheep.NewHydrant.Core
     internal class Bind : OsuFunction, IMessageCommand
     {
         public IMessageCommand Create() => new Bind();
-        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
             // TODO 验证用户名是否合法
             var (success, userInfo) = await OsuApi.GetUserInfoAsync(_userName, OsuMixedApi.Mode.Standard);

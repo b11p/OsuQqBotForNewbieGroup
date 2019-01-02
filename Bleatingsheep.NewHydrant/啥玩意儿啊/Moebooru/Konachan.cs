@@ -36,7 +36,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
             "sideboob",
         };
 
-        public async Task ProcessAsync(Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task ProcessAsync(Message message, HttpApiClient api)
         {
             var k = new Api("https://konachan.net");
             var recent = await k.PopularRecentAsync();

@@ -17,6 +17,6 @@ namespace Bleatingsheep.NewHydrant.Attributions
         /// 初始化，或者重新初始化。
         /// </summary>
         /// <returns>是否成功。</returns>
-        Task<bool> InitializeAsync(ExecutingInfo executingInfo);
+        Task<bool> InitializeAsync();
     }
 }

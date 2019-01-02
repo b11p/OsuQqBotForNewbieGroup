@@ -22,7 +22,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         private readonly object _thisLock = new object();
         private readonly Dictionary<(long group, long qq), DateTime> _lastCheckTime = new Dictionary<(long group, long qq), DateTime>();
 
-        public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
             var g = message as GroupMessage;
             // 检查群是否要监视。
@@ -50,7 +50,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             if (osuId == null)
             {// 在没有绑定的情况下尝试自动绑定。
                 string response;
-                response = await AutoBind(api, executingInfo, g, success);
+                response = await AutoBind(api, g, success);
                 await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage("\r\n您好，" + response));
                 return;
             }
@@ -127,7 +127,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
         }
 
-        private static async Task<string> AutoBind(HttpApiClient api, ExecutingInfo executingInfo, GroupMessage g, bool success)
+        private static async Task<string> AutoBind(HttpApiClient api, GroupMessage g, bool success)
         {
             string response;
             var memberInfo = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);

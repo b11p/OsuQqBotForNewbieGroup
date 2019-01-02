@@ -24,7 +24,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             3082577334,
         };
 
-        public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
             if (!(message is GroupMessage g && g.GroupId == GroupId)) return;
 

@@ -19,7 +19,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         private long UserId => long.Parse(_match.Groups[2].Value);
         private string Message => _match.Groups[3].Value;
 
-        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
             var (success, osuId) = await DataProvider.GetBindingIdAsync(UserId);
             if (!success)

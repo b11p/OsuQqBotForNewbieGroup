@@ -7,6 +7,6 @@ namespace Bleatingsheep.NewHydrant.Attributions
     interface IMessageCommand
     {
         bool ShouldResponse(MessageContext context);
-        Task ProcessAsync(MessageContext context, Sisters.WudiLib.HttpApiClient api, ExecutingInfo executingInfo);
+        Task ProcessAsync(MessageContext context, Sisters.WudiLib.HttpApiClient api);
     }
 }

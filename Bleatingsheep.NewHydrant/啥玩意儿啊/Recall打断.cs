@@ -9,7 +9,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
     [Function("recall_old_hydrant")]
     internal class Recall打断 : IMessageMonitor
     {
-        public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
             if (message.UserId == 122866607 && message is GroupMessage g && g.GroupId == 641236878
                 && message.Content.IsPlaintext && message.Content.Text == "打断")

@@ -19,7 +19,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public TimeSpan? Every => null;
 
-        public async Task RunAsync(HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task RunAsync(HttpApiClient api)
         {
             var result = await Database.GetPlusRecordedUsersAsync();
             if (!result.Success)

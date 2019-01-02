@@ -20,7 +20,7 @@ namespace Bleatingsheep.NewHydrant.Admin
         private long _operator;
         private string _reason;
 
-        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
             var osuApi = OsuApi;
 

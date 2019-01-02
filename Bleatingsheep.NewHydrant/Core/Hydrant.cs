@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -8,8 +7,6 @@ using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Addon;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Logging;
-using Bleatingsheep.OsuMixedApi;
-using Bleatingsheep.OsuMixedApi.MotherShip;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
@@ -22,7 +19,6 @@ namespace Bleatingsheep.NewHydrant.Core
     {
         private readonly HttpApiClient _qq;
         private readonly ApiPostListener _listener;
-        private readonly ExecutingInfo _executingInfo;
         private readonly ILogger _logger;
         private readonly Assembly[] _assemblies;
         private int _isInitialized = 0;
@@ -45,10 +41,6 @@ namespace Bleatingsheep.NewHydrant.Core
             _qq = httpApiClient;
             _listener = listener;
 
-            _executingInfo = new ExecutingInfo
-            {
-            };
-
             // 配置日志
             _logger = FileLogger.Default;
             listener.OnException += _logger.LogException;
@@ -63,7 +55,7 @@ namespace Bleatingsheep.NewHydrant.Core
                     {
                         try
                         {
-                            await info.Action.RunAsync(_qq, _executingInfo);
+                            await info.Action.RunAsync(_qq);
                         }
                         catch (Exception e)
                         {
@@ -131,7 +123,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 {
                     try
                     {
-                        await m.OnMessageAsync(message, api, _executingInfo);
+                        await m.OnMessageAsync(message, api);
                     }
                     catch (ExecutingException)
                     {
@@ -159,7 +151,7 @@ namespace Bleatingsheep.NewHydrant.Core
                         _logger.LogException(e);
                         return;
                     }
-                    var task = hit?.ProcessAsync(message, api, _executingInfo);
+                    var task = hit?.ProcessAsync(message, api);
                     if (task != null)
                         await task;
                 }
@@ -233,7 +225,7 @@ namespace Bleatingsheep.NewHydrant.Core
             {
                 var init = lazy.Value as IInitializable;
 
-                var success = init.InitializeAsync(_executingInfo).Result;
+                var success = init.InitializeAsync().Result;
                 if (!success)
                     throw new AggregateException();
 

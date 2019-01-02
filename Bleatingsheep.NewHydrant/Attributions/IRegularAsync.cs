@@ -9,6 +9,6 @@ namespace Bleatingsheep.NewHydrant.Attributions
     {
         TimeSpan? OnUtc { get; }
         TimeSpan? Every { get; }
-        Task RunAsync(HttpApiClient api, ExecutingInfo executingInfo);
+        Task RunAsync(HttpApiClient api);
     }
 }

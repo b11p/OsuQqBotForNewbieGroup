@@ -19,7 +19,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
         {
             641236878,
         };
-        public async Task OnMessageAsync(Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task OnMessageAsync(Message message, HttpApiClient api)
         {
             if (message is GroupMessage g && ValidGroups.Contains(g.GroupId))
             {

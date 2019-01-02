@@ -15,7 +15,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public IMessageCommand Create() => new PerformancePlusUser();
         private string queryUser;
-        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
             dynamic query;
             if (!string.IsNullOrWhiteSpace(queryUser))

@@ -16,7 +16,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
 
         public IMessageCommand Create() => new PPBeatmapInfo();
-        public async Task ProcessAsync(Message message, Sisters.WudiLib.HttpApiClient api, ExecutingInfo executingInfo)
+        public async Task ProcessAsync(Message message, Sisters.WudiLib.HttpApiClient api)
         {
             long id = message.UserId;
             var (networkSuccess, osuResult) = await DataProvider.GetBindingIdAsync(id);
