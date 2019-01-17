@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.Osu.PerformancePlus;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
@@ -20,7 +20,18 @@ namespace Bleatingsheep.NewHydrant.Osu
             dynamic query;
             if (!string.IsNullOrWhiteSpace(queryUser))
             {
-                query = queryUser;
+                bool success;
+                (success, query) = await GetUserKey(queryUser);
+                if (!success)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "查询失败。");
+                    return;
+                }
+                if (query is null)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "查无此人。");
+                    return;
+                }
             }
             else
             {
@@ -90,6 +101,19 @@ Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
             {
                 await api.SendMessageAsync(message.Endpoint, "查询PP+失败。");
                 return;
+            }
+        }
+
+        private static async Task<(bool success, dynamic key)> GetUserKey(string userName)
+        {
+            if (userName.All(c => char.IsDigit(c)))
+            {
+                var (success, user) = await OsuApi.GetUserInfoAsync(userName, OsuMixedApi.Mode.Standard);
+                return (success, user?.Id);
+            }
+            else
+            {
+                return (true, userName);
             }
         }
 
