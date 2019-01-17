@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Osu;
+using Bleatingsheep.NewHydrant.Osu.Newbie;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
@@ -56,6 +57,7 @@ namespace Bleatingsheep.NewHydrant
                 apiPostListener.GroupRequestEvent += (api, e) => e.UserId == configure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
                 apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
                 //apiPostListener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
+                apiPostListener.GroupRequestEvent += NotifyOnJoinRequest.Monitor;
 
                 // 配置 osu
                 OsuFunction.SetApiKey(configure.ApiKey);
