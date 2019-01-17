@@ -34,9 +34,9 @@ namespace OsuQqBot.StatelessFunctions
                 _count = 1;
             }
 
-            if (_count > 1 && !IsVip(_qq))
+            if (_count > 1 && !IsVip(_qq) && !(endPoint is PrivateEndPoint))
             {
-                qq.SendMessageAsync(endPoint, "不给看。");
+                qq.SendMessageAsync(endPoint, "这个功能是仅限私聊的。");
                 return;
             }
 
