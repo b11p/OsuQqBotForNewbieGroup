@@ -4,7 +4,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Attributions
 {
-    interface IMessageCommand
+    public interface IMessageCommand
     {
         bool ShouldResponse(MessageContext context);
         Task ProcessAsync(MessageContext context, Sisters.WudiLib.HttpApiClient api);

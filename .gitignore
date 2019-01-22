@@ -2,7 +2,7 @@
 /Bleatingsheep.OsuQqBot.Database/Models/ServerInfo.cs
 
 # Ignore my configure which includes my API Key
-/Bleatingsheep.NewHydrant/HardcodedConfigure.cs
+/Bleatingsheep.NewHydrant.Bot/HardcodedConfigure.cs
 
 # Ignore publish file
 FolderProfile.pubxml
@@ -269,5 +269,5 @@ paket-files/
 __pycache__/
 *.pyc
 /Bleatingsheep.NewHydrant.Irc/Password.cs
-/Bleatingsheep.NewHydrant/秘密功能
+/Bleatingsheep.NewHydrant.Bot/秘密功能
 /OsuQqBotHttp/HardcodedConfigure.cs

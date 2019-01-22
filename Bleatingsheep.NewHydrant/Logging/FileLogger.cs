@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Bleatingsheep.NewHydrant.Logging
 {
-    class FileLogger : ILogger
+    public class FileLogger : ILogger
     {
         private readonly string _file;
         private readonly TimeSpan _offset = new TimeSpan(8, 0, 0);

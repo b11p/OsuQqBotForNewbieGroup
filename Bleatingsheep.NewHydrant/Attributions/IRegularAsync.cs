@@ -5,7 +5,7 @@ using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Attributions
 {
-    interface IRegularAsync
+    public interface IRegularAsync
     {
         TimeSpan? OnUtc { get; }
         TimeSpan? Every { get; }

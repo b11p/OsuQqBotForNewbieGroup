@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Bleatingsheep.NewHydrant</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bleatingsheep.Osu.Enums" Version="0.2.0" />
+    <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
+    <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.4.1" />
+    <PackageReference Include="PuppeteerSharp" Version="1.11.1" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.2" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="4.5.0" />
+    <PackageReference Include="WebApiClient.AOT" Version="0.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Sisters.WudiLib\Sisters.WudiLib\Sisters.WudiLib.csproj" />
+    <ProjectReference Include="..\Bleatingsheep.NewHydrant.Data\Bleatingsheep.NewHydrant.Data.csproj" />
+    <ProjectReference Include="..\Bleatingsheep.NewHydrant\Bleatingsheep.NewHydrant.csproj" />
+    <ProjectReference Include="..\Bleatingsheep.OsuQqBot.Database\Bleatingsheep.OsuQqBot.Database.csproj" />
+  </ItemGroup>
+
+</Project>

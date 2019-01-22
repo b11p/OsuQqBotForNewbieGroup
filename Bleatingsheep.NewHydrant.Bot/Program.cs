@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.NewHydrant.Osu.Newbie;
+using Bleatingsheep.OsuQqBot.Database.Execution;
+using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
@@ -62,10 +65,10 @@ namespace Bleatingsheep.NewHydrant
                 // 配置 osu
                 OsuFunction.SetApiKey(configure.ApiKey);
 
-                var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly());
+                var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly(), typeof(Hydrant).Assembly);
 
-                // 添加异常处理
-                hydrant.OnCommandException += Hydrant_OnCommandExceptionAsync;
+                // 设置异常处理。
+                hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
 
                 hydrant.Init();
             }
@@ -78,8 +81,29 @@ namespace Bleatingsheep.NewHydrant
             Task.Delay(-1).Wait();
         }
 
-        private static async void Hydrant_OnCommandExceptionAsync(string funName, Exception exception, HttpApiClient api, Sisters.WudiLib.Posts.Message message)
+        private static async Task Hydrant_ExceptionCaught_Command(string funcName, Exception exception, HttpApiClient api, Sisters.WudiLib.Posts.Message message)
         {
+            if (exception is DatabaseFailException e)
+            {
+                await api.SendMessageAsync(
+                    endpoint: message.Endpoint,
+                    message: e.Message ?? (e.InnerException is DbUpdateConcurrencyException ? "数据库太忙。" : "无法访问数据库。")
+                );
+                Logging.FileLogger.Default.LogException(e);
+            }
+            else if (exception is MySqlException)
+            {
+                await api.SendMessageAsync(message.Endpoint, "无法访问 MySQL 数据库。");
+            }
+            else if (exception is ApiAccessException)
+            {
+                // 酷 Q 失败。
+            }
+            else
+            {
+                await api.SendMessageAsync(message.Endpoint, "有一些不好的事发生了。");
+                Logging.FileLogger.Default.LogException(exception);
+            }
         }
     }
 }

@@ -7,9 +7,6 @@ using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Addon;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Logging;
-using Bleatingsheep.OsuQqBot.Database.Execution;
-using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
@@ -167,39 +164,41 @@ namespace Bleatingsheep.NewHydrant.Core
                         _logger.LogException(e.InnerException);
                     }
                 }
-                catch (Exception e) when (_isInitialized == 0) // 暂时不会执行。
+                catch (Exception e) //when (_isInitialized == 0) // 暂时不会执行。
                 {
                     try
                     {
                         var attr = hit.GetType().GetCustomAttribute<FunctionAttribute>();
-                        OnCommandException?.Invoke(attr.Name, e, api, message);
+                        var hTask = ExceptionCaught_Command?.Invoke(attr.Name, e, api, message);
+                        if (hTask != null)
+                            await hTask;
                     }
                     catch (Exception)
                     {
                         // ignore exception on handling
                     }
                 }
-                catch (DatabaseFailException e)
-                {
-                    await api.SendMessageAsync(
-                        endpoint: message.Endpoint,
-                        message: e.Message ?? (e.InnerException is DbUpdateConcurrencyException ? "数据库太忙。" : "无法访问数据库。")
-                    );
-                    _logger.LogException(e);
-                }
-                catch (MySqlException)
-                {
-                    await api.SendMessageAsync(message.Endpoint, "无法访问 MySQL 数据库。");
-                }
-                catch (ApiAccessException)
-                {
-                    // 酷 Q 失败。
-                }
-                catch (Exception e)
-                {
-                    await api.SendMessageAsync(message.Endpoint, "有一些不好的事发生了。");
-                    _logger.LogException(e);
-                }
+                //catch (DatabaseFailException e)
+                //{
+                //    await api.SendMessageAsync(
+                //        endpoint: message.Endpoint,
+                //        message: e.Message ?? (e.InnerException is DbUpdateConcurrencyException ? "数据库太忙。" : "无法访问数据库。")
+                //    );
+                //    _logger.LogException(e);
+                //}
+                //catch (MySqlException)
+                //{
+                //    await api.SendMessageAsync(message.Endpoint, "无法访问 MySQL 数据库。");
+                //}
+                //catch (ApiAccessException)
+                //{
+                //    // 酷 Q 失败。
+                //}
+                //catch (Exception e)
+                //{
+                //    await api.SendMessageAsync(message.Endpoint, "有一些不好的事发生了。");
+                //    _logger.LogException(e);
+                //}
             };
 
             // 跑定期任务
@@ -256,7 +255,10 @@ namespace Bleatingsheep.NewHydrant.Core
 
         #region ExceptionEvent
 
-        public event Action<string, Exception, HttpApiClient, Sisters.WudiLib.Posts.Message> OnCommandException;
+        /// <summary>
+        /// 在执行命令时被框架抓到了异常。
+        /// </summary>
+        public event Func<string, Exception, HttpApiClient, Sisters.WudiLib.Posts.Message, Task> ExceptionCaught_Command;
 
         #endregion
     }
