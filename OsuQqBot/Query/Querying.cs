@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuMixedApi;
 using Newtonsoft.Json;
 
@@ -20,14 +21,22 @@ namespace OsuQqBot.Query
 
         public static Querying Instance { get; private set; } = null;
 
-        private readonly OsuApiClient _api = null;
+        private OsuApiClient Api => OpenApi.Instance.OsuApiClient;
+        private readonly Lazy<IDataProvider> _dataProviderLazy;
+        private IDataProvider DataProvider => _dataProviderLazy.Value;
 
-        private Querying() => _api = OpenApi.Instance.OsuApiClient;
+        private Querying()
+        {
+            _dataProviderLazy = new Lazy<IDataProvider>(() =>
+            {
+                return new DataProvider(Api);
+            });
+        }
 
         public IReadOnlyCollection<UserInfo> CheckUsername(IEnumerable<string> possibleUsernames, bool requireAllSucceeded = true)
         {
             var userInfos = new System.Collections.Concurrent.ConcurrentBag<UserInfo>();
-            var api = _api;
+            var api = Api;
 
             var result = Parallel.ForEach(possibleUsernames, (name, state) =>
             {
@@ -48,11 +57,18 @@ namespace OsuQqBot.Query
         }
 
         /// <summary>
+        /// 查找 QQ 号绑定的 osu! 账号。
+        /// </summary>
+        /// <exception cref="OsuApiFailedException">访问 API 时出现异常。</exception>
+        /// <returns>绑定 osu! 账号的 User ID；如果未绑定，则为 <c>null</c>。</returns>
+        public Task<int?> GetUserBind(long qqId) => GetUserBind_Db(qqId);
+
+        /// <summary>
         /// 通过 API (https://api.bleatingsheep.org/api/binding/{qqId}) 查找 QQ 号绑定的 osu! 账号。
         /// </summary>
         /// <exception cref="OsuApiFailedException">访问 API 时出现异常。</exception>
         /// <returns>绑定 osu! 账号的 User ID；如果未绑定，则为 <c>null</c>。</returns>
-        public async Task<int?> GetUserBind(long qqId)
+        private async Task<int?> GetUserBind_Api(long qqId)
         {
             try
             {
@@ -66,8 +82,27 @@ namespace OsuQqBot.Query
             }
             catch (Exception e)
             {
-                throw new OsuApiFailedException("Something was wrong while finding binding.", e);
+                throw CreateEx(e);
             }
         }
+
+        private async Task<int?> GetUserBind_Db(long qqId)
+        {
+            bool success;
+            int? result;
+            try
+            {
+                (success, result) = await DataProvider.GetBindingIdAsync(qqId);
+            }
+            catch (Exception e)
+            {
+                throw CreateEx(e);
+            }
+            return success
+                ? result
+                : throw CreateEx(null);
+        }
+
+        private static OsuApiFailedException CreateEx(Exception e) => new OsuApiFailedException("Something was wrong while finding binding.", e);
     }
 }

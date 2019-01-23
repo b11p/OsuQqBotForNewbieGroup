@@ -1,4 +1,5 @@
-﻿using OsuQqBot.QqBot;
+﻿using Bleatingsheep.OsuMixedApi;
+using OsuQqBot.QqBot;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -26,7 +27,16 @@ namespace OsuQqBot
                     qq.SendMessageAsync(endPoint, "不查，浪费资源");
                     return;
                 }
-                var uid = Query.Querying.Instance.GetUserBind(source.FromQq).GetAwaiter().GetResult();
+                int? uid;
+                try
+                {
+                    uid = Query.Querying.Instance.GetUserBind(source.FromQq).GetAwaiter().GetResult();
+                }
+                catch (OsuApiFailedException)
+                {
+                    qq.SendMessageAsync(endPoint, "API 故障，查询失败。");
+                    throw;
+                }
                 if (uid == null)
                 {
                     qq.SendMessageAsync(endPoint, "未绑定，请使用绑定<你的账号>命令绑定");
