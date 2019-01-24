@@ -9,6 +9,7 @@ using Bleatingsheep.NewHydrant.Osu.Newbie;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
+using NLog;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
@@ -23,6 +24,8 @@ namespace Bleatingsheep.NewHydrant
             CultureInfo.CurrentUICulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+            // config logger
 
             var configure = new HardcodedConfigure();
 
@@ -65,19 +68,24 @@ namespace Bleatingsheep.NewHydrant
                 // 配置 osu
                 OsuFunction.SetApiKey(configure.ApiKey);
 
-                var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly(), typeof(Hydrant).Assembly);
+                var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly(), typeof(Hydrant).Assembly)
+                    .AddLogger(LogManager.LogFactory);
 
                 // 设置异常处理。
                 hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
 
                 hydrant.Init();
+
+                Task.Delay(-1).Wait();
             }
             catch (Exception e)
             {
                 var logPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "fatal.log");
                 new Logging.FileLogger(logPath).LogException(e);
+                LogManager.Shutdown();
             }
 
+            // 阻止自动重启
             Task.Delay(-1).Wait();
         }
 

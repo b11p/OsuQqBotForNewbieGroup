@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Addon;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.Logging;
+using NLog;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
@@ -16,9 +16,9 @@ namespace Bleatingsheep.NewHydrant.Core
     {
         private readonly HttpApiClient _qq;
         private readonly ApiPostListener _listener;
-        private readonly ILogger _logger;
         private readonly Assembly[] _assemblies;
         private int _isInitialized = 0;
+        private LogFactory _logFactory;
 
         /// <exception cref="ArgumentException">Some of elements in <c>assemblies</c> was <c>null</c>.</exception>
         public Hydrant(HttpApiClient httpApiClient, ApiPostListener listener, params Assembly[] assemblies)
@@ -39,8 +39,8 @@ namespace Bleatingsheep.NewHydrant.Core
             _listener = listener;
 
             // 配置日志
-            _logger = FileLogger.Default;
-            listener.OnException += _logger.LogException;
+            //_logger = FileLogger.Default;
+            listener.OnException += e => LogException(nameof(ApiPostListener), "Listener 的异常", e);
 
             // 配置定期任务
             _plan = new Task(() =>
@@ -56,7 +56,8 @@ namespace Bleatingsheep.NewHydrant.Core
                         }
                         catch (Exception e)
                         {
-                            _logger.LogException(e);
+                            //_logger.LogException(e);
+                            LogException(GetServiceName(info.Action), "定期任务的异常", e);
                         }
                     });
                 }
@@ -88,6 +89,25 @@ namespace Bleatingsheep.NewHydrant.Core
             }, TaskCreationOptions.LongRunning);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logFactory"></param>
+        /// <exception cref="Exception">The logger is already added.</exception>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <returns></returns>
+        public Hydrant AddLogger(LogFactory logFactory)
+        {
+            if (logFactory == null)
+            {
+                throw new ArgumentNullException(nameof(logFactory));
+            }
+
+            var old = Interlocked.CompareExchange(ref _logFactory, logFactory, default);
+            if (old != default) throw new Exception();
+            return this;
+        }
+
         #region 执行期间各种事件处理器集合
         private readonly IList<IInitializable> _initializableList = new List<IInitializable>();
         private readonly IList<IMessageCommand> _messageCommandList = new List<IMessageCommand>();
@@ -105,6 +125,24 @@ namespace Bleatingsheep.NewHydrant.Core
             {
                 Init(_assemblies);
             }
+        }
+
+        private static string GetServiceName(object hit)
+        {
+            if (hit == null)
+            {
+                throw new ArgumentNullException(nameof(hit));
+            }
+
+            var attr = hit.GetType().GetCustomAttribute<FunctionAttribute>();
+            var name = attr?.Name;
+            return name;
+        }
+
+        private void LogException(string name, string message, Exception e)
+        {
+            var logger = _logFactory?.GetLogger(name) ?? LogManager.CreateNullLogger();
+            logger.Warn(e, message);
         }
 
         private void Init(IEnumerable<Assembly> assemblies)
@@ -128,7 +166,8 @@ namespace Bleatingsheep.NewHydrant.Core
                     }
                     catch (Exception e)
                     {
-                        _logger.LogException(e);
+                        //_logger.LogException(e);
+                        LogException(GetServiceName(m), "Monitor 的异常。", e);
                     }
                 });
             };
@@ -145,7 +184,8 @@ namespace Bleatingsheep.NewHydrant.Core
                     }
                     catch (Exception e)
                     {
-                        _logger.LogException(e);
+                        //_logger.LogException(e);
+                        LogException(nameof(Hydrant), "ShouldResponse 方法引发了一个异常", e);
                         return;
                     }
                     var task = hit?.ProcessAsync(message, api);
@@ -161,15 +201,16 @@ namespace Bleatingsheep.NewHydrant.Core
                         );
                     if (e.InnerException != null)
                     {
-                        _logger.LogException(e.InnerException);
+                        //_logger.LogException(e.InnerException);
+                        LogException(GetServiceName(hit), "包含内部异常的执行异常", e.InnerException);
                     }
                 }
                 catch (Exception e) //when (_isInitialized == 0) // 暂时不会执行。
                 {
                     try
                     {
-                        var attr = hit.GetType().GetCustomAttribute<FunctionAttribute>();
-                        var hTask = ExceptionCaught_Command?.Invoke(attr.Name, e, api, message);
+                        var name = GetServiceName(hit);
+                        var hTask = ExceptionCaught_Command?.Invoke(name, e, api, message);
                         if (hTask != null)
                             await hTask;
                     }
