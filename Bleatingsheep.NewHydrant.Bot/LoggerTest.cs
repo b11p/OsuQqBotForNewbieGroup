@@ -10,7 +10,7 @@ using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant
 {
-    [Function("logger_test")]
+    //[Function("logger_test")]
     public class LoggerTest : Service, IMessageMonitor, IMessageCommand
     {
         public Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)

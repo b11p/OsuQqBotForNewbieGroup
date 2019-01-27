@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using NLog;
 
 namespace Bleatingsheep.NewHydrant.Core
@@ -16,6 +14,6 @@ namespace Bleatingsheep.NewHydrant.Core
 
         internal LogFactory LogFactory { private get; set; }
 
-        protected Logger Logger { get; }
+        protected Logger Logger => _logger.Value;
     }
 }
