@@ -145,6 +145,28 @@ namespace Bleatingsheep.NewHydrant.Core
             logger.Warn(e, message);
         }
 
+        private object CreateServiceInstance(Type type)
+        {
+            var result = type.CreateInstance();
+            ConfigureDefaultService(result);
+            return result;
+        }
+
+        private T CreateServiceInstance<T>(Type type)
+        {
+            var result = type.CreateInstance<T>();
+            ConfigureDefaultService(result);
+            return result;
+        }
+
+        private void ConfigureDefaultService(object result)
+        {
+            if (result is Service s)
+            {
+                s.LogFactory = _logFactory;
+            }
+        }
+
         private void Init(IEnumerable<Assembly> assemblies)
         {
             var types = assemblies.SelectMany(a => a.GetTypes()
@@ -179,7 +201,7 @@ namespace Bleatingsheep.NewHydrant.Core
                     try
                     {
                         hit = _messageCommandList
-                        .Select(c => c.GetType().CreateInstance<IMessageCommand>())
+                        .Select(c => CreateServiceInstance<IMessageCommand>(c.GetType()))
                         .FirstOrDefault(c => c.ShouldResponse(message));
                     }
                     catch (Exception e)
@@ -253,7 +275,7 @@ namespace Bleatingsheep.NewHydrant.Core
         {
             var interfaces = t.GetInterfaces();
             var lazy = new Lazy<object>(
-                valueFactory: () => Assembly.GetAssembly(t).CreateInstance(t.FullName),
+                valueFactory: () => CreateServiceInstance(t),
                 mode: LazyThreadSafetyMode.None
             );
             Array.ForEach(interfaces, i => InitInterface(i, lazy));
