@@ -24,15 +24,17 @@ namespace Bleatingsheep.NewHydrant.Osu
             var result = await Database.GetPlusRecordedUsersAsync();
             if (!result.Success)
             {
-                Logger.LogInBackground("更新 PP+ 数据时访问数据库失败。");
-                Logger.LogException(result.Exception);
+                FLogger.LogInBackground("更新 PP+ 数据时访问数据库失败。");
+                FLogger.LogException(result.Exception);
                 return;
             }
 
             IEnumerable<int> todo = result.Result;
+            Logger.Info($"找到{todo.Count()}个查询过的玩家。");
             int retry = 10;
             do
             {
+                Logger.Info($"开始查询。");
                 var failed = new ConcurrentBag<int>();
                 var results = new ConcurrentBag<IUserPlus>();
 
@@ -49,11 +51,13 @@ namespace Bleatingsheep.NewHydrant.Osu
                         failed.Add(userId);
                     }
                 });
+                Logger.Info($"查询成功{results.Count}条。");
+                Logger.Info($"失败{failed.Count}条，首个失败是{failed.FirstOrDefault()}");
                 var addResult = await Database.AddPlusHistoryRangeAsync(results);
                 if (!addResult.Success)
                 {
-                    Logger.LogInBackground("添加新的 PP+ 数据失败。");
-                    Logger.LogException(addResult.Exception);
+                    FLogger.LogInBackground("添加新的 PP+ 数据失败。");
+                    FLogger.LogException(addResult.Exception);
                 }
 
                 todo = failed.ToList();

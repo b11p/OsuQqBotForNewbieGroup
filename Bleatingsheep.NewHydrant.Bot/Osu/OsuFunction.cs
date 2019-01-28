@@ -7,7 +7,7 @@ using Bleatingsheep.OsuQqBot.Database.Execution;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
-    public class OsuFunction
+    public class OsuFunction : Service
     {
         protected static OsuApiClient OsuApi { get; private set; }
 
@@ -15,13 +15,13 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         protected static INewbieDatabase Database { get; } = new NewbieDatabase();
 
-        protected static ILogger Logger => FileLogger.Default;
+        protected static ILogger FLogger => FileLogger.Default;
 
         public static void SetApiKey(string apiKey)
         {
             OsuApi = OsuApiClient.ClientUsingKey(apiKey);
             var dataProvider = new DataProvider(OsuApi);
-            dataProvider.OnException += Logger.LogException;
+            dataProvider.OnException += FLogger.LogException;
             DataProvider = dataProvider;
         }
 
