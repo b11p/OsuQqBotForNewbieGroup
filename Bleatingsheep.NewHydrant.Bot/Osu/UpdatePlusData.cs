@@ -15,7 +15,7 @@ namespace Bleatingsheep.NewHydrant.Osu
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
 
-        public TimeSpan? OnUtc => new TimeSpan(20, 30, 0);
+        public TimeSpan? OnUtc => new TimeSpan(20, 0, 0);
 
         public TimeSpan? Every => null;
 
