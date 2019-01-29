@@ -38,7 +38,10 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var failed = new ConcurrentBag<int>();
                 var results = new ConcurrentBag<IUserPlus>();
 
-                todo.AsParallel().ForAll(userId =>
+                Parallel.ForEach(todo, new ParallelOptions
+                {
+                    MaxDegreeOfParallelism = 8,
+                }, userId =>
                 {
                     try
                     {
