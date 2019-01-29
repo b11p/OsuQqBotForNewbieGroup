@@ -127,7 +127,7 @@ namespace Bleatingsheep.NewHydrant.Core
             }
         }
 
-        private static string GetServiceName(object hit)
+        internal static string GetServiceName(object hit)
         {
             if (hit == null)
             {

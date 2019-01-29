@@ -9,7 +9,7 @@ namespace Bleatingsheep.NewHydrant.Core
 
         public Service()
             => _logger = new Lazy<Logger>(
-                () => LogFactory?.GetCurrentClassLogger() ?? LogManager.CreateNullLogger()
+                () => LogFactory?.GetLogger(Hydrant.GetServiceName(this)) ?? LogManager.CreateNullLogger()
             );
 
         internal LogFactory LogFactory { private get; set; }
