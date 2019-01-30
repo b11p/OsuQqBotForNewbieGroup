@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.Osu.PerformancePlus;
 using Sisters.WudiLib;
 
@@ -34,13 +34,14 @@ namespace Bleatingsheep.NewHydrant.Osu
             int retry = 10;
             do
             {
-                Logger.Info($"开始查询。");
+                const int threads = 10;
+                Logger.Debug($"开始查询，线程数为{threads.ToString(CultureInfo.InvariantCulture)}");
                 var failed = new ConcurrentBag<int>();
                 var results = new ConcurrentBag<IUserPlus>();
 
                 Parallel.ForEach(todo, new ParallelOptions
                 {
-                    MaxDegreeOfParallelism = 8,
+                    MaxDegreeOfParallelism = threads,
                 }, userId =>
                 {
                     try
