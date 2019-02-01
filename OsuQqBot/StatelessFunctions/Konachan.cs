@@ -1,4 +1,5 @@
-﻿using OsuQqBot.QqBot;
+﻿using NLog;
+using OsuQqBot.QqBot;
 using System;
 using System.Linq;
 
@@ -8,6 +9,13 @@ namespace OsuQqBot.StatelessFunctions
     {
         protected virtual string Website { get; } = "https://konachan.net";
         protected virtual string StartWord { get; } = "konachan";
+
+        /// <summary>
+        /// 已知的最小的无法发送的大小。
+        /// </summary>
+        private const long MinNo = 11457410;
+
+        private const long MaxYes = 2550804;
 
         private static bool IsVip(long qq) => qq == 630060047;
 
@@ -41,13 +49,18 @@ namespace OsuQqBot.StatelessFunctions
             }
 
             var k = new Moebooru.Api(Website);
-            var result = await k.PopularRecentAsync();
+            var result = (await k.PopularRecentAsync())?.Where(p => p.JpegSizeFallback < MinNo).ToList();
+            var logger = LogManager.GetCurrentClassLogger();
             if (!result.Any())
+            {
+                logger.Debug("没有图。");
                 return;
+            }
 
             var posts = result.Take(_count);
             foreach (var post in posts)
             {
+                logger.Debug($"{Website} | {post.id}, jpeg size {post.jpeg_file_size}({post.file_size})");
                 qq.SendMessageAsync(endPoint, qq.OnlineImage(post.JpegUrl));
             }
         }

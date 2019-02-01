@@ -58,6 +58,8 @@ namespace OsuQqBot.Moebooru
         public object[] frames { get; set; }
         public object flag_detail { get; set; }
 
+        public int JpegSizeFallback => jpeg_file_size == 0 ? file_size : jpeg_file_size;
+
         private static string UrlFormat(string ori)
         {
             if (ori.StartsWith("//")) return ProtocolPrefix + ori;
