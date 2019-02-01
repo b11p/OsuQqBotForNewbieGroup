@@ -11,7 +11,8 @@ namespace OsuQqBotHttp
 {
     class QqBot : IQqBot
     {
-        static readonly string server = new Bleatingsheep.NewHydrant.HardcodedConfigure().ApiAddress;
+        private static readonly Bleatingsheep.NewHydrant.HardcodedConfigure hardcodedConfigure = new Bleatingsheep.NewHydrant.HardcodedConfigure();
+        static readonly string server = hardcodedConfigure.ApiAddress;
         static readonly string privatePath = "/send_private_msg_async";
         static readonly string groupPath = "/send_group_msg_async";
         static readonly string discussPath = "/send_discuss_msg_async";
@@ -22,6 +23,18 @@ namespace OsuQqBotHttp
         private ICollection<GroupAdminChangeEventHandler> groupAdminChange = new LinkedList<GroupAdminChangeEventHandler>();
 
         private ICollection<GroupMemberIncreaseEventHandler> groupMemberIncrease = new LinkedList<GroupMemberIncreaseEventHandler>();
+
+        private readonly HttpClient _httpClient = new HttpClient();
+
+        public QqBot()
+        {
+            var token = hardcodedConfigure.AccessToken;
+            if (!string.IsNullOrEmpty(token))
+            {
+                //content.Headers.Add("Authorization", "Token " + HttpApiClient.AccessToken);
+                _httpClient.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse("Token " + token);
+            }
+        }
 
         public event GroupAdminChangeEventHandler GroupAdminChange
         {
@@ -178,50 +191,42 @@ namespace OsuQqBotHttp
             await Post(DiscussUrl, json);
         }
 
-        private static async System.Threading.Tasks.Task<string> Post(string url, string json)
+        private async System.Threading.Tasks.Task<string> Post(string url, string json)
         {
-            using (HttpClient client = new HttpClient())
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            string message;
+            try
             {
-                var token = new Bleatingsheep.NewHydrant.HardcodedConfigure().AccessToken;
-                if (!string.IsNullOrEmpty(token))
-                {
-                    //content.Headers.Add("Authorization", "Token " + HttpApiClient.AccessToken);
-                    client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse("Token " + token);
-                }
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                string message;
-                try
-                {
-                    var t = await client.PostAsync(url, content);
-                    //if (t.StatusCode != 0)
-                    //{
-                    //    StringBuilder sb = new StringBuilder();
-                    //    sb.AppendLine(url);
-                    //    sb.AppendLine(json);
-                    //    if ((int)t.StatusCode == 1)
-                    //    {
-                    //        sb.AppendLine("Async!");
-                    //        sb.AppendLine();
-                    //    }
-                    //    else
-                    //    {
-                    //        sb.AppendFormat("StatusCode is {0}", t.StatusCode);
-                    //        sb.AppendLine();
-                    //        sb.AppendLine();
-                    //    }
-                    //    Logger.Log(sb.ToString());
-                    //}
-                    message = await t.Content.ReadAsStringAsync();
-                }
-                catch (HttpRequestException e)
-                {
-                    //Logger.Log(json);
-                    Logger.Log("由于网络错误，API 访问失败。");
-                    Logger.LogException(e);
-                    message = null;
-                }
-                return message;
+                var t = await _httpClient.PostAsync(url, content);
+                //if (t.StatusCode != 0)
+                //{
+                //    StringBuilder sb = new StringBuilder();
+                //    sb.AppendLine(url);
+                //    sb.AppendLine(json);
+                //    if ((int)t.StatusCode == 1)
+                //    {
+                //        sb.AppendLine("Async!");
+                //        sb.AppendLine();
+                //    }
+                //    else
+                //    {
+                //        sb.AppendFormat("StatusCode is {0}", t.StatusCode);
+                //        sb.AppendLine();
+                //        sb.AppendLine();
+                //    }
+                //    Logger.Log(sb.ToString());
+                //}
+                message = await t.Content.ReadAsStringAsync();
             }
+            catch (HttpRequestException e)
+            {
+                //Logger.Log(json);
+                Logger.Log("由于网络错误，API 访问失败。");
+                Logger.LogException(e);
+                message = null;
+            }
+            return message;
+
         }
 
         public void SendMessageAsync(EndPoint endPoint, string message)
