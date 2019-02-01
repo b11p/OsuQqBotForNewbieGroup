@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Bleatingsheep.OsuMixedApi;
 using Newtonsoft.Json;
+using NLog;
 using OsuQqBot.QqBot;
 
 namespace OsuQqBotHttp
@@ -14,6 +15,7 @@ namespace OsuQqBotHttp
     {
         static void Main(string[] args)
         {
+            var logger = LogManager.GetCurrentClassLogger();
             var culture = CultureInfo.GetCultureInfo("zh-CN");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
