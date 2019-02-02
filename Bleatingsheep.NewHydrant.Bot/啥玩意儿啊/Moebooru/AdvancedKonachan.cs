@@ -68,7 +68,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
                 var count = (context.Endpoint is PrivateEndpoint || await IsVipAsync(context.UserId)) ? GetCount() : 1;
 
                 var result = (await booru.GetPopularRecentAsync())
-                    .Where(p => p.Rating == Rating.Safe && p.Status == Status.Active);
+                    .Where(p => p.Rating == Rating.Safe && p.Status == Status.Active && !p.Tags.Split().Intersect(diss).Any());
                 if (await ShouldRandomize(context.Endpoint))
                 {
                     result = result.Randomize();
