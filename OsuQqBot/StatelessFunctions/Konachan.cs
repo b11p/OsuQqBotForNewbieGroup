@@ -13,9 +13,9 @@ namespace OsuQqBot.StatelessFunctions
         /// <summary>
         /// 已知的最小的无法发送的大小。
         /// </summary>
-        private const long MinNo = 11457410;
+        private const long MinNo = 6319344;
 
-        private const long MaxYes = 2550804;
+        private const long MaxYes = 6262104;
 
         private static bool IsVip(long qq) => qq == 630060047;
 

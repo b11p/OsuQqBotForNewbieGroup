@@ -9,10 +9,10 @@ using Message = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
 {
-    [Function("konachan")]
+    //[Function("konachan")]
     class Konachan : IMessageCommand
     {
-        private static readonly ISet<string> DissTags = new HashSet<string>
+        internal static readonly ISet<string> DissTags = new HashSet<string>
         {
             "bikini",
             "panties",
