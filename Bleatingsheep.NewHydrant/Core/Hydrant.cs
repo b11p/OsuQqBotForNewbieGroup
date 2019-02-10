@@ -198,16 +198,17 @@ namespace Bleatingsheep.NewHydrant.Core
                 IMessageCommand hit = default;
                 try
                 {
+                    IMessageCommand last = null;
                     try
                     {
                         hit = _messageCommandList
                         .Select(c => CreateServiceInstance<IMessageCommand>(c.GetType()))
-                        .FirstOrDefault(c => c.ShouldResponse(message));
+                        .FirstOrDefault(c => (last = c).ShouldResponse(message));
                     }
                     catch (Exception e)
                     {
                         //_logger.LogException(e);
-                        LogException(nameof(Hydrant), "ShouldResponse 方法引发了一个异常", e);
+                        LogException(last is null ? nameof(Hydrant) : GetServiceName(last), "ShouldResponse 方法引发了一个异常", e);
                         return;
                     }
                     var task = hit?.ProcessAsync(message, api);
@@ -229,6 +230,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 }
                 catch (Exception e) //when (_isInitialized == 0) // 暂时不会执行。
                 {
+                    LogException(GetServiceName(hit), "有一些不好的事发生了。", e);
                     try
                     {
                         var name = GetServiceName(hit);
