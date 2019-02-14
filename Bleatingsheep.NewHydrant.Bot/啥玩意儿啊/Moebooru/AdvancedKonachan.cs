@@ -45,10 +45,17 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
 
         private bool IsHealthy => !string.IsNullOrEmpty(HealthyFlag);
 
+        private static readonly ICollection<long> EnhancedGroups = new HashSet<long>
+        {
+            308419061, // Steam
+            601110599, // requested by 瓜皇
+            514661057,
+        };
+
         private static Task<bool> IsVipAsync(long qq) => Task.FromResult(qq == 630060047);
 
         private static Task<bool> ShouldRandomize(Endpoint endpoint)
-            => Task.FromResult(endpoint is PrivateEndpoint || endpoint is GroupEndpoint g && g.GroupId == 308419061);
+            => Task.FromResult(endpoint is PrivateEndpoint || endpoint is GroupEndpoint g && EnhancedGroups.Contains(g.GroupId));
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
