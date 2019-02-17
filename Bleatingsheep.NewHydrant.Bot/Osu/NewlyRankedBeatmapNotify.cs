@@ -23,7 +23,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             672076603, // HTTP 机器人。
             514661057, // 后花园。
             308419061, // Steam。
-            838187450, // 歪爱抚。
+            //838187450, // 歪爱抚。
         };
 
         private readonly object _thisLock = new object();

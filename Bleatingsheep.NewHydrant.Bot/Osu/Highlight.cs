@@ -88,7 +88,8 @@ GROUP BY user_id
                     var sb = new StringBuilder(100);
                     sb.AppendLine("最飞升：");
                     if (increase != null)
-                        sb.AppendLine($"{increase.New.Name} 增加了 {increase.New.Performance - (double)increase.Old.PpRaw:#.##} PP。");
+                        sb.AppendLine($"{increase.New.Name} 增加了 {increase.New.Performance - (double)increase.Old.PpRaw:#.##} PP。")
+                            .AppendLine($"({increase.Old.PpRaw:#.##} -> {increase.New.Performance:#.##})");
                     else
                         sb.AppendLine("你群没有人飞升。");
                     sb.AppendLine("最肝：")
