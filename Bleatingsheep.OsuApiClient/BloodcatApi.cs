@@ -38,14 +38,19 @@ namespace Bleatingsheep.OsuMixedApi
             return response?.SelectMany(s => s.Beatmaps).Where(b => string.Equals(b.FileMD5, md5, StringComparison.OrdinalIgnoreCase)).ToArray();
         }
 
-        public async Task<BloodcatBeatmapSet> GetBeatmapAsync(int bid)
+        public async Task<BloodcatBeatmapSet> GetBeatmapNoFilterAsync(int bid)
         {
             (string, string)[] para = BloodcatParam("b", bid.ToString(), (Mode[])Enum.GetValues(typeof(Mode)));
             var response = await HttpMethods.GetJsonArrayDeserializeAsync<BloodcatBeatmapSet>("https://bloodcat.com/osu/", para);
             var result = response?.SingleOrDefault();
-            if (result == null)
-                return null;
-            result.Beatmaps = result.Beatmaps.Where(b => b.Id == bid).ToArray();
+            return result;
+        }
+
+        public async Task<BloodcatBeatmapSet> GetBeatmapAsync(int bid)
+        {
+            BloodcatBeatmapSet result = await GetBeatmapNoFilterAsync(bid);
+            if (result != null)
+                result.Beatmaps = result.Beatmaps.Where(b => b.Id == bid).ToArray();
             return result;
         }
 
