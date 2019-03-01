@@ -15,6 +15,7 @@
     <PackageReference Include="PuppeteerSharp" Version="1.11.1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.2" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="4.5.0" />
+    <PackageReference Include="WebApiClient.AOT" Version="0.3.3" />
   </ItemGroup>
 
   <ItemGroup>
