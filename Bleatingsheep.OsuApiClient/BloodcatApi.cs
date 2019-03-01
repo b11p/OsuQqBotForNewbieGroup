@@ -32,16 +32,16 @@ namespace Bleatingsheep.OsuMixedApi
             return response;
         }
 
-        public async Task<BloodcatBeatmapSet> SearchRankedByMd5NoFilterAsync(string md5)
+        public async Task<BloodcatBeatmapSet[]> SearchRankedByMd5NoFilterAsync(string md5)
         {
             BloodcatBeatmapSet[] bloodcatBeatmapSets = await HttpMethods.GetJsonArrayDeserializeAsync<BloodcatBeatmapSet>("https://bloodcat.com/osu/", ("q", $"md5={md5}"), ("mod", "json"));
-            return bloodcatBeatmapSets?.SingleOrDefault();
+            return bloodcatBeatmapSets;
         }
 
         public async Task<BloodcatBeatmap[]> SearchRankedByMd5Async(string md5)
         {
-            BloodcatBeatmapSet responseSet = await SearchRankedByMd5NoFilterAsync(md5);
-            return responseSet.Beatmaps.Where(b => string.Equals(b.FileMD5, md5, StringComparison.OrdinalIgnoreCase)).ToArray();
+            BloodcatBeatmapSet[] response = await SearchRankedByMd5NoFilterAsync(md5);
+            return response?.SelectMany(s => s.Beatmaps).Where(b => string.Equals(b.FileMD5, md5, StringComparison.OrdinalIgnoreCase)).ToArray();
         }
 
         public async Task<BloodcatBeatmapSet> GetBeatmapNoFilterAsync(int bid)
