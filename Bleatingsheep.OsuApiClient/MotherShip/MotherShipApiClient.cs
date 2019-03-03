@@ -5,8 +5,8 @@ namespace Bleatingsheep.OsuMixedApi.MotherShip
 {
     public class MotherShipApiClient
     {
-        public const string DefaultHost = "http://www.mothership.top:8080/";
-        public const string BleatingsheepCdnHost = "https://mothership.bleatingsheep.org/";
+        public const string DefaultHost = "https://www.mothership.top/";
+        public const string LegacyInsecureHost = "http://www.mothership.top:8080/";
         private readonly string _host;
 
         public MotherShipApiClient(string host)
