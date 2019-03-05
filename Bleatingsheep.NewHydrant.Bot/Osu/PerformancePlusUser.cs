@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.Osu.Newbie;
 using Bleatingsheep.Osu.PerformancePlus;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
@@ -18,23 +17,6 @@ namespace Bleatingsheep.NewHydrant.Osu
         private string queryUser;
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
-
-
-            if (message is GroupMessage grt && NewbieCardChecker.IgnoreListProvider.MonitoredGroups.Contains(grt.GroupId) && grt.Sender.Authority == Sisters.WudiLib.Responses.GroupMemberInfo.GroupMemberAuthority.Manager)
-            {
-                var (_, binding) = await DataProvider.GetBindingIdAsync(grt.UserId);
-                if (binding != null)
-                {
-                    var (_, userInfo) = await OsuApi.GetUserInfoAsync(binding.Value, OsuMixedApi.Mode.Standard);
-                    var hint = NewbieCardChecker.GetHintMessage(userInfo.Name, grt.Sender.InGroupName);
-                    if (hint != null)
-                    {
-                        await api.SendMessageAsync(grt.Endpoint, "请管理员以身作则，不要改乱七八糟的群名片。");
-                        return;
-                    }
-                }
-            }
-
             dynamic query;
             if (!string.IsNullOrWhiteSpace(queryUser))
             {
