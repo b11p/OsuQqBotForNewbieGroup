@@ -9,6 +9,7 @@ using Bleatingsheep.OsuQqBot.Database.Execution;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Sisters.WudiLib.Responses;
+using static Bleatingsheep.NewHydrant.Osu.Newbie.NewbieCardChecker;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
@@ -16,8 +17,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
     internal class NewbieKeeper : OsuFunction, IMessageMonitor
     {
         private static TimeSpan CheckInterval { get; } = new TimeSpan(10, 53, 31);
-
-        private readonly INewbieInfoProvider IgnoreListProvider = HardcodedProvider.GetProvider();
 
         private readonly object _thisLock = new object();
         private readonly Dictionary<(long group, long qq), DateTime> _lastCheckTime = new Dictionary<(long group, long qq), DateTime>();
@@ -109,22 +108,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         private static async Task CheckGroupCard(HttpApiClient api, GroupMemberInfo groupMember, GroupMessage g, string name)
         {
-            string card = string.IsNullOrEmpty(groupMember.InGroupName) ? groupMember.Nickname : groupMember.InGroupName;
-            if (OsuHelper.DiscoverUsernames(card).Any(u => u.Equals(name, StringComparison.OrdinalIgnoreCase)))
-                return;
+            var card = string.IsNullOrEmpty(groupMember.InGroupName) ? groupMember.Nickname : groupMember.InGroupName;
             string hint;
-            // 用户名不行。
-            if (card.Contains(name, StringComparison.OrdinalIgnoreCase))
-            {
-                // 临时忽略。
-                hint = "建议修改群名片，不要在用户名前后添加可以被用做用户名的字符，以免混淆。";
-                hint += "\r\n" + "建议群名片：" + RecommendCard(card, name);
-            }
-            else
-            {
-                hint = "为了方便其他人认出您，请修改群名片，必须包括正确的 osu! 用户名。";
-            }
-            await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
+            hint = NewbieCardChecker.GetHintMessage(name, card);
+            if (hint != null)
+                await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
         }
 
         private static async Task<string> AutoBind(HttpApiClient api, GroupMessage g, bool success)
@@ -166,27 +154,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
 
             return response;
-        }
-
-        /// <summary>
-        /// 根据群名片和用户名推荐群名片
-        /// </summary>
-        private static string RecommendCard(string card, string username)
-        {
-            int firstIndex = card.IndexOf(username, StringComparison.OrdinalIgnoreCase);
-            if (firstIndex != -1)
-            {
-                string recommendCard = card.Substring(0, firstIndex);
-                if (firstIndex != 0)
-                    recommendCard += "|";
-                recommendCard += username;
-                if (firstIndex + username.Length < card.Length)
-                {
-                    recommendCard += "|" + card.Substring(firstIndex + username.Length);
-                }
-                return recommendCard;
-            }
-            return null;
         }
     }
 }

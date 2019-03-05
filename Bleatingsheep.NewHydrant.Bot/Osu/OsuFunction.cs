@@ -2,6 +2,7 @@
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Logging;
+using Bleatingsheep.NewHydrant.Osu.Newbie;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 
@@ -23,6 +24,8 @@ namespace Bleatingsheep.NewHydrant.Osu
             var dataProvider = new DataProvider(OsuApi);
             dataProvider.OnException += FLogger.LogException;
             DataProvider = dataProvider;
+
+            NewbieCardChecker.Load();
         }
 
         /// <exception cref="ExecutingException"></exception>
