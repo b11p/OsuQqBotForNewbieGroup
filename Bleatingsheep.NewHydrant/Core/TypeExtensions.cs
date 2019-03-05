@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bleatingsheep.NewHydrant.Addon
+namespace Bleatingsheep.NewHydrant.Core
 {
     internal static class TypeExtensions
     {
