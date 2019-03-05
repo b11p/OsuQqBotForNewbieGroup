@@ -81,7 +81,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
             ExecutingException.Ensure(userInfo != null, string.Empty);
             // 检查 PP。
-            await CheckPerformance(api, groupMember, g, userInfo);
+            //await CheckPerformance(api, groupMember, g, userInfo);
 
         }
 
