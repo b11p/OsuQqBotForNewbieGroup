@@ -14,7 +14,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
 {
-    [Function("advanced_konachan")]
+    //[Function("advanced_konachan")]
     class AdvancedKonachan : Service, IMessageCommand
     {
         private static readonly Regex s_regex = new Regex(
