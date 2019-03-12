@@ -30,26 +30,28 @@ namespace Bleatingsheep.NewHydrant.Osu
             using (var dbContext = new NewbieContext())
             using (var motherShip = new 秘密功能.MotherShipDatabase.OsuContext())
             {
-                var bindings = await (from b in dbContext.Bindings
-                                      join mi in groupMembers on b.UserId equals mi.UserId
-                                      select new { Info = mi, Binding = b.OsuId }).ToListAsync();
-                //var history = (from bi in bindings.AsQueryable()
-                //               join ui in motherShip.Userinfo on bi.Binding equals ui.UserId into histories
-                //               select new { bi.Info, bi.Binding, History = histories.OrderByDescending(ui => ui.QueryDate).First() }).ToList();
-                var osuIds = bindings.Select(b => b.Binding).Distinct().ToList();
+                //var bindings = await (from b in dbContext.Bindings
+                //                      join mi in groupMembers on b.UserId equals mi.UserId
+                //                      select new { Info = mi, Binding = b.OsuId }).ToListAsync();
+                ////var history = (from bi in bindings.AsQueryable()
+                ////               join ui in motherShip.Userinfo on bi.Binding equals ui.UserId into histories
+                ////               select new { bi.Info, bi.Binding, History = histories.OrderByDescending(ui => ui.QueryDate).First() }).ToList();
+                //var osuIds = bindings.Select(b => b.Binding).Distinct().ToList();
+                var qqs = groupMembers.Select(mi => mi.UserId).ToList();
+                var osuIds = await dbContext.Bindings.Where(bi => qqs.Contains(bi.UserId)).Select(bi => bi.OsuId).Distinct().ToListAsync();
+
                 int mode = 0;
 
                 // old query
                 var history = await
-                    (from mother in motherShip.Userinfo.FromSql(
+                    motherShip.Userinfo.FromSql(
                         @"SELECT a.*
 FROM (SELECT user_id, `mode`, max(queryDate) queryDate
 FROM userinfo
 WHERE `mode`={0}
 GROUP BY user_id
 ) b JOIN userinfo a ON a.user_id = b.user_id AND a.queryDate = b.queryDate AND a.`mode` = b.`mode`", mode)
-                     join bi in osuIds on mother.UserId equals bi
-                     select mother).ToListAsync();
+                        .Where(mother => osuIds.Contains((int)mother.UserId)).ToListAsync();
 
                 Logger.Debug($"找到 {history.Count} 个绑定及历史信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
 
