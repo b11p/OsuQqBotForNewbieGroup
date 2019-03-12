@@ -9,6 +9,9 @@ namespace Bleatingsheep.OsuMixedApi
 {
     internal static class HttpMethods
     {
+        private static HttpClient s_httpClient = new HttpClient();
+        private static long s_httpClientCreateDate = DateTimeOffset.Now.ToUnixTimeSeconds();
+
         /// <summary>
         /// Get array with specified URL and arguments.
         /// </summary>
@@ -40,21 +43,32 @@ namespace Bleatingsheep.OsuMixedApi
                 url += needed + key + "=" + HttpUtility.UrlEncode(value);
                 needed = '&';
             }
-            using (var client = new HttpClient())
+
+            UpdateClientInstanceIfNecessary();
+            var client = s_httpClient;
+            string result = null;
+            var stopwatch = Stopwatch.StartNew();
+            Exception exception = null;
+            try
             {
-                string result = null;
-                var stopwatch = Stopwatch.StartNew();
-                Exception exception = null;
-                try
-                {
-                    result = await client.GetStringAsync(url);
-                }
-                catch (Exception e)
-                {
-                    exception = e;
-                }
-                Diagnostics.FinishRequest(url, stopwatch.ElapsedMilliseconds, exception);
-                return result;
+                result = await client.GetStringAsync(url);
+            }
+            catch (Exception e)
+            {
+                exception = e;
+            }
+            Diagnostics.FinishRequest(url, stopwatch.ElapsedMilliseconds, exception);
+            return result;
+        }
+
+        private static void UpdateClientInstanceIfNecessary()
+        {
+            int outdated = 1800;
+            var now = DateTimeOffset.Now.ToUnixTimeSeconds();
+            if (now - s_httpClientCreateDate > outdated)
+            {
+                s_httpClient = new HttpClient();
+                s_httpClientCreateDate = now;
             }
         }
     }
