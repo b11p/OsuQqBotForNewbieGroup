@@ -11,7 +11,7 @@ namespace OsuQqBotHttp
 {
     class QqBot : IQqBot
     {
-        private static readonly Bleatingsheep.NewHydrant.HardcodedConfigure hardcodedConfigure = new Bleatingsheep.NewHydrant.HardcodedConfigure();
+        private static readonly Bleatingsheep.NewHydrant.EnvironmentConfigure hardcodedConfigure = new Bleatingsheep.NewHydrant.EnvironmentConfigure();
         static readonly string server = hardcodedConfigure.ApiAddress;
         static readonly string privatePath = "/send_private_msg_async";
         static readonly string groupPath = "/send_group_msg_async";

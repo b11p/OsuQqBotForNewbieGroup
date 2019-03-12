@@ -8,10 +8,10 @@
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="NLog" Version="4.5.11" />
+    <PackageReference Include="Sisters.WudiLib" Version="0.0.4.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Sisters.WudiLib\Sisters.WudiLib\Sisters.WudiLib.csproj" />
     <ProjectReference Include="..\Bleatingsheep.NewHydrant.Data\Bleatingsheep.NewHydrant.Data.csproj" />
     <ProjectReference Include="..\Bleatingsheep.OsuApiClient\Bleatingsheep.OsuMixedApi.csproj" />
   </ItemGroup>
