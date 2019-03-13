@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.ServiceModel.Syndication;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Extentions;
 using HtmlAgilityPack;
 using Sisters.WudiLib;
-using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 
@@ -23,16 +19,25 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             string url = "https://rsshub.app/pixiv/ranking/day";
             var xmlReader = XmlReader.Create(url);
             var feed = SyndicationFeed.Load(xmlReader);
-            var imgNode = feed.Items.Select(i =>
+            var tuple = feed.Items.Select(i =>
             {
                 var doc = new HtmlDocument();
                 doc.LoadHtml(i.Summary.Text);
-                return doc.DocumentNode.SelectNodes("//p/img");
-            }).Randomize().FirstOrDefault(nc => nc.Count == 1)?.First();
+                return (item: i, nodes: doc.DocumentNode.SelectNodes("//p/img"));
+            }).Randomize().FirstOrDefault(t => t.nodes.Count == 1);
+            var (item, imgNode) = (tuple.item, tuple.nodes?.First());
             if (imgNode != null)
             {
                 var imgUrl = imgNode.Attributes["src"].Value;
-                await api.SendMessageAsync(context.Endpoint, Message.NetImage(imgUrl));
+                if (await api.SendMessageAsync(
+                    endpoint: context.Endpoint,
+                    message: new Message(item.Title.Text + "\r\n")
+                        + Message.NetImage(imgUrl)
+                        + new Message("\r\n" + item.Links.FirstOrDefault().Uri)
+                    ) == null)
+                {
+                    await api.SendMessageAsync(context.Endpoint, "图片发送失败。");
+                }
             }
             else
             {
