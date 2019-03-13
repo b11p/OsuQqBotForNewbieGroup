@@ -12,7 +12,8 @@
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
     <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.4.1" />
     <PackageReference Include="Bleatingsheep.SimpleBooru" Version="0.1.0.1" />
-    <PackageReference Include="PuppeteerSharp" Version="1.11.1" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.9.2" />
+    <PackageReference Include="PuppeteerSharp" Version="1.12.1" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.4" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="4.5.0" />
     <PackageReference Include="WebApiClient.AOT" Version="0.3.3" />

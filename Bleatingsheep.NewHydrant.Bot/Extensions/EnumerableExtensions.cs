@@ -13,19 +13,22 @@ namespace Bleatingsheep.NewHydrant.Extentions
         {
             lock (s_randomLock)
             {
-                var result = source.ToList();
-                // i 是 Count 到 2
-                for (int i = result.Count - 1; i > 0; i--)
+                checked
                 {
-                    var swap = s_random.Next(i + 1);
-                    if (i != swap)
+                    var result = source.ToList();
+                    // i 是 Count 到 2
+                    for (int i = result.Count - 1; i > 0; i--)
                     {
-                        var temp = result[i];
-                        result[i] = result[swap];
-                        result[swap] = temp;
+                        var swap = s_random.Next(i + 1);
+                        if (i != swap)
+                        {
+                            var temp = result[i];
+                            result[i] = result[swap];
+                            result[swap] = temp;
+                        }
                     }
+                    return result;
                 }
-                return result;
             }
         }
     }
