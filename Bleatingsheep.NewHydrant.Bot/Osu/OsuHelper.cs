@@ -10,7 +10,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         /// 发现用户名用的模式。
         /// </summary>
         private const string DiscoverPattern = "(?<=^|[^0-9A-Za-z_\\-\\[\\]])" + // 匹配字符串开始，或者任何不能使用在osu! username的字符，或者空格（不能使用在username开头）
-        "[0-9A-Za-z_\\-\\[\\]][0-9A-Za-z_\\-\\[\\] ]{1,13}[0-9A-Za-z_\\-\\[\\]]" + // 匹配ID中可以使用的字符，其中ID的长度是3-15
+        "[0-9A-Za-z_\\-\\[\\]][0-9A-Za-z_\\-\\[\\] ]{1,}[0-9A-Za-z_\\-\\[\\]]" + // 匹配ID中可以使用的字符，早期用户没有ID长度限制
         "(?=$|[^0-9A-Za-z_\\-\\[\\]])"; // 匹配字符串结束，或者不能使用在osu! username的字符，或者空格（不能使用在username结尾）
         /// <summary>
         /// 可以匹配到用户名的模式。
