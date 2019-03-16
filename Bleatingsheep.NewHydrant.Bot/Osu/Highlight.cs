@@ -9,6 +9,7 @@ using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using MotherShipDatabase;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -28,7 +29,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             var stopwatch = Stopwatch.StartNew();
 
             using (var dbContext = new NewbieContext())
-            using (var motherShip = new 秘密功能.MotherShipDatabase.OsuContext())
+            using (var motherShip = new OsuContext())
             {
                 //var bindings = await (from b in dbContext.Bindings
                 //                      join mi in groupMembers on b.UserId equals mi.UserId
@@ -40,8 +41,11 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var qqs = groupMembers.Select(mi => mi.UserId).ToList();
                 var osuIds = await dbContext.Bindings.Where(bi => qqs.Contains(bi.UserId)).Select(bi => bi.OsuId).Distinct().ToListAsync();
 
+                Logger.Debug($"找到 {osuIds.Count} 个绑定信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
+
                 int mode = 0;
 
+                stopwatch = Stopwatch.StartNew();
                 // old query
                 var history = await
                     motherShip.Userinfo.FromSql(
@@ -53,7 +57,7 @@ GROUP BY user_id
 ) b JOIN userinfo a ON a.user_id = b.user_id AND a.queryDate = b.queryDate AND a.`mode` = b.`mode`", mode)
                         .Where(mother => osuIds.Contains((int)mother.UserId)).ToListAsync();
 
-                Logger.Debug($"找到 {history.Count} 个绑定及历史信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
+                Logger.Debug($"找到 {history.Count} 个历史信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
 
                 var nowInfos = new ConcurrentDictionary<int, UserInfo>(10, history.Count);
                 var fails = new ConcurrentBag<int>();

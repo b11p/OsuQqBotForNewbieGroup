@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.NewHydrant.Da
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{929DD942-07A5-48E1-9761-645919A2CE1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bleatingsheep.NewHydrant.Bot", "Bleatingsheep.NewHydrant.Bot\Bleatingsheep.NewHydrant.Bot.csproj", "{A28CF984-AA36-487C-8C7C-35E8B33F116C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.NewHydrant.Bot", "Bleatingsheep.NewHydrant.Bot\Bleatingsheep.NewHydrant.Bot.csproj", "{A28CF984-AA36-487C-8C7C-35E8B33F116C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotherShipDatabase", "..\..\..\..\..\source\repos\MotherShipDatabase\MotherShipDatabase\MotherShipDatabase.csproj", "{36105D74-27BE-435A-8E96-DE6DB2A60CB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{A28CF984-AA36-487C-8C7C-35E8B33F116C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A28CF984-AA36-487C-8C7C-35E8B33F116C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A28CF984-AA36-487C-8C7C-35E8B33F116C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36105D74-27BE-435A-8E96-DE6DB2A60CB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36105D74-27BE-435A-8E96-DE6DB2A60CB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36105D74-27BE-435A-8E96-DE6DB2A60CB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36105D74-27BE-435A-8E96-DE6DB2A60CB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -61,7 +61,7 @@ namespace OsuQqBot
 
             // 初始化
             OpenApi.Init(
-                motherShipApiClient: new MotherShipApiClient(MotherShipApiClient.DefaultHost),
+                motherShipApiClient: new MotherShipApiClient(MotherShipApiClient.LegacyInsecureHost),
                 osuApiClient: Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey)
             );
             _plan = new Task(() =>
@@ -536,14 +536,14 @@ namespace OsuQqBot
 选项：
 用户名 要查询的玩家名称";
                         break;
-//                    case "chart":
-//                        help = @"chart有关命令列表
-//*请注意所有命令均以空格（ ）开头*
-// charts 查看本群chart
-// commit 提交chart
-// my 查看提交记录
-// rank x 查看编号为x的chart排名";
-//                        break;
+                    //                    case "chart":
+                    //                        help = @"chart有关命令列表
+                    //*请注意所有命令均以空格（ ）开头*
+                    // charts 查看本群chart
+                    // commit 提交chart
+                    // my 查看提交记录
+                    // rank x 查看编号为x的chart排名";
+                    //                        break;
                     default:
                         break;
                 }

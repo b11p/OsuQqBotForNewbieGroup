@@ -10,7 +10,7 @@ namespace Bleatingsheep.NewHydrant.Data
     public class DataProvider : IDataProvider
     {
         private readonly OsuApiClient _api;
-        private readonly MotherShipApiClient _motherShipApi = new MotherShipApiClient(MotherShipApiClient.DefaultHost);
+        private readonly MotherShipApiClient _motherShipApi = new MotherShipApiClient(MotherShipApiClient.LegacyInsecureHost);
         private readonly NewbieDatabase _database = new NewbieDatabase();
         
         public DataProvider(OsuApiClient api) => _api = api;
