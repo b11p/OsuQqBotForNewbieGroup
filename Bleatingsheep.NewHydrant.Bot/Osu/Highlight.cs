@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.OsuMixedApi;
@@ -18,7 +19,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Function("highlight")]
-    public sealed class Highlight : OsuFunction, IMessageCommand
+    public sealed class Highlight : OsuFunction, IMessageCommand, IRegularAsync
     {
         public async Task ProcessAsync(MessageContext superContext, HttpApiClient api)
         {
@@ -46,16 +47,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 int mode = 0;
 
                 stopwatch = Stopwatch.StartNew();
-                // old query
-                var history = await
-                    motherShip.Userinfo.FromSql(
-                        @"SELECT a.*
-FROM (SELECT user_id, `mode`, max(queryDate) queryDate
-FROM userinfo
-WHERE `mode`={0}
-GROUP BY user_id
-) b JOIN userinfo a ON a.user_id = b.user_id AND a.queryDate = b.queryDate AND a.`mode` = b.`mode`", mode)
-                        .Where(mother => osuIds.Contains((int)mother.UserId)).ToListAsync();
+                List<Userinfo> history = await GetHistories(osuIds, mode);
 
                 Logger.Debug($"找到 {history.Count} 个历史信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
 
@@ -64,7 +56,7 @@ GROUP BY user_id
                 stopwatch = Stopwatch.StartNew();
                 Parallel.ForEach(history.Select(h => (int)h.UserId).Distinct(), bi =>
                 {
-                    var (success, userInfo) = OsuApi.GetUserInfoAsync(bi, (Mode)mode).GetAwaiter().GetResult();
+                    var (success, userInfo) = GetCachedUserInfo(bi, (Bleatingsheep.Osu.Mode)mode).GetAwaiter().GetResult();
                     if (!success)
                         fails.Add(bi);
                     else if (userInfo != null)
@@ -105,6 +97,92 @@ GROUP BY user_id
                     await api.SendMessageAsync(context.Endpoint, sb.ToString());
                 }
             }
+        }
+
+        private static readonly ReaderWriterLockSlim CacheLock = new ReaderWriterLockSlim();
+        private static readonly HashSet<Userinfo> Cache = new HashSet<Userinfo>(new UserInfoComparier());
+
+        TimeSpan? IRegularAsync.OnUtc { get; } = new TimeSpan(22, 0, 0); // 北京6点
+        TimeSpan? IRegularAsync.Every { get; }
+
+        Task IRegularAsync.RunAsync(HttpApiClient api)
+        {
+            CacheLock.EnterWriteLock();
+            try
+            {
+                Cache.Clear();
+            }
+            finally
+            {
+                CacheLock.ExitWriteLock();
+            }
+            return Task.CompletedTask;
+        }
+
+        private static async Task<List<Userinfo>> GetHistories(List<int> osuIds, int mode)
+        {
+            var results = new List<Userinfo>();
+
+            CacheLock.EnterReadLock();
+            try
+            {
+                results.AddRange(Cache.Where(i => osuIds.Contains((int)i.UserId) && i.Mode == mode));
+            }
+            finally
+            {
+                CacheLock.ExitReadLock();
+            }
+
+            var remain = osuIds.Except(results.Select(i => (int)i.UserId)).ToList();
+
+            if (remain.Any())
+            {
+                using (var osuContext = new OsuContext())
+                {
+                    var updated = await
+                        osuContext.Userinfo.FromSql(
+                            @"SELECT a.*
+FROM (SELECT user_id, `mode`, max(queryDate) queryDate
+FROM userinfo
+WHERE `mode`={0}
+GROUP BY user_id
+) b JOIN userinfo a ON a.user_id = b.user_id AND a.queryDate = b.queryDate AND a.`mode` = b.`mode`", mode)
+                            .Where(mother => remain.Contains((int)mother.UserId)).ToListAsync();
+                    results.AddRange(updated);
+
+                    CacheLock.EnterUpgradeableReadLock();
+                    try
+                    {
+                        var toAdd = updated.Except(Cache);
+                        CacheLock.EnterWriteLock();
+                        try
+                        {
+                            foreach (var item in toAdd)
+                            {
+                                Cache.Add(item);
+                            }
+                        }
+                        finally
+                        {
+                            CacheLock.ExitWriteLock();
+                        }
+                    }
+                    finally
+                    {
+                        CacheLock.ExitUpgradeableReadLock();
+                    }
+                }
+            }
+            return results;
+        }
+
+        private sealed class UserInfoComparier : IEqualityComparer<Userinfo>
+        {
+            public bool Equals(Userinfo x, Userinfo y)
+                => (x.UserId, x.Mode) == (y.UserId, y.Mode);
+
+            public int GetHashCode(Userinfo obj)
+                => ((int)obj.UserId << 2) + (int)obj.Mode;
         }
 
         public bool ShouldResponse(MessageContext context)

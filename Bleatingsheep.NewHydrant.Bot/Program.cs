@@ -76,6 +76,8 @@ namespace Bleatingsheep.NewHydrant
 
                 hydrant.Init();
 
+                Console.WriteLine("init complete.");
+
                 Task.Delay(-1).Wait();
             }
             catch (Exception e)
