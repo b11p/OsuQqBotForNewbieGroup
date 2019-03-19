@@ -61,7 +61,7 @@ namespace OsuQqBot
 
             // 初始化
             OpenApi.Init(
-                motherShipApiClient: new MotherShipApiClient(MotherShipApiClient.LegacyInsecureHost),
+                motherShipApiClient: new MotherShipApiClient(MotherShipApiClient.DefaultHost),
                 osuApiClient: Bleatingsheep.OsuMixedApi.OsuApiClient.ClientUsingKey(config.ApiKey)
             );
             _plan = new Task(() =>
