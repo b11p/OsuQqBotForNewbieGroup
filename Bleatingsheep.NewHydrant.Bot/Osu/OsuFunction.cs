@@ -50,10 +50,12 @@ namespace Bleatingsheep.NewHydrant.Osu
         private static readonly ConcurrentDictionary<(int id, Bleatingsheep.Osu.Mode mode), (DateTimeOffset date, UserInfo info)> Cache
             = new ConcurrentDictionary<(int, Bleatingsheep.Osu.Mode), (DateTimeOffset, UserInfo)>();
 
+        private static readonly TimeSpan CacheAvailable = TimeSpan.FromMinutes(10);
+
         protected async Task<(bool, UserInfo)> GetCachedUserInfo(int id, Bleatingsheep.Osu.Mode mode)
         {
             var hasCache = Cache.TryGetValue((id, mode), out var tuple);
-            if (hasCache && DateTimeOffset.Now - tuple.date <= TimeSpan.FromMinutes(5))
+            if (hasCache && DateTimeOffset.Now - tuple.date <= CacheAvailable)
             {
                 return (true, tuple.info);
             }

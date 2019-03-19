@@ -89,8 +89,11 @@ namespace Bleatingsheep.NewHydrant.Irc
             }
             catch (Exception e)
             {
-                Log($"于 {Now} 崩溃。");
-                Log(lastMessage);
+                if (!string.IsNullOrEmpty(lastMessage))
+                {
+                    Log($"于 {Now} 崩溃。");
+                    Log(lastMessage);
+                }
                 if (!(e is PlatformNotSupportedException))
                 {
                     LogException(e);
