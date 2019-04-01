@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Threading.Tasks;
 using System.Xml;
 using Bleatingsheep.NewHydrant.Attributions;
+using HtmlAgilityPack;
 using PuppeteerSharp;
 using Sisters.WudiLib;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -23,12 +25,26 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             var item = feed.Items.LastOrDefault();
             if (item != default)
             {
+                bool modified = false;
+                var doc = new HtmlDocument();
+                var htmlText = item.Summary.Text;
+                doc.LoadHtml(htmlText);
+                foreach (var imgNode in doc.DocumentNode.SelectNodes("//div/div/div/div/div/p/img").Where(n => n.GetClasses().FirstOrDefault() == "content-image"))
+                {
+                    imgNode.SetAttributeValue("width", "100%");
+                    modified = true;
+                }
+                if (modified)
+                {
+                    htmlText = doc.DocumentNode.InnerHtml;
+                }
+
                 using (var page = await Chrome.OpenNewPageAsync())
                 {
-                    await page.SetContentAsync(item.Summary.Text);
+                    await page.SetContentAsync(htmlText);
                     await page.SetViewportAsync(new ViewPortOptions
                     {
-                        DeviceScaleFactor = 1,
+                        DeviceScaleFactor = 1.25,
                         Width = 360,
                         Height = 640,
                     });

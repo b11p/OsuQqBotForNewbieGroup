@@ -44,7 +44,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
             else if (osuId == null)
             {
-                response = "这个人没绑定。其余信息的查询正在施工。";
+                response = "这个人没绑定。其余信息的查询不做了没有了。";
             }
             else
             {
