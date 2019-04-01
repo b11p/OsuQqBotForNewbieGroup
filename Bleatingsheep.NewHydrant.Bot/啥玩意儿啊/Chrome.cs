@@ -26,7 +26,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                             Width = 360,
                             Height = 640,
                         },
-                        Args = new[] { "--no-sandbox" },
+                        Args = new[] { "--no-sandbox", "--lang=zh-CN" },
                     }).GetAwaiter().GetResult();
                 }
                 if (s_browser != null)
