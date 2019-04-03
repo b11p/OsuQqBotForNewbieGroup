@@ -29,7 +29,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 var doc = new HtmlDocument();
                 var htmlText = item.Summary.Text;
                 doc.LoadHtml(htmlText);
-                foreach (var imgNode in doc.DocumentNode.SelectNodes("//div/div/div/div/div/p/img").Where(n => n.GetClasses().FirstOrDefault() == "content-image"))
+                foreach (var imgNode in doc.DocumentNode.SelectNodes("//div/div/div/div/div/p/img")?.Where(n => n.GetClasses().FirstOrDefault() == "content-image") ?? Enumerable.Empty<HtmlNode>())
                 {
                     imgNode.SetAttributeValue("width", "100%");
                     modified = true;
@@ -44,7 +44,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                     await page.SetContentAsync(htmlText);
                     await page.SetViewportAsync(new ViewPortOptions
                     {
-                        DeviceScaleFactor = 1.25,
+                        DeviceScaleFactor = 3,
                         Width = 360,
                         Height = 640,
                     });
