@@ -1,10 +1,9 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
+﻿using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Threading.Tasks;
 using System.Xml;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using HtmlAgilityPack;
 using PuppeteerSharp;
 using Sisters.WudiLib;
@@ -14,7 +13,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
     [Function("zhihu_daily")]
-    public class 知乎日报 : IMessageCommand
+    public class 知乎日报 : Service, IMessageCommand
     {
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
@@ -44,7 +43,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                     await page.SetContentAsync(htmlText);
                     await page.SetViewportAsync(new ViewPortOptions
                     {
-                        DeviceScaleFactor = 3,
+                        DeviceScaleFactor = 2,
                         Width = 360,
                         Height = 640,
                     });
@@ -53,7 +52,11 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                         FullPage = true,
                     });
                     await Task.Delay(100);
-                    await api.SendMessageAsync(context.Endpoint, Message.ByteArrayImage(data));
+                    var sendCode = await api.SendMessageAsync(context.Endpoint, Message.ByteArrayImage(data));
+                    if (sendCode == null)
+                    {
+                        Logger.Info("知乎日报发送失败。");
+                    }
                 }
             }
         }
