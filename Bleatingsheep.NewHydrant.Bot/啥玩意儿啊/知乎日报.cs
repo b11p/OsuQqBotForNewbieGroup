@@ -12,7 +12,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
-    [Function("zhihu_daily")]
+    //[Function("zhihu_daily")]
     public class 知乎日报 : Service, IMessageCommand
     {
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
@@ -43,7 +43,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                     await page.SetContentAsync(htmlText);
                     await page.SetViewportAsync(new ViewPortOptions
                     {
-                        DeviceScaleFactor = 2,
+                        DeviceScaleFactor = 1.5,
                         Width = 360,
                         Height = 640,
                     });
