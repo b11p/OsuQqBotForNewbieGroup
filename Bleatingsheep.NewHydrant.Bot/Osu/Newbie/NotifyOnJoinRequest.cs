@@ -74,11 +74,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 var performance = HintBinding(httpApiClient, endpoint, e.UserId).GetAwaiter().GetResult();
                 if (performance >= limit)
                 {
-                    //var reason = $"您的 PP 超限，不能加入本群。";
-                    //_ = httpApiClient.SendMessageAsync(endpoint, $"以“{reason}”拒绝。");
-                    //return new GroupRequestResponse(reason);
-                    _ = httpApiClient.SendMessageAsync(endpoint, $"建议拒绝。");
-                    return null;
+                    var reason = $"您的 PP 超限，不能加入本群。";
+                    _ = httpApiClient.SendMessageAsync(endpoint, $"以“{reason}”拒绝。");
+                    return new GroupRequestResponse(reason);
+                    //_ = httpApiClient.SendMessageAsync(endpoint, $"建议拒绝。");
+                    //return null;
                 }
             }
             return null;
