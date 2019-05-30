@@ -1,4 +1,6 @@
 ﻿#pragma warning disable IDE1006
+using Newtonsoft.Json;
+
 namespace OsuQqBot.Api
 {
     class UserRaw
@@ -21,6 +23,10 @@ namespace OsuQqBot.Api
         //public string count_rank_sh { get; set; }
         public string count_rank_a { get; set; }
         public string country { get; set; }
+
+        [JsonProperty("total_seconds_played")]
+        public int TotalSecondsPlayed { get; set; }
+
         public string pp_country_rank { get; set; }
         public Event[] events { get; set; }
     }

@@ -360,7 +360,7 @@ namespace OsuQqBot
         {
             //string message;
             //StringBuilder sb = new StringBuilder();
-            string[] byLine = new string[9];
+            string[] byLine = new string[10];
 
             //sb.Append(user.Name + "的个人信息")
             //    .Append(mode == Mode.Unspecified ? "" : "—" + mode.GetModeString()).AppendLine();
@@ -393,6 +393,7 @@ namespace OsuQqBot
             byLine[6] = displayAcc + "% 准确率";
             byLine[7] = user.PlayCount + " 游玩次数";
             byLine[8] = (user.Tth).ToString("#,###") + " 总命中次数";
+            byLine[9] = $"{user.PlayTime.Days * 24 + user.PlayTime.Hours} 小时 {user.PlayTime.Minutes} 分钟 {user.PlayTime.Seconds} 秒游玩时间";
 
             if (history != null)
             {

@@ -31,6 +31,9 @@ namespace OsuQqBot.Api
         public int CountryRank { get; private set; }
         //public Event[] events { get; private set; }
 
+        public int TotalSecondsPlayed { get; set; }
+        public TimeSpan PlayTime { get; set; }
+
         public static implicit operator User(UserRaw raw)
         {
             try
@@ -49,6 +52,8 @@ namespace OsuQqBot.Api
                     Accuracy = double.Parse(raw.accuracy),
                     Country = raw.Country(),
                     CountryRank = int.Parse(raw.pp_country_rank),
+                    PlayTime = new TimeSpan(0, 0, raw.TotalSecondsPlayed),
+                    TotalSecondsPlayed = raw.TotalSecondsPlayed,
                 };
             }
             catch (ArgumentNullException)
