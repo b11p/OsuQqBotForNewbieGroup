@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Bleatingsheep.OsuMixedApi
 {
@@ -11,6 +12,10 @@ namespace Bleatingsheep.OsuMixedApi
         [JsonProperty("username")]
         public string Name { get; private set; }
         public Mode Mode { get; internal set; }
+
+        [JsonProperty("join_date")]
+        public DateTimeOffset JoinDate { get; set; }
+
         [JsonProperty("count300")]
         private int? count300;
         public int Count300 => DefaultIfNull(count300);
@@ -60,6 +65,10 @@ namespace Bleatingsheep.OsuMixedApi
         [JsonProperty("country")]
         public string CountryCode { get; private set; }
         public string Country => Iso3166.CountryOf(CountryCode);
+
+        [JsonProperty("total_seconds_played")]
+        public int TotalSecondsPlayed { get; set; }
+
         [JsonProperty("pp_country_rank")]
         public int? CountryRank { get; private set; }
         [JsonProperty("events")]
