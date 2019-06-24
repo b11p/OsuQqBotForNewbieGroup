@@ -32,7 +32,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             await HintBinding(api, endpoint, userId);
         }
 
-        private static async ValueTask<double?> HintBinding(HttpApiClient api, Endpoint endpoint, long userId)
+        private async ValueTask<double?> HintBinding(HttpApiClient api, Endpoint endpoint, long userId)
         {
             var (success, osuId) = await DataProvider.GetBindingIdAsync(userId);
             string response = string.Empty;
@@ -66,7 +66,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             return _match.Success;
         }
 
-        public static GroupRequestResponse Monitor(HttpApiClient httpApiClient, GroupRequest e)
+        public GroupRequestResponse Monitor(HttpApiClient httpApiClient, GroupRequest e)
         {
             if (ManagedGroups.TryGetValue(e.GroupId, out var limit))
             {

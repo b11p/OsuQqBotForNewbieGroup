@@ -63,7 +63,7 @@ namespace Bleatingsheep.NewHydrant
                 apiPostListener.GroupRequestEvent += (api, e) => e.UserId == configure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
                 apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
                 //apiPostListener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
-                apiPostListener.GroupRequestEvent += NotifyOnJoinRequest.Monitor;
+                apiPostListener.GroupRequestEvent += new NotifyOnJoinRequest().Monitor;
 
                 // 配置 osu
                 OsuFunction.SetApiKey(configure.ApiKey);

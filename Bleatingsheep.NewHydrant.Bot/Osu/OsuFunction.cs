@@ -14,7 +14,7 @@ namespace Bleatingsheep.NewHydrant.Osu
     {
         protected static OsuApiClient OsuApi { get; private set; }
 
-        protected static IDataProvider DataProvider { get; private set; }
+        protected IDataProvider DataProvider { get; private set; }
 
         protected static INewbieDatabase Database { get; } = new NewbieDatabase();
 
@@ -23,11 +23,15 @@ namespace Bleatingsheep.NewHydrant.Osu
         public static void SetApiKey(string apiKey)
         {
             OsuApi = OsuApiClient.ClientUsingKey(apiKey);
-            var dataProvider = new DataProvider(OsuApi);
-            dataProvider.OnException += FLogger.LogException;
-            DataProvider = dataProvider;
 
             NewbieCardChecker.Load();
+        }
+
+        public OsuFunction()
+        {
+            var dataProvider = new DataProvider(OsuApi);
+            dataProvider.OnException += e => Logger.Error(e);
+            DataProvider = dataProvider;
         }
 
         /// <exception cref="ExecutingException"></exception>
