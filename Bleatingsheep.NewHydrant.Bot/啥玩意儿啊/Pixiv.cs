@@ -16,7 +16,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
     {
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            string url = "https://rss.bleatingsheep.org/pixiv/ranking/day";
+            string url = "https://rsshub.app/pixiv/ranking/day";
             var xmlReader = XmlReader.Create(url);
             var feed = SyndicationFeed.Load(xmlReader);
             var tuple = feed.Items.Select(i =>
