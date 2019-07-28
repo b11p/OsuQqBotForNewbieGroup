@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -17,7 +18,10 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
     public class ExchangeRates : Service, IMessageCommand
     {
         static ExchangeRates()
-            => HttpApi.Register<IExchangeRate>();
+        {
+            HttpApi.Register<IExchangeRate>();
+            HttpApi.Register<ICmbcCreditRate>();
+        }
 
         private static readonly IReadOnlyList<string> s_currencies = new List<string>
         {
@@ -30,7 +34,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            var match = Regex.Match(_text, @"^汇率([A-Za-z]{3}) (\d*\.?\d*)$");
+            var match = Regex.Match(_text, @"^汇率\s*([A-Za-z]{3})\s*(\d*\.?\d*)$");
             if (!match.Success)
             {
                 return;
@@ -48,6 +52,9 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
             {
                 checked
                 {
+                    // cmbc
+                    var cmbcTask = HttpApi.Resolve<ICmbcCreditRate>().GetRates();
+
                     var response = await exRateApi.GetExchangeRates(@base);
                     var results = new List<string>(3);
                     foreach (var currency in s_currencies)
@@ -59,6 +66,24 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                         var rate = response.Rates[currency];
                         results.Add($"{currency} {amount * rate}");
                     }
+
+                    //cmbc
+                    try
+                    {
+                        var cmbcResult = await cmbcTask;
+                        var price = cmbcResult?.Data?.First(d => string.Equals(@base, d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
+                        if (price != null)
+                        {
+                            var cny = amount * price.Value;
+                            results.Add($"CMBC CNY {cny}");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        results.Add("CMBC 查询失败。");
+                        Logger.Error(e);
+                    }
+
                     await api.SendMessageAsync(context.Endpoint, string.Join("\r\n", results));
                 }
             }
