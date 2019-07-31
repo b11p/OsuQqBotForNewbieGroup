@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Concurrent;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.Osu;
@@ -13,14 +12,20 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
-    //[Function("check_over_pp")]
-    public class 检查新人群超PP : OsuFunction, IMessageCommand
+    [Function("newbie_statistics")]
+    public class 统计新人群成员 : OsuFunction, IMessageCommand
     {
+        private const int 新人群号 = 885984366;
+        private const int 管理群号 = 695600319;
+        private const int Limit = 2800;
+        private const string DestPath = "/root/outputs/statistics.csv";
+        private const string ResourceUrl = "https://res.bleatingsheep.org/statistics.csv";
+
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            var infoList = await api.GetGroupMemberListAsync(885984366);
+            await api.SendMessageAsync(context.Endpoint, $"即将统计新人群玩家列表，PP 超过 {Limit} 将标记为超限。");
+            var infoList = await api.GetGroupMemberListAsync(新人群号);
             var results = new ConcurrentBag<string>();
-            results.Add("qq,uid,name,pp,card,remark");
             Parallel.ForEach(infoList, i =>
             {
                 var (success, result) = DataProvider.GetBindingIdAsync(i.UserId).GetAwaiter().GetResult();
@@ -46,21 +51,22 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     else
                     {
                         results.Add($"{i.UserId},{result},{user.Name},{user.Performance},{JsonConvert.SerializeObject(i.DisplayName)}," +
-                            $"{(user.Performance == 0 ? "可能不活跃" : (user.Performance >= 3100 ? "超限" : "正常"))}");
+                            $"{(user.Performance == 0 ? "可能不活跃" : (user.Performance >= Limit ? "超限" : "正常"))}");
                     }
                 }
             });
-            var message = string.Join("\r\n", results);
+            var message = string.Join("\r\n", results.Prepend("qq,uid,name,pp,card,remark"));
             Logger.Info(message);
-            await api.SendMessageAsync(context.Endpoint, message);
+            File.WriteAllText(DestPath, message);
+            await api.SendMessageAsync(context.Endpoint, $"统计完成，前往 {ResourceUrl} 查看结果。");
         }
 
         public bool ShouldResponse(MessageContext context)
         {
             return context is GroupMessage g
-                && g.GroupId == 695600319
+                && g.GroupId == 管理群号
                 && g.Content.TryGetPlainText(out string text)
-                && text.Trim() == "超限";
+                && text.Trim() == "统计新人群玩家";
         }
     }
 }
