@@ -8,14 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bleatingsheep.Osu.Enums" Version="0.2.0" />
+    <PackageReference Include="Bleatingsheep.Osu.Enums" Version="0.6.0" />
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
     <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.4.1" />
     <PackageReference Include="Bleatingsheep.SimpleBooru" Version="0.2.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.4" />
     <PackageReference Include="PuppeteerSharp" Version="1.14.1" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="4.5.0" />
-    <PackageReference Include="WebApiClient.AOT" Version="1.0.8" />
+    <PackageReference Include="WebApiClient.AOT" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
