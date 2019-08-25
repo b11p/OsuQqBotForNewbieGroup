@@ -32,7 +32,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             await HintBinding(api, endpoint, userId);
         }
 
-        private async ValueTask<double?> HintBinding(HttpApiClient api, Endpoint endpoint, long userId)
+        private async ValueTask<double?> HintBinding(HttpApiClient api, Endpoint endpoint, long userId, string comment = null)
         {
             var (success, osuId) = await DataProvider.GetBindingIdAsync(userId);
             string response = string.Empty;
@@ -53,6 +53,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
                 response = $"这个人绑定的 uid 是 {osuId}，用户名是 {(osuApiGood ? user?.Name ?? "被办了" : "查询失败")}\r\n（正在施工）";
             }
+
+            // 保留 comment
+            if (!string.IsNullOrEmpty(comment))
+            {
+                response = comment + "\r\n" + response;
+            }
+
             await api.SendMessageAsync(endpoint, response);
             return performance;
         }
@@ -71,7 +78,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             if (ManagedGroups.TryGetValue(e.GroupId, out var limit))
             {
                 var endpoint = new GroupEndpoint(NewbieManagementGroupId);
-                var performance = HintBinding(httpApiClient, endpoint, e.UserId).GetAwaiter().GetResult();
+                var performance = HintBinding(httpApiClient, endpoint, e.UserId, e.Comment).GetAwaiter().GetResult();
                 if (performance >= limit)
                 {
                     var reason = $"您的 PP 超限，不能加入本群。";
