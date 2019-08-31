@@ -30,7 +30,7 @@ namespace Bleatingsheep.OsuMixedApi
         {
             string json = await GetAsync(url, ps);
             if (json == null) return (false, default(T));
-            T result = JsonConvert.DeserializeObject<T>(json);
+            T result = JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
             return (true, result);
         }
 
