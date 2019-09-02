@@ -64,8 +64,6 @@ namespace OsuQqBot
                     {
                         string uNameToQuery = message.Trim().Substring("where".Length).Trim();
                         uNameToQuery = qq.AfterReceive(uNameToQuery);
-                        if (!Bleatingsheep.Osu.Helper.UserNameHelper.IsUserName(uNameToQuery))
-                            return;
                         if (string.IsNullOrEmpty(uNameToQuery))
                             return;
                         const string pattern = @"^qq\s*=\s*(\d+)$";
@@ -74,6 +72,11 @@ namespace OsuQqBot
                         {
                             long qq = long.Parse(match.Groups[1].Value);
                             this.qq.SendMessageAsync(endPoint, await QueryFromQq(qq));
+                            return;
+                        }
+                        // 不匹配 qq=? 模式，视为用户名
+                        if (!Bleatingsheep.Osu.Helper.UserNameHelper.IsUserName(uNameToQuery))
+                        {// 不是合法用户名，忽略。
                             return;
                         }
                         var (success, info) = await ProcessQuery(username: uNameToQuery);
