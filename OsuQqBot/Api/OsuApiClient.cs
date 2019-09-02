@@ -72,7 +72,7 @@ namespace OsuQqBot.Api
             string jsonResult;
             jsonResult = await GetHttpAsync($"{protocol}://{site}{paths[InformationType.User]}", list.ToArray());
             if (jsonResult == null) return null;
-            var result = JsonConvert.DeserializeObject<IEnumerable<UserRaw>>(jsonResult);
+            var result = JsonConvert.DeserializeObject<IEnumerable<UserRaw>>(jsonResult, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
             // 确保返回数据满足指定类型
             if (result.Any())
