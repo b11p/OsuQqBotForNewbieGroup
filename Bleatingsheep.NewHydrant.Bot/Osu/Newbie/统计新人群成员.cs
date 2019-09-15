@@ -55,9 +55,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     }
                 }
             });
-            var message = string.Join("\r\n", results.Prepend("腾讯qq,uid,name,pp,card,remark"));
+            var message = string.Join("\r\n", results.Prepend("qq,uid,name,pp,card,remark"));
             Logger.Info(message);
-            File.WriteAllText(DestPath, message);
+            File.WriteAllText(DestPath, message, new System.Text.UTF8Encoding(true));
             await api.SendMessageAsync(context.Endpoint, $"统计完成，前往 {ResourceUrl} 查看结果。");
         }
 
