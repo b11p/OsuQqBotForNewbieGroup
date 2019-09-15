@@ -4,18 +4,21 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.啥玩意儿啊;
+using PuppeteerSharp;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
+using Message = Sisters.WudiLib.SendingMessage;
+using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
     [Function("newbie_request_notify")]
-    class NotifyOnJoinRequest : OsuFunction, IMessageCommand
+    internal class NotifyOnJoinRequest : OsuFunction/*, IMessageCommand*/
     {
-        private const string Pattern = @"^收到新人群加群申请\r\n群号: (\d+)\r\n群类型: .*?\r\n申请者: (\d+)\r\n验证信息: (.*)$"; // 匹配上报申请的消息。
+        //private const string Pattern = @"^收到新人群加群申请\r\n群号: (\d+)\r\n群类型: .*?\r\n申请者: (\d+)\r\n验证信息: (.*)$"; // 匹配上报申请的消息。
         private const int NewbieManagementGroupId = 695600319;
         private static readonly IReadOnlyDictionary<long, double?> ManagedGroups = new Dictionary<long, double?>
         {
@@ -23,33 +26,34 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             [758120648] = null,
             [514661057] = null,
         };
-        private readonly static Regex regex = new Regex(Pattern, RegexOptions.Compiled);
+        //private static readonly Regex regex = new Regex(Pattern, RegexOptions.Compiled);
 
-        private Match _match;
-        private long GroupId => long.Parse(_match.Groups[1].Value);
-        private long UserId => long.Parse(_match.Groups[2].Value);
-        private string Message => _match.Groups[3].Value;
+        //private Match _match;
+        //private long GroupId => long.Parse(_match.Groups[1].Value);
+        //private long UserId => long.Parse(_match.Groups[2].Value);
+        //private string Message => _match.Groups[3].Value;
 
-        public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
-        {
-            Endpoint endpoint = message.Endpoint;
-            var userId = UserId;
-            await HintBinding(api, endpoint, userId);
-        }
+        //public async Task ProcessAsync(MessageContext message, HttpApiClient api)
+        //{
+        //    Endpoint endpoint = message.Endpoint;
+        //    var userId = UserId;
+        //    await HintBinding(api, endpoint, userId);
+        //}
 
         private async Task ParseInfoAsync(
             HttpApiClient api,
             Endpoint sendBackEndpoint,
-            long userId,
+            GroupRequest r,
             int? osuId = null,
-            OsuMixedApi.UserInfo userInfo = default,
-            string comment = null)
+            OsuMixedApi.UserInfo userInfo = default)
         {
-            var hints = new List<string>();
+            long userId = r.UserId;
+            string comment = r.Comment;
+            var hints = new List<Message>();
             var levelInfo = await api.GetLevelInfo(userId);
             if (levelInfo != null)
             {
-                hints.Add($"QQ 等级为 {levelInfo.Level}");
+                hints.Add(new Message($"QQ 等级为 {levelInfo.Level}"));
             }
             if (!string.IsNullOrEmpty(comment))
             {
@@ -64,8 +68,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     {
                         var (success, info) = await OsuApi.GetUserInfoAsync(name, Bleatingsheep.Osu.Mode.Standard);
                         // 我想用 8.0 新语法
-                        hints.Add($"{info?.Name ?? name}: " +
-                            $"{(success ? info == null ? "不存在此用户。" : $"PP: {info.Performance}, PC: {info.PlayCount}, TTH: {info.TotalHits}" : "查询失败。")}");
+                        hints.Add(new Message($"{info?.Name ?? name}: " +
+                            $"{(success ? info == null ? "不存在此用户。" : $"PP: {info.Performance}, PC: {info.PlayCount}, TTH: {info.TotalHits}" : "查询失败。")}"));
+
+                        if (info == null)
+                        {
+                            continue;
+                        }
 
                         // 提供绑定并放行的捷径。
                         if (info?.Performance < 2500)
@@ -75,23 +84,47 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                             {
                                 bw.Write(userId);
                                 bw.Write(info.Id);
+                                bw.Write(r.Flag);
                             }
                             ms.Write(MD5.Create().ComputeHash(ms.ToArray()));
                             var bytes = ms.ToArray();
                             var base64 = Convert.ToBase64String(bytes);
                             await api.SendMessageAsync(sendBackEndpoint, $"（占位）绑定为 {info.Name} 并放行：#{base64}#");
                         }
+
+                        // 画某图
+                        Message message;
+                        using (var page = await Chrome.OpenNewPageAsync())
+                        {
+                            await page.SetViewportAsync(new ViewPortOptions
+                            {
+                                DeviceScaleFactor = 1,
+                                Width = 1440,
+                                Height = 900,
+                            });
+                            await page.GoToAsync($"https://osu.ppy.sh/users/{info.Id}/osu");
+                            const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
+                            ElementHandle detailElement = await page.WaitForSelectorAsync(chartSelector);
+                            var data = await detailElement
+                                .ScreenshotDataAsync(new ScreenshotOptions
+                                {
+                                });
+                            message = Message.ByteArrayImage(data);
+                        }
+                        hints.Add(message);
                     }
                 }
             }
             if (hints.Any())
             {
-                await api.SendMessageAsync(sendBackEndpoint, string.Join("\r\n", hints));
+                await api.SendMessageAsync(sendBackEndpoint, hints.Aggregate((m1, m2) => m1 + m2));
             }
         }
 
-        private async ValueTask<double?> HintBinding(HttpApiClient api, Endpoint endpoint, long userId, string comment = null)
+        private async ValueTask<double?> HintBinding(HttpApiClient api, Endpoint endpoint, GroupRequest r)
         {
+            long userId = r.UserId;
+            string comment = r.Comment;
             var (success, osuId) = await DataProvider.GetBindingIdAsync(userId);
             string response = string.Empty;
             double? performance = default;
@@ -117,7 +150,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             // 提供额外信息
             try
             {
-                await ParseInfoAsync(api, endpoint, userId, osuId, user, comment);
+                await ParseInfoAsync(api, endpoint, r, osuId, user);
             }
             catch (Exception e)
             {
@@ -134,21 +167,21 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             return performance;
         }
 
-        public bool ShouldResponse(Sisters.WudiLib.Posts.Message message)
-        {
-            if (!(message is GroupMessage g && g.GroupId == NotifyOnJoinRequest.NewbieManagementGroupId && g.UserId == 3082577334))
-                return false;
+        //public bool ShouldResponse(MessageContext message)
+        //{
+        //    if (!(message is GroupMessage g && g.GroupId == NotifyOnJoinRequest.NewbieManagementGroupId && g.UserId == 3082577334))
+        //        return false;
 
-            _match = regex.Match(message.Content.Text);
-            return _match.Success;
-        }
+        //    _match = regex.Match(message.Content.Text);
+        //    return _match.Success;
+        //}
 
         public GroupRequestResponse Monitor(HttpApiClient httpApiClient, GroupRequest e)
         {
             if (ManagedGroups.TryGetValue(e.GroupId, out var limit))
             {
                 var endpoint = new GroupEndpoint(NewbieManagementGroupId);
-                var performance = HintBinding(httpApiClient, endpoint, e.UserId, e.Comment).GetAwaiter().GetResult();
+                var performance = HintBinding(httpApiClient, endpoint, e).ConfigureAwait(false).GetAwaiter().GetResult();
                 if (performance >= limit)
                 {
                     var reason = $"您的 PP 超限，不能加入本群。";
