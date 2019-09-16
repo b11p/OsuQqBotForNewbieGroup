@@ -117,7 +117,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
             if (hints.Any())
             {
-                await api.SendMessageAsync(sendBackEndpoint, hints.Aggregate((m1, m2) => m1 + m2));
+                var newLine = new Message("\r\n");
+                await api.SendMessageAsync(sendBackEndpoint, hints.Aggregate((m1, m2) => m1 + newLine + m2));
             }
         }
 
