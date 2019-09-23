@@ -9,7 +9,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
-    [Function("print_screen")]
+    //[Function("print_screen")]
     internal class 个人信息网页截图 : OsuFunction, IMessageCommand
     {
         private static readonly Regex s_regex = new Regex($"^users?/(?<name>{OsuHelper.UsernamePattern})/(?<mode>.*)$");

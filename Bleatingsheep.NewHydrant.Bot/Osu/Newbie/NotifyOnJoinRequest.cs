@@ -93,7 +93,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                         }
 
                         // 画某图
-                        Message message;
+                        async Task<byte[]> GetScreenshot(Page page, string chartSelector)
+                        {
+                            ElementHandle detailElement = await page.WaitForSelectorAsync(chartSelector);
+                            var data = await detailElement
+                                .ScreenshotDataAsync(new ScreenshotOptions
+                                {
+                                });
+                            return data;
+                        }
+                        Message messageRankHistory, messageBest;
                         using (var page = await Chrome.OpenNewPageAsync())
                         {
                             await page.SetViewportAsync(new ViewPortOptions
@@ -103,15 +112,17 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                                 Height = 900,
                             });
                             await page.GoToAsync($"https://osu.ppy.sh/users/{info.Id}/osu");
+                            // draw history
                             const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
-                            ElementHandle detailElement = await page.WaitForSelectorAsync(chartSelector);
-                            var data = await detailElement
-                                .ScreenshotDataAsync(new ScreenshotOptions
-                                {
-                                });
-                            message = Message.ByteArrayImage(data);
+                            var data = await GetScreenshot(page, chartSelector);
+                            messageRankHistory = Message.ByteArrayImage(data);
+                            // draw ranks
+                            const string rankSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div:nth-child(3) > div > div:nth-child(2) > div > div.play-detail-list";
+                            data = await GetScreenshot(page, rankSelector);
+                            messageBest = Message.ByteArrayImage(data);
                         }
-                        hints.Add(message);
+                        hints.Add(messageRankHistory);
+                        hints.Add(messageBest);
                     }
                 }
             }
