@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -16,7 +17,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
     [Function("newbie_request_notify")]
-    internal class NotifyOnJoinRequest : OsuFunction/*, IMessageCommand*/
+    internal class NotifyOnJoinRequest : OsuFunction, IMessageCommand
     {
         //private const string Pattern = @"^收到新人群加群申请\r\n群号: (\d+)\r\n群类型: .*?\r\n申请者: (\d+)\r\n验证信息: (.*)$"; // 匹配上报申请的消息。
         private const int NewbieManagementGroupId = 695600319;
@@ -26,19 +27,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             [758120648] = null,
             [514661057] = null,
         };
-        //private static readonly Regex regex = new Regex(Pattern, RegexOptions.Compiled);
-
-        //private Match _match;
-        //private long GroupId => long.Parse(_match.Groups[1].Value);
-        //private long UserId => long.Parse(_match.Groups[2].Value);
-        //private string Message => _match.Groups[3].Value;
-
-        //public async Task ProcessAsync(MessageContext message, HttpApiClient api)
-        //{
-        //    Endpoint endpoint = message.Endpoint;
-        //    var userId = UserId;
-        //    await HintBinding(api, endpoint, userId);
-        //}
 
         private async Task ParseInfoAsync(
             HttpApiClient api,
@@ -86,43 +74,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                                 bw.Write(info.Id);
                                 bw.Write(r.Flag);
                             }
-                            ms.Write(MD5.Create().ComputeHash(ms.ToArray()));
+#pragma warning disable CA5351 // 不要使用损坏的加密算法
+                            using var md5 = MD5.Create();
+#pragma warning restore CA5351 // 不要使用损坏的加密算法
+                            ms.Write(md5.ComputeHash(ms.ToArray()));
                             var bytes = ms.ToArray();
                             var base64 = Convert.ToBase64String(bytes);
                             await api.SendMessageAsync(sendBackEndpoint, $"（占位）绑定为 {info.Name} 并放行：#{base64}#");
                         }
-
-                        // 画某图
-                        async Task<byte[]> GetScreenshot(Page page, string chartSelector)
-                        {
-                            ElementHandle detailElement = await page.WaitForSelectorAsync(chartSelector);
-                            var data = await detailElement
-                                .ScreenshotDataAsync(new ScreenshotOptions
-                                {
-                                });
-                            return data;
-                        }
-                        Message messageRankHistory, messageBest;
-                        using (var page = await Chrome.OpenNewPageAsync())
-                        {
-                            await page.SetViewportAsync(new ViewPortOptions
-                            {
-                                DeviceScaleFactor = 1,
-                                Width = 1440,
-                                Height = 900,
-                            });
-                            await page.GoToAsync($"https://osu.ppy.sh/users/{info.Id}/osu");
-                            // draw history
-                            const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
-                            var data = await GetScreenshot(page, chartSelector);
-                            messageRankHistory = Message.ByteArrayImage(data);
-                            // draw ranks
-                            const string rankSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div:nth-child(3) > div > div:nth-child(2) > div > div.play-detail-list";
-                            data = await GetScreenshot(page, rankSelector);
-                            messageBest = Message.ByteArrayImage(data);
-                        }
-                        hints.Add(messageRankHistory);
-                        hints.Add(messageBest);
+                        var uid = info.Id;
+                        await ScreenShotsAsync(hints, uid).ConfigureAwait(false);
                     }
                 }
             }
@@ -130,6 +91,53 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             {
                 var newLine = new Message("\r\n");
                 await api.SendMessageAsync(sendBackEndpoint, hints.Aggregate((m1, m2) => m1 + newLine + m2));
+            }
+        }
+
+        private static async Task ScreenShotsAsync(List<Message> hints, int uid)
+        {
+            async Task<byte[]> GetScreenshot(Page page, string selector)
+            {
+                ElementHandle detailElement = await page.WaitForSelectorAsync(selector);
+                var data = await detailElement
+                    .ScreenshotDataAsync(new ScreenshotOptions
+                    {
+                    });
+                return data;
+            }
+
+            Message messageRankHistory, messageBest;
+            using (var page = await Chrome.OpenNewPageAsync())
+            {
+                await page.SetViewportAsync(new ViewPortOptions
+                {
+                    DeviceScaleFactor = 2,
+                    Width = 1440,
+                    Height = 900,
+                });
+                await page.GoToAsync($"https://osu.ppy.sh/users/{uid}/osu");
+                // draw history
+                const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
+                var data = await GetScreenshot(page, chartSelector);
+                messageRankHistory = Message.ByteArrayImage(data);
+                hints.Add(messageRankHistory);
+
+                // draw ranks
+                const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > div > div.play-detail-list";
+                const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > p";
+                ElementHandle bpElement = (await page.QuerySelectorAsync(bestSelector))
+                    ?? await page.QuerySelectorAsync(bestFallbackSelector);
+                if (bpElement != null)
+                {
+                    data = await bpElement?.ScreenshotDataAsync();
+                    //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);
+                    messageBest = Message.ByteArrayImage(data);
+                    hints.Add(messageBest);
+                }
+                else
+                {
+                    hints.Add(new Message("查询 BP 失败。既没有找到 BP 数据，也没有找到未上传成绩的说明。"));
+                }
             }
         }
 
@@ -164,7 +172,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             {
                 await ParseInfoAsync(api, endpoint, r, osuId, user);
             }
+#pragma warning disable CA1031 // 不捕获常规异常类型
             catch (Exception e)
+#pragma warning restore CA1031 // 不捕获常规异常类型
             {
                 await api.SendMessageAsync(endpoint, e.ToString());
             }
@@ -178,15 +188,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             await api.SendMessageAsync(endpoint, response);
             return performance;
         }
-
-        //public bool ShouldResponse(MessageContext message)
-        //{
-        //    if (!(message is GroupMessage g && g.GroupId == NotifyOnJoinRequest.NewbieManagementGroupId && g.UserId == 3082577334))
-        //        return false;
-
-        //    _match = regex.Match(message.Content.Text);
-        //    return _match.Success;
-        //}
 
         public GroupRequestResponse Monitor(HttpApiClient httpApiClient, GroupRequest e)
         {
@@ -204,6 +205,23 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 }
             }
             return null;
+        }
+
+        private string _content;
+
+        public bool ShouldResponse(MessageContext context)
+            => context switch
+            {
+                GroupMessage g when g.GroupId == 695600319 && g.Content.TryGetPlainText(out _content) && _content.StartsWith("drawu", StringComparison.OrdinalIgnoreCase) => true,
+                _ => false
+            };
+
+        public async Task ProcessAsync(MessageContext context, HttpApiClient api)
+        {
+            var uid = int.Parse(_content.Substring(5).Trim(), CultureInfo.InvariantCulture);
+            var hints = new List<Message>();
+            await ScreenShotsAsync(hints, uid).ConfigureAwait(false);
+            _ = await api.SendMessageAsync(context.Endpoint, hints[0] + hints[1]).ConfigureAwait(false);
         }
     }
 }
