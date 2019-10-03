@@ -21,11 +21,12 @@ namespace Bleatingsheep.NewHydrant.Osu
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
             var uid = await EnsureGetBindingIdAsync(context.UserId).ConfigureAwait(false);
+            var apiTask = OsuApi.GetUserInfoAsync(uid, Bleatingsheep.Osu.Mode.Standard).ConfigureAwait(false);
             using (var page = await Chrome.OpenNewPageAsync().ConfigureAwait(false))
             {
                 await page.SetViewportAsync(new ViewPortOptions
                 {
-                    DeviceScaleFactor = 1.5,
+                    DeviceScaleFactor = 2.75,
                     Width = 1440,
                     Height = 900,
                 }).ConfigureAwait(false);
@@ -90,8 +91,15 @@ bpList.forEach((element) => { var dateTime = element.querySelector("div.play-det
                 await (await page.QuerySelectorAsync("body > div.js-pinned-header.hidden-xs.no-print.nav2-header > div.nav2-header__body").ConfigureAwait(false)).EvaluateFunctionAsync(@"(element) => element.remove()").ConfigureAwait(false);
                 await (await page.QuerySelectorAsync("body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.hidden-xs.page-extra-tabs.page-extra-tabs--profile-page.js-switchable-mode-page--scrollspy-offset").ConfigureAwait(false)).EvaluateFunctionAsync(@"(element) => element.remove()").ConfigureAwait(false);
 
-                ElementHandle bpsElement = await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
-                var data = await bpsElement.ScreenshotDataAsync(new ScreenshotOptions()).ConfigureAwait(false);
+                // add extra information
+                await page.EvaluateExpressionAsync($@"document.querySelector(""{bestSelector}"").parentElement.parentElement.querySelector(""h3"").textContent += "" （用户名："" + {JsonConvert.SerializeObject((await apiTask).Item2?.Name ?? "获取失败")} + "" 查询时间："" + {JsonConvert.SerializeObject(DateTime.Now.ToString("yyyy-MM-dd H:mm）"))}").ConfigureAwait(false);
+
+                //ElementHandle printElement = await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
+                var printElement =
+                    await (await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false))
+                    .EvaluateFunctionHandleAsync("(element) => element.parentNode.parentNode").ConfigureAwait(false) as ElementHandle;
+                printElement ??= await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
+                var data = await printElement.ScreenshotDataAsync(new ScreenshotOptions()).ConfigureAwait(false);
 
                 await api.SendMessageAsync(context.Endpoint, Message.ByteArrayImage(data)).ConfigureAwait(false);
             }
