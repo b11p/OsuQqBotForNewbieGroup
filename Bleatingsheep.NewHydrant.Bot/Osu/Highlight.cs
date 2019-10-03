@@ -56,7 +56,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 stopwatch = Stopwatch.StartNew();
                 Parallel.ForEach(history.Select(h => (int)h.UserId).Distinct(), bi =>
                 {
-                    var (success, userInfo) = GetCachedUserInfo(bi, (Bleatingsheep.Osu.Mode)mode).GetAwaiter().GetResult();
+                    var (success, userInfo) = GetCachedUserInfo(bi, (Bleatingsheep.Osu.Mode)mode).ConfigureAwait(false).GetAwaiter().GetResult();
                     if (!success)
                         fails.Add(bi);
                     else if (userInfo != null)

@@ -15,9 +15,9 @@ using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var cultureInfo = CultureInfo.GetCultureInfo("zh-CN");
             CultureInfo.CurrentCulture = cultureInfo;

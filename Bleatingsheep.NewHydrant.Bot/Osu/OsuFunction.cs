@@ -34,6 +34,9 @@ namespace Bleatingsheep.NewHydrant.Osu
             DataProvider = dataProvider;
         }
 
+        /// <summary>
+        /// 确保。
+        /// </summary>
         /// <exception cref="ExecutingException"></exception>
         protected async Task<int> EnsureGetBindingIdAsync(long qq)
         {

@@ -46,7 +46,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 {
                     try
                     {
-                        var user = s_spider.GetUserPlusAsync(userId).Result;
+                        var user = s_spider.GetUserPlusAsync(userId).ConfigureAwait(false).GetAwaiter().GetResult();
                         if (user != null)
                             results.Add(user);
                     }
