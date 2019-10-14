@@ -13,11 +13,13 @@ using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
+using Mode = Bleatingsheep.Osu.Mode;
+using UserInfo = Bleatingsheep.OsuMixedApi.UserInfo;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
     [Function("newbie_request_notify")]
-    internal class NotifyOnJoinRequest : OsuFunction, IMessageCommand
+    internal partial class NotifyOnJoinRequest : OsuFunction, IMessageCommand
     {
         //private const string Pattern = @"^收到新人群加群申请\r\n群号: (\d+)\r\n群类型: .*?\r\n申请者: (\d+)\r\n验证信息: (.*)$"; // 匹配上报申请的消息。
         private const int NewbieManagementGroupId = 695600319;
@@ -46,21 +48,32 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             if (!string.IsNullOrEmpty(comment))
             {
                 var userNames = OsuHelper.DiscoverUsernames(comment).Where(n => !string.Equals(n, "osu", StringComparison.OrdinalIgnoreCase));
-                if (userInfo != null && userNames.Any(n => string.Equals(userInfo.Name, n, StringComparison.OrdinalIgnoreCase)))
-                {// 绑定一致
-
+                if (osuId != null)
+                {
+                    bool success = userInfo != null; // 由于当前未从调用方法处获得上级 API 是否调用成功，在信息不为 null 时默认成功。
+                    if (userInfo == null)
+                    {// 可能的重试。
+                        (success, userInfo) = await OsuApi.GetUserInfoAsync(osuId.Value, Mode.Standard).ConfigureAwait(false);
+                    }
+                    _ = await ProcessApplicantReportAsync(hints, null, (success, userInfo)).ConfigureAwait(false);
+                    if (userInfo != null && !userNames.Any(n => string.Equals(userInfo.Name, n, StringComparison.OrdinalIgnoreCase)))
+                    {// 绑定不一致
+                        hints.Add(new Message("警告：其绑定的账号与申请不符。"));
+                    }
                 }
-                else if (osuId == null)
+                else
                 {// 忽略已绑定的情况，因为可能绑定不一致或者查询失败。
                     foreach (var name in userNames)
                     {
-                        var (success, info) = await OsuApi.GetUserInfoAsync(name, Bleatingsheep.Osu.Mode.Standard);
-                        // 我想用 8.0 新语法
-                        hints.Add(new Message($"{info?.Name ?? name}: " +
-                            $"{(success ? info == null ? "不存在此用户。" : $"PP: {info.Performance}, PC: {info.PlayCount}, TTH: {info.TotalHits}" : "查询失败。")}"));
+                        var userTuple = await OsuApi.GetUserInfoAsync(name, Bleatingsheep.Osu.Mode.Standard);
+                        //// 我想用 8.0 新语法
+                        //hints.Add(new Message($"{info?.Name ?? name}: " +
+                        //    $"{(success ? info == null ? "不存在此用户。" : $"PP: {info.Performance}, PC: {info.PlayCount}, TTH: {info.TotalHits}" : "查询失败。")}"));
+
+                        var info = await ProcessApplicantReportAsync(hints, name, userTuple).ConfigureAwait(false);
 
                         if (info == null)
-                        {
+                        {// 属于没有查到的情况（因为网络问题或者用户不存在），并且之前已经给出错误信息。
                             continue;
                         }
 
@@ -82,8 +95,23 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                             var base64 = Convert.ToBase64String(bytes);
                             await api.SendMessageAsync(sendBackEndpoint, $"（占位）绑定为 {info.Name} 并放行：#{base64}#");
                         }
-                        var uid = info.Id;
-                        await ScreenShotsAsync(hints, uid).ConfigureAwait(false);
+                        // 自动绑定，在请求消息完全匹配 osu! 用户名的前提下。
+                        if (userNames.Count() == 1
+                            && comment.TrimEnd().EndsWith($"答案：{name}", StringComparison.Ordinal)
+                            && info != null)
+                        {
+                            var bindingResult = await Database.AddNewBindAsync(
+                                qq: r.UserId,
+                                osuId: info.Id,
+                                osuName: info.Name,
+                                source: "Auto (Request)",
+                                operatorId: r.UserId,
+                                operatorName: info.Name).ConfigureAwait(false);
+                            if (bindingResult.Success)
+                            {
+                                hints.Add(new Message($"自动绑定为 {info.Name}"));
+                            }
+                        }
                     }
                 }
             }
@@ -91,53 +119,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             {
                 var newLine = new Message("\r\n");
                 await api.SendMessageAsync(sendBackEndpoint, hints.Aggregate((m1, m2) => m1 + newLine + m2));
-            }
-        }
-
-        private static async Task ScreenShotsAsync(List<Message> hints, int uid)
-        {
-            async Task<byte[]> GetScreenshot(Page page, string selector)
-            {
-                ElementHandle detailElement = await page.WaitForSelectorAsync(selector);
-                var data = await detailElement
-                    .ScreenshotDataAsync(new ScreenshotOptions
-                    {
-                    });
-                return data;
-            }
-
-            Message messageRankHistory, messageBest;
-            using (var page = await Chrome.OpenNewPageAsync())
-            {
-                await page.SetViewportAsync(new ViewPortOptions
-                {
-                    DeviceScaleFactor = 2,
-                    Width = 1440,
-                    Height = 900,
-                });
-                await page.GoToAsync($"https://osu.ppy.sh/users/{uid}/osu");
-                // draw history
-                const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
-                var data = await GetScreenshot(page, chartSelector);
-                messageRankHistory = Message.ByteArrayImage(data);
-                hints.Add(messageRankHistory);
-
-                // draw ranks
-                const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > div > div.play-detail-list";
-                const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > p";
-                ElementHandle bpElement = (await page.QuerySelectorAsync(bestSelector))
-                    ?? await page.QuerySelectorAsync(bestFallbackSelector);
-                if (bpElement != null)
-                {
-                    data = await bpElement?.ScreenshotDataAsync();
-                    //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);
-                    messageBest = Message.ByteArrayImage(data);
-                    hints.Add(messageBest);
-                }
-                else
-                {
-                    hints.Add(new Message("查询 BP 失败。既没有找到 BP 数据，也没有找到未上传成绩的说明。"));
-                }
             }
         }
 
@@ -152,6 +133,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             if (!success)
             {
                 response = "查询失败";
+                goto exit;
             }
 
             else if (osuId == null)
@@ -164,7 +146,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 (osuApiGood, user) = await OsuApi.GetUserInfoAsync(osuId.Value, OsuMixedApi.Mode.Standard);
                 performance = user?.Performance;
 
-                response = $"这个人绑定的 uid 是 {osuId}，用户名是 {(osuApiGood ? user?.Name ?? "被办了" : "查询失败")}\r\n（正在施工）";
+                response = $"这个人绑定的 uid 是 {osuId}，用户名是 {(osuApiGood ? user?.Name ?? "被办了" : "查询失败")}\r\n（居然施工差不多了）";
             }
 
             // 提供额外信息
@@ -185,6 +167,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 response = comment + "\r\n" + response;
             }
 
+        exit:
             await api.SendMessageAsync(endpoint, response);
             return performance;
         }

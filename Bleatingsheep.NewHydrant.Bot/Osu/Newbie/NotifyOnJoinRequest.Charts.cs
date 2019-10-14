@@ -1,0 +1,80 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using Bleatingsheep.NewHydrant.啥玩意儿啊;
+using PuppeteerSharp;
+using Message = Sisters.WudiLib.SendingMessage;
+using MessageContext = Sisters.WudiLib.Posts.Message;
+using Mode = Bleatingsheep.Osu.Mode;
+using UserInfo = Bleatingsheep.OsuMixedApi.UserInfo;
+
+namespace Bleatingsheep.NewHydrant.Osu.Newbie
+{
+    partial class NotifyOnJoinRequest
+    {
+        private static async Task<UserInfo> ProcessApplicantReportAsync(List<Message> hints, string fallbackName, (bool networkSuccess, OsuMixedApi.UserInfo) userTuple)
+        {
+            var (success, info) = userTuple;
+            var userName = info?.Name ?? fallbackName;
+            var basicInfo = (success, info) switch
+            {
+                (false, _) => "查询失败。",
+                (true, null) => "不存在此用户。",
+                (_, _) => $"PP: {info.Performance}, PC: {info.PlayCount}, TTH: {info.TotalHits}",
+            };// 包含 PC 、PP等基础信息。
+            var hint = $"{userName}: {basicInfo}";
+            hints.Add(new Message(hint));
+            if (info != null)
+                await ScreenShotsAsync(hints, info.Id).ConfigureAwait(false);
+            return info;
+        }
+
+        private static async Task ScreenShotsAsync(List<Message> hints, int uid)
+        {
+            async Task<byte[]> GetScreenshot(Page page, string selector)
+            {
+                ElementHandle detailElement = await page.WaitForSelectorAsync(selector);
+                var data = await detailElement
+                    .ScreenshotDataAsync(new ScreenshotOptions
+                    {
+                    });
+                return data;
+            }
+
+            Message messageRankHistory, messageBest;
+            using (var page = await Chrome.OpenNewPageAsync())
+            {
+                await page.SetViewportAsync(new ViewPortOptions
+                {
+                    DeviceScaleFactor = 2,
+                    Width = 1440,
+                    Height = 900,
+                });
+                await page.GoToAsync($"https://osu.ppy.sh/users/{uid}/osu");
+                // draw history
+                const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
+                var data = await GetScreenshot(page, chartSelector);
+                messageRankHistory = Message.ByteArrayImage(data);
+                hints.Add(messageRankHistory);
+
+                // draw ranks
+                const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > div > div.play-detail-list";
+                const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > p";
+                ElementHandle bpElement = (await page.QuerySelectorAsync(bestSelector))
+                    ?? await page.QuerySelectorAsync(bestFallbackSelector);
+                if (bpElement != null)
+                {
+                    data = await bpElement.ScreenshotDataAsync();
+                    //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);
+                    messageBest = Message.ByteArrayImage(data);
+                    hints.Add(messageBest);
+                }
+                else
+                {
+                    hints.Add(new Message("查询 BP 失败。既没有找到 BP 数据，也没有找到未上传成绩的说明。"));
+                }
+            }
+        }
+    }
+}
