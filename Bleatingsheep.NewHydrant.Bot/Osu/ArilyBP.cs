@@ -54,17 +54,17 @@ namespace Bleatingsheep.NewHydrant.Osu
             await page.SetViewportAsync(new ViewPortOptions
             {
                 DeviceScaleFactor = Math.Sqrt(2),
-                Width = 578,
+                Width = 700,
                 Height = 80,
             }).ConfigureAwait(false);
             _ = await page.GoToAsync(url).ConfigureAwait(false);
             _ = await page.WaitForSelectorAsync("#finish").ConfigureAwait(false);
-            await Task.Delay(0).ConfigureAwait(false);
+            //await Task.Delay(0).ConfigureAwait(false);
             var data = await page.ScreenshotDataAsync(new ScreenshotOptions
             {
                 FullPage = true,
                 Type = ScreenshotType.Jpeg,
-                Quality = 100
+                Quality = 100,
             }).ConfigureAwait(false);
             _ = await api.SendMessageAsync(context.Endpoint, Message.ByteArrayImage(data)).ConfigureAwait(false);
         }
