@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
@@ -45,6 +46,17 @@ namespace Bleatingsheep.NewHydrant.Osu
                 Logger.Debug($"找到 {osuIds.Count} 个绑定信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
 
                 int mode = 0;
+                if (!string.IsNullOrEmpty(ModeString))
+                {
+                    try
+                    {
+                        mode = (int)Bleatingsheep.Osu.ModeExtensions.Parse(ModeString);
+                    }
+                    catch (FormatException)
+                    {
+                        // ignore
+                    }
+                }
 
                 stopwatch = Stopwatch.StartNew();
                 List<Userinfo> history = await GetHistories(osuIds, mode);
@@ -185,9 +197,14 @@ GROUP BY user_id
                 => ((int)obj.UserId << 2) + (int)obj.Mode;
         }
 
+        [Parameter("mode")]
+        private string ModeString { get; set; }
+
+        private static readonly Regex s_regex = new Regex(@"^今日高光\s*(?:[,，]\s*(?<mode>.+?)\s*)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
         public bool ShouldResponse(MessageContext context)
             => context is GroupMessage g
                 && g.Content.TryGetPlainText(out string text)
-                && text == "今日高光";
+                && RegexCommand(s_regex, text.Trim());
     }
 }
