@@ -54,7 +54,14 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 //    })));
 
 
-                const string detailSelector = "#app > div > div.ant-layout-container > div > div > div.ant-col-xs-24.ant-col-lg-15 > div > div";
+                const string detailSelector = "#app > div > div.ant-layout-container > div > div.ant-row > div > div > div.index__29fc4";
+
+                // delete advertisement
+                const string adSelector = "#app > div > div.ant-layout-container > div > div > div > div > div.index__29fc4 > a";
+                ElementHandle adElement = await page.QuerySelectorAsync(adSelector).ConfigureAwait(false);
+                if (!(adElement is null))
+                    await adElement.EvaluateFunctionAsync(@"(element) => { element.remove(); }").ConfigureAwait(false);
+
                 ElementHandle detailElement = await page.WaitForSelectorAsync(detailSelector);
                 var data = await detailElement
                     .ScreenshotDataAsync(new ScreenshotOptions

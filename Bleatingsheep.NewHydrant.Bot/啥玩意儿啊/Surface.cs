@@ -21,7 +21,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             {
                 DeviceScaleFactor = 1.234,
                 Width = 900,
-                Height = 1000,
+                Height = 10000,
             }).ConfigureAwait(false);
             await page.GoToAsync("https://surface.wiki/").ConfigureAwait(false);
             var listElement = await page.QuerySelectorAsync("body > main > div > div > div.surface-list").ConfigureAwait(false);
