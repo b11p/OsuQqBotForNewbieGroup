@@ -152,14 +152,25 @@ namespace Bleatingsheep.NewHydrant.Osu
                 using (var osuContext = new OsuContext())
                 {
                     var updated = await
+#pragma warning disable EF1000 // Possible SQL injection vulnerability.
                         osuContext.Userinfo.FromSql(
-                            @"SELECT a.*
-FROM (SELECT user_id, `mode`, max(queryDate) queryDate
-FROM userinfo
-WHERE `mode`={0}
-GROUP BY user_id
-) b JOIN userinfo a ON a.user_id = b.user_id AND a.queryDate = b.queryDate AND a.`mode` = b.`mode`", mode)
-                            .Where(mother => remain.Contains((int)mother.UserId)).ToListAsync();
+                            FormattableString.Invariant($@"SELECT a.*
+                    FROM (SELECT user_id, `mode`, max(queryDate) queryDate
+                    FROM userinfo
+                    WHERE `mode`={mode} AND user_id IN({string.Join(',', remain.Select(u => u.ToString()))})
+                    GROUP BY user_id
+                    ) b JOIN userinfo a ON a.user_id = b.user_id AND a.queryDate = b.queryDate AND a.`mode` = b.`mode`"))
+#pragma warning restore EF1000 // Possible SQL injection vulnerability.
+                              //.Where(mother => remain.Contains((int)mother.UserId))
+                            .ToListAsync();
+                    //var updated = await
+                    //    (from oo in from ui in osuContext.Userinfo
+                    //                where ui.Mode == mode && remain.Contains((int)ui.UserId)
+                    //                group new { ui.UserId, ui.QueryDate } by ui.UserId into g
+                    //                select new { UserId = g.Key, QueryDate = g.Max(u => u.QueryDate) }
+                    //     from ob in osuContext.Userinfo
+                    //     where ob.Mode == mode && oo.UserId == ob.UserId && oo.QueryDate == ob.QueryDate
+                    //     select ob).ToListAsync().ConfigureAwait(false);
                     results.AddRange(updated);
 
                     CacheLock.EnterUpgradeableReadLock();
