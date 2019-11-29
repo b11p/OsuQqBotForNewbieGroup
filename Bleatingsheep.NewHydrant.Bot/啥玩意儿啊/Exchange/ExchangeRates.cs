@@ -47,7 +47,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                 return;
             }
 
-            var exRateApi = HttpApi.Resolve<IExchangeRate>();
+            using var exRateApi = HttpApi.Resolve<IExchangeRate>();
             try
             {
                 checked
@@ -71,7 +71,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     try
                     {
                         var cmbcResult = await cmbcTask;
-                        var price = cmbcResult?.Data?.First(d => string.Equals(@base, d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
+                        var price = cmbcResult?.Data?.FirstOrDefault(d => string.Equals(@base, d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
                         if (price != null)
                         {
                             var cny = amount * price.Value;

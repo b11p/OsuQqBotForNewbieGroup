@@ -10,6 +10,7 @@ using Bleatingsheep.OsuQqBot.Database.Execution;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using NLog;
+using PuppeteerSharp;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
@@ -108,6 +109,10 @@ namespace Bleatingsheep.NewHydrant
             else if (exception is ApiAccessException)
             {
                 // 酷 Q 失败。
+            }
+            else if (exception is NavigationException)
+            {
+                await api.SendMessageAsync(message.Endpoint, "无法访问对应网站。").ConfigureAwait(false);
             }
             else
             {

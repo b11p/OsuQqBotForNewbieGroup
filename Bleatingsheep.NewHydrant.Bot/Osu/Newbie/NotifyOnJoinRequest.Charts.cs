@@ -47,7 +47,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             {
                 await page.SetViewportAsync(new ViewPortOptions
                 {
-                    DeviceScaleFactor = 2,
+                    DeviceScaleFactor = 2.5,
                     Width = 1440,
                     Height = 900,
                 });

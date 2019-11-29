@@ -52,7 +52,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
             514661057,
         };
 
-        private static Task<bool> IsVipAsync(long qq) => Task.FromResult(qq == 630060047);
+        private static Task<bool> IsVipAsync(long qq) => Task.FromResult(false);
 
         private static Task<bool> ShouldRandomize(Endpoint endpoint)
             => Task.FromResult(endpoint is PrivateEndpoint || endpoint is GroupEndpoint g && EnhancedGroups.Contains(g.GroupId));
