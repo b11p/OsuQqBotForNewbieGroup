@@ -35,8 +35,8 @@ namespace Bleatingsheep.NewHydrant.Osu
                 }
                 else
                 {
-                    await api.SendMessageAsync(context.Endpoint, "日期格式错误").ConfigureAwait(false);
-                    return;
+                    //await api.SendMessageAsync(context.Endpoint, "日期格式错误").ConfigureAwait(false);
+                    //return;
                 }
             }
 
