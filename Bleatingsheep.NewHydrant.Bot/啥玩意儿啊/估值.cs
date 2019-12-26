@@ -20,7 +20,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 {
                     DeviceScaleFactor = 2,
                     Width = 618,
-                    Height = 2000,
+                    Height = 3000,
                 });
                 await page.GoToAsync("https://qieman.com/idx-eval");
 
@@ -75,7 +75,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 {
                     var mesResponse = await api.SendMessageAsync(context.Endpoint, Message.ByteArrayImage(data)).ConfigureAwait(false);
                     inLoop = mesResponse == null;
-                } while (--retry > 0);
+                } while (inLoop && --retry > 0);
             }
         }
 
