@@ -66,14 +66,15 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var nowInfos = new ConcurrentDictionary<int, UserInfo>(10, history.Count);
                 var fails = new ConcurrentBag<int>();
                 stopwatch = Stopwatch.StartNew();
-                Parallel.ForEach(history.Select(h => (int)h.UserId).Distinct(), bi =>
+                var tasks = history.AsParallel().Select(h => (int)h.UserId).Distinct().Select(async bi =>
                 {
-                    var (success, userInfo) = GetCachedUserInfo(bi, (Bleatingsheep.Osu.Mode)mode).ConfigureAwait(false).GetAwaiter().GetResult();
+                    var (success, userInfo) = await GetCachedUserInfo(bi, (Bleatingsheep.Osu.Mode)mode).ConfigureAwait(false);
                     if (!success)
                         fails.Add(bi);
                     else if (userInfo != null)
                         nowInfos[bi] = userInfo;
-                });
+                }).ToArray();
+                await Task.WhenAll(tasks).ConfigureAwait(false);
                 Logger.Debug($"查询 API 花费 {stopwatch.ElapsedMilliseconds}ms，失败 {fails.Count} 个。");
 
                 var cps = (from his in history
@@ -161,7 +162,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                     GROUP BY user_id
                     ) b JOIN userinfo a ON a.user_id = b.user_id AND a.queryDate = b.queryDate AND a.`mode` = b.`mode`"))
 #pragma warning restore EF1000 // Possible SQL injection vulnerability.
-                              //.Where(mother => remain.Contains((int)mother.UserId))
+                            //.Where(mother => remain.Contains((int)mother.UserId))
                             .ToListAsync();
                     //var updated = await
                     //    (from oo in from ui in osuContext.Userinfo
