@@ -146,11 +146,31 @@ namespace Bleatingsheep.OsuMixedApi
         #endregion
 
         #region Utils
+        private readonly ThreadSafeRandom _threadSafeRandom = new ThreadSafeRandom();
+
         private async Task<T[]> SafeGetArrayAsync<T>(string url, params (string key, string value)[] ps)
         {
             // TODO: 增加访问数限制。
 
-            var result = await HttpMethods.GetJsonArrayDeserializeAsync<T>(url, ps);
+            // Exponential backoff 指数退避
+            T[] result = null;
+            int millisecondsDelay = 50;
+            int times = 6;
+            while (times-- > 0)
+            {
+                result = await HttpMethods.GetJsonArrayDeserializeAsync<T>(url, ps);
+                if (result != null)
+                {
+                    // succeeded
+                    return result;
+                }
+
+                if (times > 0)
+                {
+                    await Task.Delay(_threadSafeRandom.Next(millisecondsDelay) + 1).ConfigureAwait(false);
+                    millisecondsDelay <<= 1;
+                }
+            }
             return result;
         }
 
