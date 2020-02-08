@@ -154,11 +154,11 @@ namespace Bleatingsheep.OsuMixedApi
 
             // Exponential backoff 指数退避
             T[] result = null;
-            int millisecondsDelay = 50;
-            int times = 6;
+            int millisecondsDelay = 75;
+            int times = 10;
             while (times-- > 0)
             {
-                result = await HttpMethods.GetJsonArrayDeserializeAsync<T>(url, ps);
+                result = await HttpMethods.GetJsonArrayDeserializeAsync<T>(url, ps).ConfigureAwait(false);
                 if (result != null)
                 {
                     // succeeded

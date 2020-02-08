@@ -66,7 +66,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var nowInfos = new ConcurrentDictionary<int, UserInfo>(10, history.Count);
                 var fails = new ConcurrentBag<int>();
                 stopwatch = Stopwatch.StartNew();
-                var tasks = history.AsParallel().Select(h => (int)h.UserId).Distinct().Select(async bi =>
+                var tasks = history.Select(h => (int)h.UserId).Distinct().Select(async bi =>
                 {
                     var (success, userInfo) = await GetCachedUserInfo(bi, (Bleatingsheep.Osu.Mode)mode).ConfigureAwait(false);
                     if (!success)

@@ -19,7 +19,8 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                     s_browser = Puppeteer.LaunchAsync(new LaunchOptions
                     {
                         Headless = true,
-                        ExecutablePath = @"/opt/google/chrome/chrome",
+                        //ExecutablePath = @"/opt/google/chrome/chrome",
+                        ExecutablePath = @"/usr/bin/chromium-browser",
                         DefaultViewport = new ViewPortOptions
                         {
                             DeviceScaleFactor = 1,
