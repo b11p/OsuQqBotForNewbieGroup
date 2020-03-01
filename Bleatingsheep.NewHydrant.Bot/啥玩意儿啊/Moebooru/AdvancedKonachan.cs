@@ -50,9 +50,23 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
             308419061, // Steam
             601110599, // requested by 瓜皇
             514661057,
+            851868928,
+            661021255,
         };
 
         private static Task<bool> IsVipAsync(long qq) => Task.FromResult(false);
+
+        private static readonly ISet<long> _promotedGroups = new HashSet<long>
+        {
+            851868928,
+            661021255,
+        };
+
+        private static Task<IEnumerable<long>> GetPromotedGroupsAsync() => Task.FromResult(_promotedGroups as IEnumerable<long>);
+
+        private static async Task<bool> AllowMulti(MessageContext context)
+            => !(context.Endpoint is GroupEndpoint g)
+            || (await GetPromotedGroupsAsync().ConfigureAwait(false)).Contains(g.GroupId);
 
         private static Task<bool> ShouldRandomize(Endpoint endpoint)
             => Task.FromResult(endpoint is PrivateEndpoint || endpoint is GroupEndpoint g && EnhancedGroups.Contains(g.GroupId));
@@ -72,7 +86,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
                     diss = Enumerable.Empty<string>();
                 }
 
-                var count = (context.Endpoint is PrivateEndpoint || await IsVipAsync(context.UserId)) ? GetCount() : 1;
+                var count = await AllowMulti(context).ConfigureAwait(false) ? GetCount() : 1;
 
                 var result = (await booru.GetPopularRecentAsync())
                     .Where(p => p.Rating == Rating.Safe && p.Status == Status.Active && !p.Tags.Split().Intersect(diss).Any());
