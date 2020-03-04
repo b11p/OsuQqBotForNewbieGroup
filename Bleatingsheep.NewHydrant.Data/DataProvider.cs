@@ -37,8 +37,8 @@ namespace Bleatingsheep.NewHydrant.Data
             }
             catch (OsuApiFailedException)
             {
-                // TODO
-                return (false, default(BindingInfo));
+                // ignore
+                return (true, default(BindingInfo));
             }
 
             // has mother ship result
