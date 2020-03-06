@@ -20,7 +20,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 {
                     DeviceScaleFactor = 2,
                     Width = 618,
-                    Height = 3000,
+                    Height = 3500,
                 });
                 await page.GoToAsync("https://qieman.com/idx-eval");
 

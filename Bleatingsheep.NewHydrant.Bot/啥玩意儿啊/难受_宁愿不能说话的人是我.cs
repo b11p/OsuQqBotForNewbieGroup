@@ -18,7 +18,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 {
                     if ((ban.Time.Second & 1) == 0)
                     {
-                        await api.SendGroupMessageAsync(ban.GroupId, Message.At(3082577334) + new Message(" 快解开啊，白妹妹太可怜了")).ConfigureAwait(false);
+                        await api.SendGroupMessageAsync(ban.GroupId, Message.At(1061566571) + new Message(" 快解开啊，白妹妹太可怜了")).ConfigureAwait(false);
                     }
                     else
                     {
