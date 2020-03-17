@@ -53,14 +53,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 });
                 await page.GoToAsync($"https://osu.ppy.sh/users/{uid}/osu");
                 // draw history
-                const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
+                const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
                 var data = await GetScreenshot(page, chartSelector);
                 messageRankHistory = Message.ByteArrayImage(data);
                 hints.Add(messageRankHistory);
 
                 // draw ranks
-                const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > div > div.play-detail-list";
-                const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > p";
+                const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > div > div.play-detail-list";
+                const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > p";
                 ElementHandle bpElement = (await page.QuerySelectorAsync(bestSelector))
                     ?? await page.QuerySelectorAsync(bestFallbackSelector);
                 if (bpElement != null)
