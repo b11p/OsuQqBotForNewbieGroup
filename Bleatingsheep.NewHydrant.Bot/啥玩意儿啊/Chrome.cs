@@ -36,7 +36,16 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             }
         };
 
+        private static readonly System.Collections.Generic.Dictionary<string, string> s_extraHeaders = new System.Collections.Generic.Dictionary<string, string>()
+        {
+            ["Accept-Language"] = "zh-CN",
+        };
+
         public static async Task<Page> OpenNewPageAsync()
-            => await GetBrowser().NewPageAsync();
+        {
+            Page page = await GetBrowser().NewPageAsync().ConfigureAwait(false);
+            await page.SetExtraHttpHeadersAsync(s_extraHeaders).ConfigureAwait(false);
+            return page;
+        }
     }
 }
