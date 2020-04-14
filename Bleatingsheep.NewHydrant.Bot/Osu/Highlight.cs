@@ -154,7 +154,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 {
                     var updated = await
 #pragma warning disable EF1000 // Possible SQL injection vulnerability.
-                        osuContext.Userinfo.FromSql(
+                        osuContext.Userinfo.FromSqlRaw(
                             FormattableString.Invariant($@"SELECT a.*
                     FROM (SELECT user_id, `mode`, max(queryDate) queryDate
                     FROM userinfo
