@@ -10,8 +10,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<Beatmap> CachedBeatmaps { get; private set; }
         public DbSet<OperationHistory> Histories { get; private set; }
         public DbSet<BindingInfo> Bindings { get; private set; }
-        public DbSet<MemberInfo> Members { get; private set; }
-        public DbSet<MemberGroup> Groups { get; private set; }
+
         public DbSet<PlusHistory> PlusHistories { get; private set; }
         public DbSet<RelationshipInfo> Relationships { get; private set; }
         public DbSet<BeatmapPlus> BeatmapPlusCache { get; private set; }
@@ -26,9 +25,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Ignore<Osu.ApiClient.UserEvent>();
-
-            modelBuilder.Entity<GroupMemberInfo>()
-                .HasKey(mg => new { mg.GroupName, mg.UserId });
 
             var beatmaps = modelBuilder.Entity<Beatmap>();
             beatmaps
