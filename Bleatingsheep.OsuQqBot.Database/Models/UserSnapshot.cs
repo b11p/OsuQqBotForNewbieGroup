@@ -15,5 +15,15 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DateTimeOffset Date { get; set; } = DateTimeOffset.UtcNow;
         [Required]
         public UserInfo UserInfo { get; set; }
+
+        public static UserSnapshot Create(int osuId, Mode mode, UserInfo userInfo)
+        {
+            return new UserSnapshot
+            {
+                UserId = osuId,
+                Mode = mode,
+                UserInfo = userInfo,
+            };
+        }
     }
 }

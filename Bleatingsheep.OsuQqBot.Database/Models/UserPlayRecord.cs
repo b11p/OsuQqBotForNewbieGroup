@@ -11,5 +11,16 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public Mode Mode { get; set; }
         [Required]
         public UserRecent Record { get; set; }
+
+        public static UserPlayRecord Create(int osuId, Mode mode, int playNumber, UserRecent userRecent)
+        {
+            return new UserPlayRecord
+            {
+                UserId = osuId,
+                Mode = mode,
+                PlayNumber = playNumber,
+                Record = userRecent,
+            };
+        }
     }
 }
