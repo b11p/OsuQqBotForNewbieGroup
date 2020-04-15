@@ -49,31 +49,23 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
                     .ToList();
 
                 var currentMinPlayNumber = records.Last().PlayNumber;
-                var retries = 4 - 1;
-                while (true)
+
+                var strategy = dbContext.Database.CreateExecutionStrategy();
+                await strategy.ExecuteAsync(async () =>
                 {
                     using var t = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable).ConfigureAwait(false);
-                    try
-                    {
-                        // Filter existing data.
-                        var existed = await dbContext.UserPlayRecords
-                            .Where(r => r.UserId == osuId && r.Mode == mode && r.PlayNumber >= currentMinPlayNumber)
-                            .Select(r => r.PlayNumber)
-                            .ToListAsync().ConfigureAwait(false);
-                        var inserting = records.Where(r => !existed.Contains(r.PlayNumber));
+                    // Filter existing data.
+                    var existed = await dbContext.UserPlayRecords
+                        .Where(r => r.UserId == osuId && r.Mode == mode && r.PlayNumber >= currentMinPlayNumber)
+                        .Select(r => r.PlayNumber)
+                        .ToListAsync().ConfigureAwait(false);
+                    var inserting = records.Where(r => !existed.Contains(r.PlayNumber));
 
-                        // Insert data.
-                        await dbContext.UserPlayRecords.AddRangeAsync(inserting).ConfigureAwait(false);
-                        await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                        await t.CommitAsync().ConfigureAwait(false);
-                        break;
-                    }
-                    catch (DbUpdateConcurrencyException) when (retries-- > 0)
-                    {
-                        await t.RollbackAsync().ConfigureAwait(false);
-                    }
-                }
-                Console.WriteLine(); // Check endless loop.
+                    // Insert data.
+                    await dbContext.UserPlayRecords.AddRangeAsync(inserting).ConfigureAwait(false);
+                    await dbContext.SaveChangesAsync().ConfigureAwait(false);
+                    await t.CommitAsync().ConfigureAwait(false);
+                }).ConfigureAwait(false);
             }
             else
             {
