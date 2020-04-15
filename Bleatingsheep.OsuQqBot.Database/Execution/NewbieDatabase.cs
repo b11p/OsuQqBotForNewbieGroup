@@ -105,9 +105,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
             return await TryExecuteAsync(async context =>
             {
                 var binding = await context.Bindings.Where(bi => bi.UserId == qq).SingleOrDefaultAsync();
-                bool add;
                 var oldUid = binding?.OsuId;
-                if (add = binding == null)
+                if (binding == null)
                 {
                     binding = CreateBindingInfo(qq, osuId, source);
                     await context.Bindings.AddAsync(binding);

@@ -286,7 +286,7 @@ namespace Bleatingsheep.NewHydrant.Core
         {
             if (t == typeof(IInitializable))
             {
-                var init = lazy.Value as IInitializable;
+                var init = lazy.Value as IInitializable ?? throw new InvalidCastException();
 
                 var success = init.InitializeAsync().Result;
                 if (!success)
