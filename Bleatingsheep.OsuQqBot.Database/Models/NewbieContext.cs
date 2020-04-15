@@ -15,7 +15,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<RelationshipInfo> Relationships { get; private set; }
         public DbSet<BeatmapPlus> BeatmapPlusCache { get; private set; }
         public DbSet<WebLog> WebLogs { get; private set; }
-        public DbSet<UserHistoryInfo> UserHistories { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -51,15 +50,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
                 .HasKey(ph => new { ph.Id, ph.Date });
             modelBuilder.Entity<PlusHistory>()
                 .Property(ph => ph.Name)
-                .IsRequired();
-
-            modelBuilder.Entity<UserHistoryInfo>()
-                .HasKey(h => new { h.Id, h.Date, h.Mode });
-            modelBuilder.Entity<UserHistoryInfo>()
-                .Property(h => h.Name)
-                .IsRequired();
-            modelBuilder.Entity<UserHistoryInfo>()
-                .Property(h => h.CountryCode)
                 .IsRequired();
 
             modelBuilder.Entity<RelationshipInfo>()
