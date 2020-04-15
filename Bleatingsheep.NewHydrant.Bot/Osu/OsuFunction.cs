@@ -5,14 +5,19 @@ using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Logging;
 using Bleatingsheep.NewHydrant.Osu.Newbie;
+using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Execution;
+using UserInfo = Bleatingsheep.OsuMixedApi.UserInfo;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
     public class OsuFunction : Service
     {
         protected static OsuApiClient OsuApi { get; private set; }
+
+        private static WebApiClient.HttpApiFactory<IOsuApiClient> s_osuApiFactory;
+        protected static IOsuApiClient CreateOsuApi() => s_osuApiFactory.CreateHttpApi();
 
         protected IDataProvider DataProvider { get; private set; }
 
@@ -23,6 +28,8 @@ namespace Bleatingsheep.NewHydrant.Osu
         public static void SetApiKey(string apiKey)
         {
             OsuApi = OsuApiClient.ClientUsingKey(apiKey);
+
+            s_osuApiFactory = OsuApiClientFactory.CreateFactory(apiKey);
 
             NewbieCardChecker.Load();
         }
