@@ -16,6 +16,11 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<BeatmapPlus> BeatmapPlusCache { get; private set; }
         public DbSet<WebLog> WebLogs { get; private set; }
 
+        #region User snapshots and play records.
+        public DbSet<UserPlayRecord> UserPlayRecords { get; private set; }
+        public DbSet<UserSnapshot> UserSnapshots { get; private set; }
+        #endregion
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySql($"server={Server};port={Port};database={ServerInfo.Database};user={User};pwd={Password};SslMode=VerifyCA;");
@@ -59,6 +64,11 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             //    .HasKey(bp => bp.Id);
 
             modelBuilder.Entity<BeatmapPlus>().Property(bp => bp.Id).ValueGeneratedNever();
+
+            modelBuilder.Entity<UserPlayRecord>().HasKey(r => new { r.UserId, r.Mode, r.PlayNumber });
+            modelBuilder.Entity<UserPlayRecord>().OwnsOne(r => r.Record);
+
+            modelBuilder.Entity<UserSnapshot>().OwnsOne(r => r.UserInfo);
         }
     }
 }
