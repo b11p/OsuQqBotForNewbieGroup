@@ -53,18 +53,19 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
                 var strategy = dbContext.Database.CreateExecutionStrategy();
                 await strategy.ExecuteAsync(async () =>
                 {
-                    //using var t = await dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable).ConfigureAwait(false);
                     // Filter existing data.
                     var existed = await dbContext.UserPlayRecords
                         .Where(r => r.UserId == osuId && r.Mode == mode && r.PlayNumber >= currentMinPlayNumber)
                         .Select(r => r.PlayNumber)
                         .ToListAsync().ConfigureAwait(false);
-                    var inserting = records.Where(r => !existed.Contains(r.PlayNumber));
+                    var inserting = records.Where(r => !existed.Contains(r.PlayNumber)).ToList();
 
                     // Insert data.
-                    await dbContext.UserPlayRecords.AddRangeAsync(inserting).ConfigureAwait(false);
-                    await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                    //await t.CommitAsync().ConfigureAwait(false);
+                    if (inserting.Count > 0)
+                    {
+                        await dbContext.UserPlayRecords.AddRangeAsync(inserting).ConfigureAwait(false);
+                        await dbContext.SaveChangesAsync().ConfigureAwait(false);
+                    }
                 }).ConfigureAwait(false);
             }
             else
