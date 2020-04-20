@@ -30,8 +30,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
             var userInfo1 = await getUserTask.ConfigureAwait(false);
             if (userInfo1 is null) return;
             if (userInfo1.PlayCount == snap?.PlayCount && userInfo1.Performance == 0) return; // Inactive player.
-            await dbContext.UserSnapshots.AddAsync(UserSnapshot.Create(osuId, mode, userInfo1)).ConfigureAwait(false);
-            await dbContext.SaveChangesAsync().ConfigureAwait(false);
+            userInfo1.Events = null; // Set to null to help compare.
+            if (!PropertyEquals(userInfo1, snap))
+            {
+                await dbContext.UserSnapshots.AddAsync(UserSnapshot.Create(osuId, mode, userInfo1)).ConfigureAwait(false);
+                await dbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
 
             var userRecent = await getRecentTask.ConfigureAwait(false);
             if (userRecent is null || userRecent.Length == 0)
@@ -87,6 +91,19 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
             {
                 yield return start;
             }
+        }
+
+        private static bool PropertyEquals<T>(T left, T right) => PropertyEquals(left, right, typeof(T));
+
+        private static bool PropertyEquals(object left, object right, Type type)
+        {
+            if (ReferenceEquals(left, right)) return true;
+            if (left is null && right is null) return true;
+            if (left is null || right is null) return false;
+            if (!(type.IsInstanceOfType(left) && type.IsInstanceOfType(right)))
+                throw new InvalidOperationException("Type error!");
+            var properties = type.GetProperties();
+            return properties.Where(p => p.CanRead).All(p => Equals(p.GetValue(left), p.GetValue(right)));
         }
     }
 }
