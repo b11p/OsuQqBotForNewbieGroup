@@ -349,6 +349,30 @@ namespace OsuQqBot
             }
         }
 
+#nullable enable
+        private static bool TryGetFlag(string? countryCode, out string? flag)
+        {
+            if (countryCode?.Length != 2
+                || countryCode[0] > 'Z' || countryCode[0] < 'A'
+                || countryCode[1] > 'Z' || countryCode[1] < 'A')
+            {
+                flag = null;
+                return false;
+            }
+            flag = System.Text.Encoding.UTF32.GetString(stackalloc byte[] {
+                (byte)(countryCode[0] + 165),
+                241,
+                1,
+                0,
+                (byte)(countryCode[1] + 165),
+                241,
+                1,
+                0
+            });
+            return true;
+        }
+#nullable restore
+
         /// <summary>
         /// 根据查询结果和历史数据构造查询结果字符串
         /// </summary>
@@ -360,7 +384,7 @@ namespace OsuQqBot
         {
             //string message;
             //StringBuilder sb = new StringBuilder();
-            string[] byLine = new string[10];
+            ArraySegment<string> byLine = new string[10];
 
             //sb.Append(user.Name + "的个人信息")
             //    .Append(mode == Mode.Unspecified ? "" : "—" + mode.GetModeString()).AppendLine();
@@ -388,17 +412,8 @@ namespace OsuQqBot
             byLine[1] = string.Empty;
             byLine[2] = user.PP + "pp 表现";
             byLine[3] = "#" + user.Rank;
-            try
-            {// Feature: country/region flags.
-                byLine[4] = System.Text.Encoding.UTF32.GetString(
-                    new byte[] { (byte)(user.CountryCode[0] + 165), 241, 1, 0,
-                        (byte)(user.CountryCode[1] + 165), 241, 1, 0 })
-                    + " #" + user.CountryRank;
-            }
-            catch (Exception)
-            {// Fallback to old country/region name
-                byLine[4] = user.Country + " #" + user.CountryRank;
-            }
+            var rankRemark = (TryGetFlag(user.CountryCode, out string userFlag) ? userFlag : user.CountryCode)
+                + "#" + user.CountryRank;
             byLine[5] = (user.RankedScore).ToString("#,###") + " Ranked谱面总分";
             byLine[6] = displayAcc + "% 准确率";
             byLine[7] = user.PlayCount + " 游玩次数";
@@ -412,9 +427,9 @@ namespace OsuQqBot
                 else if (history.PP > user.PP)
                     byLine[2] += " (-" + (history.PP - user.PP).ToString(".##") + ")";
                 if (history.Rank > user.Rank)
-                    byLine[3] += " (↑" + (history.Rank - user.Rank) + ")";
+                    rankRemark = "↑" + (history.Rank - user.Rank) + ", " + rankRemark;
                 else if (history.Rank < user.Rank)
-                    byLine[3] += " (↓" + (user.Rank - history.Rank) + ")";
+                    rankRemark = "↓" + (user.Rank - history.Rank) + ", " + rankRemark;
                 //if(history.RankedScore)
                 // 98.96934509277344 98.969345
                 // 99.02718353271484 99.02718
@@ -433,7 +448,10 @@ namespace OsuQqBot
                     byLine[8] += " (+" + (user.Tth - history.Tth).ToString("#,###") + ")";
             }
 
-            return string.Join(Environment.NewLine, byLine);
+            // Add country rank and rank change.
+            byLine[3] += " (" + rankRemark + ")";
+
+            return string.Join(Environment.NewLine, byLine[0..4].Concat(byLine[5..]));
         }
 
         /// <summary>
