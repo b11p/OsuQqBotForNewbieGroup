@@ -28,6 +28,7 @@ namespace OsuQqBot.Api
         //public string count_rank_s { get; private set; }
         //public string count_rank_a { get; private set; }
         public string Country { get; private set; }
+        public string CountryCode { get; private set; }
         public int CountryRank { get; private set; }
         //public Event[] events { get; private set; }
 
@@ -51,6 +52,7 @@ namespace OsuQqBot.Api
                     PP = double.Parse(raw.pp_raw),
                     Accuracy = double.Parse(raw.accuracy),
                     Country = raw.Country(),
+                    CountryCode = raw.country,
                     CountryRank = int.Parse(raw.pp_country_rank),
                     PlayTime = new TimeSpan(0, 0, raw.TotalSecondsPlayed),
                     TotalSecondsPlayed = raw.TotalSecondsPlayed,

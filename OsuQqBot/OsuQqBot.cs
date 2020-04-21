@@ -388,7 +388,17 @@ namespace OsuQqBot
             byLine[1] = string.Empty;
             byLine[2] = user.PP + "pp 表现";
             byLine[3] = "#" + user.Rank;
-            byLine[4] = user.Country + " #" + user.CountryRank;
+            try
+            {// Feature: country/region flags.
+                byLine[4] = System.Text.Encoding.UTF32.GetString(
+                    new byte[] { (byte)(user.CountryCode[0] + 165), 241, 1, 0,
+                        (byte)(user.CountryCode[1] + 165), 241, 1, 0 })
+                    + " #" + user.CountryRank;
+            }
+            catch (Exception)
+            {// Fallback to old country/region name
+                byLine[4] = user.Country + " #" + user.CountryRank;
+            }
             byLine[5] = (user.RankedScore).ToString("#,###") + " Ranked谱面总分";
             byLine[6] = displayAcc + "% 准确率";
             byLine[7] = user.PlayCount + " 游玩次数";
