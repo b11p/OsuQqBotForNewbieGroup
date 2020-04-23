@@ -80,6 +80,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
             }
         }
 
+        /// <summary>
+        /// Query user play records.
+        /// Parameters must have same number of elements,
+        /// and there must not be any duplicate <c>userId</c> and <c>mode</c> combination.
+        /// </summary>
+        /// <param name="context">Database context to use.</param>
+        /// <param name="userIds">List of queried user ids. <c>userIds</c>, <c>modes</c> and <c>startIndecies</c> must have same number of elements.</param>
+        /// <param name="modes">List of queried modes. <c>userIds</c>, <c>modes</c> and <c>startIndecies</c> must have same number of elements.</param>
+        /// <param name="startIndecies">List of first numbers played. <c>userIds</c>, <c>modes</c> and <c>startIndecies</c> must have same number of elements.</param>
+        /// <returns>A list of user play records.</returns>
         public static async Task<IList<UserPlayRecord>> GetUserPlayRecordsAsync(
             NewbieContext context,
             IEnumerable<int> userIds,
