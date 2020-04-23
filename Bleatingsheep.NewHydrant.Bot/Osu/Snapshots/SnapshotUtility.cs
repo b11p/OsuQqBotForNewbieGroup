@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.Osu;
@@ -77,6 +78,45 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
                 Logger.Info($"Concurrent error! Get different play_count in two queries. ({userInfo1.PlayCount}, {userInfo2?.PlayCount})");
                 Logger.Info($"The user is {userInfo1.Name}({userInfo1.Id}); the mode is {mode}");
             }
+        }
+
+        public static async Task<IList<UserPlayRecord>> GetUserPlayRecordsAsync(
+            NewbieContext context,
+            IEnumerable<int> userIds,
+            IEnumerable<Mode> modes,
+            IEnumerable<int> startIndecies)
+        {
+            var tracking = context.ChangeTracker.QueryTrackingBehavior;
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+            // TODO: Verify that there is no repeating conditions (with same userId and mode).
+            // If so, select the minimum of StartNumber.
+            var filters = userIds.Zip(modes).Zip(startIndecies, (tuple, start) =>
+            {
+                var (userId, mode) = tuple;
+                return new PlayRecordQueryTemp
+                {
+                    UserId = userId,
+                    Mode = mode,
+                    StartNumber = start,
+                };
+            });
+
+            var result = await context.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
+            {
+                using (await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted).ConfigureAwait(false))
+                {
+                    await context.PlayRecordQueryTemps.AddRangeAsync(filters).ConfigureAwait(false);
+                    await context.SaveChangesAsync().ConfigureAwait(false);
+                    return await (from r in context.UserPlayRecords
+                                  join f in context.PlayRecordQueryTemps on new { r.UserId, r.Mode } equals new { f.UserId, f.Mode }
+                                  where r.PlayNumber >= f.StartNumber
+                                  select r).ToListAsync().ConfigureAwait(false);
+                }
+            }).ConfigureAwait(false);
+
+            context.ChangeTracker.QueryTrackingBehavior = tracking;
+            return result;
         }
 
         /// <summary>
