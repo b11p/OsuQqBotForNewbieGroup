@@ -19,6 +19,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         #region User snapshots and play records.
         public DbSet<UserPlayRecord> UserPlayRecords { get; private set; }
         public DbSet<UserSnapshot> UserSnapshots { get; private set; }
+        public DbSet<PlayRecordQueryTemp> PlayRecordQueryTemps { get; private set; }
         #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -70,6 +71,10 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             modelBuilder.Entity<UserPlayRecord>().OwnsOne(r => r.Record);
 
             modelBuilder.Entity<UserSnapshot>().OwnsOne(r => r.UserInfo);
+
+            modelBuilder.Entity<PlayRecordQueryTemp>()
+                .HasIndex(t => new { t.UserId, t.Mode })
+                .IsUnique();
         }
     }
 }
