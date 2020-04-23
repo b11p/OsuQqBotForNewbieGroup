@@ -20,6 +20,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<UserPlayRecord> UserPlayRecords { get; private set; }
         public DbSet<UserSnapshot> UserSnapshots { get; private set; }
         public DbSet<PlayRecordQueryTemp> PlayRecordQueryTemps { get; private set; }
+        public DbSet<UpdateSchedule> UpdateSchedules { get; private set; }
         #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -75,6 +76,9 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             modelBuilder.Entity<PlayRecordQueryTemp>()
                 .HasIndex(t => new { t.UserId, t.Mode })
                 .IsUnique();
+
+            modelBuilder.Entity<UpdateSchedule>()
+                .HasKey(s => new { s.UserId, s.Mode });
         }
     }
 }
