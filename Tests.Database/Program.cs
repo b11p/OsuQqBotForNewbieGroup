@@ -12,49 +12,27 @@ namespace Tests.Database
         static void Main(string[] args)
         {
             using var newbieContext = new NewbieContext();
-            newbieContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            // This works, w/o any Update() statements.
+            //var first = newbieContext.UpdateSchedules.First();
+            //first.ActiveIndex++;
+            //newbieContext.SaveChanges();
             using var newbieContext2 = new NewbieContext();
-            newbieContext2.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             var strategy1 = newbieContext.Database.CreateExecutionStrategy();
             strategy1.Execute(() =>
             {
                 using var transaction1 = newbieContext.Database.BeginTransaction(IsolationLevel.ReadCommitted);
                 using var transaction2 = newbieContext2.Database.BeginTransaction(IsolationLevel.ReadCommitted);
-                newbieContext.PlayRecordQueryTemps.Add(new PlayRecordQueryTemp
-                {
-                    UserId = 10,
-                    Mode = Bleatingsheep.Osu.Mode.Standard,
-                    StartNumber = 30,
-                });
-                newbieContext2.PlayRecordQueryTemps.Add(new PlayRecordQueryTemp
-                {
-                    UserId = 10,
-                    Mode = Bleatingsheep.Osu.Mode.Taiko,
-                    StartNumber = 30,
-                });
+                var first = newbieContext.UpdateSchedules.First();
+                first.ActiveIndex += 10;
+                var first2 = newbieContext2.UpdateSchedules.First();
+                first2.ActiveIndex += 20;
                 newbieContext2.SaveChanges();
-                newbieContext.PlayRecordQueryTemps.Add(new PlayRecordQueryTemp
-                {
-                    UserId = 10,
-                    Mode = Bleatingsheep.Osu.Mode.Taiko,
-                    StartNumber = 30,
-                });
-                newbieContext.SaveChanges(); // Deadlock. Throws after 5 mins.
-                Console.WriteLine(newbieContext.PlayRecordQueryTemps.Where(r => r.UserId == 10).Count());
-                Console.WriteLine(newbieContext2.PlayRecordQueryTemps.Where(r => r.UserId == 10).Count());
                 Task.Run(() =>
                 {
                     Task.Delay(10_000).Wait();
-                    transaction1.Dispose();
+                    transaction2.Commit();
                 });
-                newbieContext2.PlayRecordQueryTemps.Add(new PlayRecordQueryTemp
-                {
-                    UserId = 10,
-                    Mode = Bleatingsheep.Osu.Mode.Standard,
-                    StartNumber = 30,
-                });
-                newbieContext2.SaveChanges();
-                Console.WriteLine(newbieContext2.PlayRecordQueryTemps.Where(r => r.UserId == 10).Count());
+                newbieContext.SaveChanges(); // Throws?
             });
         }
     }
