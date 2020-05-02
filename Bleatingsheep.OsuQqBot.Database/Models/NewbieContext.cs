@@ -72,6 +72,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             modelBuilder.Entity<UserPlayRecord>().OwnsOne(r => r.Record);
 
             modelBuilder.Entity<UserSnapshot>().OwnsOne(r => r.UserInfo);
+            modelBuilder.Entity<UserSnapshot>().HasIndex(r => new { r.UserId, r.Mode, r.Date });
 
             modelBuilder.Entity<PlayRecordQueryTemp>()
                 .HasIndex(t => new { t.UserId, t.Mode })
