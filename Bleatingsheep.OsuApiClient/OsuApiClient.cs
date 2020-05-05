@@ -156,7 +156,7 @@ namespace Bleatingsheep.OsuMixedApi
             // Exponential backoff 指数退避
             return await Policy
                 .HandleResult((T[])null)
-                .WaitAndRetryAsync(9, t => TimeSpan.FromMilliseconds(_threadSafeRandom.Next(75 << (t - 1)) + 1))
+                .WaitAndRetryAsync(2, t => TimeSpan.FromMilliseconds(_threadSafeRandom.Next(75 << (t - 1)) + 1))
                 .ExecuteAsync(() => HttpMethods.GetJsonArrayDeserializeAsync<T>(url, ps))
                 .ConfigureAwait(false);
         }

@@ -64,15 +64,35 @@ namespace Bleatingsheep.NewHydrant.Osu
                 Logger.Debug($"找到 {history.Count} 个历史信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
 
                 var nowInfos = new ConcurrentDictionary<int, UserInfo>(10, history.Count);
-                var fails = new ConcurrentBag<int>();
+                var fails = new BlockingCollection<int>();
                 stopwatch = Stopwatch.StartNew();
-                var tasks = history.Select(h => (int)h.UserId).Distinct().Select(async bi =>
+                var fetchIds = history.Select(h => (int)h.UserId).Distinct().ToList();
+                int completes = 0;
+                var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
+                var tasks = fetchIds.Concat(fails.GetConsumingEnumerable()).Select(async bi =>
                 {
                     var (success, userInfo) = await GetCachedUserInfo(bi, (Bleatingsheep.Osu.Mode)mode).ConfigureAwait(false);
                     if (!success)
-                        fails.Add(bi);
-                    else if (userInfo != null)
-                        nowInfos[bi] = userInfo;
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            fails.CompleteAdding();
+                        if (!fails.IsAddingCompleted)
+                            try
+                            {
+                                fails.Add(bi);
+                            }
+                            catch (InvalidOperationException)
+                            {
+                            }
+                    }
+                    else
+                    {
+                        Interlocked.Increment(ref completes);
+                        if (completes == fetchIds.Count)
+                            fails.CompleteAdding();
+                        if (userInfo != null)
+                            nowInfos[bi] = userInfo;
+                    }
                 }).ToArray();
                 await Task.WhenAll(tasks).ConfigureAwait(false);
                 Logger.Debug($"查询 API 花费 {stopwatch.ElapsedMilliseconds}ms，失败 {fails.Count} 个。");
