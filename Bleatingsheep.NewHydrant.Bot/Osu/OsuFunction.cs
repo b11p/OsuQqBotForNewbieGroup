@@ -8,6 +8,7 @@ using Bleatingsheep.NewHydrant.Osu.Newbie;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Execution;
+using Microsoft.Extensions.Caching.Memory;
 using UserInfo = Bleatingsheep.OsuMixedApi.UserInfo;
 
 namespace Bleatingsheep.NewHydrant.Osu
@@ -61,22 +62,21 @@ namespace Bleatingsheep.NewHydrant.Osu
             return result;
         }
 
-        private static readonly ConcurrentDictionary<(int id, Bleatingsheep.Osu.Mode mode), (DateTimeOffset date, UserInfo info)> Cache
-            = new ConcurrentDictionary<(int, Bleatingsheep.Osu.Mode), (DateTimeOffset, UserInfo)>();
+        private static readonly IMemoryCache s_cache = new MemoryCache(new MemoryCacheOptions());
 
         private static readonly TimeSpan CacheAvailable = TimeSpan.FromMinutes(10);
 
         protected async Task<(bool, UserInfo)> GetCachedUserInfo(int id, Bleatingsheep.Osu.Mode mode)
         {
-            var hasCache = Cache.TryGetValue((id, mode), out var tuple);
-            if (hasCache && DateTimeOffset.Now - tuple.date <= CacheAvailable)
+            var hasCache = s_cache.TryGetValue<UserInfo>((id, mode), out var cachedInfo);
+            if (hasCache)
             {
-                return (true, tuple.info);
+                return (true, cachedInfo);
             }
             var (success, userInfo) = await OsuApi.GetUserInfoAsync(id, mode);
             if (success)
             {
-                Cache[(id, mode)] = (DateTimeOffset.Now, userInfo);
+                s_cache.Set((id, mode), userInfo, CacheAvailable);
                 return (true, userInfo);
             }
             else
