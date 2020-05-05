@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Polly;
 
 namespace Bleatingsheep.OsuMixedApi
 {
@@ -153,25 +154,11 @@ namespace Bleatingsheep.OsuMixedApi
             // TODO: 增加访问数限制。
 
             // Exponential backoff 指数退避
-            T[] result = null;
-            int millisecondsDelay = 75;
-            int times = 10;
-            while (times-- > 0)
-            {
-                result = await HttpMethods.GetJsonArrayDeserializeAsync<T>(url, ps).ConfigureAwait(false);
-                if (result != null)
-                {
-                    // succeeded
-                    return result;
-                }
-
-                if (times > 0)
-                {
-                    await Task.Delay(_threadSafeRandom.Next(millisecondsDelay) + 1).ConfigureAwait(false);
-                    millisecondsDelay <<= 1;
-                }
-            }
-            return result;
+            return await Policy
+                .HandleResult((T[])null)
+                .WaitAndRetryAsync(9, t => TimeSpan.FromMilliseconds(_threadSafeRandom.Next(75 << (t - 1)) + 1))
+                .ExecuteAsync(() => HttpMethods.GetJsonArrayDeserializeAsync<T>(url, ps))
+                .ConfigureAwait(false);
         }
 
         private async Task<PlayRecord[]> GetRecentlyAsync(string u, string type, Osu.Mode m, int limit)
