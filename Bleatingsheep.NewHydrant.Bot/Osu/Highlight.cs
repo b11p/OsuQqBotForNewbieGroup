@@ -63,6 +63,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
                 Logger.Debug($"找到 {history.Count} 个历史信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
 
+                // Using ConcurrentBag is enough here. ConcurrentDictionary is unnecessary and costly.
                 var nowInfos = new ConcurrentDictionary<int, UserInfo>(10, history.Count);
                 var fails = new BlockingCollection<int>();
                 stopwatch = Stopwatch.StartNew();
