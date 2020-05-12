@@ -8,6 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Template.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Template.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Bleatingsheep.Osu.ApiClient" Version="0.6.21" />
     <PackageReference Include="Bleatingsheep.Osu.Enums" Version="0.6.0" />
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
