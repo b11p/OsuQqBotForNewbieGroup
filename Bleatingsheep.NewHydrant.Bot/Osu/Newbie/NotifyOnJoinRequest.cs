@@ -8,13 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.啥玩意儿啊;
+using Microsoft.EntityFrameworkCore;
+using MotherShipDatabase;
 using PuppeteerSharp;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 using Mode = Bleatingsheep.Osu.Mode;
-using UserInfo = Bleatingsheep.OsuMixedApi.UserInfo;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
@@ -35,7 +36,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             Endpoint sendBackEndpoint,
             GroupRequest r,
             int? osuId = null,
-            OsuMixedApi.UserInfo userInfo = default)
+            TrustedUserInfo userInfo = default)
         {
             long userId = r.UserId;
             string comment = r.Comment;
@@ -77,6 +78,28 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                             continue;
                         }
 
+                        // 自动绑定，在请求消息完全匹配 osu! 用户名的前提下。
+                        if (userNames.Count() == 1
+                            && comment.TrimEnd().EndsWith($"答案：{name}", StringComparison.Ordinal)
+                            && info != null)
+                        {
+                            var bindingResult = await Database.AddNewBindAsync(
+                                qq: r.UserId,
+                                osuId: info.Id,
+                                osuName: info.Name,
+                                source: "Auto (Request)",
+                                operatorId: r.UserId,
+                                operatorName: info.Name).ConfigureAwait(false);
+                            if (bindingResult.Success)
+                            {
+                                hints.Add(new Message($"自动绑定为 {info.Name}"));
+                                goto binding_end;
+                            }
+                            else
+                            {
+                                hints.Add(new Message($"自动绑定失败。"));
+                            }
+                        }
                         // 提供绑定并放行的捷径。
                         if (info?.Performance < 2500)
                         {
@@ -95,27 +118,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                             var base64 = Convert.ToBase64String(bytes);
                             await api.SendMessageAsync(sendBackEndpoint, $"（占位）绑定为 {info.Name} 并放行：#{base64}#");
                         }
-                        // 自动绑定，在请求消息完全匹配 osu! 用户名的前提下。
-                        if (userNames.Count() == 1
-                            && comment.TrimEnd().EndsWith($"答案：{name}", StringComparison.Ordinal)
-                            && info != null)
-                        {
-                            var bindingResult = await Database.AddNewBindAsync(
-                                qq: r.UserId,
-                                osuId: info.Id,
-                                osuName: info.Name,
-                                source: "Auto (Request)",
-                                operatorId: r.UserId,
-                                operatorName: info.Name).ConfigureAwait(false);
-                            if (bindingResult.Success)
-                            {
-                                hints.Add(new Message($"自动绑定为 {info.Name}"));
-                            }
-                        }
+                    binding_end:;
                     }
                 }
             }
-            if (hints.Any())
+            if (hints.Count > 0)
             {
                 var newLine = new Message("\r\n");
                 await api.SendMessageAsync(sendBackEndpoint, hints.Aggregate((m1, m2) => m1 + newLine + m2));
@@ -129,7 +136,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var (success, osuId) = await DataProvider.GetBindingIdAsync(userId);
             string response = string.Empty;
             double? performance = default;
-            OsuMixedApi.UserInfo user = null;
+            TrustedUserInfo user = null;
             if (!success)
             {
                 response = "查询失败";
@@ -142,11 +149,40 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
             else
             {
+                var sb = new StringBuilder();
+                sb.Append("这个人绑定的 uid 是 ").Append(osuId).Append('，');
                 bool osuApiGood;
                 (osuApiGood, user) = await OsuApi.GetUserInfoAsync(osuId.Value, OsuMixedApi.Mode.Standard);
-                performance = user?.Performance;
+                _ = ((osuApiGood, user) switch
+                {
+                    (false, _) => sb.Append("查询失败。"),
+                    (_, null) => sb.Append("被办了。"),
+                    (_, TrustedUserInfo _) when user.Name != null => sb.Append("用户名是 ").Append(user.Name),
+                    _ => sb.Append("未知错误"),
+                });
+                response = sb.ToString();
 
-                response = $"这个人绑定的 uid 是 {osuId}，用户名是 {(osuApiGood ? user?.Name ?? "被办了" : "查询失败")}\r\n（居然施工差不多了）";
+                if (osuApiGood && user is null)
+                {// user is banned, find user from mother ship
+                    try
+                    {
+                        using var mother = new OsuContext();
+                        var role = await mother.Userrole.Where(r => r.UserId == osuId).FirstOrDefaultAsync().ConfigureAwait(false);
+                        var info = await mother.Userinfo.Where(i => i.UserId == osuId).OrderByDescending(i => i.QueryDate).FirstOrDefaultAsync().ConfigureAwait(false);
+                        if (!(role is null || info is null))
+                        {
+                            user = TrustedUserInfo.FromMotherShip(info, role);
+                        }
+                    }
+#pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
+#pragma warning disable CA1031 // Do not catch general exception types
+                    catch (Exception)
+#pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception.
+                    {
+                    }
+#pragma warning restore CA1031 // Do not catch general exception types
+                }
+                performance = user?.Performance;
             }
 
             // 提供额外信息
@@ -158,7 +194,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             catch (Exception e)
 #pragma warning restore CA1031 // 不捕获常规异常类型
             {
-                await api.SendMessageAsync(endpoint, e.ToString());
+                await api.SendMessageAsync(endpoint, e.Message).ConfigureAwait(false);
             }
 
             // 保留 comment
@@ -195,7 +231,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         public bool ShouldResponse(MessageContext context)
             => context switch
             {
-                GroupMessage g when g.GroupId == 695600319 && g.Content.TryGetPlainText(out _content) && _content.StartsWith("drawu", StringComparison.OrdinalIgnoreCase) => true,
+                GroupMessage g when g.GroupId == 695600319 && g.Content.TryGetPlainText(out _content) && _content.StartsWith("shotu", StringComparison.OrdinalIgnoreCase) => true,
                 _ => false
             };
 
@@ -204,7 +240,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var uid = int.Parse(_content.Substring(5).Trim(), CultureInfo.InvariantCulture);
             var hints = new List<Message>();
             await ScreenShotsAsync(hints, uid).ConfigureAwait(false);
-            _ = await api.SendMessageAsync(context.Endpoint, hints[0] + hints[1]).ConfigureAwait(false);
+            var newLine = new Message("\r\n");
+            Message message = hints.Count > 0
+                ? hints.Aggregate((m1, m2) => m1 + newLine + m2)
+                : new Message("没有结果。");
+            await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
         }
     }
 }

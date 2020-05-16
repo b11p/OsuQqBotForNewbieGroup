@@ -13,7 +13,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
     partial class NotifyOnJoinRequest
     {
-        private static async Task<UserInfo> ProcessApplicantReportAsync(List<Message> hints, string fallbackName, (bool networkSuccess, OsuMixedApi.UserInfo) userTuple)
+        private static async Task<TrustedUserInfo> ProcessApplicantReportAsync(List<Message> hints, string fallbackName, (bool networkSuccess, TrustedUserInfo) userTuple)
         {
             var (success, info) = userTuple;
             var userName = info?.Name ?? fallbackName;
@@ -25,7 +25,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             };// 包含 PC 、PP等基础信息。
             var hint = $"{userName}: {basicInfo}";
             hints.Add(new Message(hint));
-            if (info != null)
+            if (info?.IsBanned == false)
                 await ScreenShotsAsync(hints, info.Id).ConfigureAwait(false);
             return info;
         }
@@ -42,39 +42,49 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 return data;
             }
 
-            Message messageRankHistory, messageBest;
-            using (var page = await Chrome.OpenNewPageAsync())
+            try
             {
-                await page.SetViewportAsync(new ViewPortOptions
+                Message messageRankHistory, messageBest;
+                using (var page = await Chrome.OpenNewPageAsync())
                 {
-                    DeviceScaleFactor = 2.5,
-                    Width = 1440,
-                    Height = 900,
-                });
-                await page.GoToAsync($"https://osu.ppy.sh/users/{uid}/osu");
-                // draw history
-                const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
-                var data = await GetScreenshot(page, chartSelector);
-                messageRankHistory = Message.ByteArrayImage(data);
-                hints.Add(messageRankHistory);
+                    await page.SetViewportAsync(new ViewPortOptions
+                    {
+                        DeviceScaleFactor = 2.5,
+                        Width = 1440,
+                        Height = 900,
+                    });
+                    var response = await page.GoToAsync($"https://osu.ppy.sh/users/{uid}/osu").ConfigureAwait(false);
+                    if (response.Status == System.Net.HttpStatusCode.NotFound) return;
+                    // draw history
+                    const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
+                    var data = await GetScreenshot(page, chartSelector);
+                    messageRankHistory = Message.ByteArrayImage(data);
+                    hints.Add(messageRankHistory);
 
-                // draw ranks
-                const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > div > div.play-detail-list";
-                const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > p";
-                ElementHandle bpElement = (await page.QuerySelectorAsync(bestSelector))
-                    ?? await page.QuerySelectorAsync(bestFallbackSelector);
-                if (bpElement != null)
-                {
-                    data = await bpElement.ScreenshotDataAsync();
-                    //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);
-                    messageBest = Message.ByteArrayImage(data);
-                    hints.Add(messageBest);
-                }
-                else
-                {
-                    hints.Add(new Message("查询 BP 失败。既没有找到 BP 数据，也没有找到未上传成绩的说明。"));
+                    // draw ranks
+                    const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > div > div.play-detail-list";
+                    const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > p";
+                    ElementHandle bpElement = (await page.QuerySelectorAsync(bestSelector))
+                        ?? await page.QuerySelectorAsync(bestFallbackSelector);
+                    if (bpElement != null)
+                    {
+                        data = await bpElement.ScreenshotDataAsync();
+                        //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);
+                        messageBest = Message.ByteArrayImage(data);
+                        hints.Add(messageBest);
+                    }
+                    else
+                    {
+                        hints.Add(new Message("查询 BP 失败。既没有找到 BP 数据，也没有找到未上传成绩的说明。"));
+                    }
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
+            catch (Exception ex)
+            {
+                hints.Add(new Message(ex.Message));
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
     }
 }
