@@ -13,7 +13,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
     partial class NotifyOnJoinRequest
     {
-        private static async Task<TrustedUserInfo> ProcessApplicantReportAsync(List<Message> hints, string fallbackName, (bool networkSuccess, TrustedUserInfo) userTuple)
+        private async Task<TrustedUserInfo> ProcessApplicantReportAsync(List<Message> hints, string fallbackName, (bool networkSuccess, TrustedUserInfo) userTuple)
         {
             var (success, info) = userTuple;
             var userName = info?.Name ?? fallbackName;
@@ -30,7 +30,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             return info;
         }
 
-        private static async Task ScreenShotsAsync(List<Message> hints, int uid)
+        private async Task ScreenShotsAsync(List<Message> hints, int uid)
         {
             async Task<byte[]> GetScreenshot(Page page, string selector)
             {
@@ -82,6 +82,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
+                Logger.Warn(ex);
                 hints.Add(new Message(ex.Message));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
