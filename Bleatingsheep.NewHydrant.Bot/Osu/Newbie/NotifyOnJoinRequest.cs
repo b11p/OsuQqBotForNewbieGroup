@@ -41,11 +41,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             long userId = r.UserId;
             string comment = r.Comment;
             var hints = new List<Message>();
-            var levelInfo = await api.GetLevelInfo(userId);
-            if (levelInfo != null)
-            {
-                hints.Add(new Message($"QQ 等级为 {levelInfo.Level}"));
-            }
             if (!string.IsNullOrEmpty(comment))
             {
                 var userNames = OsuHelper.DiscoverUsernames(comment).Where(n => !string.Equals(n, "osu", StringComparison.OrdinalIgnoreCase));
@@ -129,27 +124,34 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
         }
 
-        private async ValueTask<double?> HintBinding(HttpApiClient api, Endpoint endpoint, GroupRequest r)
+        private async ValueTask<(double? performance, int? level)> HintBinding(HttpApiClient api, Endpoint endpoint, GroupRequest r)
         {
             long userId = r.UserId;
             string comment = r.Comment;
             var (success, osuId) = await DataProvider.GetBindingIdAsync(userId);
-            string response = string.Empty;
+            var sb = new StringBuilder();
+            sb.Append(comment).Append("\r\n");
             double? performance = default;
             TrustedUserInfo user = null;
-            if (!success)
+
+            var levelInfo = await api.GetLevelInfo(userId).ConfigureAwait(false);
+            var level = levelInfo?.Level;
+            if (levelInfo != null)
             {
-                response = "查询失败";
-                goto exit;
+                sb.Append("QQ 等级为 ").Append(levelInfo.Level).Append("\r\n");
             }
 
+            if (!success)
+            {
+                sb.Append("查询失败");
+                goto exit;
+            }
             else if (osuId == null)
             {
-                response = "这个人没绑定。";
+                sb.Append("这个人没绑定。");
             }
             else
             {
-                var sb = new StringBuilder();
                 sb.Append("这个人绑定的 uid 是 ").Append(osuId).Append('，');
                 bool osuApiGood;
                 (osuApiGood, user) = await OsuApi.GetUserInfoAsync(osuId.Value, OsuMixedApi.Mode.Standard);
@@ -160,7 +162,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     (_, TrustedUserInfo _) when user.Name != null => sb.Append("用户名是 ").Append(user.Name),
                     _ => sb.Append("未知错误"),
                 });
-                response = sb.ToString();
 
                 if (osuApiGood && user is null)
                 {// user is banned, find user from mother ship
@@ -197,15 +198,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 await api.SendMessageAsync(endpoint, e.Message).ConfigureAwait(false);
             }
 
-            // 保留 comment
-            if (!string.IsNullOrEmpty(comment))
-            {
-                response = comment + "\r\n" + response;
-            }
-
         exit:
-            await api.SendMessageAsync(endpoint, response);
-            return performance;
+            await api.SendMessageAsync(endpoint, sb.ToString()).ConfigureAwait(false);
+            return (performance, level);
         }
 
         public GroupRequestResponse Monitor(HttpApiClient httpApiClient, GroupRequest e)
@@ -213,7 +208,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             if (ManagedGroups.TryGetValue(e.GroupId, out var limit))
             {
                 var endpoint = new GroupEndpoint(NewbieManagementGroupId);
-                var performance = HintBinding(httpApiClient, endpoint, e).ConfigureAwait(false).GetAwaiter().GetResult();
+                var (performance, level) = HintBinding(httpApiClient, endpoint, e).ConfigureAwait(false).GetAwaiter().GetResult();
                 if (performance >= limit)
                 {
                     var reason = $"您的 PP 超限，不能加入本群。";
@@ -221,6 +216,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     return new GroupRequestResponse(reason);
                     //_ = httpApiClient.SendMessageAsync(endpoint, $"建议拒绝。");
                     //return null;
+                }
+                if (limit != null && level == 1)
+                {
+                    const string reason = "";
+                    _ = httpApiClient.SendMessageAsync(endpoint, $"已拒绝。");
+                    return reason;
                 }
             }
             return null;
