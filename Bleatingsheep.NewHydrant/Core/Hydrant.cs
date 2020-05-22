@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
 using Bleatingsheep.NewHydrant.Attributions;
 using NLog;
 using Sisters.WudiLib;
@@ -13,11 +14,13 @@ namespace Bleatingsheep.NewHydrant.Core
 {
     public sealed class Hydrant
     {
+#nullable enable
         private readonly HttpApiClient _qq;
         private readonly ApiPostListener _listener;
         private readonly Assembly[] _assemblies;
         private int _isInitialized = 0;
-        private LogFactory _logFactory;
+        private LogFactory? _logFactory;
+        private IContainer _container = default!;
 
         /// <exception cref="ArgumentException">Some of elements in <c>assemblies</c> was <c>null</c>.</exception>
         public Hydrant(HttpApiClient httpApiClient, ApiPostListener listener, params Assembly[] assemblies)
@@ -27,11 +30,11 @@ namespace Bleatingsheep.NewHydrant.Core
                 throw new ArgumentNullException(nameof(assemblies));
             }
 
-            _assemblies = assemblies.Clone() as Assembly[];
+            _assemblies = (Assembly[])assemblies.Clone();
 
             if (_assemblies.Any(a => a is null))
             {
-                throw new ArgumentException("No assembly avalible.", nameof(assemblies));
+                throw new ArgumentException("Each of elements in assemblies must not be null.", nameof(assemblies));
             }
 
             _qq = httpApiClient;
@@ -103,7 +106,7 @@ namespace Bleatingsheep.NewHydrant.Core
             }
 
             var old = Interlocked.CompareExchange(ref _logFactory, logFactory, default);
-            if (old != default) throw new Exception();
+            if (old != default) throw new InvalidOperationException("Logger can be added only once.");
             return this;
         }
 
@@ -118,42 +121,41 @@ namespace Bleatingsheep.NewHydrant.Core
         private readonly Task _plan;
         #endregion
 
-        public void Init()
+        public void Init() => Init<IHydrantStartup>(default!);
+
+        public void Init<T>(T startup) where T : IHydrantStartup
         {
             if (Interlocked.Exchange(ref _isInitialized, 1) == 0)
             {
-                Init(_assemblies);
+                var builder = new ContainerBuilder();
+                startup?.Configure(builder);
+                Init(_assemblies, builder);
             }
         }
 
-        internal static string GetServiceName(object hit)
+        internal static string GetServiceName(object? hit)
         {
-            if (hit == null)
-            {
-                throw new ArgumentNullException(nameof(hit));
-            }
-
-            var attr = hit.GetType().GetCustomAttribute<FunctionAttribute>();
-            var name = attr?.Name;
-            return name;
+            var type = hit?.GetType() ?? typeof(Hydrant);
+            var attr = type.GetCustomAttribute<FunctionAttribute>();
+            return attr?.Name ?? type.Name;
         }
 
-        private void LogException(string name, string message, Exception e)
+        private void LogException(string name, string? message, Exception e)
         {
             var logger = _logFactory?.GetLogger(name) ?? LogManager.CreateNullLogger();
             logger.Warn(e, message);
         }
 
-        private object CreateServiceInstance(Type type)
+        private object CreateServiceInstance(Type type, IComponentContext componentContext)
         {
-            var result = type.CreateInstance();
+            var result = type.CreateInstance(componentContext);
             ConfigureDefaultService(result);
             return result;
         }
 
-        private T CreateServiceInstance<T>(Type type)
+        private T CreateServiceInstance<T>(Type type, IComponentContext componentContext) where T : notnull
         {
-            var result = type.CreateInstance<T>();
+            var result = type.CreateInstance<T>(componentContext);
             ConfigureDefaultService(result);
             return result;
         }
@@ -166,10 +168,14 @@ namespace Bleatingsheep.NewHydrant.Core
             }
         }
 
-        private void Init(IEnumerable<Assembly> assemblies)
+        private void Init(IEnumerable<Assembly> assemblies, ContainerBuilder builder)
         {
             var types = assemblies.SelectMany(a => a.GetTypes()
-                .Where(t => t.GetCustomAttributes<FunctionAttribute>().Any()));
+                .Where(t => t.GetCustomAttributes<FunctionAttribute>().Any()))
+                .ToList();
+
+            types.ForEach(t => builder.RegisterType(t));
+            _container = builder.Build();
 
             types.ForEach(InitType);
 
@@ -194,20 +200,21 @@ namespace Bleatingsheep.NewHydrant.Core
             };
             _listener.MessageEvent += async (api, message) =>
             {
-                IMessageCommand hit = default;
+                using var scope = _container.BeginLifetimeScope();
+                IMessageCommand? hit = default;
                 try
                 {
-                    IMessageCommand last = null;
+                    IMessageCommand? last = null;
                     try
                     {
                         hit = _messageCommandList
-                        .Select(c => CreateServiceInstance<IMessageCommand>(c.GetType()))
+                        .Select(c => CreateServiceInstance<IMessageCommand>(c.GetType(), scope))
                         .FirstOrDefault(c => (last = c).ShouldResponse(message));
                     }
                     catch (Exception e)
                     {
                         //_logger.LogException(e);
-                        LogException(last is null ? nameof(Hydrant) : GetServiceName(last), "ShouldResponse 方法引发了一个异常", e);
+                        LogException(GetServiceName(last), "ShouldResponse 方法引发了一个异常", e);
                         return;
                     }
                     var task = hit?.ProcessAsync(message, api);
@@ -237,32 +244,11 @@ namespace Bleatingsheep.NewHydrant.Core
                         if (hTask != null)
                             await hTask;
                     }
-                    catch (Exception)
+                    catch (Exception he)
                     {
-                        // ignore exception on handling
+                        LogException("Exception handling", null, he);
                     }
                 }
-                //catch (DatabaseFailException e)
-                //{
-                //    await api.SendMessageAsync(
-                //        endpoint: message.Endpoint,
-                //        message: e.Message ?? (e.InnerException is DbUpdateConcurrencyException ? "数据库太忙。" : "无法访问数据库。")
-                //    );
-                //    _logger.LogException(e);
-                //}
-                //catch (MySqlException)
-                //{
-                //    await api.SendMessageAsync(message.Endpoint, "无法访问 MySQL 数据库。");
-                //}
-                //catch (ApiAccessException)
-                //{
-                //    // 酷 Q 失败。
-                //}
-                //catch (Exception e)
-                //{
-                //    await api.SendMessageAsync(message.Endpoint, "有一些不好的事发生了。");
-                //    _logger.LogException(e);
-                //}
             };
 
             // 跑定期任务
@@ -274,9 +260,10 @@ namespace Bleatingsheep.NewHydrant.Core
 
         internal void InitType(Type t)
         {
+            using var scope = _container.BeginLifetimeScope();
             var interfaces = t.GetInterfaces();
             var lazy = new Lazy<object>(
-                valueFactory: () => CreateServiceInstance(t),
+                valueFactory: () => CreateServiceInstance(t, scope),
                 mode: LazyThreadSafetyMode.None
             );
             Array.ForEach(interfaces, i => InitInterface(i, lazy));
@@ -305,7 +292,7 @@ namespace Bleatingsheep.NewHydrant.Core
             }
             if (t == typeof(IRegularAsync))
             {
-                InitTask(lazy.Value as IRegularAsync);
+                InitTask(lazy.Value as IRegularAsync ?? throw new InvalidCastException());
             }
         }
 
@@ -316,6 +303,7 @@ namespace Bleatingsheep.NewHydrant.Core
             if (task.OnUtc is TimeSpan onUtc)
                 _regularTasks.Add(new ScheduleInfo(ScheduleType.Daily, onUtc, task));
         }
+#nullable restore
 
         #region ExceptionEvent
 

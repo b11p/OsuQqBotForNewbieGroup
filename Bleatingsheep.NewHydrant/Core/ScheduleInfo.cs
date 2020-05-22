@@ -3,6 +3,7 @@ using Bleatingsheep.NewHydrant.Attributions;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
+#nullable enable
     internal class ScheduleInfo
     {
         private static readonly TimeSpan Close = new TimeSpan(0, 0, 1);
@@ -66,4 +67,5 @@ namespace Bleatingsheep.NewHydrant.Core
         ByInterval = 0,
         Daily = 1,
     }
+#nullable restore
 }
