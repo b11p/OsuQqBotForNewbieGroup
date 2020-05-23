@@ -146,6 +146,13 @@ namespace Bleatingsheep.NewHydrant.Core
             logger.Warn(e, message);
         }
 
+        #region Create Service Instance
+        public T CreateServiceInstance<T>() where T : notnull, Service
+        {
+            using var scope = _container.BeginLifetimeScope();
+            return CreateServiceInstance<T>(typeof(T), scope);
+        }
+
         private object CreateServiceInstance(Type type, IComponentContext componentContext)
         {
             var result = type.CreateInstance(componentContext);
@@ -167,6 +174,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 s.LogFactory = _logFactory;
             }
         }
+        #endregion
 
         private void Init(IEnumerable<Assembly> assemblies, ContainerBuilder builder)
         {
