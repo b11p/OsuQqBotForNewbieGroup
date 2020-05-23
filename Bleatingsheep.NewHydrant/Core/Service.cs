@@ -8,6 +8,7 @@ using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
+#nullable enable
     public abstract class Service
     {
         private readonly Lazy<Logger> _logger;
@@ -17,7 +18,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 () => LogFactory?.GetLogger(Hydrant.GetServiceName(this)) ?? LogManager.CreateNullLogger()
             );
 
-        internal LogFactory LogFactory { private get; set; }
+        internal LogFactory? LogFactory { private get; set; }
 
         protected Logger Logger => _logger.Value;
 
@@ -39,8 +40,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 throw new ArgumentNullException(nameof(message));
             }
 
-            bool isPlain = message.TryGetPlainText(out string text);
-            return mustBePlainText && !isPlain ? false : RegexCommand(regex, text);
+            return mustBePlainText && !message.IsPlaintext ? false : RegexCommand(regex, message.Text);
         }
 
         /// <summary>
@@ -88,4 +88,5 @@ namespace Bleatingsheep.NewHydrant.Core
             }
         }
     }
+#nullable restore
 }
