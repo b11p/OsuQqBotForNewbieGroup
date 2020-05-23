@@ -59,19 +59,19 @@ namespace Bleatingsheep.NewHydrant
                 apiPostListener.ForwardTo = "http://oldbot:8876";
                 apiPostListener.StartListen();
 
-                // 添加必要的事件处理。
-                apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
-                apiPostListener.GroupRequestEvent += (api, e) => e.UserId == configure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
-                apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
-                //apiPostListener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
-                apiPostListener.GroupRequestEvent += new NotifyOnJoinRequest().Monitor;
-                apiPostListener.GroupBanEvent += new 啥玩意儿啊.难受_宁愿不能说话的人是我().EvilDalou;
-
                 // 配置 osu
                 OsuFunction.SetApiKey(configure.ApiKey);
 
                 var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly(), typeof(Hydrant).Assembly)
                     .AddLogger(LogManager.LogFactory);
+
+                // 添加必要的事件处理。
+                apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
+                apiPostListener.GroupRequestEvent += (api, e) => e.UserId == configure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
+                apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
+                //apiPostListener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
+                apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
+                apiPostListener.GroupBanEvent += new 啥玩意儿啊.难受_宁愿不能说话的人是我().EvilDalou;
 
                 // 设置异常处理。
                 hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
