@@ -65,6 +65,11 @@ namespace Bleatingsheep.NewHydrant
                 var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly(), typeof(Hydrant).Assembly)
                     .AddLogger(LogManager.LogFactory);
 
+                // 设置异常处理。
+                hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
+
+                hydrant.Init();
+
                 // 添加必要的事件处理。
                 apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
                 apiPostListener.GroupRequestEvent += (api, e) => e.UserId == configure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
@@ -73,12 +78,10 @@ namespace Bleatingsheep.NewHydrant
                 apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
                 apiPostListener.GroupBanEvent += new 啥玩意儿啊.难受_宁愿不能说话的人是我().EvilDalou;
 
-                // 设置异常处理。
-                hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
-
-                hydrant.Init();
-
                 Console.WriteLine("init complete.");
+
+                hydrant.Run();
+                Console.WriteLine("Running...");
 
                 Task.Delay(-1).Wait();
             }

@@ -121,6 +121,7 @@ namespace Bleatingsheep.NewHydrant.Core
         private readonly Task _plan;
         #endregion
 
+        #region init and run
         public void Init() => Init<IHydrantStartup>(default!);
 
         public void Init<T>(T startup) where T : IHydrantStartup
@@ -133,60 +134,8 @@ namespace Bleatingsheep.NewHydrant.Core
             }
         }
 
-        internal static string GetServiceName(object? hit)
+        public void Run()
         {
-            var type = hit?.GetType() ?? typeof(Hydrant);
-            var attr = type.GetCustomAttribute<FunctionAttribute>();
-            return attr?.Name ?? type.Name;
-        }
-
-        private void LogException(string name, string? message, Exception e)
-        {
-            var logger = _logFactory?.GetLogger(name) ?? LogManager.CreateNullLogger();
-            logger.Warn(e, message);
-        }
-
-        #region Create Service Instance
-        public T CreateServiceInstance<T>() where T : notnull, Service
-        {
-            using var scope = _container.BeginLifetimeScope();
-            return CreateServiceInstance<T>(typeof(T), scope);
-        }
-
-        private object CreateServiceInstance(Type type, IComponentContext componentContext)
-        {
-            var result = type.CreateInstance(componentContext);
-            ConfigureDefaultService(result);
-            return result;
-        }
-
-        private T CreateServiceInstance<T>(Type type, IComponentContext componentContext) where T : notnull
-        {
-            var result = type.CreateInstance<T>(componentContext);
-            ConfigureDefaultService(result);
-            return result;
-        }
-
-        private void ConfigureDefaultService(object result)
-        {
-            if (result is Service s)
-            {
-                s.LogFactory = _logFactory;
-            }
-        }
-        #endregion
-
-        private void Init(IEnumerable<Assembly> assemblies, ContainerBuilder builder)
-        {
-            var types = assemblies.SelectMany(a => a.GetTypes()
-                .Where(t => t.GetCustomAttributes<FunctionAttribute>().Any()))
-                .ToList();
-
-            types.ForEach(t => builder.RegisterType(t));
-            _container = builder.Build();
-
-            types.ForEach(InitType);
-
             _listener.MessageEvent += async (api, message) =>
             {
                 await _messageMonitorList.ForEachAsync(async m =>
@@ -265,6 +214,63 @@ namespace Bleatingsheep.NewHydrant.Core
                 _plan.Start();
             }
         }
+        #endregion
+
+        internal static string GetServiceName(object? hit)
+        {
+            var type = hit?.GetType() ?? typeof(Hydrant);
+            var attr = type.GetCustomAttribute<FunctionAttribute>();
+            return attr?.Name ?? type.Name;
+        }
+
+        private void LogException(string name, string? message, Exception e)
+        {
+            var logger = _logFactory?.GetLogger(name) ?? LogManager.CreateNullLogger();
+            logger.Warn(e, message);
+        }
+
+        #region Create Service Instance
+        public T CreateServiceInstance<T>() where T : notnull, Service
+        {
+            using var scope = _container.BeginLifetimeScope();
+            return CreateServiceInstance<T>(typeof(T), scope);
+        }
+
+        private object CreateServiceInstance(Type type, IComponentContext componentContext)
+        {
+            var result = type.CreateInstance(componentContext);
+            ConfigureDefaultService(result);
+            return result;
+        }
+
+        private T CreateServiceInstance<T>(Type type, IComponentContext componentContext) where T : notnull
+        {
+            var result = type.CreateInstance<T>(componentContext);
+            ConfigureDefaultService(result);
+            return result;
+        }
+
+        private void ConfigureDefaultService(object result)
+        {
+            if (result is Service s)
+            {
+                s.LogFactory = _logFactory;
+            }
+        }
+        #endregion
+
+        #region init private
+        private void Init(IEnumerable<Assembly> assemblies, ContainerBuilder builder)
+        {
+            var types = assemblies.SelectMany(a => a.GetTypes()
+                .Where(t => t.GetCustomAttributes<FunctionAttribute>().Any()))
+                .ToList();
+
+            types.ForEach(t => builder.RegisterType(t));
+            _container = builder.Build();
+
+            types.ForEach(InitType);
+        }
 
         internal void InitType(Type t)
         {
@@ -311,6 +317,7 @@ namespace Bleatingsheep.NewHydrant.Core
             if (task.OnUtc is TimeSpan onUtc)
                 _regularTasks.Add(new ScheduleInfo(ScheduleType.Daily, onUtc, task));
         }
+        #endregion
 
         #region ExceptionEvent
 
