@@ -311,15 +311,15 @@ namespace Bleatingsheep.NewHydrant.Core
             if (task.OnUtc is TimeSpan onUtc)
                 _regularTasks.Add(new ScheduleInfo(ScheduleType.Daily, onUtc, task));
         }
-#nullable restore
 
         #region ExceptionEvent
 
         /// <summary>
         /// 在执行命令时被框架抓到了异常。
         /// </summary>
-        public event Func<string, Exception, HttpApiClient, Sisters.WudiLib.Posts.Message, Task> ExceptionCaught_Command;
+        public event Func<string, Exception, HttpApiClient, Sisters.WudiLib.Posts.Message, Task>? ExceptionCaught_Command;
 
         #endregion
+#nullable restore
     }
 }
