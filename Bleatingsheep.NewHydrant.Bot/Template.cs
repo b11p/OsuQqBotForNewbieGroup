@@ -7,8 +7,10 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace $rootnamespace$
 {
+#nullable enable
     [Function("$itemname$")]
     public class $safeitemname$
     {
     }
+#nullable restore
 }
