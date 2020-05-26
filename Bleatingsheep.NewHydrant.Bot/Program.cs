@@ -33,6 +33,7 @@ namespace Bleatingsheep.NewHydrant
             var httpApiClient = new HttpApiClient();
             httpApiClient.AccessToken = configure.AccessToken;
             httpApiClient.ApiAddress = configure.ApiAddress;
+#if !DEBUG
             do
             {
                 try
@@ -50,6 +51,7 @@ namespace Bleatingsheep.NewHydrant
                 Console.WriteLine("等待...");
                 Task.Delay(5000).Wait();
             } while (true);
+#endif
 
             try
             {
@@ -68,7 +70,7 @@ namespace Bleatingsheep.NewHydrant
                 // 设置异常处理。
                 hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
 
-                hydrant.Init();
+                hydrant.Init<HydrantStartup>(new HydrantStartup());
 
                 // 添加必要的事件处理。
                 apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
