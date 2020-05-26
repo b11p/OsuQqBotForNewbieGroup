@@ -175,11 +175,10 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                             user = TrustedUserInfo.FromMotherShip(info, role);
                         }
                     }
-#pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
 #pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception)
-#pragma warning restore RCS1075 // Avoid empty catch clause that catches System.Exception.
+                    catch (Exception e)
                     {
+                        Logger.Info(e);
                     }
 #pragma warning restore CA1031 // Do not catch general exception types
                 }
@@ -195,6 +194,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             catch (Exception e)
 #pragma warning restore CA1031 // 不捕获常规异常类型
             {
+                Logger.Warn(e);
                 await api.SendMessageAsync(endpoint, e.Message).ConfigureAwait(false);
             }
 
