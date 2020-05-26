@@ -19,7 +19,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 await page.SetViewportAsync(new ViewPortOptions
                 {
                     DeviceScaleFactor = 2,
-                    Width = 618,
+                    Width = 400,
                     Height = 3500,
                 });
                 await page.GoToAsync("https://qieman.com/idx-eval");
@@ -54,10 +54,10 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 //    })));
 
 
-                const string detailSelector = "#app > div > div.ant-layout-container > div > div.ant-row > div > div > div.index__29fc4";
+                const string detailSelector = "#app > div > div.ant-layout-container > div > div > div > div.index__29fc4";
 
                 // delete advertisement
-                const string adSelector = "#app > div > div.ant-layout-container > div > div > div > div > div.index__29fc4 > a > img";
+                const string adSelector = "#app > div > div.ant-layout-container > div > div > div > div.index__29fc4 > a > img";
                 ElementHandle adElement = await page.WaitForSelectorAsync(adSelector).ConfigureAwait(false);
                 if (!(adElement is null))
                     await adElement.EvaluateFunctionAsync(@"(element) => { element.parentElement.remove(); }").ConfigureAwait(false);
