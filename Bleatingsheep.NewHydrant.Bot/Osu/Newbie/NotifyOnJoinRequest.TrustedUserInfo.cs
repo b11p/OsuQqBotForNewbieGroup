@@ -1,4 +1,5 @@
-﻿using MotherShipDatabase;
+﻿using System.Diagnostics.CodeAnalysis;
+using MotherShipDatabase;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
@@ -13,15 +14,20 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             public int PlayCount { get; set; }
             public bool IsBanned { get; set; }
 
-            public static implicit operator TrustedUserInfo(OsuMixedApi.UserInfo userInfo) => new TrustedUserInfo
-            {
-                Id = userInfo.Id,
-                Name = userInfo.Name,
-                TotalHits = userInfo.TotalHits,
-                Performance = userInfo.Performance,
-                PlayCount = userInfo.PlayCount,
-                IsBanned = false,
-            };
+#nullable enable
+            [return: NotNullIfNotNull("userInfo")]
+            public static implicit operator TrustedUserInfo?(OsuMixedApi.UserInfo? userInfo)
+                => userInfo is null ? null :
+                new TrustedUserInfo
+                {
+                    Id = userInfo.Id,
+                    Name = userInfo.Name,
+                    TotalHits = userInfo.TotalHits,
+                    Performance = userInfo.Performance,
+                    PlayCount = userInfo.PlayCount,
+                    IsBanned = false,
+                };
+#nullable restore
 
             public static TrustedUserInfo FromMotherShip(Userinfo info, Userrole role) => new TrustedUserInfo
             {
