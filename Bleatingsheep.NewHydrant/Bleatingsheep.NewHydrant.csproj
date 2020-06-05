@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1;netcoreapp2.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>warnings</Nullable>
     <WarningsAsErrors>CS8600;CS8602;CS8603;CS8618</WarningsAsErrors>
