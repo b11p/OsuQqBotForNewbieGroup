@@ -7,7 +7,7 @@ using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
-    [Function("bind")]
+    [Component("bind")]
     internal class Bind : OsuFunction, IMessageCommand
     {
         public IMessageCommand Create() => new Bind();

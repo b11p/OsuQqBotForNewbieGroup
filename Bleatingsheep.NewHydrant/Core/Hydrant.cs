@@ -219,7 +219,7 @@ namespace Bleatingsheep.NewHydrant.Core
         internal static string GetServiceName(object? hit)
         {
             var type = hit?.GetType() ?? typeof(Hydrant);
-            var attr = type.GetCustomAttribute<FunctionAttribute>();
+            var attr = type.GetCustomAttribute<ComponentAttribute>();
             return attr?.Name ?? type.Name;
         }
 
@@ -263,7 +263,7 @@ namespace Bleatingsheep.NewHydrant.Core
         private void Init(IEnumerable<Assembly> assemblies, ContainerBuilder builder)
         {
             var types = assemblies.SelectMany(a => a.GetTypes()
-                .Where(t => t.GetCustomAttributes<FunctionAttribute>().Any()))
+                .Where(t => t.GetCustomAttributes<ComponentAttribute>().Any()))
                 .ToList();
 
             types.ForEach(t => builder.RegisterType(t));

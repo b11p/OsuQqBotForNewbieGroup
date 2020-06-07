@@ -7,7 +7,7 @@ using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
-    [Function("no_repeat_plus")]
+    [Component("no_repeat_plus")]
     internal class LikeSayo : 啥玩意儿啊Base, IMessageMonitor
     {
         public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)

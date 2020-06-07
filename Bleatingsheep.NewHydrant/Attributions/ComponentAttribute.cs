@@ -3,9 +3,9 @@
 namespace Bleatingsheep.NewHydrant.Attributions
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    public sealed class FunctionAttribute : Attribute
+    public sealed class ComponentAttribute : Attribute
     {
-        public FunctionAttribute(string name) => Name = name;
+        public ComponentAttribute(string name) => Name = name;
 
         public string Name { get; }
     }

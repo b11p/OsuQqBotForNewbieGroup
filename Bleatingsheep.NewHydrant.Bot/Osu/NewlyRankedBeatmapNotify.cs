@@ -11,7 +11,7 @@ using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
-    [Function("newly_ranked")]
+    [Component("newly_ranked")]
     internal class NewlyRankedBeatmapNotify : OsuFunction, IRegularAsync
     {
         public TimeSpan? OnUtc => null;

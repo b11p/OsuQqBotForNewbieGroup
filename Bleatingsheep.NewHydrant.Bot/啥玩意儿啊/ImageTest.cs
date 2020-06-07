@@ -10,7 +10,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
-    [Function("img")]
+    [Component("img")]
     public class ImageTest : Service, IMessageCommand
     {
         private static readonly Regex s_regex = new Regex(@"^image (?<url>.*)$", RegexOptions.Compiled);

@@ -12,7 +12,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
-    [Function("newbie_statistics")]
+    [Component("newbie_statistics")]
     public class 统计新人群成员 : OsuFunction, IMessageCommand
     {
         private const int 新人群号 = 885984366;

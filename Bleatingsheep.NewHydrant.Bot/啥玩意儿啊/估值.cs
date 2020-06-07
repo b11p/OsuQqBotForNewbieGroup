@@ -9,7 +9,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
-    [Function("指数估值")]
+    [Component("指数估值")]
     class 估值 : Service, IMessageCommand
     {
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)

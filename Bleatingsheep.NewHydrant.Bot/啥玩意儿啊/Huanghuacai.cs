@@ -11,7 +11,7 @@ using Message = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
-    [Function("burang")]
+    [Component("burang")]
     class Huanghuacai : IMessageMonitor
     {
         private static readonly ConcurrentDictionary<long, DateTimeOffset> LastSpeakTime = new ConcurrentDictionary<long, DateTimeOffset>();

@@ -8,7 +8,7 @@ using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
-    [Function("pp+")]
+    [Component("pp+")]
     internal class PerformancePlusUser : OsuFunction, IMessageCommand
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();

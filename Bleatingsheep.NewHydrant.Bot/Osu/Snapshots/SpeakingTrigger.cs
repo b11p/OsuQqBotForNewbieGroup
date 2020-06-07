@@ -11,7 +11,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu.Snapshots
 {
-    [Function("speaking_trigger_for_snapshot")]
+    [Component("speaking_trigger_for_snapshot")]
     public class SpeakingTrigger : OsuFunction, IMessageMonitor
     {
         private static readonly MemoryCache s_cache = new MemoryCache(new MemoryCacheOptions());

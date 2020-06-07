@@ -15,7 +15,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 namespace Bleatingsheep.NewHydrant.Osu
 {
 #nullable enable
-    [Function("bpme")]
+    [Component("bpme")]
     internal class BPMe : OsuFunction, IMessageCommand
     {
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)

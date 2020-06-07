@@ -8,11 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Template.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Template.cs" />
+    <Compile Remove="Core\Template.cs" />
   </ItemGroup>
 
   <ItemGroup>

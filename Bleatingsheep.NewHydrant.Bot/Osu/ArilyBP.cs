@@ -11,7 +11,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
-    [Function("arily")]
+    [Component("arily")]
     internal class ArilyBP : OsuFunction, IMessageCommand
     {
         private static readonly Regex s_regex = new Regex(@"^\s*arily[1!！]{2}\s*(?<name>" + OsuHelper.UsernamePattern + @")?\s*(?:[，,]\s*(?<date>.*?))?\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);

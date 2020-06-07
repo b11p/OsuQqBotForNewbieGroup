@@ -9,7 +9,7 @@ using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
-    [Function("no_repeat")]
+    [Component("no_repeat")]
     internal class NoRepeat : 啥玩意儿啊Base, IMessageMonitor
     {
         private readonly object _thisLock = new object();

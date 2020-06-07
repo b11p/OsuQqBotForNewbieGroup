@@ -13,7 +13,7 @@ using static Bleatingsheep.NewHydrant.Osu.Newbie.NewbieCardChecker;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
-    [Function("newbie_keeper")]
+    [Component("newbie_keeper")]
     internal class NewbieKeeper : OsuFunction, IMessageMonitor
     {
         private static TimeSpan CheckInterval { get; } = new TimeSpan(10, 53, 31);

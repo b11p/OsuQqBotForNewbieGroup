@@ -12,7 +12,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu.Snapshots
 {
-    [Function("speaking_trigger_for_snapshot")]
+    [Component("speaking_trigger_for_snapshot")]
     public class BotCommandTrigger : OsuFunction, IMessageMonitor
     {
         private static readonly IReadOnlyCollection<string> s_baicaiCommands = new List<string>

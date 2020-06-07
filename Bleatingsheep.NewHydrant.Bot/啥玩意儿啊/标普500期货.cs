@@ -10,7 +10,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
-    [Function("标普500期货")]
+    [Component("标普500期货")]
     internal class 标普500期货 : IMessageCommand
     {
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)

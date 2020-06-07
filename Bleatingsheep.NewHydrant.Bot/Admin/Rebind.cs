@@ -8,7 +8,7 @@ using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Admin
 {
-    [Function("rebind")]
+    [Component("rebind")]
     class Rebind : OsuFunction, IMessageCommand
     {
         private static IVerifier Verifier { get; } = new AdminVerifier();

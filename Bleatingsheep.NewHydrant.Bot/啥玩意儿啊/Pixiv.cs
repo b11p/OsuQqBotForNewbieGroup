@@ -11,7 +11,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
-    [Function("pixiv")]
+    [Component("pixiv")]
     public class Pixiv : IMessageCommand
     {
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)

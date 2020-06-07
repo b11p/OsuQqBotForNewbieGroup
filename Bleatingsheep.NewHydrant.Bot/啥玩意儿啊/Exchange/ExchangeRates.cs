@@ -14,7 +14,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
 {
-    [Function("ex_rates")]
+    [Component("ex_rates")]
     public class ExchangeRates : Service, IMessageCommand
     {
         static ExchangeRates()

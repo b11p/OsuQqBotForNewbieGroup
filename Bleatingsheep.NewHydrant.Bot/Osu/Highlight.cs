@@ -19,7 +19,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
-    [Function("highlight")]
+    [Component("highlight")]
     public sealed class Highlight : OsuFunction, IMessageCommand, IRegularAsync
     {
         public async Task ProcessAsync(MessageContext superContext, HttpApiClient api)
