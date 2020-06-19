@@ -1,6 +1,8 @@
+**This README file is WIP.**
+
 # Xiaofangshuan
 ## Introduction
-Xiaofangshuan is a popular chatting bot in QQ, the most popular IM software in China. It facilitates users (who are also [osu!](https://osu.ppy.sh/) players) to query game data and display to others during chats (mainly group chat).
+Xiaofangshuan is a popular chatting bot in QQ, the most popular IM software in China. It facilitates users (who are also [osu!](https://osu.ppy.sh/) players) to query game data and display to others during chats (mainly group chat). It is a server-side application.
 
 ## Folders (Projects)
 |Folder|Description|
@@ -14,20 +16,61 @@ Xiaofangshuan is a popular chatting bot in QQ, the most popular IM software in C
 |OsuQqBot|Legacy code.|
 |OsuQqBotHttp|Legacy code.|
 |Tests.Database|Legacy code.|
-|UnitTests|Legacy code.|
+|UnitTests|Legacy test code.|
 
 ### Bleatingsheep.NewHydrant
+`Bleatingsheep.NewHydrant` is the framework project.
 
+### Bleatingsheep.NewHydrant.Bot
+Service code or business code. 
 
-## Platforms and Techs
-- .NET Core
+### Bleatingsheep.NewHydrant.Data
+It is basically a wrap of the database. Also, it fetches data from other data sources like my friend's API. If more than one sources of the same data are available, it chooses the best one. It also contains some retry policies.
+
+### OsuQqBot, OsuQqBotHttp
+Legacy code. They still function. They run as expected but it is not convenient to add services there because of the naïve design.
+
+### UnitTests
+It was used to test this application, but it's not used now.
+
+I've got basic comprehension about unit tests. However, I have yet to find a way to use unit tests in Xiaofangshuan elegantly and bring me convenience.
+
+I add some tests to keep me from making same mistakes, occasionally.
+
+## Platforms, Techs and Tools
+- .NET Core (as well as ASP .NET Core, EF Core, etc.)
 - Linux
 - Docker
 - HTTP
 
+This application is made to run on .NET Core. It used to run on Windows Server, but now it run on Linux because Linux is provided by most VPS sellers.
+
+CoolQ and this application run in separate Docker containers.
+
+There is an ASP .NET Core application that provides API about Xiaofangshuan, but it's not in this repository.
+
 ### Headless Chrome
+Sometimes I want to send an image as response. To simplify the drawing, I use headless Chrome to take screenshots so that I can just write HTML. 
 
 ## Highlights
+I think the most significant highlight is the design of framework. To make development convenient, I introduced an attribute class `ComponentAttribute` and several interfaces. The `ComponentAttribute` indicates that classes marked with this attribute should be processed by the framework. It is analogous to `ControllerAttribute` in ASP .NET Core. The implemented interfaces tell the framework about how to deal with the class. For example:
+```C#
+[Component("pixiv")]
+public class Pixiv : IMessageCommand
+{
+    public async Task ProcessAsync(MessageContext context, HttpApiClient api)
+    {
+        string url = "https://rsshub.app/pixiv/ranking/day";
+        ... 
+    }
+
+    public bool ShouldResponse(MessageContext context)
+        => context.Content.TryGetPlainText(out string text) && text.Trim() == "ピクシブ";
+}
+```
+This component sends a popular image from Pixiv at random.
+
+The `ShouldResponse` method returns a `bool` value that indicates whether a specific message is a command to this component. If so, the framework will invoke the `ProcessAsync` method.
 <!-- (Design of framework.) -->
 <!-- Understand DI use->understand -->
 
@@ -35,5 +78,12 @@ Xiaofangshuan is a popular chatting bot in QQ, the most popular IM software in C
 I did these works.
 
 ### PP+ Spider
+A spider that gets data from [PP+](https://syrin.me/pp+/). This website is made by others. I use regex to get dimensions of user performance from pages like [this](https://syrin.me/pp+/u/bleatingsheep/).
 
 ### osu! API Client (two versions)
+
+## About what I've learnt during making Xiaofangshuan
+I learn on my own demand. For example, at the very beginning I make Xiaofangshuan, the data was stored in files. 
+<!-- DB -->
+<!-- DI -->
+<!-- Tests -->
