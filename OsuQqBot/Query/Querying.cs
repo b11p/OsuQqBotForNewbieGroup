@@ -29,7 +29,9 @@ namespace OsuQqBot.Query
         {
             _dataProviderLazy = new Lazy<IDataProvider>(() =>
             {
-                return new DataProvider(Api);
+                var dataProvider = new DataProvider(Api);
+                dataProvider.OnException += e => Logger.LogException(e);
+                return dataProvider;
             });
         }
 
