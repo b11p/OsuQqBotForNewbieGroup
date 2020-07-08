@@ -49,7 +49,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var user = await EnsureGetUserInfo(Name, Bleatingsheep.Osu.Mode.Standard).ConfigureAwait(false);
                 uid = user.Id;
             }
-            string url = $"https://p.ri.mk/users/{uid}/{DateTimeText}";
+            string url = $"https://o.ri.mk/users/{uid}/{DateTimeText}";
             using var page = await Chrome.OpenNewPageAsync().ConfigureAwait(false);
             await page.SetViewportAsync(new ViewPortOptions
             {
