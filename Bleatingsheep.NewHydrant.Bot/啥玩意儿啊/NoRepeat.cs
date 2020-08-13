@@ -1,38 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.Core;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
+using Message = Sisters.WudiLib.SendingMessage;
+using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 {
+    /// <summary>
+    /// 检测到 Daloubot 复读就 At 大楼。
+    /// </summary>
     [Component("no_repeat")]
     internal class NoRepeat : 啥玩意儿啊Base, IMessageMonitor
     {
-        private readonly object _thisLock = new object();
+        private static readonly object _thisLock = new object();
         private string _currentMessage;
-        private int _count;
-        private readonly IDictionary<string, long> _messages = new Dictionary<string, long>();
-        private const long GroupId = 641236878;
-        private static readonly ISet<long> Bots = new HashSet<long>
-        {
-            2839098896,
-            1394932996,
-            3082577334,
-        };
+        private const long GroupId = 514661057;
+        private const long BotId = 3082577334;
+        private const long BotMaintainerId = 1061566571;
 
-        public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
+        public async Task OnMessageAsync(MessageContext message, HttpApiClient api)
         {
             if (!(message is GroupMessage g && g.GroupId == GroupId)) return;
 
-            bool isBotRepeat;
-            isBotRepeat = IsBotRepeat(g);
-            if (isBotRepeat)
+            if (IsBotRepeat(g))
             {
-                await RecallAndBan(api, g);
+                await api.SendMessageAsync(g.Endpoint, Message.At(BotMaintainerId) + new Message(" 求求你别复读了。")).ConfigureAwait(false);
             }
         }
 
@@ -41,26 +34,11 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             bool isBotRepeat;
             lock (_thisLock)
             {
-                // 更新消息和连击条数。
-                if (g.RawMessage != _currentMessage)
-                {
-                    _currentMessage = g.RawMessage;
-                    _count = 0;
-                }
-                _count++;
-
-                // 如果大于等于3条，记录到复读消息列表。
-                if (_count >= 3)
-                {
-                    _messages[g.RawMessage] = DateTimeOffset.Now.ToUnixTimeSeconds();
-                }
-
                 // 是bot复读
-                isBotRepeat = Bots.Contains(g.UserId) && _messages.ContainsKey(g.RawMessage);
+                isBotRepeat = BotId == g.UserId && _currentMessage == g.RawMessage;
 
-                // 清除过旧的消息，防止内存泄露。
-                _messages.Where(p => p.Value < DateTimeOffset.Now.ToUnixTimeSeconds() - 800).Select(p => p.Key).ToList()
-                    .ForEach(k => _messages.Remove(k));
+                // 更新消息。
+                _currentMessage = g.RawMessage;
             }
 
             return isBotRepeat;

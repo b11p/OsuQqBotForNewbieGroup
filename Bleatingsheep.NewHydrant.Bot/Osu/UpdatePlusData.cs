@@ -10,7 +10,7 @@ using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
-    [Component("pp+_update")]
+    //[Component("pp+_update")]
     internal class UpdatePlusData : OsuFunction, IRegularAsync
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
