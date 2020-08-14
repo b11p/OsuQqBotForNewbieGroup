@@ -39,7 +39,7 @@ namespace OsuQqBot.Api
                         tryTime--;
                     }
                 while (tryTime > 0);
-                if (jsonResult == null) return null;
+                if (string.IsNullOrEmpty(jsonResult)) return null;
                 var response = JsonConvert.DeserializeObject<MotherShipResponse<T>>(jsonResult);
                 if (response.code != 0) return null;
                 return response.data;
