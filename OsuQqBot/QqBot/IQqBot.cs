@@ -20,10 +20,10 @@ namespace OsuQqBot.QqBot
         void SendMessageAsync(EndPoint endPoint, string message, bool isPlainText);
 
         /// <summary>
-        /// 转义非功能部分
+        /// 转义三种字符，不包括 ','，适用于转义消息内容。
         /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
+        /// <param name="message">要转义的消息。</param>
+        /// <returns>转义后的字符串。</returns>
         string BeforeSend(string message);
 
         /// <summary>

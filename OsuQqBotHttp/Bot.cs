@@ -261,7 +261,12 @@ namespace OsuQqBotHttp
             }
         }
 
-        public string BeforeSend(string message) => message.Replace("&", "&amp;").Replace("[", "&#91;").Replace("]", "&#93;").Replace(",", "&#44;");
+        /// <summary>
+        /// 转义三种字符，不包括 ','，适用于转义消息内容。
+        /// </summary>
+        /// <param name="message">要转义的消息。</param>
+        /// <returns>转义后的字符串。</returns>
+        public string BeforeSend(string message) => message.Replace("&", "&amp;").Replace("[", "&#91;").Replace("]", "&#93;");
         public string AfterReceive(string message) => message.Replace("&#44;", ",").Replace("&#91;", "[").Replace("&#93;", "]").Replace("&amp;", "&");
         public string At(long qq) => $"[CQ:at,qq={qq}]";
         public string LocalImage(string path) => $"[CQ:image,file=base64://{Convert.ToBase64String(File.ReadAllBytes(path), Base64FormattingOptions.None)}]";
