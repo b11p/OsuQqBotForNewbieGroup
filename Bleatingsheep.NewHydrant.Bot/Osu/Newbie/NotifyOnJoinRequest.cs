@@ -134,12 +134,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             double? performance = default;
             TrustedUserInfo user = null;
 
-            var levelInfo = await api.GetLevelInfo(userId).ConfigureAwait(false);
-            var level = levelInfo?.Level;
-            if (levelInfo != null)
-            {
-                sb.Append("QQ 等级为 ").Append(levelInfo.Level).Append("\r\n");
-            }
+            // API not implemented in go-cqhttp
+            //var levelInfo = await api.GetLevelInfo(userId).ConfigureAwait(false);
+            //var level = levelInfo?.Level;
+            //if (levelInfo != null)
+            //{
+            //    sb.Append("QQ 等级为 ").Append(levelInfo.Level).Append("\r\n");
+            //}
 
             if (!success)
             {
@@ -200,13 +201,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         exit:
             await api.SendMessageAsync(endpoint, sb.ToString()).ConfigureAwait(false);
-            return (performance, level);
+            // API not implemented in go-cqhttp
+            //return (performance, level);
+            return (performance, null);
         }
 
         public GroupRequestResponse Monitor(HttpApiClient httpApiClient, GroupRequest e)
         {
             if (ManagedGroups.TryGetValue(e.GroupId, out var limit))
             {
+                Logger.Info($"{e.UserId}申请加入群{e.GroupId}。");
                 var endpoint = new GroupEndpoint(NewbieManagementGroupId);
                 var (performance, level) = HintBinding(httpApiClient, endpoint, e).ConfigureAwait(false).GetAwaiter().GetResult();
                 if (performance >= limit)
