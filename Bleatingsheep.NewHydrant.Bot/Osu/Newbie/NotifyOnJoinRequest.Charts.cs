@@ -62,8 +62,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     hints.Add(messageRankHistory);
 
                     // draw ranks
-                    const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > div > div.play-detail-list";
-                    const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > p";
+                    const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.user-profile-pages.ui-sortable > div > div > div:nth-child(2) > div > div.play-detail-list";
+                    const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.user-profile-pages.ui-sortable > div > div > div:nth-child(2) > p";
                     ElementHandle bpElement = (await page.QuerySelectorAsync(bestSelector))
                         ?? await page.QuerySelectorAsync(bestFallbackSelector);
                     if (bpElement != null)
