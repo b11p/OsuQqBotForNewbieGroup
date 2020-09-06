@@ -63,15 +63,20 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
                     // draw ranks
                     const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.user-profile-pages.ui-sortable > div > div > div:nth-child(2) > div > div.play-detail-list";
-                    const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.user-profile-pages.ui-sortable > div > div > div:nth-child(2) > p";
-                    ElementHandle bpElement = (await page.QuerySelectorAsync(bestSelector))
-                        ?? await page.QuerySelectorAsync(bestFallbackSelector);
+                    const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.user-profile-pages.ui-sortable > div > div > div:nth-child(2) > h3 > span.title__count";
+                    bool noBP = false;
+                    ElementHandle bpElement = await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
+                    if (bpElement is null)
+                    {
+                        noBP = true;
+                        bpElement = await page.QuerySelectorAsync(bestFallbackSelector).ConfigureAwait(false);
+                    }
                     if (bpElement != null)
                     {
                         data = await bpElement.ScreenshotDataAsync();
                         //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);
                         messageBest = Message.ByteArrayImage(data);
-                        hints.Add(messageBest);
+                        hints.Add(noBP ? new Message("有") + messageBest + new Message("条BP") : messageBest);
                     }
                     else
                     {
