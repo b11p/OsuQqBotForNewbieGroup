@@ -120,7 +120,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             if (hints.Count > 0)
             {
                 var newLine = new Message("\r\n");
-                await api.SendMessageAsync(sendBackEndpoint, hints.Aggregate((m1, m2) => m1 + newLine + m2));
+                await api.SendMessageAsync(sendBackEndpoint, hints.Aggregate((m1, m2) =>
+                {
+                    return (m1.Sections.LastOrDefault()?.Type, m2.Sections.FirstOrDefault()?.Type) switch
+                    {
+                        ("text", "text") => m1 + newLine + m2,
+                        _ => m1 + m2,
+                    };
+                })).ConfigureAwait(false);
             }
         }
 
