@@ -23,6 +23,10 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<UpdateSchedule> UpdateSchedules { get; private set; }
         #endregion
 
+        #region ML related
+        public DbSet<MessageEntry> Messages { get; private set; }
+        #endregion
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySql($"server={Server};port={Port};database={ServerInfo.Database};user={User};pwd={Password};SslMode=VerifyCA;",
