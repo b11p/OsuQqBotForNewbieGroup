@@ -73,10 +73,19 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     }
                     if (bpElement != null)
                     {
-                        data = await bpElement.ScreenshotDataAsync();
-                        //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);
-                        messageBest = Message.ByteArrayImage(data);
-                        hints.Add(noBP ? new Message("有") + messageBest + new Message("条BP") : messageBest);
+                        if (noBP)
+                        {
+                            var bpCount = await bpElement.EvaluateFunctionAsync<string>("e => e.innerText").ConfigureAwait(false);
+                            bpCount = bpCount.Trim();
+                            hints.Add(new Message($"有{bpCount}条BP"));
+                        }
+                        else
+                        {
+                            data = await bpElement.ScreenshotDataAsync();
+                            //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);
+                            messageBest = Message.ByteArrayImage(data);
+                            hints.Add(messageBest);
+                        }
                     }
                     else
                     {
