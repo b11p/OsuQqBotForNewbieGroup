@@ -20,7 +20,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Component("highlight")]
-    public sealed class Highlight : OsuFunction, IMessageCommand, IRegularAsync
+    public sealed class Highlight : OsuFunction, IMessageCommand
     {
         public async Task ProcessAsync(MessageContext superContext, HttpApiClient api)
         {
@@ -31,7 +31,6 @@ namespace Bleatingsheep.NewHydrant.Osu
             var stopwatch = Stopwatch.StartNew();
 
             using (var dbContext = new NewbieContext())
-            using (var motherShip = new OsuContext())
             {
                 //var bindings = await (from b in dbContext.Bindings
                 //                      join mi in groupMembers on b.UserId equals mi.UserId
@@ -45,12 +44,12 @@ namespace Bleatingsheep.NewHydrant.Osu
 
                 Logger.Debug($"找到 {osuIds.Count} 个绑定信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
 
-                int mode = 0;
+                Bleatingsheep.Osu.Mode mode = 0;
                 if (!string.IsNullOrEmpty(ModeString))
                 {
                     try
                     {
-                        mode = (int)Bleatingsheep.Osu.ModeExtensions.Parse(ModeString);
+                        mode = Bleatingsheep.Osu.ModeExtensions.Parse(ModeString);
                     }
                     catch (FormatException)
                     {
@@ -59,7 +58,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 }
 
                 stopwatch = Stopwatch.StartNew();
-                List<Userinfo> history = await GetHistories(osuIds, mode);
+                List<UserSnapshot> history = await GetHistories(osuIds, mode).ConfigureAwait(false);
 
                 Logger.Debug($"找到 {history.Count} 个历史信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
 
@@ -100,9 +99,9 @@ namespace Bleatingsheep.NewHydrant.Osu
 
                 var cps = (from his in history
                            join now in nowInfos on his.UserId equals now.Key
-                           where his.Playcount != now.Value.PlayCount
-                           orderby now.Value.Performance - (double?)his.PpRaw ?? double.PositiveInfinity descending
-                           select new { Old = his, New = now.Value }).ToList();
+                           where his.UserInfo.PlayCount != now.Value.PlayCount
+                           orderby now.Value.Performance - his.UserInfo.Performance descending
+                           select new { Old = his.UserInfo, New = now.Value, Meta = his }).ToList();
 
                 if (fails.Count > 0)
                 {
@@ -115,17 +114,17 @@ namespace Bleatingsheep.NewHydrant.Osu
                 }
                 else
                 {
-                    var increase = cps.Where(cp => cp.Old.PpRaw != 0 && cp.New.Performance != (double?)cp.Old.PpRaw).FirstOrDefault();
-                    var mostPlay = cps.OrderByDescending(cp => cp.New.Count300 + cp.New.Count100 + cp.New.Count50 - cp.Old.Count300 - cp.Old.Count100 - cp.Old.Count50).First();
+                    var increase = cps.Find(cp => cp.Old.Performance != 0 && cp.New.Performance != cp.Old.Performance);
+                    var mostPlay = cps.OrderByDescending(cp => cp.New.TotalHits - cp.Old.TotalHits).First();
                     var sb = new StringBuilder(100);
                     sb.AppendLine("最飞升：");
                     if (increase != null)
-                        sb.AppendLine($"{increase.New.Name} 增加了 {increase.New.Performance - (double)increase.Old.PpRaw:#.##} PP。")
-                            .AppendLine($"({increase.Old.PpRaw:#.##} -> {increase.New.Performance:#.##})");
+                        sb.AppendLine($"{increase.New.Name} 增加了 {increase.New.Performance - increase.Old.Performance:#.##} PP。")
+                            .AppendLine($"({increase.Old.Performance:#.##} -> {increase.New.Performance:#.##})");
                     else
                         sb.AppendLine("你群没有人飞升。");
                     sb.AppendLine("最肝：")
-                        .Append($"{mostPlay.New.Name} 打了 {mostPlay.New.Count300 + mostPlay.New.Count100 + mostPlay.New.Count50 - mostPlay.Old.Count300 - mostPlay.Old.Count100 - mostPlay.Old.Count50} 下。");
+                        .Append($"{mostPlay.New.Name} 打了 {mostPlay.New.TotalHits - mostPlay.Old.TotalHits} 下。");
 
 
                     await api.SendMessageAsync(context.Endpoint, sb.ToString());
@@ -133,92 +132,26 @@ namespace Bleatingsheep.NewHydrant.Osu
             }
         }
 
-        private static readonly ReaderWriterLockSlim CacheLock = new ReaderWriterLockSlim();
-        private static readonly HashSet<Userinfo> Cache = new HashSet<Userinfo>(new UserInfoComparier());
-
-        TimeSpan? IRegularAsync.OnUtc { get; } = new TimeSpan(22, 0, 0); // 北京6点
-        TimeSpan? IRegularAsync.Every { get; }
-
-        Task IRegularAsync.RunAsync(HttpApiClient api)
+        private static async Task<List<UserSnapshot>> GetHistories(List<int> osuIds, Bleatingsheep.Osu.Mode mode)
         {
-            CacheLock.EnterWriteLock();
-            try
+            static TimeSpan GetError(DateTimeOffset wanted, DateTimeOffset actual)
             {
-                Cache.Clear();
-            }
-            finally
-            {
-                CacheLock.ExitWriteLock();
-            }
-            return Task.CompletedTask;
-        }
-
-        private static async Task<List<Userinfo>> GetHistories(List<int> osuIds, int mode)
-        {
-            var results = new List<Userinfo>();
-
-            CacheLock.EnterReadLock();
-            try
-            {
-                results.AddRange(Cache.Where(i => osuIds.Contains((int)i.UserId) && i.Mode == mode));
-            }
-            finally
-            {
-                CacheLock.ExitReadLock();
+                var error = wanted - actual;
+                if (error < TimeSpan.Zero)
+                    error = -error;
+                return error;
             }
 
-            var remain = osuIds.Except(results.Select(i => (int)i.UserId)).ToList();
+            using var newbieContext = new NewbieContext();
+            var now = DateTimeOffset.Now;
+            var snaps = await newbieContext.UserSnapshots
+                .Where(s => now.Subtract(TimeSpan.FromHours(36)) < s.Date && s.Mode == mode && osuIds.Contains(s.UserId))
+                .ToListAsync().ConfigureAwait(false);
 
-            if (remain.Any())
-            {
-                using (var osuContext = new OsuContext())
-                {
-                    var updated = await
-#pragma warning disable EF1000 // Possible SQL injection vulnerability.
-                        osuContext.Userinfo.FromSqlRaw(
-                            FormattableString.Invariant($@"SELECT a.*
-                    FROM (SELECT user_id, `mode`, max(queryDate) queryDate
-                    FROM userinfo
-                    WHERE `mode`={mode} AND user_id IN({string.Join(',', remain.Select(u => u.ToString()))})
-                    GROUP BY user_id
-                    ) b JOIN userinfo a ON a.user_id = b.user_id AND a.queryDate = b.queryDate AND a.`mode` = b.`mode`"))
-#pragma warning restore EF1000 // Possible SQL injection vulnerability.
-                            //.Where(mother => remain.Contains((int)mother.UserId))
-                            .ToListAsync();
-                    //var updated = await
-                    //    (from oo in from ui in osuContext.Userinfo
-                    //                where ui.Mode == mode && remain.Contains((int)ui.UserId)
-                    //                group new { ui.UserId, ui.QueryDate } by ui.UserId into g
-                    //                select new { UserId = g.Key, QueryDate = g.Max(u => u.QueryDate) }
-                    //     from ob in osuContext.Userinfo
-                    //     where ob.Mode == mode && oo.UserId == ob.UserId && oo.QueryDate == ob.QueryDate
-                    //     select ob).ToListAsync().ConfigureAwait(false);
-                    results.AddRange(updated);
-
-                    CacheLock.EnterUpgradeableReadLock();
-                    try
-                    {
-                        var toAdd = updated.Except(Cache);
-                        CacheLock.EnterWriteLock();
-                        try
-                        {
-                            foreach (var item in toAdd)
-                            {
-                                Cache.Add(item);
-                            }
-                        }
-                        finally
-                        {
-                            CacheLock.ExitWriteLock();
-                        }
-                    }
-                    finally
-                    {
-                        CacheLock.ExitUpgradeableReadLock();
-                    }
-                }
-            }
-            return results;
+            return snaps
+                .GroupBy(s => s.UserId)
+                .Select(g => g.OrderByDescending(s => GetError(now - TimeSpan.FromHours(24), s.Date)).First())
+                .ToList();
         }
 
         private sealed class UserInfoComparier : IEqualityComparer<Userinfo>
