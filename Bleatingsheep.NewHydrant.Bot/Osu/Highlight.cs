@@ -119,12 +119,15 @@ namespace Bleatingsheep.NewHydrant.Osu
                     var sb = new StringBuilder(100);
                     sb.AppendLine("最飞升：");
                     if (increase != null)
-                        sb.AppendLine($"{increase.New.Name} 增加了 {increase.New.Performance - increase.Old.Performance:#.##} PP。")
-                            .AppendLine($"({increase.Old.Performance:#.##} -> {increase.New.Performance:#.##})");
+                        // sb.AppendLine($"{increase.New.Name} 增加了 {increase.New.Performance - increase.Old.Performance:#.##} PP。")
+                        sb.Append(increase.New.Name).Append(" 增加了 ").AppendFormat("{0:#.##}", increase.New.Performance - increase.Old.Performance).AppendLine(" PP。")
+                            // .AppendLine($"({increase.Old.Performance:#.##} -> {increase.New.Performance:#.##})");
+                            .Append('(').AppendFormat("{0:#.##}", increase.Old.Performance).Append(" -> ").AppendFormat("{0:#.##}", increase.New.Performance).AppendLine(")");
                     else
                         sb.AppendLine("你群没有人飞升。");
                     sb.AppendLine("最肝：")
-                        .Append($"{mostPlay.New.Name} 打了 {mostPlay.New.TotalHits - mostPlay.Old.TotalHits} 下。");
+                        // .Append($"{mostPlay.New.Name} 打了 {mostPlay.New.TotalHits - mostPlay.Old.TotalHits} 下。");
+                        .Append(mostPlay.New.Name).Append(" 打了 ").Append(mostPlay.New.TotalHits - mostPlay.Old.TotalHits).Append(" 下。");
 
 
                     await api.SendMessageAsync(context.Endpoint, sb.ToString());
