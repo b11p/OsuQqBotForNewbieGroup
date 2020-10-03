@@ -64,7 +64,7 @@ namespace Bleatingsheep.OsuMixedApi.MotherShip
         public async Task<int?> GetUserBindAsync(long qqId)
         {
             var response = await GetUserInfoAsync(qqId);
-            return response.IsSuccessStatusCode() ? (int?)response.Data.OsuId : null;
+            return response?.IsSuccessStatusCode() == true ? (int?)response.Data.OsuId : null;
         }
     }
 }
