@@ -153,7 +153,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
             return snaps
                 .GroupBy(s => s.UserId)
-                .Select(g => g.OrderByDescending(s => GetError(now - TimeSpan.FromHours(24), s.Date)).First())
+                .Select(g => g.OrderBy(s => GetError(now - TimeSpan.FromHours(24), s.Date)).First())
                 .ToList();
         }
 
