@@ -21,6 +21,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
         {
             HttpApi.Register<IExchangeRate>();
             HttpApi.Register<ICmbcCreditRate>();
+            HttpApi.Register<ICibRate>();
         }
 
         private static readonly IReadOnlyList<string> s_currencies = new List<string>
@@ -55,6 +56,9 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     // cmbc
                     var cmbcTask = HttpApi.Resolve<ICmbcCreditRate>().GetRates();
 
+                    // cib
+                    var cibTask = HttpApi.Resolve<ICibRate>().GetRates();
+
                     var response = await exRateApi.GetExchangeRates(@base);
                     var results = new List<string>(3);
                     foreach (var currency in s_currencies)
@@ -81,6 +85,24 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     catch (Exception e)
                     {
                         results.Add("CMBC 查询失败。");
+                        Logger.Error(e);
+                    }
+
+                    // cib
+                    try
+                    {
+                        var cibResult = await cibTask.ConfigureAwait(false);
+
+                        var price = cibResult[@base];
+                        if (price != null)
+                        {
+                            var cny = amount * price.Value;
+                            results.Add($"CIB CNY {cny}");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        results.Add("CIB 查询失败。");
                         Logger.Error(e);
                     }
 
