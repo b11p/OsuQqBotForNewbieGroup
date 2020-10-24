@@ -20,7 +20,8 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                     {
                         Headless = true,
                         //ExecutablePath = @"/opt/google/chrome/chrome",
-                        ExecutablePath = @"/usr/bin/chromium-browser",
+                        //ExecutablePath = @"/usr/bin/chromium-browser",
+                        ExecutablePath = @"/usr/bin/microsoft-edge",
                         DefaultViewport = new ViewPortOptions
                         {
                             DeviceScaleFactor = 1,
