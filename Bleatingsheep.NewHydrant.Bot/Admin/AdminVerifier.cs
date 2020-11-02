@@ -18,6 +18,7 @@ namespace Bleatingsheep.NewHydrant.Admin
             2541721178, // heisiban
             447503971, // 白季
             944072537,
+            1340691940, // muzi
         };
 
         public AdminVerifier()

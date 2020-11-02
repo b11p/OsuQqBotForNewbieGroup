@@ -10,7 +10,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
     {
         private class ExecuteInfo
         {
-            public const int Max = 9;
+            public const int Max = 8;
 
             private List<(int heavy, int light)> Known { get; } = new List<(int, int)>();
             private readonly List<string> _knownForHints = new List<string>();
