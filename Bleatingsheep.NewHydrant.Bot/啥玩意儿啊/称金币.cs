@@ -21,6 +21,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
         private static readonly IMemoryCache s_cache = new MemoryCache(new MemoryCacheOptions());
 
         private const int Max = ExecuteInfo.Max;
+        private const int Best = 16;
 
         private bool _isInit;
 
@@ -50,7 +51,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 });
             }
             sb.Append("你有").Append(Max).Append("枚重量各不相同的金币，编号为1-").Append(Max).Append(@"，和一个天平。你可以用天平比较两枚金币的重量。
-你的目标是：称最少的次数（8 枚金币 16 次），将这些金币按从轻到重排序
+你的目标是：称最少的次数（").Append(Max).Append(" 枚金币 ").Append(Best).Append(@" 次），将这些金币按从轻到重排序
 你可以使用指令“称xy”来比较两枚金币的重量，其中x、y都是金币编号。
 例如：称12
 你无须提交排序结果，消防栓会自动检测你能否排出来。
@@ -94,10 +95,13 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             {
                 s_cache.Remove(context.UserId);
                 sb.Append("\r\n恭喜排序完成，共称了").Append(exec.WeighingCount).Append("次。");
-                if (exec.WeighingCount <= 19)
+                if (exec.WeighingCount <= Best)
                 {
                     await api.SendMessageAsync(context.Endpoint, "恭喜达到最优次数！").ConfigureAwait(false);
-                    await api.SendPrivateMessageAsync(962549599, $"{context.UserId} 达到最优19次！").ConfigureAwait(false);
+                    if (Max > 8)
+#pragma warning disable CS0162 // Unreachable code detected
+                        await api.SendPrivateMessageAsync(962549599, $"{context.UserId} 达到最优 {Best} 次！").ConfigureAwait(false);
+#pragma warning restore CS0162 // Unreachable code detected
                     await api.SendPrivateMessageAsync(962549599, GetInfo(cp)).ConfigureAwait(false);
 
                 }
