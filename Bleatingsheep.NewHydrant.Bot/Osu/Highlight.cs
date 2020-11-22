@@ -137,14 +137,6 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         private static async Task<List<UserSnapshot>> GetHistories(List<int> osuIds, Bleatingsheep.Osu.Mode mode)
         {
-            static TimeSpan GetError(DateTimeOffset wanted, DateTimeOffset actual)
-            {
-                var error = wanted - actual;
-                if (error < TimeSpan.Zero)
-                    error = -error;
-                return error;
-            }
-
             using var newbieContext = new NewbieContext();
             var now = DateTimeOffset.Now;
             var snaps = await newbieContext.UserSnapshots
@@ -153,7 +145,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
             return snaps
                 .GroupBy(s => s.UserId)
-                .Select(g => g.OrderBy(s => GetError(now - TimeSpan.FromHours(24), s.Date)).First())
+                .Select(g => g.OrderBy(s => Utilities.DateUtility.GetError(now - TimeSpan.FromHours(24), s.Date)).First())
                 .ToList();
         }
 
