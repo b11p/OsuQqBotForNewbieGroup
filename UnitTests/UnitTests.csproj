@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <PrivateAssets>all</PrivateAssets>
@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bleatingsheep.NewHydrant\Bleatingsheep.NewHydrant.csproj" />
+    <ProjectReference Include="..\Bleatingsheep.NewHydrant.Bot\Bleatingsheep.NewHydrant.Bot.csproj" />
   </ItemGroup>
 
 </Project>
