@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
@@ -18,7 +19,7 @@ namespace Bleatingsheep.NewHydrant.Osu
     [Component("query")]
     public class QueryTrigger : Service, IMessageCommand
     {
-        private static readonly Regex s_selfRegex = new Regex(@"^(?<trigger>~)\s*[,，]?\s*(?<mode>\S*)\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private static readonly Regex s_selfRegex = new Regex(@"^(?<trigger>[~～∼])\s*[,，]?\s*(?<mode>\S*)\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
         private static readonly Regex s_whereRegex = new Regex($@"^(?<trigger>where)\s*(?<name>{OsuHelper.UsernamePattern})\s*[,，]?\s*(?<mode>\S*)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         private readonly Lazy<IOsuApiClient> _osuApiLazy;
@@ -57,7 +58,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            if (context is not GroupMessage g || g.GroupId == 851868928)
+            if (context is not GroupMessage g || g.GroupId == 851868928 || g.GroupId == 72318078)
             {
                 if (string.IsNullOrEmpty(Name))
                 {
@@ -78,7 +79,9 @@ namespace Bleatingsheep.NewHydrant.Osu
                         mode = default;
                     }
                     var message = await QueryHelper.QueryByUserId(osuId, mode).ConfigureAwait(false);
+                    await api.SendMessageAsync(context.Endpoint, $"已经生成了长度为{message.Raw.Length}的消息。").ConfigureAwait(false);
                     await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
+                    await api.SendMessageAsync(context.Endpoint, Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Raw))).ConfigureAwait(false);
                 }
             }
         }

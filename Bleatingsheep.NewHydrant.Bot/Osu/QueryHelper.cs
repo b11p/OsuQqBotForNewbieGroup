@@ -96,14 +96,14 @@ namespace Bleatingsheep.NewHydrant.Osu
             var compared = snapshot?.UserInfo;
             var text = $@"{userInfo.Name}的个人信息{(mode is null ? "" : "—" + mode.Value.GetShortModeString())}
 
-{userInfo.Performance:#.##}pp 表现{IncrementUtility.FormatIncrement(userInfo.Performance - compared?.Performance)}
+{userInfo.Performance:0.##}pp 表现{IncrementUtility.FormatIncrement(userInfo.Performance - compared?.Performance)}
 #{userInfo.Rank}{IncrementUtility.FormatIncrement(userInfo.Rank - compared?.Rank, '↓', '↑')}
 {userInfo.CountryName} #{userInfo.CountryRank}{IncrementUtility.FormatIncrement(userInfo.CountryRank - compared?.CountryRank, '↓', '↑')}
-{userInfo.RankedScore / 1_000_000.0:#,###}m Ranked谱面总分{IncrementUtility.FormatIncrement((userInfo.RankedScore - userInfo.RankedScore) / 1_000_000.0, "#,###")}
-{userInfo.AccuracyFloat:#.##%} 准确率{IncrementUtility.FormatIncrementPercentage(userInfo.AccuracyFloat - compared?.AccuracyFloat)}
+{userInfo.RankedScore / 1_000_000.0:#,##0}m Ranked谱面总分{IncrementUtility.FormatIncrement((userInfo.RankedScore - userInfo.RankedScore) / 1_000_000.0, "#,###")}
+{userInfo.AccuracyFloat:0.##%} 准确率{IncrementUtility.FormatIncrementPercentage(userInfo.AccuracyFloat - compared?.AccuracyFloat)}
 {userInfo.PlayCount} 游玩次数{IncrementUtility.FormatIncrement(userInfo.PlayCount - compared?.PlayCount)}
-{userInfo.TotalHits:#,###} 总命中次数{IncrementUtility.FormatIncrement(userInfo.TotalHits - compared?.TotalHits)}
-{userInfo.PlayTime.Days * 24 + userInfo.PlayTime.Hours} 小时 {userInfo.PlayTime.Minutes} 分钟 {userInfo.PlayTime.Seconds} 秒游玩时间{IncrementUtility.FormatIncrement(userInfo.PlayTime.TotalSeconds - compared?.PlayTime.TotalSeconds)}";
+{userInfo.TotalHits:#,##0} 总命中次数{IncrementUtility.FormatIncrement(userInfo.TotalHits - compared?.TotalHits, "#,###")}
+{userInfo.PlayTime.Days * 24 + userInfo.PlayTime.Hours} 小时 {userInfo.PlayTime.Minutes} 分钟 {userInfo.PlayTime.Seconds} 秒游玩时间{IncrementUtility.FormatIncrement(userInfo.PlayTime.TotalSeconds - compared?.PlayTime.TotalSeconds, "#,###")}";
             return new Message(text);
         }
     }
