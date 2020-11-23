@@ -1,5 +1,4 @@
 ﻿using Bleatingsheep.Osu.PerformancePlus;
-using Bleatingsheep.OsuMixedApi;
 using Microsoft.EntityFrameworkCore;
 using static Bleatingsheep.OsuQqBot.Database.Models.ServerInfo;
 
@@ -7,7 +6,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 {
     public class NewbieContext : DbContext
     {
-        public DbSet<Beatmap> CachedBeatmaps { get; private set; }
         public DbSet<OperationHistory> Histories { get; private set; }
         public DbSet<BindingInfo> Bindings { get; private set; }
 
@@ -36,21 +34,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Ignore<Osu.ApiClient.UserEvent>();
-
-            var beatmaps = modelBuilder.Entity<Beatmap>();
-            beatmaps
-                .Ignore(b => b.PlayCount)
-                .Ignore(b => b.PassCount);
-            beatmaps
-                .HasKey(b => new { b.Id, b.Mode });
-            beatmaps.Property("DifficultyName").IsRequired();
-            beatmaps.Property("FileMD5").IsRequired();
-            beatmaps.Property("Artist").IsRequired();
-            beatmaps.Property("Title").IsRequired();
-            beatmaps.Property("Creator").IsRequired();
-            beatmaps.Property("Source").IsRequired();
-            beatmaps.Property("Tags").IsRequired();
-            beatmaps.HasIndex(b => b.FileMD5).HasName("index_md5");
 
             //modelBuilder.Entity<PlusHistory>()
             //    .Property(ph => ph.Date)

@@ -42,27 +42,6 @@ namespace Bleatingsheep.NewHydrant.Data
             return fromPpp;
         }
 
-        public static async Task<Beatmap[]> GetCachedBeatmapAsync(this OsuApiClient osuApiClient, string md5)
-        {
-            try
-            {
-                var fromDb = await GetFromDbAsync(context => context.CachedBeatmaps, b => b.FileMD5 == md5);
-                if (fromDb != null)
-                    return new[] { fromDb };
-            }
-            catch
-            {
-            }
-
-            var fromApi = await osuApiClient.GetBeatmapAsync(md5);
-
-            if (fromApi?.Any() == true && fromApi[0].IsInfoFixed())
-            {
-                await TryAddCacheAsync(context => context.CachedBeatmaps, fromApi[0]);
-            }
-            return fromApi;
-        }
-        
         /// <exception cref="MySqlException"></exception>
         private static async Task<T> GetFromDbAsync<T>(Func<NewbieContext, DbSet<T>> table, Expression<Func<T, bool>> predicate) where T : class
         {
