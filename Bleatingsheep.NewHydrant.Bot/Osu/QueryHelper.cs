@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Utilities;
 using Bleatingsheep.Osu;
@@ -97,16 +94,16 @@ namespace Bleatingsheep.NewHydrant.Osu
         private Message BuildMessage(UserInfo userInfo, UserSnapshot? snapshot, Mode? mode)
         {
             var compared = snapshot?.UserInfo;
-            var text = $@"bleatingsheep的个人信息{(mode is null ? "" : "—" + mode.Value.GetShortModeString())}
+            var text = $@"{userInfo.Name}的个人信息{(mode is null ? "" : "—" + mode.Value.GetShortModeString())}
 
 {userInfo.Performance:#.##}pp 表现{IncrementUtility.FormatIncrement(userInfo.Performance - compared?.Performance)}
 #{userInfo.Rank}{IncrementUtility.FormatIncrement(userInfo.Rank - compared?.Rank, '↓', '↑')}
 {userInfo.CountryName} #{userInfo.CountryRank}{IncrementUtility.FormatIncrement(userInfo.CountryRank - compared?.CountryRank, '↓', '↑')}
-{userInfo.RankedScore / 1_000_000:#,###}m Ranked谱面总分{IncrementUtility.FormatIncrement((userInfo.RankedScore - userInfo.RankedScore) / 1_000_000, "#,###")}
-98.97% 准确率{IncrementUtility.FormatIncrementPercentage(userInfo.AccuracyFloat - compared?.AccuracyFloat)}
-8040 游玩次数{IncrementUtility.FormatIncrement(userInfo.PlayCount - compared?.PlayCount)}
-4,150,253 总命中次数{IncrementUtility.FormatIncrement(userInfo.TotalHits - compared?.TotalHits)}
-253 小时 21 分钟 26 秒游玩时间{IncrementUtility.FormatIncrement(userInfo.PlayTime.TotalSeconds - compared?.PlayTime.TotalSeconds)}";
+{userInfo.RankedScore / 1_000_000.0:#,###}m Ranked谱面总分{IncrementUtility.FormatIncrement((userInfo.RankedScore - userInfo.RankedScore) / 1_000_000.0, "#,###")}
+{userInfo.AccuracyFloat:#.##%} 准确率{IncrementUtility.FormatIncrementPercentage(userInfo.AccuracyFloat - compared?.AccuracyFloat)}
+{userInfo.PlayCount} 游玩次数{IncrementUtility.FormatIncrement(userInfo.PlayCount - compared?.PlayCount)}
+{userInfo.TotalHits:#,###} 总命中次数{IncrementUtility.FormatIncrement(userInfo.TotalHits - compared?.TotalHits)}
+{userInfo.PlayTime.Days * 24 + userInfo.PlayTime.Hours} 小时 {userInfo.PlayTime.Minutes} 分钟 {userInfo.PlayTime.Seconds} 秒游玩时间{IncrementUtility.FormatIncrement(userInfo.PlayTime.TotalSeconds - compared?.PlayTime.TotalSeconds)}";
             return new Message(text);
         }
     }
