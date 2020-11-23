@@ -7,10 +7,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.啥玩意儿啊;
-using Microsoft.EntityFrameworkCore;
-using MotherShipDatabase;
-using PuppeteerSharp;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -171,25 +167,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     _ => sb.Append("未知错误"),
                 });
 
-                if (osuApiGood && user is null)
-                {// user is banned, find user from mother ship
-                    try
-                    {
-                        using var mother = new OsuContext();
-                        var role = await mother.Userrole.Where(r => r.UserId == osuId).FirstOrDefaultAsync().ConfigureAwait(false);
-                        var info = await mother.Userinfo.Where(i => i.UserId == osuId).OrderByDescending(i => i.QueryDate).FirstOrDefaultAsync().ConfigureAwait(false);
-                        if (!(role is null || info is null))
-                        {
-                            user = TrustedUserInfo.FromMotherShip(info, role);
-                        }
-                    }
-#pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception e)
-                    {
-                        Logger.Info(e);
-                    }
-#pragma warning restore CA1031 // Do not catch general exception types
-                }
+                // TODO: When user is banned, find snapshot from other sources (database, mothership database, etc.)
                 performance = user?.Performance;
             }
 

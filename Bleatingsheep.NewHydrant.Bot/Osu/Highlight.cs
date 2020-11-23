@@ -11,7 +11,6 @@ using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
-using MotherShipDatabase;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -147,15 +146,6 @@ namespace Bleatingsheep.NewHydrant.Osu
                 .GroupBy(s => s.UserId)
                 .Select(g => g.OrderBy(s => Utilities.DateUtility.GetError(now - TimeSpan.FromHours(24), s.Date)).First())
                 .ToList();
-        }
-
-        private sealed class UserInfoComparier : IEqualityComparer<Userinfo>
-        {
-            public bool Equals(Userinfo x, Userinfo y)
-                => (x.UserId, x.Mode) == (y.UserId, y.Mode);
-
-            public int GetHashCode(Userinfo obj)
-                => ((int)obj.UserId << 2) + (int)obj.Mode;
         }
 
         [Parameter("mode")]

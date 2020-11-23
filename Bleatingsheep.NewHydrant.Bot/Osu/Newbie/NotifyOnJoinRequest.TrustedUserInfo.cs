@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using MotherShipDatabase;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
@@ -28,16 +27,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     IsBanned = false,
                 };
 #nullable restore
-
-            public static TrustedUserInfo FromMotherShip(Userinfo info, Userrole role) => new TrustedUserInfo
-            {
-                Id = info.UserId.Value,
-                Name = role.CurrentUname,
-                TotalHits = (int)(info.Count300 + info.Count100 + info.Count50),
-                Performance = (double)info.PpRaw,
-                PlayCount = info.Playcount.Value,
-                IsBanned = role.IsBanned,
-            };
         }
     }
 }
