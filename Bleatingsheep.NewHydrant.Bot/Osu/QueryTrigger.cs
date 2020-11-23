@@ -80,7 +80,9 @@ namespace Bleatingsheep.NewHydrant.Osu
                     }
                     var message = await QueryHelper.QueryByUserId(osuId, mode).ConfigureAwait(false);
                     await api.SendMessageAsync(context.Endpoint, $"已经生成了长度为{message.Raw.Length}的消息。").ConfigureAwait(false);
-                    await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
+                    var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
+                    if (sendResponse is null)
+                        await api.SendMessageAsync(context.Endpoint, "检测到发送失败。").ConfigureAwait(false);
                     await api.SendMessageAsync(context.Endpoint, Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Raw))).ConfigureAwait(false);
                 }
             }
