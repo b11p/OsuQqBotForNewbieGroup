@@ -91,6 +91,18 @@ namespace Bleatingsheep.NewHydrant.Osu
             };
         }
 
+        public async ValueTask<Message> QueryByUserName(string userName, Mode? desired_mode)
+        {
+            Mode mode = desired_mode ?? Mode.Standard;
+            return await QueryInternal(userName, mode).ConfigureAwait(false) switch
+            {
+                (true, null, _) => new Message("没这个人。"),
+                (_, UserInfo userInfo, var snapshot) => BuildMessage(userInfo, snapshot, desired_mode),
+                (false, null, null) => new Message("查询失败。"),
+                (false, null, var snapshot) => BuildMessage(snapshot.UserInfo, default, desired_mode) + new Message("\r\n查询 API 失败。"),
+            };
+        }
+
         private Message BuildMessage(UserInfo userInfo, UserSnapshot? snapshot, Mode? mode)
         {
             var compared = snapshot?.UserInfo;
