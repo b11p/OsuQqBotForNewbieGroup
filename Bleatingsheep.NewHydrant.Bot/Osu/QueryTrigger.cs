@@ -86,43 +86,41 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            if (context is not GroupMessage g || g.GroupId == 851868928 || g.GroupId == 72318078)
+            Mode? mode;
+            try
             {
-                Mode? mode;
-                try
+                mode = ModeExtensions.Parse(ModeString);
+            }
+            catch
+            {
+                mode = default;
+            }
+            Message message;
+            if (QQId != default)
+            {
+                var bindingInfo = await NewbieContext.Bindings.Where(b => b.UserId == QQId).FirstOrDefaultAsync().ConfigureAwait(false);
+                if (bindingInfo is null)
                 {
-                    mode = ModeExtensions.Parse(ModeString);
-                }
-                catch
-                {
-                    mode = default;
-                }
-                Message message;
-                if (QQId != default)
-                {
-                    var bindingInfo = await NewbieContext.Bindings.Where(b => b.UserId == QQId).FirstOrDefaultAsync().ConfigureAwait(false);
-                    if (bindingInfo is null)
-                    {
-                        await api.SendMessageAsync(context.Endpoint, "未绑定 osu! 账号。").ConfigureAwait(false);
-                        return;
-                    }
-                    var osuId = bindingInfo.OsuId;
-                    message = await QueryHelper.QueryByUserId(osuId, mode).ConfigureAwait(false);
-                }
-                else if (!string.IsNullOrEmpty(Name))
-                {
-                    message = await QueryHelper.QueryByUserName(Name, mode).ConfigureAwait(false);
-                }
-                else
-                {
+                    await api.SendMessageAsync(context.Endpoint, "未绑定 osu! 账号。").ConfigureAwait(false);
                     return;
                 }
-                var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
-                if (sendResponse is null)
-                {
-                    await api.SendMessageAsync(context.Endpoint, $"检测到发送失败，消息长度为{message.Raw.Length}，[调试]将转换成 base64 发送。").ConfigureAwait(false);
-                    await api.SendMessageAsync(context.Endpoint, Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Raw))).ConfigureAwait(false);
-                }
+                var osuId = bindingInfo.OsuId;
+                message = await QueryHelper.QueryByUserId(osuId, mode).ConfigureAwait(false);
+            }
+            else if (!string.IsNullOrEmpty(Name))
+            {
+                message = await QueryHelper.QueryByUserName(Name, mode).ConfigureAwait(false);
+            }
+            else
+            {
+                return;
+            }
+            var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
+            if (sendResponse is null)
+            {
+                // 可能会假失败，即消息发出去了，但检测到失败。
+                //await api.SendMessageAsync(context.Endpoint, $"检测到发送失败，消息长度为{message.Raw.Length}，[调试]将转换成 base64 发送。").ConfigureAwait(false);
+                //await api.SendMessageAsync(context.Endpoint, Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Raw))).ConfigureAwait(false);
             }
         }
     }
