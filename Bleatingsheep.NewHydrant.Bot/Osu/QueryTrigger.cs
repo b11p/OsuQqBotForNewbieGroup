@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
+using Bleatingsheep.NewHydrant.啥玩意儿啊;
 using Bleatingsheep.Osu;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using PuppeteerSharp;
 using Sisters.WudiLib;
-using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 
@@ -115,12 +116,40 @@ namespace Bleatingsheep.NewHydrant.Osu
             {
                 return;
             }
-            var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
+            //var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
+            Sisters.WudiLib.Responses.SendMessageResponseData sendResponse = null;
             if (sendResponse is null)
             {
                 // 可能会假失败，即消息发出去了，但检测到失败。
                 //await api.SendMessageAsync(context.Endpoint, $"检测到发送失败，消息长度为{message.Raw.Length}，[调试]将转换成 base64 发送。").ConfigureAwait(false);
                 //await api.SendMessageAsync(context.Endpoint, Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Raw))).ConfigureAwait(false);
+
+                var text = message.Sections[0].Data["text"];
+                using var sr = new System.IO.StringReader(text);
+                var lines = new List<string>();
+                while (sr.ReadLine() is string line)
+                {
+                    // 分行发送发送失败的消息
+                    //await api.SendMessageAsync(context.Endpoint, line).ConfigureAwait(false);
+
+                    lines.Add(line);
+                }
+
+                var page = await Chrome.OpenNewPageAsync().ConfigureAwait(false);
+                await page.SetViewportAsync(new ViewPortOptions
+                {
+                    DeviceScaleFactor = 3,
+                    Width = 360,
+                    Height = 202,
+                }).ConfigureAwait(false);
+                var style = "font-family: 'Source Han Sans CN', sans-serif;";
+                await page.SetContentAsync($@"<div lang=""zh-CN"" style=""{style}"">{string.Join("<br>", lines)}</div>").ConfigureAwait(false);
+                var data = await page.ScreenshotDataAsync(new ScreenshotOptions
+                {
+                    FullPage = true,
+                }).ConfigureAwait(false);
+
+                await api.SendMessageAsync(context.Endpoint, Message.ByteArrayImage(data)).ConfigureAwait(false);
             }
         }
     }
