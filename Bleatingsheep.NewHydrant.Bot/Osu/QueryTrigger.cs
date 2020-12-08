@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.啥玩意儿啊;
@@ -143,7 +144,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                     Height = 202,
                 }).ConfigureAwait(false);
                 var style = "font-family: 'Source Han Sans CN', sans-serif;";
-                await page.SetContentAsync($@"<div lang=""zh-CN"" style=""{style}"">{string.Join("<br>", lines)}</div>").ConfigureAwait(false);
+                await page.SetContentAsync($@"<div lang=""zh-CN"" style=""{style}"">{string.Join("<br>", lines.Select(HttpUtility.HtmlEncode))}</div>").ConfigureAwait(false);
                 var data = await page.ScreenshotDataAsync(new ScreenshotOptions
                 {
                     FullPage = true,
