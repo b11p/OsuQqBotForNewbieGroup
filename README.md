@@ -72,6 +72,7 @@ namespace Bleatingsheep.NewHydrant
     }
 }
 ```
+#### 参考
 > [go-cqhttp 的配置文件](https://github.com/Mrs4s/go-cqhttp/blob/master/docs/config.md)
 
 3. (Optional) 修改 `Bleatingsheep.NewHydrant.Bot/啥玩意儿啊/Chrome.cs` 文件，将 `ExecutablePath` 改为 Chromium 内核浏览器的可执行文件位置。如果未正确设置，部分功能可能无法使用。
