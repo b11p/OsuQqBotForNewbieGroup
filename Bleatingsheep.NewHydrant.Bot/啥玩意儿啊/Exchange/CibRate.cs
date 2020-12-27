@@ -29,7 +29,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
             get
             {
                 var data = Array.Find(Rows, d => string.Equals(Currency, d.EnglishName, StringComparison.OrdinalIgnoreCase));
-                return data.BuyPrice / data.Unit;
+                return data?.BuyPrice / data?.Unit;
             }
         }
     }
