@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using PuppeteerSharp;
 
@@ -19,10 +20,10 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                     s_browser = Puppeteer.LaunchAsync(new LaunchOptions
                     {
                         Headless = true,
-                        //ExecutablePath = @"/opt/google/chrome/chrome",
+                        //ExecutablePath = @"/opt/google/chrome/google-chrome",
                         //ExecutablePath = @"/usr/bin/chromium-browser",
-                        //ExecutablePath = @"/usr/bin/microsoft-edge",
-                        ExecutablePath = @"/usr/bin/chromium",
+                        ExecutablePath = @"/usr/bin/microsoft-edge",
+                        //ExecutablePath = @"/usr/bin/chromium",
                         DefaultViewport = new ViewPortOptions
                         {
                             DeviceScaleFactor = 1,
@@ -37,6 +38,30 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 return s_browser;
             }
         };
+
+        public static async Task RefreashBrowserAsync()
+        {
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true,
+                //ExecutablePath = @"/opt/google/chrome/google-chrome",
+                //ExecutablePath = @"/usr/bin/chromium-browser",
+                ExecutablePath = @"/usr/bin/microsoft-edge",
+                //ExecutablePath = @"/usr/bin/chromium",
+                DefaultViewport = new ViewPortOptions
+                {
+                    DeviceScaleFactor = 1,
+                    Width = 360,
+                    Height = 640,
+                },
+                Args = new[] { "--no-sandbox", "--lang=zh-CN" },
+            }).ConfigureAwait(false);
+            var oldBrowser = Interlocked.Exchange(ref s_browser, browser);
+            if (oldBrowser is not null)
+            {
+                await oldBrowser.DisposeAsync().ConfigureAwait(false);
+            }
+        }
 
         private static readonly System.Collections.Generic.Dictionary<string, string> s_extraHeaders = new System.Collections.Generic.Dictionary<string, string>()
         {
