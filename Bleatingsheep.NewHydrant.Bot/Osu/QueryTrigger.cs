@@ -24,6 +24,8 @@ namespace Bleatingsheep.NewHydrant.Osu
     {
         private static readonly Regex s_selfRegex = new Regex(@"^\s*(?<trigger>[~～∼])\s*[,，]?\s*(?<mode>\S*)\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
         private static readonly Regex s_whereRegex = new Regex($@"^\s*(?<trigger>where)\s*(?<name>{OsuHelper.UsernamePattern})\s*[,，]?\s*(?<mode>\S*)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        private static readonly Regex s_whereQQRegex = new Regex(@"^\s*(?<trigger>where)\s*qq\s*=\s*(?<qq>\d+)\s*[,，]?\s*(?<mode>\S*)\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
         private static readonly Regex s_queryPrefixRegex = new Regex(@"^\s*查\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
         private static readonly Regex s_querySuffixRegex = new Regex(@"^\s*[,，]?\s*(?<mode>\S*)\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
@@ -45,6 +47,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         [Parameter("mode")]
         public string ModeString { get; set; }
 
+        [Parameter("qq")]
         public long QQId { get; set; }
 
         #endregion
@@ -68,7 +71,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                     QQId = context.UserId;
                     return true;
                 }
-                return RegexCommand(s_whereRegex, text);
+                return RegexCommand(s_whereRegex, text) || RegexCommand(s_whereQQRegex, text);
             }
             else if (context.Content.Sections.Select(f => f.Type).SequenceEqual(s_cqCodeSeq) &&
                 RegexCommand(s_queryPrefixRegex, context.Content.Sections[0].Data["text"]))
