@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsuQqBotHttp", "OsuQqBotHttp\OsuQqBotHttp.csproj", "{CC06F456-CB9F-4A6F-9D7B-AD702003C597}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsuQqBot", "OsuQqBot\OsuQqBot.csproj", "{CA198E3B-B788-4CB9-A4AC-74836A08B02F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.OsuMixedApi", "Bleatingsheep.OsuApiClient\Bleatingsheep.OsuMixedApi.csproj", "{7A8C5120-70EE-4061-8AEC-7405E155A81E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.OsuQqBot.Database", "Bleatingsheep.OsuQqBot.Database\Bleatingsheep.OsuQqBot.Database.csproj", "{1A110CC5-B7EE-4925-85A5-9C8A429531D6}"
@@ -31,14 +27,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CC06F456-CB9F-4A6F-9D7B-AD702003C597}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC06F456-CB9F-4A6F-9D7B-AD702003C597}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CC06F456-CB9F-4A6F-9D7B-AD702003C597}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CC06F456-CB9F-4A6F-9D7B-AD702003C597}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA198E3B-B788-4CB9-A4AC-74836A08B02F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA198E3B-B788-4CB9-A4AC-74836A08B02F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA198E3B-B788-4CB9-A4AC-74836A08B02F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA198E3B-B788-4CB9-A4AC-74836A08B02F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7A8C5120-70EE-4061-8AEC-7405E155A81E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7A8C5120-70EE-4061-8AEC-7405E155A81E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A8C5120-70EE-4061-8AEC-7405E155A81E}.Release|Any CPU.ActiveCfg = Release|Any CPU
