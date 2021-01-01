@@ -81,18 +81,18 @@ namespace Bleatingsheep.NewHydrant.Osu
                     }
                 }
 
-                // 读取并缓存 PP+ 数据。
-                var plus = new PerformancePlusSpider();
-                foreach (var id in newSets.SelectMany(s => s.Beatmaps.Select(b => b.Id)))
-                {
-                    try
-                    {
-                        await plus.GetCachedBeatmapPlusAsync(id);
-                    }
-                    catch (Exception)
-                    {
-                    }
-                }
+                //// 读取并缓存 PP+ 数据。
+                //var plus = new PerformancePlusSpider();
+                //foreach (var id in newSets.SelectMany(s => s.Beatmaps.Select(b => b.Id)))
+                //{
+                //    try
+                //    {
+                //        await plus.GetCachedBeatmapPlusAsync(id);
+                //    }
+                //    catch (Exception)
+                //    {
+                //    }
+                //}
             }
         }
     }
