@@ -10,10 +10,12 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
     internal interface ICibRate : IHttpApi
     {
         [HttpGet("https://personalbank.cib.com.cn/pers/main/pubinfo/ifxQuotationQuery.do")]
+        [Cache(20 * 60_000)]
         Task<HttpResponseMessage> Prepare();
 
         [HttpGet("https://personalbank.cib.com.cn/pers/main/pubinfo/ifxQuotationQuery!list.do?_search=false&dataSet.rows=80&dataSet.page=1&dataSet.sidx=&dataSet.sord=asc")]
         [JsonReturn]
+        [Cache(2 * 20 * 60_000)]
         Task<CibRate> GetRates([AliasAs("dataSet.nd")][PathQuery] long timestamp);
     }
 

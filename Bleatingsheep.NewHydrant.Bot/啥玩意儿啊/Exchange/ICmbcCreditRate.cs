@@ -11,6 +11,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
     {
         [HttpGet("https://creditcard.cmbc.com.cn/fe//op_exchange_rate/list.gsp")]
         [JsonReturn]
+        [Cache(20 * 60_000)]
         Task<CmbcRate> GetRates();
     }
 }
