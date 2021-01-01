@@ -10,7 +10,7 @@ namespace Bleatingsheep.NewHydrant
 {
     internal class HydrantStartup : IHydrantStartup
     {
-        public void Configure(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<NewbieContext>();
 

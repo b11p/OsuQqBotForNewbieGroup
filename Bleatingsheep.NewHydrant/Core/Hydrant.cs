@@ -129,7 +129,7 @@ namespace Bleatingsheep.NewHydrant.Core
             if (Interlocked.Exchange(ref _isInitialized, 1) == 0)
             {
                 var services = new ServiceCollection();
-                startup?.Configure(services);
+                startup?.ConfigureServices(services);
                 Init(_assemblies, services);
             }
         }

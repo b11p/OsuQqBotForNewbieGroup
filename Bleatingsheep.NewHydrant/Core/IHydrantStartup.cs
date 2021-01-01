@@ -5,7 +5,7 @@ namespace Bleatingsheep.NewHydrant.Core
 #nullable enable
     public interface IHydrantStartup
     {
-        void Configure(IServiceCollection services);
+        void ConfigureServices(IServiceCollection services);
     }
 #nullable restore
 }
