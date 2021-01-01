@@ -63,6 +63,9 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             }
         }
 
+        public static async Task<ReadOnlyMemory<Page>> GetTabsAsync()
+            => await GetBrowser().DefaultContext.PagesAsync().ConfigureAwait(false);
+
         private static readonly System.Collections.Generic.Dictionary<string, string> s_extraHeaders = new System.Collections.Generic.Dictionary<string, string>()
         {
             ["Accept-Language"] = "zh-CN",

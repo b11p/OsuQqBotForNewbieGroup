@@ -139,7 +139,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                     lines.Add(line);
                 }
 
-                var page = await Chrome.OpenNewPageAsync().ConfigureAwait(false);
+                using var page = await Chrome.OpenNewPageAsync().ConfigureAwait(false);
                 await page.SetViewportAsync(new ViewPortOptions
                 {
                     DeviceScaleFactor = 3,
