@@ -92,6 +92,8 @@ namespace Bleatingsheep.NewHydrant
                 var logPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "fatal.log");
                 new Logging.FileLogger(logPath).LogException(e);
                 LogManager.Shutdown();
+
+                Console.WriteLine(e);
             }
 
             // 阻止自动重启

@@ -1,28 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Autofac;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
+using Microsoft.Extensions.DependencyInjection;
 using WebApiClient;
 
 namespace Bleatingsheep.NewHydrant
 {
     internal class HydrantStartup : IHydrantStartup
     {
-        public void Configure(ContainerBuilder builder)
+        public void Configure(IServiceCollection services)
         {
-            builder.RegisterType<NewbieContext>().AsSelf();
+            services.AddDbContext<NewbieContext>();
 
             var hc = new HardcodedConfigure();
             var factory = OsuApiClientFactory.CreateFactory(hc.ApiKey);
-            builder.RegisterInstance(factory).As(typeof(IHttpApiFactory<IOsuApiClient>)).SingleInstance();
-            builder.Register(c => c.Resolve<IHttpApiFactory<IOsuApiClient>>().CreateHttpApi())
-                .As<IOsuApiClient>().InstancePerLifetimeScope();
+            services.AddSingleton<IHttpApiFactory<IOsuApiClient>>(factory);
+            services.AddScoped<IOsuApiClient>(c => c.GetService<IHttpApiFactory<IOsuApiClient>>().CreateHttpApi());
 
-            builder.RegisterType<QueryHelper>().AsSelf();
+            services.AddTransient<QueryHelper>();
+
+            services.AddTransient(typeof(Lazy<>), typeof(LazyService<>));
+        }
+
+        private sealed class LazyService<T> : Lazy<T> where T : class
+        {
+            public LazyService(IServiceProvider provider)
+                : base(() => provider.GetRequiredService<T>())
+            {
+            }
         }
     }
 }

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Autofac;
 using Bleatingsheep.NewHydrant.Attributions;
+using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
@@ -20,7 +20,7 @@ namespace Bleatingsheep.NewHydrant.Core
         private readonly Assembly[] _assemblies;
         private int _isInitialized = 0;
         private LogFactory? _logFactory;
-        private IContainer _container = default!;
+        private IServiceProvider _serviceProvider = default!;
 
         /// <exception cref="ArgumentException">Some of elements in <c>assemblies</c> was <c>null</c>.</exception>
         public Hydrant(HttpApiClient httpApiClient, ApiPostListener listener, params Assembly[] assemblies)
@@ -128,9 +128,9 @@ namespace Bleatingsheep.NewHydrant.Core
         {
             if (Interlocked.Exchange(ref _isInitialized, 1) == 0)
             {
-                var builder = new ContainerBuilder();
-                startup?.Configure(builder);
-                Init(_assemblies, builder);
+                var services = new ServiceCollection();
+                startup?.Configure(services);
+                Init(_assemblies, services);
             }
         }
 
@@ -157,7 +157,7 @@ namespace Bleatingsheep.NewHydrant.Core
             };
             _listener.MessageEvent += async (api, message) =>
             {
-                using var scope = _container.BeginLifetimeScope();
+                using var scope = _serviceProvider.CreateScope();
                 IMessageCommand? hit = default;
                 try
                 {
@@ -232,20 +232,20 @@ namespace Bleatingsheep.NewHydrant.Core
         #region Create Service Instance
         public T CreateServiceInstance<T>() where T : notnull, Service
         {
-            using var scope = _container.BeginLifetimeScope();
+            using var scope = _serviceProvider.CreateScope();
             return CreateServiceInstance<T>(typeof(T), scope);
         }
 
-        private object CreateServiceInstance(Type type, IComponentContext componentContext)
+        private object CreateServiceInstance(Type type, IServiceScope scope)
         {
-            var result = type.CreateInstance(componentContext);
+            var result = type.CreateInstance(scope);
             ConfigureDefaultService(result);
             return result;
         }
 
-        private T CreateServiceInstance<T>(Type type, IComponentContext componentContext) where T : notnull
+        private T CreateServiceInstance<T>(Type type, IServiceScope scope) where T : notnull
         {
-            var result = type.CreateInstance<T>(componentContext);
+            var result = type.CreateInstance<T>(scope);
             ConfigureDefaultService(result);
             return result;
         }
@@ -260,21 +260,21 @@ namespace Bleatingsheep.NewHydrant.Core
         #endregion
 
         #region init private
-        private void Init(IEnumerable<Assembly> assemblies, ContainerBuilder builder)
+        private void Init(IEnumerable<Assembly> assemblies, IServiceCollection services)
         {
             var types = assemblies.SelectMany(a => a.GetTypes()
                 .Where(t => t.GetCustomAttributes<ComponentAttribute>().Any()))
                 .ToList();
 
-            types.ForEach(t => builder.RegisterType(t));
-            _container = builder.Build();
+            types.ForEach(t => services.AddTransient(t));
+            _serviceProvider = services.BuildServiceProvider();
 
             types.ForEach(InitType);
         }
 
         internal void InitType(Type t)
         {
-            using var scope = _container.BeginLifetimeScope();
+            using var scope = _serviceProvider.CreateScope();
             var interfaces = t.GetInterfaces();
             var lazy = new Lazy<object>(
                 valueFactory: () => CreateServiceInstance(t, scope),
