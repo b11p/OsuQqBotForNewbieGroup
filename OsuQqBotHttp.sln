@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sisters.WudiLib", "..\Siste
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.NewHydrant", "Bleatingsheep.NewHydrant\Bleatingsheep.NewHydrant.csproj", "{23ED3ADF-4258-41AE-8451-A6F63AF3A19B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.NewHydrant.Irc", "Bleatingsheep.NewHydrant.Irc\Bleatingsheep.NewHydrant.Irc.csproj", "{65562187-7328-4DF4-99C0-9DEEE0678BD3}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.NewHydrant.Data", "Bleatingsheep.NewHydrant.Data\Bleatingsheep.NewHydrant.Data.csproj", "{03770784-53F1-419D-AB1D-96613F87B881}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{929DD942-07A5-48E1-9761-645919A2CE1F}"
@@ -43,10 +41,6 @@ Global
 		{23ED3ADF-4258-41AE-8451-A6F63AF3A19B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23ED3ADF-4258-41AE-8451-A6F63AF3A19B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23ED3ADF-4258-41AE-8451-A6F63AF3A19B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{65562187-7328-4DF4-99C0-9DEEE0678BD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{65562187-7328-4DF4-99C0-9DEEE0678BD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{65562187-7328-4DF4-99C0-9DEEE0678BD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{65562187-7328-4DF4-99C0-9DEEE0678BD3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{03770784-53F1-419D-AB1D-96613F87B881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{03770784-53F1-419D-AB1D-96613F87B881}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03770784-53F1-419D-AB1D-96613F87B881}.Release|Any CPU.ActiveCfg = Release|Any CPU
