@@ -17,7 +17,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
         {
             await api.SendMessageAsync(
                 context.Endpoint,
-                "请去 https://github.com/b11p/OsuQqBotForNewbieGroup/wiki/osu%21-%E7%9B%B8%E5%85%B3%E5%8A%9F%E8%83%BD" +
+                "请去 https://help.b11p.com/" +
                 " 查看 osu! 相关帮助。页面右侧可以查看其他相关帮助。"
             ).ConfigureAwait(false);
         }

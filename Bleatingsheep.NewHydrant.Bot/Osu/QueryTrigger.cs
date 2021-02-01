@@ -91,14 +91,18 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            Mode? mode;
+            Mode? mode = default(Mode);
             try
             {
-                mode = ModeExtensions.Parse(ModeString);
+                if (!string.IsNullOrWhiteSpace(ModeString))
+                {
+                    mode = ModeExtensions.Parse(ModeString);
+                }
             }
             catch
             {
-                mode = default;
+                // Ignore when the mode string is invalid.
+                return;
             }
             Message message;
             if (QQId != default)
