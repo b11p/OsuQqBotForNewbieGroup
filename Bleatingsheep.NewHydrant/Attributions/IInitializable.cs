@@ -11,7 +11,7 @@ namespace Bleatingsheep.NewHydrant.Attributions
         /// <summary>
         /// 名称，用于指令中识别。
         /// </summary>
-        string Name { get; }
+        string? Name { get; }
 
         /// <summary>
         /// 初始化，或者重新初始化。
