@@ -18,7 +18,7 @@
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
     <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.4.1" />
     <PackageReference Include="Bleatingsheep.SimpleBooru" Version="0.2.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.29" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.30" />
     <PackageReference Include="PuppeteerSharp" Version="2.0.4" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />

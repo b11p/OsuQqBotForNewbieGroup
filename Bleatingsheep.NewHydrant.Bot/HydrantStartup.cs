@@ -12,7 +12,7 @@ namespace Bleatingsheep.NewHydrant
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<NewbieContext>();
+            services.AddDbContext<NewbieContext>(ServiceLifetime.Transient);
 
             var hc = new HardcodedConfigure();
             var factory = OsuApiClientFactory.CreateFactory(hc.ApiKey);
