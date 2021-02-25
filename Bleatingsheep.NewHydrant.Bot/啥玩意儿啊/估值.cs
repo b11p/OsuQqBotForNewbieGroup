@@ -54,7 +54,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 //    })));
 
 
-                const string detailSelector = "#app > div > div.ant-layout-container > div > div > div > div.index__29fc4";
+                const string detailSelector = "#app > div.ant-layout-main.ant-layout-main-f > div.ant-layout-container.safe-padding-bottom > div > div > div > div.index__29fc4";
                 ElementHandle detailElement = await page.WaitForSelectorAsync(detailSelector).ConfigureAwait(false);
 
                 // delete advertisement
