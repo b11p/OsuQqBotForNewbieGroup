@@ -81,6 +81,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                         }
                         else
                         {
+                            // remove banner
+                            const string bannerSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.hidden-xs.page-extra-tabs.page-extra-tabs--profile-page.js-switchable-mode-page--scrollspy-offset";
+                            var banner = await page.QuerySelectorAsync(bannerSelector).ConfigureAwait(false);
+                            if (banner is not null)
+                            {
+                                _ = await banner.EvaluateFunctionAsync("b => b.remove()").ConfigureAwait(false);
+                            }
+                            // screenshot bests
                             data = await bpElement.ScreenshotDataAsync();
                             //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);
                             messageBest = Message.ByteArrayImage(data);
