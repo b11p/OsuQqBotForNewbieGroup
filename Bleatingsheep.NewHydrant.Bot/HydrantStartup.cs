@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.Osu.ApiClient;
@@ -22,6 +23,8 @@ namespace Bleatingsheep.NewHydrant
             services.AddTransient<QueryHelper>();
 
             services.AddTransient(typeof(Lazy<>), typeof(LazyService<>));
+
+            services.AddSingleton<RandomNumberGenerator, RNGCryptoServiceProvider>();
         }
 
         private sealed class LazyService<T> : Lazy<T> where T : class
