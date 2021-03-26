@@ -111,8 +111,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var card = string.IsNullOrEmpty(groupMember.InGroupName) ? groupMember.Nickname : groupMember.InGroupName;
             string hint;
             hint = NewbieCardChecker.GetHintMessage(name, card);
-            if (hint != null)
-                await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
+            //if (hint != null)
+                //await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
         }
 
         private static async Task<string> AutoBind(HttpApiClient api, GroupMessage g, bool success)

@@ -124,7 +124,8 @@ namespace Bleatingsheep.NewHydrant.Osu
             {
                 return;
             }
-            var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
+            //var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
+            object sendResponse = null;
             if (sendResponse is null)
             {
                 // 可能会假失败，即消息发出去了，但检测到失败。
@@ -141,6 +142,8 @@ namespace Bleatingsheep.NewHydrant.Osu
 
                     lines.Add(line);
                 }
+                //lines.Add(string.Empty);
+                //lines.Add("// 有会 html/css 的帮我弄好看点吗？ 斜杠可怜");
 
                 using var page = await Chrome.OpenNewPageAsync().ConfigureAwait(false);
                 await page.SetViewportAsync(new ViewPortOptions
