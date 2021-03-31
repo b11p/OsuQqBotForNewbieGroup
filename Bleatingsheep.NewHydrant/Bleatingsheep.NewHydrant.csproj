@@ -10,10 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="NLog" Version="4.7.9" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Sisters.WudiLib\Sisters.WudiLib\Sisters.WudiLib.csproj" />
+    <PackageReference Include="Sisters.WudiLib" Version="0.0.7-alpha2" />
   </ItemGroup>
 
 </Project>
