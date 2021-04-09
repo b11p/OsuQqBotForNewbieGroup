@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using Sisters.WudiLib;
@@ -136,9 +137,24 @@ namespace Bleatingsheep.NewHydrant.Core
 
         public void Run()
         {
+            var mc = new MemoryCache(new MemoryCacheOptions());
+            var slidingExpiration = TimeSpan.FromDays(2);
             _listener.MessageEvent += async (api, message) =>
             {
-                await _messageMonitorList.ForEachAsync(async m =>
+                // Workaround for go-cqhttp repeatedly post private message.
+                if (message is PrivateMessage p)
+                {
+                    var cached = mc.GetOrCreate(p.MessageId, e =>
+                    {
+                        e.SetSlidingExpiration(slidingExpiration);
+                        return p;
+                    });
+                    if (cached != p)
+                        return;
+                }
+
+                // Message monitors
+                _ = _messageMonitorList.ForEachAsync(async m =>
                 {
                     try
                     {
@@ -154,9 +170,8 @@ namespace Bleatingsheep.NewHydrant.Core
                         LogException(GetServiceName(m), "Monitor 的异常。", e);
                     }
                 });
-            };
-            _listener.MessageEvent += async (api, message) =>
-            {
+
+                // Commands
                 using var scope = _serviceProvider.CreateScope();
                 IMessageCommand? hit = default;
                 try
