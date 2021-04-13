@@ -13,6 +13,7 @@ using NLog;
 using PuppeteerSharp;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
+using Sisters.WudiLib.WebSocket;
 
 namespace Bleatingsheep.NewHydrant
 {
@@ -30,9 +31,7 @@ namespace Bleatingsheep.NewHydrant
 
             var configure = new HardcodedConfigure();
 
-            var httpApiClient = new HttpApiClient();
-            httpApiClient.AccessToken = configure.AccessToken;
-            httpApiClient.ApiAddress = configure.ApiAddress;
+            var httpApiClient = new CqHttpWebSocketApiClient(configure.ApiWS, configure.AccessToken);
 #if !DEBUG
             do
             {
@@ -55,7 +54,7 @@ namespace Bleatingsheep.NewHydrant
 
             try
             {
-                var apiPostListener = new ApiPostListener(configure.Listen);
+                var apiPostListener = new CqHttpWebSocketEvent(configure.ListenWS, configure.AccessToken);
                 apiPostListener.SetSecret(configure.Secret);
                 apiPostListener.ApiClient = httpApiClient;
                 apiPostListener.ForwardTo = "http://oldbot:8876";
