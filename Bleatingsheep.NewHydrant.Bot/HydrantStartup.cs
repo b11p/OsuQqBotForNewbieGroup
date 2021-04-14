@@ -25,6 +25,8 @@ namespace Bleatingsheep.NewHydrant
             services.AddTransient(typeof(Lazy<>), typeof(LazyService<>));
 
             services.AddSingleton<RandomNumberGenerator, RNGCryptoServiceProvider>();
+
+            services.AddMemoryCache();
         }
 
         private sealed class LazyService<T> : Lazy<T> where T : class
