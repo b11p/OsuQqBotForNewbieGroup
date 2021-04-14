@@ -26,7 +26,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             if (bindingInfo is null)
                 return;
             var url = $"https://www.mothership.top/api/v1/stat/{bindingInfo.OsuId}";
-            await api.SendMessageAsync(context.Endpoint, Message.NetImage(url)).ConfigureAwait(false);
+            await api.SendMessageAsync(context.Endpoint, Message.NetImage(url, true)).ConfigureAwait(false);
         }
 
         public bool ShouldResponse(MessageContext context)
