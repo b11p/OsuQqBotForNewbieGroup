@@ -27,13 +27,7 @@ dotnet tool install --global dotnet-ef
 ```
 
 ### 克隆
-1. 克隆本 repo 和 [Sisters.WudiLib](https://github.com/int-and-his-friends/Sisters.WudiLib)
-
-2. 移动文件位置，保证 `OsuQqBotHttp.sln` 和 `Sisters.WudiLib.sln` 按下列规则放置
-
-    ./OsuQqBotHttp.sln
-
-    ../Sisters.WudiLib/Sisters.WudiLib.sln
+1. 克隆本 repo。
 
 ### 补充缺失文件
 1. 使用 Visual Studio 打开 `OsuQqBotHttp.sln`，在 `Bleatingsheep.OsuQqBot.Database/Models` 目录创建 `ServerInfo.cs` 文件，内容如下。
