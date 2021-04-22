@@ -18,8 +18,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
     {
         private static TimeSpan CheckInterval { get; } = new TimeSpan(10, 53, 31);
 
-        private readonly object _thisLock = new object();
-        private readonly Dictionary<(long group, long qq), DateTime> _lastCheckTime = new Dictionary<(long group, long qq), DateTime>();
+        private static readonly object s_thisLock = new object();
+        private static readonly Dictionary<(long group, long qq), DateTime> s_lastCheckTime = new Dictionary<(long group, long qq), DateTime>();
 
         public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
@@ -31,12 +31,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             );
 
             // 检查上次检查时间。
-            lock (_thisLock)
+            lock (s_thisLock)
             {
-                var hasChecked = _lastCheckTime.TryGetValue((g.GroupId, g.UserId), out var lastCheck);
+                var hasChecked = s_lastCheckTime.TryGetValue((g.GroupId, g.UserId), out var lastCheck);
                 if (hasChecked && DateTime.Now - lastCheck < CheckInterval)
                     return;
-                _lastCheckTime[(g.GroupId, g.UserId)] = DateTime.Now;
+                s_lastCheckTime[(g.GroupId, g.UserId)] = DateTime.Now;
             }
 
             // 检查是否在忽略列表里。
@@ -112,7 +112,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             string hint;
             hint = NewbieCardChecker.GetHintMessage(name, card);
             //if (hint != null)
-                //await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
+            //await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
         }
 
         private static async Task<string> AutoBind(HttpApiClient api, GroupMessage g, bool success)
