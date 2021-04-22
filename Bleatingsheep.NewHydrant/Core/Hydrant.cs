@@ -156,9 +156,11 @@ namespace Bleatingsheep.NewHydrant.Core
                 // Message monitors
                 _ = _messageMonitorList.ForEachAsync(async m =>
                 {
+                    using var scope = _serviceProvider.CreateScope();
                     try
                     {
-                        await m.OnMessageAsync(message, api);
+                        var monitor = CreateServiceInstance<IMessageMonitor>(m.GetType(), scope);
+                        await monitor.OnMessageAsync(message, api).ConfigureAwait(false);
                     }
                     catch (ExecutingException)
                     {
