@@ -37,7 +37,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public OsuFunction()
         {
-            var dataProvider = new DataProvider(OsuApi);
+            var dataProvider = new DataProvider(new OsuQqBot.Database.Models.NewbieContext());
             dataProvider.OnException += e => Logger.Error(e);
             DataProvider = dataProvider;
         }
