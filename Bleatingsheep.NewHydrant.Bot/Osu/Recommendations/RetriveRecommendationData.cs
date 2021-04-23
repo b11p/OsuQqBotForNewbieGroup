@@ -65,7 +65,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
 
         private async Task Retrive()
         {
-            await using var transaction = await _newbieContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable).ConfigureAwait(false);
             var userList = await _newbieContext.UserSnapshots.Select(s => new { s.UserId, s.Mode }).Distinct().ToListAsync().ConfigureAwait(false);
             queueCount = userList.Count;
             errorCount = 0;
@@ -112,11 +111,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                              Recommendation = g.Key.Recommendation,
                              RecommendationDegree = g.Sum(),
                          };
-            var oldData = await _newbieContext.Recommendations.ToListAsync().ConfigureAwait(false);
-            _newbieContext.Recommendations.RemoveRange(oldData);
-            await _newbieContext.Recommendations.AddRangeAsync(result).ConfigureAwait(false);
-            await _newbieContext.SaveChangesAsync().ConfigureAwait(false);
-            await transaction.CommitAsync().ConfigureAwait(false);
+            await using var transaction = await _newbieContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable).ConfigureAwait(false);
+            await _newbieContext.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
+            {
+                var oldData = await _newbieContext.Recommendations.ToListAsync().ConfigureAwait(false);
+                _newbieContext.Recommendations.RemoveRange(oldData);
+                await _newbieContext.Recommendations.AddRangeAsync(result).ConfigureAwait(false);
+                await _newbieContext.SaveChangesAsync().ConfigureAwait(false);
+                await transaction.CommitAsync().ConfigureAwait(false);
+            }).ConfigureAwait(false);
         }
 
         public bool ShouldResponse(MessageContext context)
