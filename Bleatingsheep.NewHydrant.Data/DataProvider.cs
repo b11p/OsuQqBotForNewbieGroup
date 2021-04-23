@@ -1,17 +1,24 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Bleatingsheep.Osu;
+using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Polly;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
-    public class DataProvider : IDataProvider
+    public class DataProvider : IDataProvider, IDisposable
     {
         private readonly NewbieContext _dbContext;
+        private readonly IOsuApiClient _osuApiClient;
+        private readonly ThreadLocal<Random> _randomLocal = new(() => new Random());
 
-        public DataProvider(NewbieContext newbieContext)
+        public DataProvider(NewbieContext newbieContext, IOsuApiClient osuApiClient)
         {
             _dbContext = newbieContext;
+            _osuApiClient = osuApiClient;
         }
 
         public async Task<(bool success, BindingInfo? result)> GetBindingInfoAsync(long qq)
@@ -34,6 +41,22 @@ namespace Bleatingsheep.NewHydrant.Data
             return (success, bi?.OsuId);
         }
 
+        /// <summary>
+        /// 只在调用 <see cref="GetBindingIdAsync(long)"/> 和
+        /// <see cref="GetBindingInfoAsync(long)"/> 时可能触发。
+        /// </summary>
         public event Action<Exception>? OnException;
+
+        public Task<UserBest[]> GetUserBestRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default)
+        {
+            var policy = Policy.Handle<Exception>(e => e.Message.Contains("429", StringComparison.Ordinal))
+                .WaitAndRetryForeverAsync(i => TimeSpan.FromMilliseconds((25 << i) + _randomLocal.Value.Next(50)));
+            return policy.ExecuteAsync(_ => _osuApiClient.GetUserBest(userId, mode, 100), cancellationToken);
+        }
+
+        public void Dispose()
+        {
+            (_randomLocal as IDisposable)?.Dispose();
+        }
     }
 }
