@@ -71,21 +71,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                     return (IEnumerable<RecommendationEntry>)
                     (from x1 in filteredBest
                      from x2 in filteredBest
-                     where x1.b.Date < x2.b.Date
+                     where x1.b.Date > x2.b.Date
                      select new RecommendationEntry
                      {
-                         Left = new RecommendationBeatmapId
-                         {
-                             BeatmapId = x1.b.BeatmapId,
-                             Mode = u.Mode,
-                             ValidMods = x1.b.EnabledMods & s_modFilters[(int)u.Mode],
-                         },
-                         Recommendation = new RecommendationBeatmapId
-                         {
-                             BeatmapId = x2.b.BeatmapId,
-                             Mode = u.Mode,
-                             ValidMods = x2.b.EnabledMods & s_modFilters[(int)u.Mode],
-                         },
+                         Left = RecommendationBeatmapId.Create(x1.b, u.Mode),
+                         Recommendation = RecommendationBeatmapId.Create(x2.b, u.Mode),
                          RecommendationDegree = Math.Pow(0.95, x1.i + x2.i - 2),
                      });
                 }
@@ -115,7 +105,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
         }
 
         public bool ShouldResponse(MessageContext context)
-            => context.Content.Text == "开始采集数据";
+            => context.UserId == 962549599 && context.Content.Text == "采集数据";
     }
 #nullable restore
 }
