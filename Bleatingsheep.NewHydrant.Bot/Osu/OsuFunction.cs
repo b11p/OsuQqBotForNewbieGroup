@@ -20,7 +20,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         private static WebApiClient.HttpApiFactory<IOsuApiClient> s_osuApiFactory;
         protected static IOsuApiClient CreateOsuApi() => s_osuApiFactory.CreateHttpApi();
 
-        protected IDataProvider DataProvider { get; private set; }
+        protected ILegacyDataProvider DataProvider { get; private set; }
 
         protected static INewbieDatabase Database { get; } = new NewbieDatabase();
 
@@ -37,7 +37,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public OsuFunction()
         {
-            var dataProvider = new DataProvider(new OsuQqBot.Database.Models.NewbieContext());
+            var dataProvider = new DataProvider(new OsuQqBot.Database.Models.NewbieContext(), null);
             dataProvider.OnException += e => Logger.Error(e);
             DataProvider = dataProvider;
         }

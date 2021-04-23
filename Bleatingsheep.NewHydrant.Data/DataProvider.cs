@@ -9,7 +9,7 @@ using Polly;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
-    public class DataProvider : IDataProvider, IDisposable
+    public class DataProvider : IDataProvider, IDisposable, ILegacyDataProvider
     {
         private readonly NewbieContext _dbContext;
         private readonly IOsuApiClient _osuApiClient;
