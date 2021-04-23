@@ -25,6 +25,10 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<MessageEntry> Messages { get; private set; }
         #endregion
 
+        #region Recommendation related
+        public DbSet<RecommendationEntry> Recommendations { get; private set; }
+        #endregion
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySql($"server={Server};port={Port};database={ServerInfo.Database};user={User};pwd={Password};SslMode=VerifyCA;",
@@ -67,6 +71,19 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
             modelBuilder.Entity<UpdateSchedule>()
                 .HasKey(s => new { s.UserId, s.Mode });
+
+            modelBuilder.Entity<RecommendationEntry>()
+                .Property(r => r.Left)
+                .HasConversion(RecommendationBeatmapId.ValueConverter);
+            modelBuilder.Entity<RecommendationEntry>()
+                .Property(r => r.Recommendation)
+                .HasConversion(RecommendationBeatmapId.ValueConverter);
+
+            modelBuilder.Entity<RecommendationEntry>()
+                .HasAlternateKey(r => new { r.Left, r.Recommendation });
+
+            modelBuilder.Entity<RecommendationEntry>()
+                .HasIndex(r => r.Left);
         }
     }
 }
