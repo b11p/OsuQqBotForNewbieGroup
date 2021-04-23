@@ -34,6 +34,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
         private readonly IDataProvider _dataProvider;
         private readonly NewbieContext _newbieContext;
 
+        private bool _start = false;
+
         public RetriveRecommendationData(IDataProvider dataProvider, NewbieContext newbieContext)
         {
             _dataProvider = dataProvider;
@@ -42,21 +44,31 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            if (!s_startSemaphore.Wait(0))
-            {
-                await api.SendMessageAsync(context.Endpoint, $"当前队列：{queueCount}").ConfigureAwait(false);
-                return;
-            }
-
             var currentCount = await _newbieContext.Recommendations.CountAsync().ConfigureAwait(false);
-            if (currentCount > 0)
+            await api.SendMessageAsync(context.Endpoint, $"已有 {currentCount} 条数据。").ConfigureAwait(false);
+
+            if (!_start || !s_startSemaphore.Wait(0))
             {
-                await api.SendMessageAsync(context.Endpoint, $"已有 {currentCount} 条数据。").ConfigureAwait(false);
+                await api.SendMessageAsync(context.Endpoint, $"当前队列：{queueCount}, 错误：{errorCount}").ConfigureAwait(false);
                 return;
             }
 
+            try
+            {
+                await Retrive().ConfigureAwait(false);
+            }
+            finally
+            {
+                s_startSemaphore.Release();
+            }
+        }
+
+        private async Task Retrive()
+        {
+            await using var transaction = await _newbieContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable).ConfigureAwait(false);
             var userList = await _newbieContext.UserSnapshots.Select(s => new { s.UserId, s.Mode }).Distinct().ToListAsync().ConfigureAwait(false);
             queueCount = userList.Count;
+            errorCount = 0;
             var taskList = userList.Select(async u =>
             {
                 try
@@ -100,12 +112,27 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                              Recommendation = g.Key.Recommendation,
                              RecommendationDegree = g.Sum(),
                          };
+            var oldData = await _newbieContext.Recommendations.ToListAsync().ConfigureAwait(false);
+            _newbieContext.Recommendations.RemoveRange(oldData);
             await _newbieContext.Recommendations.AddRangeAsync(result).ConfigureAwait(false);
             await _newbieContext.SaveChangesAsync().ConfigureAwait(false);
+            await transaction.CommitAsync().ConfigureAwait(false);
         }
 
         public bool ShouldResponse(MessageContext context)
-            => context.UserId == 962549599 && context.Content.Text == "采集数据";
+        {
+            if (context.UserId == 962549599)
+            {
+                if (context.Content.Text == "采集数据")
+                    return true;
+                if (context.Content.Text == "开始采集数据")
+                {
+                    _start = true;
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 #nullable restore
 }
