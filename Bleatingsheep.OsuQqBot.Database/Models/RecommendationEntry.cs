@@ -11,6 +11,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
     public class RecommendationEntry
     {
         public int Id { get; set; }
+        public Mode Mode { get; set; }
         public RecommendationBeatmapId Left { get; set; }
         public RecommendationBeatmapId Recommendation { get; set; }
         public double RecommendationDegree { get; set; }
@@ -28,11 +29,10 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         };
 
         public static readonly ValueConverter<RecommendationBeatmapId, long> ValueConverter = new(
-            v => ((long)v.BeatmapId << 34) | ((long)v.Mode << 32) | (long)v.ValidMods,
+            v => ((long)v.BeatmapId << 32) | (long)v.ValidMods,
             v => new RecommendationBeatmapId
             {
-                BeatmapId = (int)(v >> 34),
-                Mode = (Mode)((v >> 32) & 0x3),
+                BeatmapId = (int)(v >> 32),
                 ValidMods = (Mods)(v & 0xffffff),
             });
 
@@ -41,18 +41,16 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             return new RecommendationBeatmapId
             {
                 BeatmapId = best.BeatmapId,
-                Mode = mode,
                 ValidMods = best.EnabledMods & s_modFilters[(int)mode],
             };
         }
 
         public int BeatmapId { get; set; }
-        public Mode Mode { get; set; }
         public Mods ValidMods { get; set; }
 
         public override bool Equals(object obj) => Equals(obj as RecommendationBeatmapId);
-        public bool Equals(RecommendationBeatmapId other) => other != null && BeatmapId == other.BeatmapId && Mode == other.Mode && ValidMods == other.ValidMods;
-        public override int GetHashCode() => HashCode.Combine(BeatmapId, Mode, ValidMods);
+        public bool Equals(RecommendationBeatmapId other) => other != null && BeatmapId == other.BeatmapId && ValidMods == other.ValidMods;
+        public override int GetHashCode() => HashCode.Combine(BeatmapId, ValidMods);
 
         public static bool operator ==(RecommendationBeatmapId left, RecommendationBeatmapId right) => EqualityComparer<RecommendationBeatmapId>.Default.Equals(left, right);
         public static bool operator !=(RecommendationBeatmapId left, RecommendationBeatmapId right) => !(left == right);

@@ -80,10 +80,10 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
                 .HasConversion(RecommendationBeatmapId.ValueConverter);
 
             modelBuilder.Entity<RecommendationEntry>()
-                .HasAlternateKey(r => new { r.Left, r.Recommendation });
+                .HasAlternateKey(r => new { r.Mode, r.Left, r.Recommendation });
 
             modelBuilder.Entity<RecommendationEntry>()
-                .HasIndex(r => r.Left);
+                .HasIndex(r => new { r.Mode, r.Left });
         }
     }
 }
