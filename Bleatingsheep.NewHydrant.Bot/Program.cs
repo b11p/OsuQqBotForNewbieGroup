@@ -20,7 +20,7 @@ namespace Bleatingsheep.NewHydrant
 {
     internal static class Program
     {
-        private static HardcodedConfigure s_hardcodedConfigure = new HardcodedConfigure();
+        private static readonly HardcodedConfigure s_hardcodedConfigure = new HardcodedConfigure();
 
         private static void Main(string[] args)
         {
@@ -35,10 +35,16 @@ namespace Bleatingsheep.NewHydrant
 
             try
             {
+                // 本应在此设置 HttpApiClient，并启动，但是使用反向 WebSocket 时，无需手动这么做。
+#if DEBUG
+                var rServer = new ReverseWebSocketServer("http://localhost:9191");
+#else
                 var rServer = new ReverseWebSocketServer(s_hardcodedConfigure.ServerPort);
+#endif
                 rServer.SetAuthenticationFromAccessTokenAndUserId(s_hardcodedConfigure.ServerAccessToken, null);
-                rServer.ConfigureListener((l, _) =>
+                rServer.ConfigureListener((l, selfId) =>
                 {
+                    System.Console.WriteLine($"客户端 {selfId} 成功连接。");
                     var hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly);
                     hydrant.Run();
                     Console.WriteLine("Running...");
@@ -67,23 +73,25 @@ namespace Bleatingsheep.NewHydrant
 
         private static Hydrant ConfigureHost(HttpApiClient httpApiClient, ApiPostListener apiPostListener, params Assembly[] assemblies)
         {
-            apiPostListener.ApiClient = httpApiClient;
-            apiPostListener.StartListen();
-
-            var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly(), typeof(Hydrant).Assembly)
+            System.Console.WriteLine("开始配置消防栓。");
+            var hydrant = new Hydrant(httpApiClient, apiPostListener, assemblies)
                 .AddLogger(LogManager.LogFactory);
 
+            System.Console.WriteLine("正在配置消防栓。(50%)");
             // 设置异常处理。
             hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
 
             hydrant.Init<HydrantStartup>(new HydrantStartup());
 
             // 添加必要的事件处理。
-            //apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
+            // Public
             apiPostListener.GroupRequestEvent += (api, e) => e.UserId == s_hardcodedConfigure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
-            //apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
             apiPostListener.GroupInviteEvent += (api, e) => e.UserId == s_hardcodedConfigure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
-            apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
+
+            // Private-only.
+            //apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
+            //apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
+            //apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
 
             Console.WriteLine("init complete.");
             return hydrant;
