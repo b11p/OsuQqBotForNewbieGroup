@@ -45,14 +45,23 @@ namespace Bleatingsheep.NewHydrant
                 rServer.ConfigureListener((l, selfId) =>
                 {
                     System.Console.WriteLine($"客户端 {selfId} 成功连接。");
-                    var hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly);
-                    hydrant.Run();
-                    Console.WriteLine("Running...");
-                    l.SocketDisconnected += () =>
+                    Hydrant hydrant = null;
+                    try
                     {
-                        Console.WriteLine("Disconnected.");
+                        hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly);
+                        hydrant.Run();
+                        Console.WriteLine("Running...");
+                        l.SocketDisconnected += () =>
+                        {
+                            Console.WriteLine("Disconnected.");
+                            (hydrant as IDisposable)?.Dispose();
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
                         (hydrant as IDisposable)?.Dispose();
-                    };
+                    }
                 });
                 rServer.Start();
 
