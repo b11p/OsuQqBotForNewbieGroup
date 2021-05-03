@@ -16,7 +16,7 @@ using Mode = Bleatingsheep.Osu.Mode;
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
     [Component("newbie_request_notify")]
-    internal partial class NotifyOnJoinRequest : OsuFunction, IMessageCommand
+    public partial class NotifyOnJoinRequest : OsuFunction, IMessageCommand
     {
         //private const string Pattern = @"^收到新人群加群申请\r\n群号: (\d+)\r\n群类型: .*?\r\n申请者: (\d+)\r\n验证信息: (.*)$"; // 匹配上报申请的消息。
         private const int NewbieManagementGroupId = 695600319;

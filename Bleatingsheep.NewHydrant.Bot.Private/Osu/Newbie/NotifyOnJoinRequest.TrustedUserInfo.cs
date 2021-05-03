@@ -2,7 +2,7 @@
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
-    internal partial class NotifyOnJoinRequest
+    public partial class NotifyOnJoinRequest
     {
         private class TrustedUserInfo
         {

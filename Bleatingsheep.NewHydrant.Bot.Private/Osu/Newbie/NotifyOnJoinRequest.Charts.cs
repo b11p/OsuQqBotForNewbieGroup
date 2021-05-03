@@ -6,7 +6,7 @@ using Message = Sisters.WudiLib.SendingMessage;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
-    partial class NotifyOnJoinRequest
+    public partial class NotifyOnJoinRequest
     {
         private async Task<TrustedUserInfo> ProcessApplicantReportAsync(List<Message> hints, string fallbackName, (bool networkSuccess, TrustedUserInfo) userTuple)
         {

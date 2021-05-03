@@ -7,10 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bleatingsheep.IPLocation" Version="0.3.0" />
     <PackageReference Include="Bleatingsheep.Osu.ApiClient" Version="0.6.21" />
-    <PackageReference Include="Bleatingsheep.SimpleBooru" Version="0.2.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.32" />
+    <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
+    <PackageReference Include="Octokit" Version="0.50.0" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
   </ItemGroup>
 
