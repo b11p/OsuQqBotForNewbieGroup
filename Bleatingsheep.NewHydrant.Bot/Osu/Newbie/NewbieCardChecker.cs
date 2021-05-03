@@ -9,10 +9,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
     {
         private NewbieCardChecker() { }
 
-        public static INewbieInfoProvider IgnoreListProvider { get; private set; }
-
-        public static void Load()
-            => IgnoreListProvider = HardcodedProvider.GetProvider();
+        public static INewbieInfoProvider IgnoreListProvider => HardcodedProvider.GetProvider();
 
         /// <summary>
         /// 获取群名片提示。

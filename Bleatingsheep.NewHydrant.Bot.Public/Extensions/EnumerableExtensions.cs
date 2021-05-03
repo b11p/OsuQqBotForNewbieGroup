@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Bleatingsheep.NewHydrant.Extentions
 {
-    static class EnumerableExtensions
+    public static class EnumerableExtensions
     {
         private static readonly object s_randomLock = new object();
         private static readonly Random s_random = new Random();

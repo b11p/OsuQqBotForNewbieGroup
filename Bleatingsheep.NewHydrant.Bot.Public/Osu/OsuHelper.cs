@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
-    internal static class OsuHelper
+    public static class OsuHelper
     {
         /// <summary>
         /// 发现用户名用的模式。

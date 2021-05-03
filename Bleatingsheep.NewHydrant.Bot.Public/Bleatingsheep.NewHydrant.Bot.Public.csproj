@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Bleatingsheep.NewHydrant</RootNamespace>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bleatingsheep.IPLocation" Version="0.3.0" />
+    <PackageReference Include="Bleatingsheep.Osu.ApiClient" Version="0.6.21" />
+    <PackageReference Include="Bleatingsheep.SimpleBooru" Version="0.2.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.32" />
+    <PackageReference Include="PuppeteerSharp" Version="3.0.0" />
+    <PackageReference Include="Sisters.WudiLib.WebSocket" Version="0.1.0" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bleatingsheep.NewHydrant.Data\Bleatingsheep.NewHydrant.Data.csproj" />
+    <ProjectReference Include="..\Bleatingsheep.NewHydrant\Bleatingsheep.NewHydrant.csproj" />
+    <ProjectReference Include="..\Bleatingsheep.OsuApiClient\Bleatingsheep.OsuMixedApi.csproj" />
+  </ItemGroup>
+
+</Project>

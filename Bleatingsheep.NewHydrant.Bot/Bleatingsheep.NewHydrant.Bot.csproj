@@ -12,23 +12,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bleatingsheep.IPLocation" Version="0.3.0" />
-    <PackageReference Include="Bleatingsheep.Osu.ApiClient" Version="0.6.21" />
     <PackageReference Include="Bleatingsheep.Osu.Enums" Version="0.6.0" />
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
     <PackageReference Include="Bleatingsheep.Osu.PerformancePlus" Version="0.4.1" />
-    <PackageReference Include="Bleatingsheep.SimpleBooru" Version="0.2.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.32" />
     <PackageReference Include="Octokit" Version="0.50.0" />
-    <PackageReference Include="PuppeteerSharp" Version="3.0.0" />
-    <PackageReference Include="Sisters.WudiLib.WebSocket" Version="0.0.7-alpha5" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
     <PackageReference Include="WebApiClient.AOT" Version="1.1.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bleatingsheep.NewHydrant.Data\Bleatingsheep.NewHydrant.Data.csproj" />
+    <ProjectReference Include="..\Bleatingsheep.NewHydrant.Bot.Public\Bleatingsheep.NewHydrant.Bot.Public.csproj" />
     <ProjectReference Include="..\Bleatingsheep.NewHydrant\Bleatingsheep.NewHydrant.csproj" />
     <ProjectReference Include="..\Bleatingsheep.OsuApiClient\Bleatingsheep.OsuMixedApi.csproj" />
     <ProjectReference Include="..\Bleatingsheep.OsuQqBot.Database\Bleatingsheep.OsuQqBot.Database.csproj" />

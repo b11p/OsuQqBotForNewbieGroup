@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Logging;
-using Bleatingsheep.NewHydrant.Osu.Newbie;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Execution;
@@ -31,8 +29,6 @@ namespace Bleatingsheep.NewHydrant.Osu
             OsuApi = OsuApiClient.ClientUsingKey(apiKey);
 
             s_osuApiFactory = OsuApiClientFactory.CreateFactory(apiKey);
-
-            NewbieCardChecker.Load();
         }
 
         public OsuFunction()
