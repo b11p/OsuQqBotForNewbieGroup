@@ -57,7 +57,6 @@ namespace Bleatingsheep.NewHydrant
                 var apiPostListener = new CqHttpWebSocketEvent(configure.ListenWS, configure.AccessToken);
                 apiPostListener.SetSecret(configure.Secret);
                 apiPostListener.ApiClient = httpApiClient;
-                apiPostListener.ForwardTo = "http://oldbot:8876";
                 apiPostListener.StartListen();
 
                 // 配置 osu
@@ -77,7 +76,6 @@ namespace Bleatingsheep.NewHydrant
                 apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
                 //apiPostListener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
                 apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
-                apiPostListener.GroupBanEvent += new 啥玩意儿啊.难受_宁愿不能说话的人是我().EvilDalou;
 
                 Console.WriteLine("init complete.");
 
