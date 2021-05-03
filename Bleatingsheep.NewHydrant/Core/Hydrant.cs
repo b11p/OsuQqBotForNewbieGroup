@@ -13,12 +13,13 @@ using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
-    public sealed class Hydrant
+    public sealed class Hydrant :IDisposable
     {
 #nullable enable
         private readonly HttpApiClient _qq;
         private readonly ApiPostListener _listener;
         private readonly Assembly[] _assemblies;
+        private readonly CancellationTokenSource _disposeCancellationTokenSource = new CancellationTokenSource();
         private int _isInitialized = 0;
         private LogFactory? _logFactory;
         private IServiceProvider _serviceProvider = default!;
@@ -84,10 +85,10 @@ namespace Bleatingsheep.NewHydrant.Core
                     min = min > limit ? min - minus : min + delay;
                     return min;
                 }
-                while (true)
+                while (!_disposeCancellationTokenSource.IsCancellationRequested)
                 {
                     var interval = Clear();
-                    Task.Delay(interval).Wait();
+                    Task.Delay(interval, _disposeCancellationTokenSource.Token).Wait();
                 }
             }, TaskCreationOptions.LongRunning);
         }
@@ -333,6 +334,11 @@ namespace Bleatingsheep.NewHydrant.Core
                 _regularTasks.Add(new ScheduleInfo(ScheduleType.ByInterval, every, task));
             if (task.OnUtc is TimeSpan onUtc)
                 _regularTasks.Add(new ScheduleInfo(ScheduleType.Daily, onUtc, task));
+        }
+
+        public void Dispose()
+        {
+            _disposeCancellationTokenSource.Cancel();
         }
         #endregion
 
