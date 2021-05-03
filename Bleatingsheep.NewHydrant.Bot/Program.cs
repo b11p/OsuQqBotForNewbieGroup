@@ -30,29 +30,6 @@ namespace Bleatingsheep.NewHydrant
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
-            // config logger
-
-#if !DEBUG
-            var httpApiClient = new CqHttpWebSocketApiClient(s_hardcodedConfigure.ApiWS, s_hardcodedConfigure.AccessToken);
-            do
-            {
-                try
-                {
-                    Console.WriteLine("访问..");
-                    var li = httpApiClient.GetLoginInfoAsync().Result;
-                    if ((li?.UserId ?? 0) != default(long))
-                        break;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    Console.WriteLine("无法连接...");
-                }
-                Console.WriteLine("等待...");
-                Task.Delay(5000).Wait();
-            } while (true);
-#endif
-
             // 配置 osu
             OsuFunction.SetApiKey(s_hardcodedConfigure.ApiKey);
 
