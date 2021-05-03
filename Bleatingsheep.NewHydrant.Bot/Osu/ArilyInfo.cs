@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.啥玩意儿啊;
 using Bleatingsheep.Osu;
 using PuppeteerSharp;
 using Sisters.WudiLib;
-using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 

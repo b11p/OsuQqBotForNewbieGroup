@@ -4,7 +4,6 @@ using System.ServiceModel.Syndication;
 using System.Threading.Tasks;
 using System.Xml;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.啥玩意儿啊;
 using PuppeteerSharp;
 using Sisters.WudiLib;
 using Message = Sisters.WudiLib.SendingMessage;

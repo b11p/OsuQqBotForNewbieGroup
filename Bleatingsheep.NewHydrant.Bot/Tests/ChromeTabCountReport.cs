@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.啥玩意儿啊;
 using Sisters.WudiLib;
 using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;

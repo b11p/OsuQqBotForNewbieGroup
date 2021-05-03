@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using PuppeteerSharp;
 
-namespace Bleatingsheep.NewHydrant.啥玩意儿啊
+namespace Bleatingsheep.NewHydrant
 {
     public static class Chrome
     {

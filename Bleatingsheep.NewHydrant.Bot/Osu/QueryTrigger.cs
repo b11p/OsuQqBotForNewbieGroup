@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Web;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
-using Bleatingsheep.NewHydrant.啥玩意儿啊;
 using Bleatingsheep.Osu;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;

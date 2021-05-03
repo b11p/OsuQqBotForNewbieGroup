@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Bleatingsheep.NewHydrant.啥玩意儿啊;
 using PuppeteerSharp;
 using Message = Sisters.WudiLib.SendingMessage;
-using MessageContext = Sisters.WudiLib.Posts.Message;
-using Mode = Bleatingsheep.Osu.Mode;
-using UserInfo = Bleatingsheep.OsuMixedApi.UserInfo;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
