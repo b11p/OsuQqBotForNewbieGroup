@@ -14,11 +14,14 @@ using PuppeteerSharp;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Sisters.WudiLib.WebSocket;
+using Sisters.WudiLib.WebSocket.Reverse;
 
 namespace Bleatingsheep.NewHydrant
 {
     internal static class Program
     {
+        private static HardcodedConfigure s_hardcodedConfigure = new HardcodedConfigure();
+
         private static void Main(string[] args)
         {
             var cultureInfo = CultureInfo.GetCultureInfo("zh-CN");
@@ -29,10 +32,8 @@ namespace Bleatingsheep.NewHydrant
 
             // config logger
 
-            var configure = new HardcodedConfigure();
-
-            var httpApiClient = new CqHttpWebSocketApiClient(configure.ApiWS, configure.AccessToken);
 #if !DEBUG
+            var httpApiClient = new CqHttpWebSocketApiClient(s_hardcodedConfigure.ApiWS, s_hardcodedConfigure.AccessToken);
             do
             {
                 try
@@ -52,35 +53,25 @@ namespace Bleatingsheep.NewHydrant
             } while (true);
 #endif
 
+            // 配置 osu
+            OsuFunction.SetApiKey(s_hardcodedConfigure.ApiKey);
+
             try
             {
-                var apiPostListener = new CqHttpWebSocketEvent(configure.ListenWS, configure.AccessToken);
-                apiPostListener.SetSecret(configure.Secret);
-                apiPostListener.ApiClient = httpApiClient;
-                apiPostListener.StartListen();
-
-                // 配置 osu
-                OsuFunction.SetApiKey(configure.ApiKey);
-
-                var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly(), typeof(Hydrant).Assembly)
-                    .AddLogger(LogManager.LogFactory);
-
-                // 设置异常处理。
-                hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
-
-                hydrant.Init<HydrantStartup>(new HydrantStartup());
-
-                // 添加必要的事件处理。
-                apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
-                apiPostListener.GroupRequestEvent += (api, e) => e.UserId == configure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
-                apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
-                //apiPostListener.GroupAddedEvent += (api, e) => api.SetGroupCard(e.GroupId, e.SelfId, _configure.Name).Wait();
-                apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
-
-                Console.WriteLine("init complete.");
-
-                hydrant.Run();
-                Console.WriteLine("Running...");
+                var rServer = new ReverseWebSocketServer(s_hardcodedConfigure.ServerPort);
+                rServer.SetAuthenticationFromAccessTokenAndUserId(s_hardcodedConfigure.ServerAccessToken, null);
+                rServer.ConfigureListener((l, _) =>
+                {
+                    var hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly);
+                    hydrant.Run();
+                    Console.WriteLine("Running...");
+                    l.SocketDisconnected += () =>
+                    {
+                        Console.WriteLine("Disconnected.");
+                        (hydrant as IDisposable)?.Dispose();
+                    };
+                });
+                rServer.Start();
 
                 Task.Delay(-1).Wait();
             }
@@ -95,6 +86,30 @@ namespace Bleatingsheep.NewHydrant
 
             // 阻止自动重启
             Task.Delay(-1).Wait();
+        }
+
+        private static Hydrant ConfigureHost(HttpApiClient httpApiClient, ApiPostListener apiPostListener, params Assembly[] assemblies)
+        {
+            apiPostListener.ApiClient = httpApiClient;
+            apiPostListener.StartListen();
+
+            var hydrant = new Hydrant(httpApiClient, apiPostListener, Assembly.GetExecutingAssembly(), typeof(Hydrant).Assembly)
+                .AddLogger(LogManager.LogFactory);
+
+            // 设置异常处理。
+            hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
+
+            hydrant.Init<HydrantStartup>(new HydrantStartup());
+
+            // 添加必要的事件处理。
+            //apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
+            apiPostListener.GroupRequestEvent += (api, e) => e.UserId == s_hardcodedConfigure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
+            //apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
+            apiPostListener.GroupInviteEvent += (api, e) => e.UserId == s_hardcodedConfigure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
+            apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
+
+            Console.WriteLine("init complete.");
+            return hydrant;
         }
 
         private static async Task Hydrant_ExceptionCaught_Command(string funcName, Exception exception, HttpApiClient api, Sisters.WudiLib.Posts.Message message)
