@@ -123,8 +123,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             {
                 return;
             }
-            //var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
-            object sendResponse = null;
+            var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
             if (sendResponse is null)
             {
                 // 可能会假失败，即消息发出去了，但检测到失败。
