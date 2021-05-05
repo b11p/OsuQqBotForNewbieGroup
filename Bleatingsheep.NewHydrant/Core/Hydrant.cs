@@ -136,7 +136,7 @@ namespace Bleatingsheep.NewHydrant.Core
             }
         }
 
-        public void Run()
+        public void Start()
         {
             var mc = new MemoryCache(new MemoryCacheOptions());
             var slidingExpiration = TimeSpan.FromDays(2);

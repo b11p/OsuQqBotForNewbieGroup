@@ -49,7 +49,7 @@ namespace Bleatingsheep.NewHydrant
                     try
                     {
                         hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly);
-                        hydrant.Run();
+                        hydrant.Start();
                         Console.WriteLine("Running...");
                         l.SocketDisconnected += () =>
                         {
