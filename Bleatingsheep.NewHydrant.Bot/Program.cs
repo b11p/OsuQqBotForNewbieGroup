@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Osu;
@@ -21,6 +22,8 @@ namespace Bleatingsheep.NewHydrant
     internal static class Program
     {
         private static readonly HardcodedConfigure s_hardcodedConfigure = new HardcodedConfigure();
+
+        private static int s_connectedClinetCount = 0;
 
         private static void Main(string[] args)
         {
@@ -44,16 +47,20 @@ namespace Bleatingsheep.NewHydrant
                 rServer.SetAuthenticationFromAccessTokenAndUserId(s_hardcodedConfigure.ServerAccessToken, null);
                 rServer.ConfigureListener((l, selfId) =>
                 {
-                    System.Console.WriteLine($"客户端 {selfId} 成功连接。");
+                    var logger = LogManager.LogFactory.GetLogger("Replica");
+                    logger.Info($"客户端 {selfId} 成功连接。");
                     Hydrant hydrant = null;
                     try
                     {
                         hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly);
                         hydrant.Start();
                         Console.WriteLine("Running...");
+                        var count = Interlocked.Increment(ref s_connectedClinetCount);
+                        logger.Info($"当前已有 {count} 个分身在连接。");
                         l.SocketDisconnected += () =>
                         {
                             Console.WriteLine("Disconnected.");
+                            logger.Info("Disconnected");
                             (hydrant as IDisposable)?.Dispose();
                         };
                     }
