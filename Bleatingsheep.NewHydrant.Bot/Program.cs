@@ -44,7 +44,11 @@ namespace Bleatingsheep.NewHydrant
 #else
                 var rServer = new ReverseWebSocketServer(s_hardcodedConfigure.ServerPort);
 #endif
-                rServer.SetAuthenticationFromAccessTokenAndUserId(s_hardcodedConfigure.ServerAccessToken, null);
+                rServer.SetAuthentication(r =>
+                {
+                    LogManager.LogFactory.GetLogger("Replica").Info($"{r.Headers["X-Forwarded-For"]} 尝试连接。");
+                    return ReverseWebSocketServer.CreateAuthenticationFunction(s_hardcodedConfigure.ServerAccessToken, null)(r);
+                });
                 rServer.ConfigureListener((l, selfId) =>
                 {
                     var logger = LogManager.LogFactory.GetLogger("Replica");
@@ -61,6 +65,7 @@ namespace Bleatingsheep.NewHydrant
                         {
                             Console.WriteLine("Disconnected.");
                             logger.Info("Disconnected");
+                            Interlocked.Decrement(ref s_connectedClinetCount);
                             (hydrant as IDisposable)?.Dispose();
                         };
                     }
