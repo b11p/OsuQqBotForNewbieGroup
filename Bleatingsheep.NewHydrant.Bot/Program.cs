@@ -9,7 +9,7 @@ using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.NewHydrant.Osu.Newbie;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using NLog;
 using PuppeteerSharp;
 using Sisters.WudiLib;

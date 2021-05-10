@@ -32,6 +32,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySql($"server={Server};port={Port};database={ServerInfo.Database};user={User};pwd={Password};SslMode=VerifyCA;",
+                ServerVersion.Parse("5.7.34-mysql"),
                 options => options.EnableRetryOnFailure());
         }
 
