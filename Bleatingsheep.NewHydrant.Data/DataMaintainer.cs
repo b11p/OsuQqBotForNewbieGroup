@@ -2,24 +2,36 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.Osu;
+using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bleatingsheep.NewHydrant.Osu.Snapshots
+namespace Bleatingsheep.NewHydrant.Data
 {
-    public class SnapshotUtility : OsuFunction
+    public class DataMaintainer
     {
+        private readonly IDbContextFactory<NewbieContext> _contextFactory;
+        private readonly IOsuApiClient _osuApiClient;
+        private readonly ThreadLocal<Random> _randomLocal = new(() => new Random());
+
+        public DataMaintainer(IDbContextFactory<NewbieContext> contextFactory, IOsuApiClient osuApiClient)
+        {
+            _contextFactory = contextFactory;
+            _osuApiClient = osuApiClient;
+        }
+
         public async Task UpdateAsync(int osuId, Mode mode)
         {
             // 开始通过 API 获取用户信息和最近游玩记录。
-            using var osuApi = CreateOsuApi();
+            var osuApi = _osuApiClient;
             var getUserTask = osuApi.GetUser(osuId, mode);
             var getRecentTask = osuApi.GetUserRecent(osuId, mode, 100);
 
             // Create database context instance.
-            using var dbContext = new NewbieContext();
+            using var dbContext = _contextFactory.CreateDbContext();
             dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
             var snap = await (from s in dbContext.UserSnapshots
@@ -75,58 +87,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
             }
             else
             {
-                Logger.Info($"Concurrent error! Get different play_count in two queries. ({userInfo1.PlayCount}, {userInfo2?.PlayCount})");
-                Logger.Info($"The user is {userInfo1.Name}({userInfo1.Id}); the mode is {mode}");
+                //Logger.Info($"Concurrent error! Get different play_count in two queries. ({userInfo1.PlayCount}, {userInfo2?.PlayCount})");
+                //Logger.Info($"The user is {userInfo1.Name}({userInfo1.Id}); the mode is {mode}");
             }
-        }
-
-        /// <summary>
-        /// Query user play records.
-        /// Parameters must have same number of elements,
-        /// and there must not be any duplicate <c>userId</c> and <c>mode</c> combination.
-        /// </summary>
-        /// <param name="context">Database context to use.</param>
-        /// <param name="userIds">List of queried user ids. <c>userIds</c>, <c>modes</c> and <c>startIndecies</c> must have same number of elements.</param>
-        /// <param name="modes">List of queried modes. <c>userIds</c>, <c>modes</c> and <c>startIndecies</c> must have same number of elements.</param>
-        /// <param name="startIndecies">List of first numbers played. <c>userIds</c>, <c>modes</c> and <c>startIndecies</c> must have same number of elements.</param>
-        /// <returns>A list of user play records.</returns>
-        public static async Task<IList<UserPlayRecord>> GetUserPlayRecordsAsync(
-            NewbieContext context,
-            IEnumerable<int> userIds,
-            IEnumerable<Mode> modes,
-            IEnumerable<int> startIndecies)
-        {
-            var tracking = context.ChangeTracker.QueryTrackingBehavior;
-            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-
-            // TODO: Verify that there is no repeating conditions (with same userId and mode).
-            // If so, select the minimum of StartNumber.
-            var filters = userIds.Zip(modes).Zip(startIndecies, (tuple, start) =>
-            {
-                var (userId, mode) = tuple;
-                return new PlayRecordQueryTemp
-                {
-                    UserId = userId,
-                    Mode = mode,
-                    StartNumber = start,
-                };
-            });
-
-            var result = await context.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
-            {
-                using (await context.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted).ConfigureAwait(false))
-                {
-                    await context.PlayRecordQueryTemps.AddRangeAsync(filters).ConfigureAwait(false);
-                    await context.SaveChangesAsync().ConfigureAwait(false);
-                    return await (from r in context.UserPlayRecords
-                                  join f in context.PlayRecordQueryTemps on new { r.UserId, r.Mode } equals new { f.UserId, f.Mode }
-                                  where r.PlayNumber >= f.StartNumber
-                                  select r).ToListAsync().ConfigureAwait(false);
-                }
-            }).ConfigureAwait(false);
-
-            context.ChangeTracker.QueryTrackingBehavior = tracking;
-            return result;
         }
 
         /// <summary>
@@ -145,7 +108,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
 
         private static bool PropertyEquals<T>(T left, T right) => PropertyEquals(left, right, typeof(T));
 
-        private static bool PropertyEquals(object left, object right, Type type)
+        private static bool PropertyEquals(object? left, object? right, Type type)
         {
             if (ReferenceEquals(left, right)) return true;
             if (left is null && right is null) return true;

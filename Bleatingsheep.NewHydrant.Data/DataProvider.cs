@@ -42,6 +42,9 @@ namespace Bleatingsheep.NewHydrant.Data
             return (success, bi?.OsuId);
         }
 
+        public async Task<int?> GetOsuIdAsync(long qq)
+            => (await _dbContext.Bindings.AsNoTracking().SingleOrDefaultAsync(b => b.UserId == qq).ConfigureAwait(false))?.OsuId;
+
         /// <summary>
         /// 只在调用 <see cref="GetBindingIdAsync(long)"/> 和
         /// <see cref="GetBindingInfoAsync(long)"/> 时可能触发。

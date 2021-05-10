@@ -8,5 +8,7 @@ namespace Bleatingsheep.NewHydrant.Data
     public interface IDataProvider
     {
         Task<UserBest[]> GetUserBestRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default);
+
+        Task<int?> GetOsuIdAsync(long qq);
     }
 }

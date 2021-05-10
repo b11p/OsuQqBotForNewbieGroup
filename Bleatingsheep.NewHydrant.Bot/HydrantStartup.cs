@@ -15,6 +15,7 @@ namespace Bleatingsheep.NewHydrant
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<NewbieContext>(ServiceLifetime.Transient);
+            services.AddDbContextFactory<NewbieContext>();
 
             var hc = new HardcodedConfigure();
             var factory = OsuApiClientFactory.CreateFactory(hc.ApiKey);
@@ -30,6 +31,7 @@ namespace Bleatingsheep.NewHydrant
             services.AddMemoryCache();
 
             services.AddTransient<IDataProvider, DataProvider>();
+            services.AddTransient<DataMaintainer>();
         }
 
         private sealed class LazyService<T> : Lazy<T> where T : class
