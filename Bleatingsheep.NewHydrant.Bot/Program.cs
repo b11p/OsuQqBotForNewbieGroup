@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,10 +45,29 @@ namespace Bleatingsheep.NewHydrant
 #else
                 var rServer = new ReverseWebSocketServer(s_hardcodedConfigure.ServerPort);
 #endif
-                rServer.SetAuthentication(r =>
+                rServer.SetAuthentication(async r =>
                 {
-                    LogManager.LogFactory.GetLogger("Replica").Info($"{r.Headers["X-Forwarded-For"]} 尝试连接。");
-                    return ReverseWebSocketServer.CreateAuthenticationFunction(s_hardcodedConfigure.ServerAccessToken, null)(r);
+                    Logger logger = LogManager.LogFactory.GetLogger("Replica");
+                    logger.Info($"{r.Headers["X-Forwarded-For"]} 尝试连接。");
+                    bool generalAuth = await ReverseWebSocketServer.CreateAuthenticationFunction(s_hardcodedConfigure.ServerAccessToken, null)(r).ConfigureAwait(false);
+                    if (!generalAuth && long.TryParse(r.Headers["X-Self-ID"], out long selfId))
+                    {
+                        var auth = await new OsuQqBot.Database.Models.NewbieContext().DuplicateAuthentication.Where(a => a.SelfId == selfId).FirstOrDefaultAsync().ConfigureAwait(false);
+                        var headValue = r.Headers["Authorization"];
+                        if (string.IsNullOrWhiteSpace(headValue))
+                            return false;
+                        int spaceIndex = headValue.IndexOf(' ');
+                        if (headValue[(spaceIndex + 1)..] == auth?.AccessToken)
+                        {
+                            logger.Info($"{selfId} 已提权。");
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    return generalAuth;
                 });
                 rServer.ConfigureListener((l, selfId) =>
                 {
