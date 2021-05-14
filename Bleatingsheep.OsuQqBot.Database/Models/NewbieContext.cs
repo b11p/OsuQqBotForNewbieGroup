@@ -13,6 +13,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<RelationshipInfo> Relationships { get; private set; }
         public DbSet<BeatmapPlus> BeatmapPlusCache { get; private set; }
         public DbSet<WebLog> WebLogs { get; private set; }
+        public DbSet<DuplicateAuthentication> DuplicateAuthentication { get; private set; }
 
         #region User snapshots and play records.
         public DbSet<UserPlayRecord> UserPlayRecords { get; private set; }
