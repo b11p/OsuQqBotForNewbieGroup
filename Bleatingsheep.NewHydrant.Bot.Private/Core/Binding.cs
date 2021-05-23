@@ -8,7 +8,7 @@ using Sisters.WudiLib;
 namespace Bleatingsheep.NewHydrant.Core
 {
     [Component("bind")]
-    internal class Bind : OsuFunction, IMessageCommand
+    public class Bind : OsuFunction, IMessageCommand
     {
         public IMessageCommand Create() => new Bind();
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)

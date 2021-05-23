@@ -45,55 +45,65 @@ namespace Bleatingsheep.NewHydrant
 #else
                 var rServer = new ReverseWebSocketServer(s_hardcodedConfigure.ServerPort);
 #endif
-                rServer.SetAuthentication(async r =>
+                rServer.SetListenerAuthenticationAndConfiguration(async r =>
                 {
+                    bool elevated = false;
+                    Action<NegativeWebSocketEventListener, long> configuration = (l, selfId) =>
+                    {
+                        var logger = LogManager.LogFactory.GetLogger("Replica");
+                        logger.Info($"客户端 {selfId} 成功连接。");
+                        Hydrant hydrant = null;
+                        try
+                        {
+                            if (elevated)
+                            {
+                                hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly, typeof(Bind).Assembly);
+                            }
+                            else
+                            {
+                                hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly);
+                            }
+                            hydrant.Start();
+                            Console.WriteLine("Running...");
+                            var count = Interlocked.Increment(ref s_connectedClinetCount);
+                            logger.Info($"当前已有 {count} 个分身在连接。");
+                            l.SocketDisconnected += () =>
+                            {
+                                Console.WriteLine("Disconnected.");
+                                logger.Info("Disconnected");
+                                Interlocked.Decrement(ref s_connectedClinetCount);
+                                (hydrant as IDisposable)?.Dispose();
+                            };
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            (hydrant as IDisposable)?.Dispose();
+                        }
+                    };
+
                     Logger logger = LogManager.LogFactory.GetLogger("Replica");
                     logger.Info($"{r.Headers["X-Forwarded-For"]} 尝试连接。");
-                    bool generalAuth = await ReverseWebSocketServer.CreateAuthenticationFunction(s_hardcodedConfigure.ServerAccessToken, null)(r).ConfigureAwait(false);
+                    bool generalAuth = ReverseWebSocketServer.CreateAuthenticationFunction(s_hardcodedConfigure.ServerAccessToken, null)(r);
                     if (!generalAuth && long.TryParse(r.Headers["X-Self-ID"], out long selfId))
                     {
                         var auth = await new OsuQqBot.Database.Models.NewbieContext().DuplicateAuthentication.Where(a => a.SelfId == selfId).FirstOrDefaultAsync().ConfigureAwait(false);
                         var headValue = r.Headers["Authorization"];
                         if (string.IsNullOrWhiteSpace(headValue))
-                            return false;
+                            return null;
                         int spaceIndex = headValue.IndexOf(' ');
                         if (headValue[(spaceIndex + 1)..] == auth?.AccessToken)
                         {
+                            elevated = true;
                             logger.Info($"{selfId} 已提权。");
-                            return true;
+                            return configuration;
                         }
                         else
                         {
-                            return false;
+                            return null;
                         }
                     }
-                    return generalAuth;
-                });
-                rServer.ConfigureListener((l, selfId) =>
-                {
-                    var logger = LogManager.LogFactory.GetLogger("Replica");
-                    logger.Info($"客户端 {selfId} 成功连接。");
-                    Hydrant hydrant = null;
-                    try
-                    {
-                        hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly);
-                        hydrant.Start();
-                        Console.WriteLine("Running...");
-                        var count = Interlocked.Increment(ref s_connectedClinetCount);
-                        logger.Info($"当前已有 {count} 个分身在连接。");
-                        l.SocketDisconnected += () =>
-                        {
-                            Console.WriteLine("Disconnected.");
-                            logger.Info("Disconnected");
-                            Interlocked.Decrement(ref s_connectedClinetCount);
-                            (hydrant as IDisposable)?.Dispose();
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        (hydrant as IDisposable)?.Dispose();
-                    }
+                    return generalAuth ? configuration : null;
                 });
                 rServer.Start();
 
