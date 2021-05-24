@@ -54,8 +54,15 @@ namespace Bleatingsheep.NewHydrant.Data
         public Task<UserBest[]> GetUserBestRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default)
         {
             var policy = Policy.Handle<Exception>(e => e is not WebApiClient.HttpStatusFailureException f || f.StatusCode == HttpStatusCode.TooManyRequests)
-                .WaitAndRetryForeverAsync(i => TimeSpan.FromMilliseconds((25 << i) + _randomLocal.Value.Next(50)));
+                .WaitAndRetryForeverAsync(i => TimeSpan.FromMilliseconds((25 << i) + _randomLocal.Value!.Next(50)));
             return policy.ExecuteAsync(_ => _osuApiClient.GetUserBest(userId, mode, 100), cancellationToken);
+        }
+
+        public Task<UserInfo> GetUserInfoRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default)
+        {
+            var policy = Policy.Handle<Exception>(e => e is not WebApiClient.HttpStatusFailureException f || f.StatusCode == HttpStatusCode.TooManyRequests)
+                .WaitAndRetryForeverAsync(i => TimeSpan.FromMilliseconds((25 << i) + _randomLocal.Value!.Next(50)));
+            return policy.ExecuteAsync(_ => _osuApiClient.GetUser(userId, mode), cancellationToken);
         }
 
         public void Dispose()

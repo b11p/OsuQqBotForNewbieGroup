@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Bleatingsheep.Osu.ApiClient" Version="0.6.21" />
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
+    <PackageReference Include="CsvHelper" Version="27.0.4" />
     <PackageReference Include="Octokit" Version="0.50.0" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
   </ItemGroup>

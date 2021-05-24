@@ -1,12 +1,15 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu;
-using Newtonsoft.Json;
+using Bleatingsheep.OsuQqBot.Database.Models;
+using Microsoft.EntityFrameworkCore;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -29,6 +32,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         private static readonly Regex s_regex = new Regex("^统计(?<group>.+?)玩家$", RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
+        private readonly Lazy<NewbieContext> _lazyContext;
+        private readonly Lazy<IDataProvider> _dataProvider;
+
+        public 统计新人群成员(Lazy<NewbieContext> newbieContext, Lazy<IDataProvider> dataProvider)
+        {
+            _lazyContext = newbieContext;
+            _dataProvider = dataProvider;
+        }
+
         [Parameter("group")]
         public string ProcessingGroupName { get; set; }
 
@@ -49,37 +61,52 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         {
             await api.SendMessageAsync(context.Endpoint, $"即将统计新人群玩家列表，PP 超过 {limit} 将标记为超限。");
             var infoList = await api.GetGroupMemberListAsync(groupId);
-            var results = new ConcurrentBag<string>();
-            Parallel.ForEach(infoList, i =>
+            Logger.Info($"Find {infoList.Length} users.");
+            var userIdList = infoList.Select(i => i.UserId).ToList();
+            IQueryable<BindingInfo> bindingQuery = _lazyContext.Value.Bindings.Where(b => userIdList.Contains(b.UserId));
+            Logger.Info(bindingQuery.ToQueryString());
+            var bindingList = await bindingQuery.ToListAsync().ConfigureAwait(false);
+            Logger.Info($"Find {bindingList.Count} binding info.");
+
+            var userInfoTaskArray = bindingList.Select(async b =>
             {
-                var (success, result) = DataProvider.GetBindingIdAsync(i.UserId).GetAwaiter().GetResult();
-                if (!success)
+                var o = b.OsuId;
+                try
                 {
-                    results.Add($"{i.UserId},,,,{JsonConvert.SerializeObject(i.DisplayName)},网络错误");
+                    var userInfo = await _dataProvider.Value.GetUserInfoRetryAsync(o, Mode.Standard).ConfigureAwait(false);
+                    return (BindingInfo: b, Successful: true, UserInfo: userInfo);
                 }
-                else if (result is null)
+                catch (Exception)
                 {
-                    results.Add($"{i.UserId},,,,{JsonConvert.SerializeObject(i.DisplayName)},未绑定");
+                    return (b, false, null);
                 }
-                else
-                {
-                    var (apiSuccess, user) = OsuApi.GetUserInfoAsync(result.Value, Mode.Standard).GetAwaiter().GetResult();
-                    if (!apiSuccess)
-                    {
-                        results.Add($"{i.UserId},,,,{JsonConvert.SerializeObject(i.DisplayName)},API错误");
-                    }
-                    else if (user is null)
-                    {
-                        results.Add($"{i.UserId},,,,{JsonConvert.SerializeObject(i.DisplayName)},被ban了");
-                    }
-                    else
-                    {
-                        results.Add($"{i.UserId},{result},{user.Name},{user.Performance},{JsonConvert.SerializeObject(i.DisplayName)}," +
-                            $"{(user.Performance == 0 ? "可能不活跃" : (user.Performance >= limit ? "超限" : "正常"))}");
-                    }
-                }
-            });
-            var message = string.Join("\r\n", results.Prepend("qq,uid,name,pp,card,remark"));
+            }).ToArray();
+            Logger.Info("Complete fetching user info.");
+            await Task.WhenAll(userInfoTaskArray).ConfigureAwait(false);
+            var userInfo = userInfoTaskArray.Select(t => t.Result);
+            var results = from i in infoList
+                          join u in userInfo
+                              on i.UserId equals u.BindingInfo.UserId into validUsers
+                          from v in validUsers.DefaultIfEmpty()
+                          let b = v.BindingInfo
+                          let netOk = v.Successful
+                          let user = v.UserInfo
+                          select new
+                          {
+                              qq = i.UserId,
+                              uid = b?.OsuId,
+                              name = user?.Name,
+                              pp = user?.Performance,
+                              card = i.DisplayName,
+                              remark = b == null ? "未绑定" :
+                                  !netOk ? "API 错误" :
+                                  user == null ? "被 ban 了" :
+                                  (user.Performance == 0 ? "可能不活跃" : (user.Performance >= limit ? "超限" : "正常")),
+                          };
+            var writer = new StringWriter();
+            using (var csvWriter = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture))
+                await csvWriter.WriteRecordsAsync(results).ConfigureAwait(false);
+            var message = writer.ToString();
             Logger.Info(message);
             File.WriteAllText(string.Format(DestPath, groupId), message, new System.Text.UTF8Encoding(true));
             await api.SendMessageAsync(context.Endpoint, $"统计完成，前往 {string.Format(ResourceUrl, groupId)} 查看结果。");
