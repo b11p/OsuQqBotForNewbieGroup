@@ -6,6 +6,8 @@ using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 using WebApiClient;
 
 namespace Bleatingsheep.NewHydrant
@@ -16,6 +18,12 @@ namespace Bleatingsheep.NewHydrant
         {
             services.AddDbContext<NewbieContext>(ServiceLifetime.Transient);
             services.AddDbContextFactory<NewbieContext>();
+            services.AddLogging(b =>
+            {
+                b.ClearProviders();
+                b.SetMinimumLevel(LogLevel.Trace);
+                b.AddNLog(); // uses NLog.config?
+            });
 
             var hc = new HardcodedConfigure();
             var factory = OsuApiClientFactory.CreateFactory(hc.ApiKey);

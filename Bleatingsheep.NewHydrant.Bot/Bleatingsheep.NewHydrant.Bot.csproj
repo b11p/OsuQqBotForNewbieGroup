@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.2" />
     <PackageReference Include="Sisters.WudiLib.WebSocket" Version="0.2.0-beta3" />
   </ItemGroup>
 
