@@ -15,7 +15,6 @@ using NLog;
 using PuppeteerSharp;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
-using Sisters.WudiLib.WebSocket;
 using Sisters.WudiLib.WebSocket.Reverse;
 
 namespace Bleatingsheep.NewHydrant
@@ -57,11 +56,11 @@ namespace Bleatingsheep.NewHydrant
                         {
                             if (elevated)
                             {
-                                hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly, typeof(Bind).Assembly);
+                                hydrant = ConfigureHost(l.ApiClient, l, elevated, typeof(Highlight).Assembly, typeof(Bind).Assembly);
                             }
                             else
                             {
-                                hydrant = ConfigureHost(l.ApiClient, l, typeof(Highlight).Assembly);
+                                hydrant = ConfigureHost(l.ApiClient, l, elevated, typeof(Highlight).Assembly);
                             }
                             hydrant.Start();
                             Console.WriteLine("Running...");
@@ -122,7 +121,7 @@ namespace Bleatingsheep.NewHydrant
             Task.Delay(-1).Wait();
         }
 
-        private static Hydrant ConfigureHost(HttpApiClient httpApiClient, ApiPostListener apiPostListener, params Assembly[] assemblies)
+        private static Hydrant ConfigureHost(HttpApiClient httpApiClient, ApiPostListener apiPostListener, bool elevated, params Assembly[] assemblies)
         {
             System.Console.WriteLine("开始配置消防栓。");
             var hydrant = new Hydrant(httpApiClient, apiPostListener, assemblies)
@@ -140,9 +139,12 @@ namespace Bleatingsheep.NewHydrant
             apiPostListener.GroupInviteEvent += (api, e) => e.UserId == s_hardcodedConfigure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
 
             // Private-only.
-            //apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
-            //apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
-            //apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
+            if (elevated)
+            {
+                //apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
+                //apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
+                apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
+            }
 
             Console.WriteLine("init complete.");
             return hydrant;
