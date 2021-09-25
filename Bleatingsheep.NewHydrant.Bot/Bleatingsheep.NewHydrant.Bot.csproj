@@ -9,8 +9,16 @@
 
   <ItemGroup>
     <PackageReference Include="NLog.Extensions.Logging" Version="1.7.4" />
-    <PackageReference Include="Sisters.WudiLib" Version="0.2.0-beta6" />
-    <PackageReference Include="Sisters.WudiLib.WebSocket" Version="0.2.0-beta3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Release'">
+    <PackageReference Include="Sisters.WudiLib" Version="0.2.0-beta9" />
+    <PackageReference Include="Sisters.WudiLib.WebSocket" Version="0.2.0-beta9" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <ProjectReference Include="..\..\Sisters.WudiLib\Sisters.WudiLib\Sisters.WudiLib.csproj" />
+    <ProjectReference Include="..\..\Sisters.WudiLib\Sisters.WudiLib.WebSocket\Sisters.WudiLib.WebSocket.csproj" />
   </ItemGroup>
 
   <ItemGroup>
