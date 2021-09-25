@@ -22,7 +22,11 @@ namespace Bleatingsheep.NewHydrant
                         Headless = true,
                         //ExecutablePath = @"/opt/google/chrome/google-chrome",
                         //ExecutablePath = @"/usr/bin/chromium-browser",
+#if DEBUG
+                        ExecutablePath = @"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+#else
                         ExecutablePath = @"/usr/bin/microsoft-edge",
+#endif
                         //ExecutablePath = @"/usr/bin/chromium",
                         DefaultViewport = new ViewPortOptions
                         {

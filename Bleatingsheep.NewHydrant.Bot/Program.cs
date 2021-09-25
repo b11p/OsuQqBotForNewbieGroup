@@ -46,7 +46,11 @@ namespace Bleatingsheep.NewHydrant
 #endif
                 rServer.SetListenerAuthenticationAndConfiguration(async r =>
                 {
+#if DEBUG
+                    bool elevated = true;
+#else
                     bool elevated = false;
+#endif
                     Action<NegativeWebSocketEventListener, long> configuration = (l, selfId) =>
                     {
                         var logger = LogManager.LogFactory.GetLogger("Replica");
