@@ -107,9 +107,10 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                             ms.Write(md5.ComputeHash(ms.ToArray()));
                             var bytes = ms.ToArray();
                             var base64 = Convert.ToBase64String(bytes);
-                            await api.SendMessageAsync(sendBackEndpoint, $"（占位）绑定为 {info.Name} 并放行：#{base64}#");
+                            await api.SendMessageAsync(sendBackEndpoint, $"（占位）绑定为 {info.Name} 并放行：#{base64}#").ConfigureAwait(false);
                         }
-                    binding_end:;
+                        binding_end:
+                        ;
                     }
                 }
             }
@@ -127,68 +128,71 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
         }
 
-        private async ValueTask<(double? performance, int? level)> HintBinding(HttpApiClient api, Endpoint endpoint, GroupRequest r)
+        private async Task<(double? performance, int? level)> HintBinding(HttpApiClient api, Endpoint endpoint, GroupRequest r)
         {
             long userId = r.UserId;
             string comment = r.Comment;
-            var (success, osuId) = await DataProvider.GetBindingIdAsync(userId);
+
+            var userLevelTask = api.GetLevelInfo(userId);
+
+            var (success, osuId) = await DataProvider.GetBindingIdAsync(userId).ConfigureAwait(false);
             var sb = new StringBuilder();
             sb.Append(comment).Append("\r\n");
             double? performance = default;
             TrustedUserInfo user = null;
 
-            // API not implemented in go-cqhttp
-            //var levelInfo = await api.GetLevelInfo(userId).ConfigureAwait(false);
-            //var level = levelInfo?.Level;
-            //if (levelInfo != null)
-            //{
-            //    sb.Append("QQ 等级为 ").Append(levelInfo.Level).Append("\r\n");
-            //}
+            var levelInfo = await userLevelTask.ConfigureAwait(false);
+            var level = levelInfo?.Level;
+            if (levelInfo != null)
+            {
+                sb.Append("QQ 等级为 ").Append(levelInfo.Level).Append("\r\n");
+            }
 
             if (!success)
             {
                 sb.Append("查询失败");
-                goto exit;
-            }
-            else if (osuId == null)
-            {
-                sb.Append("这个人没绑定。");
             }
             else
             {
-                sb.Append("这个人绑定的 uid 是 ").Append(osuId).Append('，');
-                bool osuApiGood;
-                (osuApiGood, user) = await OsuApi.GetUserInfoAsync(osuId.Value, OsuMixedApi.Mode.Standard);
-                _ = ((osuApiGood, user) switch
+                if (osuId == null)
                 {
-                    (false, _) => sb.Append("查询失败。"),
-                    (_, null) => sb.Append("被办了。"),
-                    (_, TrustedUserInfo _) when user.Name != null => sb.Append("用户名是 ").Append(user.Name),
-                    _ => sb.Append("未知错误"),
-                });
+                    sb.Append("这个人没绑定。");
+                }
+                else
+                {
+                    sb.Append("这个人绑定的 uid 是 ").Append(osuId).Append('，');
+                    bool osuApiGood;
+                    (osuApiGood, user) = await OsuApi.GetUserInfoAsync(osuId.Value, OsuMixedApi.Mode.Standard).ConfigureAwait(false);
+                    _ = (osuApiGood, user) switch
+                    {
+                        (false, _) => sb.Append("查询失败。"),
+                        (_, null) => sb.Append("被办了。"),
+                        (_, TrustedUserInfo _) when user.Name != null => sb.Append("用户名是 ").Append(user.Name),
+                        _ => sb.Append("未知错误"),
+                    };
 
-                // TODO: When user is banned, find snapshot from other sources (database, mothership database, etc.)
-                performance = user?.Performance;
-            }
-
-            // 提供额外信息
-            try
-            {
-                await ParseInfoAsync(api, endpoint, r, osuId, user);
-            }
+                    // TODO: When user is banned, find snapshot from other sources (database, mothership database, etc.)
+                    performance = user?.Performance;
+                }
+                _ = Task.Run(async () =>
+                {
+                    // 提供额外信息
+                    try
+                    {
+                        await ParseInfoAsync(api, endpoint, r, osuId, user).ConfigureAwait(false);
+                    }
 #pragma warning disable CA1031 // 不捕获常规异常类型
-            catch (Exception e)
+                    catch (Exception e)
 #pragma warning restore CA1031 // 不捕获常规异常类型
-            {
-                Logger.Warn(e);
-                await api.SendMessageAsync(endpoint, e.Message).ConfigureAwait(false);
+                    {
+                        Logger.Warn(e);
+                        await api.SendMessageAsync(endpoint, e.Message).ConfigureAwait(false);
+                    }
+                });
             }
 
-        exit:
-            await api.SendMessageAsync(endpoint, sb.ToString()).ConfigureAwait(false);
-            // API not implemented in go-cqhttp
-            //return (performance, level);
-            return (performance, null);
+            _ = api.SendMessageAsync(endpoint, sb.ToString()).ConfigureAwait(false);
+            return (performance, level);
         }
 
         public GroupRequestResponse Monitor(HttpApiClient httpApiClient, GroupRequest e)
@@ -200,7 +204,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 var (performance, level) = HintBinding(httpApiClient, endpoint, e).ConfigureAwait(false).GetAwaiter().GetResult();
                 if (performance >= limit)
                 {
-                    var reason = $"您的 PP 超限，不能加入本群。";
+                    const string reason = "您的 PP 超限，不能加入本群。";
                     _ = httpApiClient.SendMessageAsync(endpoint, $"以“{reason}”拒绝。");
                     return new GroupRequestResponse(reason);
                     //_ = httpApiClient.SendMessageAsync(endpoint, $"建议拒绝。");
