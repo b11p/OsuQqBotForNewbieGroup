@@ -73,6 +73,9 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     // cib
                     var cibTask = HttpApi.Resolve<ICibRate>().GetRates();
 
+                    // boc
+                    var bocTask = BocRateClient.GetExchangeSellingRateAsync(@base);
+
                     var response = await exRateApi.GetExchangeRates(@base).ConfigureAwait(false);
                     var results = new List<string>(3);
                     foreach (var currency in s_currencies)
@@ -117,6 +120,21 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     catch (Exception e)
                     {
                         results.Add("CIB 查询失败。");
+                        Logger.Error(e);
+                    }
+
+                    // boc
+                    try
+                    {
+                        var bocResult = await bocTask.ConfigureAwait(false);
+                        if (bocResult != null)
+                        {
+                            results.Add($"BOC CNY {bocResult * amount}");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        results.Add("BOC 查询失败。");
                         Logger.Error(e);
                     }
 
