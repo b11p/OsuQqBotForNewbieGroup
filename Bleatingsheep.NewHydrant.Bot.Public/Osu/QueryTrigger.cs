@@ -11,6 +11,7 @@ using Bleatingsheep.Osu;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using PuppeteerSharp;
 using Sisters.WudiLib;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -28,9 +29,14 @@ namespace Bleatingsheep.NewHydrant.Osu
         private static readonly Regex s_queryPrefixRegex = new Regex(@"^\s*查\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
         private static readonly Regex s_querySuffixRegex = new Regex(@"^\s*[,，]?\s*(?<mode>\S*)\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+        private const string SendingFailureCacheKey = nameof(QueryTrigger) + "__risk_control__";
+        private const int Threshold = 2;
+
         private readonly Lazy<IOsuApiClient> _osuApiLazy;
         private readonly Lazy<NewbieContext> _newbieContext;
         private readonly Lazy<QueryHelper> _queryHelper;
+        private readonly IMemoryCache _memoryCache;
+
         private IOsuApiClient OsuApi => _osuApiLazy.Value;
         private NewbieContext NewbieContext => _newbieContext.Value;
         private QueryHelper QueryHelper => _queryHelper.Value;
@@ -51,11 +57,12 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         #endregion
 
-        public QueryTrigger(Lazy<IOsuApiClient> osuApiLazy, Lazy<NewbieContext> newbieContext, Lazy<QueryHelper> queryHelper)
+        public QueryTrigger(Lazy<IOsuApiClient> osuApiLazy, Lazy<NewbieContext> newbieContext, Lazy<QueryHelper> queryHelper, IMemoryCache memoryCache)
         {
             _osuApiLazy = osuApiLazy;
             _newbieContext = newbieContext;
             _queryHelper = queryHelper;
+            _memoryCache = memoryCache;
         }
 
         private static readonly ImmutableArray<string> s_cqCodeSeq = new[] { "text", "at" }.ToImmutableArray();
@@ -123,12 +130,24 @@ namespace Bleatingsheep.NewHydrant.Osu
             {
                 return;
             }
-            var sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
+            object sendResponse = null;
+            if (!_memoryCache.TryGetValue(SendingFailureCacheKey, out int t) || t < Threshold)
+                sendResponse = await api.SendMessageAsync(context.Endpoint, message).ConfigureAwait(false);
             if (sendResponse is null)
             {
                 // 可能会假失败，即消息发出去了，但检测到失败。
                 //await api.SendMessageAsync(context.Endpoint, $"检测到发送失败，消息长度为{message.Raw.Length}，[调试]将转换成 base64 发送。").ConfigureAwait(false);
                 //await api.SendMessageAsync(context.Endpoint, Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Raw))).ConfigureAwait(false);
+
+                // 记录发送失败次数。72小时内失败2次即转图。
+                // 不是完全线程安全。
+                t = _memoryCache.Set(SendingFailureCacheKey, t + 1, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(3),
+                    Priority = CacheItemPriority.NeverRemove,
+                    SlidingExpiration = TimeSpan.FromDays(1),
+                });
+
 
                 var text = message.Sections[0].Data["text"];
                 using var sr = new System.IO.StringReader(text);
