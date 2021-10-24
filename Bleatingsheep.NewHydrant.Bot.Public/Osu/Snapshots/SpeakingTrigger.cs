@@ -10,7 +10,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu.Snapshots
 {
-    [Component("speaking_trigger_for_snapshot")]
+    //[Component("speaking_trigger_for_snapshot")]
     public class SpeakingTrigger : IMessageMonitor
     {
         private static readonly MemoryCache s_cache = new MemoryCache(new MemoryCacheOptions());
