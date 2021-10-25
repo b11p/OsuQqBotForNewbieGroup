@@ -90,6 +90,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
                     .OrderBy(s => s.NextUpdate)
                     .Take(200)
                     .ToListAsync().ConfigureAwait(false);
+                if (scheduledCount == 0)
+                    return;
                 _logger.LogInformation($"Updating {toUpdate.Count} of {scheduledCount} snapshots.");
                 int successCount = 0;
                 foreach (var schedule in toUpdate)
