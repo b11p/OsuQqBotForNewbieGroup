@@ -77,7 +77,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 (int bid, int count, BeatmapInfo? beatmap) = await GetMostPlayedBeatmapAsync().ConfigureAwait(false);
                 _ = await api.SendMessageAsync(context.Endpoint, $"你最常打的一张图是 {bid}，打了 {count} 次。" +
                     $"{beatmap}").ConfigureAwait(false);
-
+            }
+            {
+                // most playing hour
+                var mostPlayingHour = GetMostPlayingHours();
+                _ = await api.SendMessageAsync(context.Endpoint, $"你最常在 {mostPlayingHour}-{mostPlayingHour + 1} 时打图。").ConfigureAwait(false);
             }
         }
 
@@ -96,6 +100,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             (int bid, int count) = (mostPlayed.Key, mostPlayed.Count());
             BeatmapInfo? beatmap = await _osuApiClient.GetBeatmap(bid, _mode).ConfigureAwait(false);
             return (bid, count, beatmap);
+        }
+
+        private int GetMostPlayingHours()
+        {
+            int mostPlayingHour = _userPlayRecords
+                .GroupBy(r => new DateTimeOffset(r.Record.Date).ToOffset(_timeZone).Hour)
+                .OrderByDescending(_g => _g.Count())
+                .First()
+                .Key;
+            return mostPlayingHour;
         }
     }
 #nullable restore
