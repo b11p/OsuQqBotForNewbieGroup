@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net.Http;
 using System.ServiceModel.Syndication;
 using System.Threading.Tasks;
 using System.Xml;
@@ -29,10 +30,14 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             if (imgNode != null)
             {
                 var imgUrl = imgNode.Attributes["src"].Value;
+                using var httpClient = new HttpClient();
+                byte[] imgArray = await httpClient
+                    .GetByteArrayAsync(imgUrl)
+                    .ConfigureAwait(false);
                 if (await api.SendMessageAsync(
                     endpoint: context.Endpoint,
                     message: new Message(item.Title.Text + "\r\n")
-                        + Message.NetImage(imgUrl)
+                        + Message.ByteArrayImage(imgArray)
                         + new Message("\r\n" + item.Links.FirstOrDefault().Uri)
                     ) == null)
                 {

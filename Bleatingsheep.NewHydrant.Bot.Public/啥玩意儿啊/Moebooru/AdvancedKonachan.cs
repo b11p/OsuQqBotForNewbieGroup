@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
@@ -142,7 +143,9 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
 
         private async Task<bool> TrySendImage(Endpoint endpoint, HttpApiClient api, int id, Uri uri, int length, int width, int height)
         {
-            var success = await api.SendMessageAsync(endpoint, Message.NetImage(uri.ToString())) != default;
+            using var httpClient = new HttpClient();
+            byte[] img = await httpClient.GetByteArrayAsync(uri).ConfigureAwait(false);
+            bool success = await api.SendMessageAsync(endpoint, Message.ByteArrayImage(img)).ConfigureAwait(false) != default;
             Logger.Debug($"ID: {id}, length: {length}, {width}x{height}, success={success}, url: {uri} ");
             return success;
         }
