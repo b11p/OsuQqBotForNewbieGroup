@@ -73,6 +73,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             // assign data to fields.
             _userPlayRecords = playList;
             {
+                // days played
+                (int days, int totalDays) = GetPlayedDays();
+                _ = await api.SendMessageAsync(context.Endpoint, $"你在过去一年中有 {days} 天打了图。").ConfigureAwait(false);
+            }
+            {
                 // most played
                 (int bid, int count, BeatmapInfo? beatmap) = await GetMostPlayedBeatmapAsync().ConfigureAwait(false);
                 _ = await api.SendMessageAsync(context.Endpoint, $"你最常打的一张图是 {bid}，打了 {count} 次。" +
@@ -89,6 +94,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
         {
             return context.Content.TryGetPlainText(out string text)
                 && text == "我的年度屙屎";
+        }
+
+        /// <summary>
+        /// Get the number of days with play records.
+        /// </summary>
+        /// <returns></returns>
+        private (int days, int totalDays) GetPlayedDays()
+        {
+            List<DateTime> days = _userPlayRecords.Select(r => r.Record.Date.Date).Distinct().ToList();
+            return (days.Count, 365);
         }
 
         private async Task<(int bid, int count, BeatmapInfo? beatmapInfo)> GetMostPlayedBeatmapAsync()
