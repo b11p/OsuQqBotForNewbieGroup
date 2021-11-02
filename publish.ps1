@@ -1,0 +1,2 @@
+dotnet build -c Release .\Bleatingsheep.NewHydrant.Bot\Bleatingsheep.NewHydrant.Bot.csproj
+dotnet publish --no-build -c Release -o $HOME/Desktop/newhydrant_publish/ .\Bleatingsheep.NewHydrant.Bot\Bleatingsheep.NewHydrant.Bot.csproj
