@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.Osu;
 using Bleatingsheep.Osu.ApiClient;
@@ -15,7 +14,6 @@ namespace Bleatingsheep.NewHydrant.Data
     {
         private readonly IDbContextFactory<NewbieContext> _contextFactory;
         private readonly IOsuApiClient _osuApiClient;
-        private readonly ThreadLocal<Random> _randomLocal = new(() => new Random());
 
         public DataMaintainer(IDbContextFactory<NewbieContext> contextFactory, IOsuApiClient osuApiClient)
         {
@@ -28,7 +26,6 @@ namespace Bleatingsheep.NewHydrant.Data
             // 开始通过 API 获取用户信息和最近游玩记录。
             var osuApi = _osuApiClient;
             var getUserTask = osuApi.GetUser(osuId, mode);
-            var getRecentTask = osuApi.GetUserRecent(osuId, mode, 100);
 
             // Create database context instance.
             using var dbContext = _contextFactory.CreateDbContext();
@@ -50,7 +47,7 @@ namespace Bleatingsheep.NewHydrant.Data
                 await dbContext.SaveChangesAsync().ConfigureAwait(false);
             }
 
-            var userRecent = await getRecentTask.ConfigureAwait(false);
+            var userRecent = await osuApi.GetUserRecent(osuId, mode, 50).ConfigureAwait(false);
             if (userRecent is null || userRecent.Length == 0)
             {// The user didn't play, no need to check play number.
                 return;
