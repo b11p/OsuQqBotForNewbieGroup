@@ -113,7 +113,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         public bool ShouldResponse(MessageContext message)
         {
-            if (message is GroupMessage g && g.GroupId == 885984366)
+            if (message is GroupMessage g && g.GroupId == 712603531)
                 return false; // ignored in newbie group.
             if (message.Content.TryGetPlainText(out string text))
             {

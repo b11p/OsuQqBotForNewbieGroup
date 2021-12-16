@@ -151,6 +151,6 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
         }
 
         public bool ShouldResponse(MessageContext context)
-            => RegexCommand(s_regex, context.Content) && (!(context is GroupMessage g) || !(g.GroupId == 885984366));
+            => RegexCommand(s_regex, context.Content) && (!(context is GroupMessage g) || !(g.GroupId == 712603531));
     }
 }

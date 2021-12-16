@@ -121,7 +121,7 @@ Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
         {
             if (!message.Content.IsPlaintext)
                 return false;
-            if (message is GroupMessage g && g.GroupId == 885984366)
+            if (message is GroupMessage g && g.GroupId == 712603531)
                 return false; // ignored in newbie group.
             string text = message.Content.Text.Trim();
             if (text.StartsWith("+", StringComparison.Ordinal))

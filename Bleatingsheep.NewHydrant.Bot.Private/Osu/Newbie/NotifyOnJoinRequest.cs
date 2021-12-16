@@ -22,7 +22,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         private const int NewbieManagementGroupId = 695600319;
         private static readonly IReadOnlyDictionary<long, double?> ManagedGroups = new Dictionary<long, double?>
         {
-            [885984366] = 2500,
+            [712603531] = 2500,
             [758120648] = null,
             [514661057] = null,
         };
