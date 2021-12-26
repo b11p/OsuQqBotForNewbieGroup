@@ -77,7 +77,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
                     }).ToList();
                     if (toSchedule.Count > 0)
                     {
-                        _logger.LogInformation($"Adding {toSchedule.Count} items to schedule.");
+                        _logger.LogDebug($"Adding {toSchedule.Count} items to schedule.");
                         db1.UpdateSchedules.AddRange(toSchedule);
                         await db1.SaveChangesAsync().ConfigureAwait(false);
                     }
@@ -92,7 +92,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
                     .ToListAsync().ConfigureAwait(false);
                 if (scheduledCount == 0)
                     return;
-                _logger.LogInformation($"Updating {toUpdate.Count} of {scheduledCount} snapshots.");
+                _logger.LogDebug($"Updating {toUpdate.Count} of {scheduledCount} snapshots.");
                 int successCount = 0;
                 foreach (var schedule in toUpdate)
                 {
@@ -110,7 +110,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
                     }
                 }
                 await db.SaveChangesAsync().ConfigureAwait(false);
-                _logger.LogInformation($"Update schedule completed. Success {successCount} of {toUpdate.Count}");
+                _logger.LogDebug($"Update schedule completed. Success {successCount} of {toUpdate.Count}");
             }
             finally
             {
