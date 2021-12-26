@@ -12,7 +12,8 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
     {
         public static async Task<decimal?> GetExchangeSellingRateAsync(string currencyName)
         {
-            string html = await new HttpClient().GetStringAsync("https://www.boc.cn/sourcedb/whpj/sjmfx_1621.html").ConfigureAwait(false);
+            using var httpClient = new HttpClient();
+            string html = await httpClient.GetStringAsync("https://www.boc.cn/sourcedb/whpj/sjmfx_1621.html").ConfigureAwait(false);
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
             var nodes = doc.DocumentNode.SelectNodes("/html/body/article/div/table/tbody/tr");
