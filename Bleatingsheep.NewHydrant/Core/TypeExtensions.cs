@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
-#nullable enable
     internal static class TypeExtensions
     {
         public static object CreateInstance(this Type type, IServiceScope scope)
@@ -13,7 +12,7 @@ namespace Bleatingsheep.NewHydrant.Core
                 throw new ArgumentNullException(nameof(type));
             }
 
-            return scope.ServiceProvider.GetService(type);
+            return scope.ServiceProvider.GetService(type) ?? throw new InvalidOperationException("The type is not registered.");
         }
 
         /// <exception cref="InvalidCastException"></exception>
@@ -21,5 +20,4 @@ namespace Bleatingsheep.NewHydrant.Core
         public static T CreateInstance<T>(this Type type, IServiceScope scope) where T : notnull
             => (T)type.CreateInstance(scope);
     }
-#nullable restore
 }

@@ -15,7 +15,6 @@ namespace Bleatingsheep.NewHydrant.Core
 {
     public sealed class Hydrant :IDisposable
     {
-#nullable enable
         private readonly HttpApiClient _qq;
         private readonly ApiPostListener _listener;
         private readonly Assembly[] _assemblies;
@@ -350,6 +349,5 @@ namespace Bleatingsheep.NewHydrant.Core
         public event Func<string, Exception, HttpApiClient, Sisters.WudiLib.Posts.Message, Task>? ExceptionCaught_Command;
 
         #endregion
-#nullable restore
     }
 }

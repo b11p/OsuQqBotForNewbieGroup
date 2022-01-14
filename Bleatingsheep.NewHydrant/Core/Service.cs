@@ -8,7 +8,6 @@ using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
-#nullable enable
     public abstract class Service
     {
         private readonly Lazy<Logger> _logger;
@@ -68,7 +67,7 @@ namespace Bleatingsheep.NewHydrant.Core
             var properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                             .Select(pi => new { pi, attr = pi.GetCustomAttribute<ParameterAttribute>() })
                             .Where(pi => pi.attr != null && pi.pi.CanWrite)
-                            .ToDictionary(pi => pi.attr.GroupName, pi => pi.pi);
+                            .ToDictionary(pi => pi.attr!.GroupName, pi => pi.pi);
 
             var match = regex.Match(text);
             if (match.Success)
@@ -88,5 +87,4 @@ namespace Bleatingsheep.NewHydrant.Core
             }
         }
     }
-#nullable restore
 }
