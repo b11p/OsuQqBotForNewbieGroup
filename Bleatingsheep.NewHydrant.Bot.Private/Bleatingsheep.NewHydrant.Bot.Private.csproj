@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Bleatingsheep.NewHydrant</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -9,9 +9,9 @@
   <ItemGroup>
     <PackageReference Include="Bleatingsheep.Osu.ApiClient" Version="0.6.21" />
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
-    <PackageReference Include="CsvHelper" Version="27.1.1" />
+    <PackageReference Include="CsvHelper" Version="27.2.1" />
     <PackageReference Include="Octokit" Version="0.50.0" />
-    <PackageReference Include="System.ServiceModel.Syndication" Version="5.0.0" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Release'">
-    <PackageReference Include="Sisters.WudiLib" Version="0.2.0-beta9" />
-    <PackageReference Include="Sisters.WudiLib.WebSocket" Version="0.2.0-beta9" />
+    <PackageReference Include="Sisters.WudiLib" Version="0.3.0-beta1" />
+    <PackageReference Include="Sisters.WudiLib.WebSocket" Version="0.2.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)'=='Debug'">
