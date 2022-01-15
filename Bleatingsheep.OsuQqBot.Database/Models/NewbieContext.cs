@@ -1,11 +1,21 @@
 ﻿using Bleatingsheep.Osu.PerformancePlus;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using static Bleatingsheep.OsuQqBot.Database.Models.ServerInfo;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models
 {
     public class NewbieContext : DbContext
     {
+        public NewbieContext()
+        {
+        }
+
+        public NewbieContext(DbContextOptions<NewbieContext> options)
+            : base(options)
+        {
+        }
+
         public DbSet<OperationHistory> Histories { get; private set; }
         public DbSet<BindingInfo> Bindings { get; private set; }
 
@@ -32,9 +42,12 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql($"server={Server};port={Port};database={ServerInfo.Database};user={User};pwd={Password};SslMode=VerifyCA;",
-                ServerVersion.Parse("5.7.34-mysql"),
-                options => options.EnableRetryOnFailure());
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseMySql($"server={Server};port={Port};database={ServerInfo.Database};user={User};pwd={Password};SslMode=VerifyCA;",
+                    ServerVersion.Parse("5.7.34-mysql"),
+                    options => options.EnableRetryOnFailure());
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
