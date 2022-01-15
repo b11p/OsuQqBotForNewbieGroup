@@ -34,7 +34,7 @@ namespace Bleatingsheep.NewHydrant
 
             services.AddTransient(typeof(Lazy<>), typeof(LazyService<>));
 
-            services.AddSingleton<RandomNumberGenerator, RNGCryptoServiceProvider>();
+            services.AddSingleton(RandomNumberGenerator.Create());
 
             services.AddMemoryCache();
 
