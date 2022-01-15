@@ -1,3 +1,6 @@
+# Ignore configuration file
+appsettings.json
+
 # Ignore server information
 /Bleatingsheep.OsuQqBot.Database/Models/ServerInfo.cs
 

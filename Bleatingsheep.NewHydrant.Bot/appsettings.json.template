@@ -1,0 +1,8 @@
+{
+  "Hydrant": {
+    "ApiKey": "",
+    "SuperAdmin": 0,
+    "ServerPort": 8800,
+    "ServerAccessToken": ""
+  }
+}

@@ -10,6 +10,7 @@ using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.NewHydrant.Osu.Newbie;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using NLog;
 using PuppeteerSharp;
@@ -21,12 +22,18 @@ namespace Bleatingsheep.NewHydrant
 {
     internal static class Program
     {
-        private static readonly HardcodedConfigure s_hardcodedConfigure = new HardcodedConfigure();
+        private static IConfiguration s_configure;
+        private static IConfiguration s_hydrantConfigure;
 
         private static int s_connectedClinetCount = 0;
 
         private static void Main(string[] args)
         {
+            ConfigurationBuilder builder = new();
+            builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            s_configure = builder.Build();
+            s_hydrantConfigure = s_configure.GetSection("Hydrant");
+
             var cultureInfo = CultureInfo.GetCultureInfo("zh-CN");
             CultureInfo.CurrentCulture = cultureInfo;
             CultureInfo.CurrentUICulture = cultureInfo;
@@ -34,7 +41,7 @@ namespace Bleatingsheep.NewHydrant
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
             // 配置 osu
-            OsuFunction.SetApiKey(s_hardcodedConfigure.ApiKey);
+            OsuFunction.SetApiKey(s_hydrantConfigure["ApiKey"]);
 
             try
             {
@@ -42,7 +49,7 @@ namespace Bleatingsheep.NewHydrant
 #if DEBUG
                 var rServer = new ReverseWebSocketServer("http://localhost:9191");
 #else
-                var rServer = new ReverseWebSocketServer(s_hardcodedConfigure.ServerPort);
+                var rServer = new ReverseWebSocketServer(int.Parse(s_hydrantConfigure["ServerPort"]));
 #endif
                 rServer.SetListenerAuthenticationAndConfiguration(async r =>
                 {
@@ -87,7 +94,7 @@ namespace Bleatingsheep.NewHydrant
 
                     Logger logger = LogManager.LogFactory.GetLogger("Replica");
                     logger.Info($"{r.Headers["X-Forwarded-For"]} 尝试连接。");
-                    bool generalAuth = ReverseWebSocketServer.CreateAuthenticationFunction(s_hardcodedConfigure.ServerAccessToken, null)(r);
+                    bool generalAuth = ReverseWebSocketServer.CreateAuthenticationFunction(s_hydrantConfigure["ServerAccessToken"], null)(r);
                     if (!generalAuth && long.TryParse(r.Headers["X-Self-ID"], out long selfId))
                     {
                         var auth = await new OsuQqBot.Database.Models.NewbieContext().DuplicateAuthentication.Where(a => a.SelfId == selfId).FirstOrDefaultAsync().ConfigureAwait(false);
@@ -135,12 +142,12 @@ namespace Bleatingsheep.NewHydrant
             // 设置异常处理。
             hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
 
-            hydrant.Init<HydrantStartup>(new HydrantStartup());
+            hydrant.Init<HydrantStartup>(new HydrantStartup(s_configure));
 
             // 添加必要的事件处理。
             // Public
-            apiPostListener.GroupRequestEvent += (api, e) => e.UserId == s_hardcodedConfigure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
-            apiPostListener.GroupInviteEvent += (api, e) => e.UserId == s_hardcodedConfigure.SuperAdmin ? new GroupRequestResponse { Approve = true } : null;
+            apiPostListener.GroupRequestEvent += (api, e) => e.UserId == int.Parse(s_hydrantConfigure["SuperAdmin"]) ? new GroupRequestResponse { Approve = true } : null;
+            apiPostListener.GroupInviteEvent += (api, e) => e.UserId == int.Parse(s_hydrantConfigure["SuperAdmin"]) ? new GroupRequestResponse { Approve = true } : null;
 
             // Private-only.
             if (elevated)

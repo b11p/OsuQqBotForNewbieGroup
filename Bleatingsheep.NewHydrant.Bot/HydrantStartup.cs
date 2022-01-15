@@ -5,6 +5,7 @@ using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
@@ -14,6 +15,13 @@ namespace Bleatingsheep.NewHydrant
 {
     internal class HydrantStartup : IHydrantStartup
     {
+        public HydrantStartup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<NewbieContext>(ServiceLifetime.Transient);
@@ -25,8 +33,7 @@ namespace Bleatingsheep.NewHydrant
                 b.AddNLog(); // uses NLog.config?
             });
 
-            var hc = new HardcodedConfigure();
-            var factory = OsuApiClientFactory.CreateFactory(hc.ApiKey);
+            var factory = OsuApiClientFactory.CreateFactory(Configuration.GetSection("Hydrant")["ApiKey"]);
             services.AddSingleton<IHttpApiFactory<IOsuApiClient>>(factory);
             services.AddScoped<IOsuApiClient>(c => c.GetService<IHttpApiFactory<IOsuApiClient>>().CreateHttpApi());
 
