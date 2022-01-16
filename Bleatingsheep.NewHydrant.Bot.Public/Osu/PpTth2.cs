@@ -14,7 +14,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Component("pptth2")]
-    class PpTth2 : OsuFunction, IMessageCommand
+    class PpTth2 : Service, IMessageCommand
     {
         //private static readonly object s_launchLock = new object();
 

@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Sisters.WudiLib;
@@ -18,7 +19,7 @@ using Mode = Bleatingsheep.Osu.Mode;
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
     [Component("newbie_request_notify")]
-    public partial class NotifyOnJoinRequest : OsuFunction, IMessageCommand
+    public partial class NotifyOnJoinRequest : Service, IMessageCommand
     {
         //private const string Pattern = @"^收到新人群加群申请\r\n群号: (\d+)\r\n群类型: .*?\r\n申请者: (\d+)\r\n验证信息: (.*)$"; // 匹配上报申请的消息。
         private const int NewbieManagementGroupId = 695600319;

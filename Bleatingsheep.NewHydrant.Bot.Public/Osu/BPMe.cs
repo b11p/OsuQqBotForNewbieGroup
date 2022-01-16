@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Newtonsoft.Json;
 using PuppeteerSharp;
@@ -12,7 +13,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 {
 #nullable enable
     [Component("bpme")]
-    internal class BPMe : OsuFunction, IMessageCommand
+    internal class BPMe : Service, IMessageCommand
     {
         public BPMe(ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
         {

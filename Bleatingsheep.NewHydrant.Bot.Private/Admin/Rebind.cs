@@ -10,7 +10,7 @@ using Sisters.WudiLib;
 namespace Bleatingsheep.NewHydrant.Admin
 {
     [Component("rebind")]
-    class Rebind : OsuFunction, IMessageCommand
+    class Rebind : Service, IMessageCommand
     {
         public Rebind(INewbieDatabase database, OsuMixedApi.OsuApiClient osuApi)
         {

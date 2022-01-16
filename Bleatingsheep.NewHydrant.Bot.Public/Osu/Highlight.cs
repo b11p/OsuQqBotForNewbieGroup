@@ -8,18 +8,18 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
-using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Component("highlight")]
-    public sealed class Highlight : OsuFunction, IMessageCommand
+    public sealed class Highlight : Service, IMessageCommand
     {
         public Highlight(OsuApiClient osuApi)
         {

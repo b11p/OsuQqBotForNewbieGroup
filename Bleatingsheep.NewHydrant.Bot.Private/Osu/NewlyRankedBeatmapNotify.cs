@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.OsuMixedApi;
 using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
     //[Component("newly_ranked")]
-    internal class NewlyRankedBeatmapNotify : OsuFunction, IRegularAsync
+    internal class NewlyRankedBeatmapNotify : Service, IRegularAsync
     {
         public NewlyRankedBeatmapNotify(OsuApiClient osuApi)
         {

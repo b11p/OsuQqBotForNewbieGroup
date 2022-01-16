@@ -6,19 +6,19 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
-using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
     [Component("newbie_statistics")]
-    public class 统计新人群成员 : OsuFunction, IMessageCommand
+    public class 统计新人群成员 : Service, IMessageCommand
     {
         private const int 管理群号 = 695600319;
         private const string DestPath = "/root/outputs/statistics_{0}.csv";

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu;
 using PuppeteerSharp;
@@ -13,7 +14,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Component("arily")]
-    internal class ArilyInfo : OsuFunction, IMessageCommand
+    internal class ArilyInfo : Service, IMessageCommand
     {
         private static readonly Regex s_regex = new Regex(@"^\s*arily[1!！]{2}\s*(?<name>" + OsuHelper.UsernamePattern + @")?\s*[,，]?\s*(?<mode>\S*)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
         private static readonly IReadOnlyDictionary<Mode, string> s_modes = new Dictionary<Mode, string>

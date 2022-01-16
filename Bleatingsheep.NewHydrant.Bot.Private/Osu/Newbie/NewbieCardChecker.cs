@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Bleatingsheep.NewHydrant.Core;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
-    internal abstract class NewbieCardChecker : OsuFunction
+    internal abstract class NewbieCardChecker : Service
     {
         private NewbieCardChecker() { }
 

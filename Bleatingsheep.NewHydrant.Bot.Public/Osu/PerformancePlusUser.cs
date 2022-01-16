@@ -2,25 +2,33 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu.PerformancePlus;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Execution;
+using Microsoft.Extensions.Logging;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Component("pp+")]
-    internal class PerformancePlusUser : OsuFunction, IMessageCommand
+    internal class PerformancePlusUser : Service, IMessageCommand
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
+        private readonly ILogger<PerformancePlusUser> _logger;
 
-        public PerformancePlusUser(INewbieDatabase database, ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
+        public PerformancePlusUser(
+            INewbieDatabase database,
+            ILegacyDataProvider dataProvider,
+            OsuApiClient osuApi,
+            ILogger<PerformancePlusUser> logger)
         {
             Database = database;
             DataProvider = dataProvider;
             OsuApi = osuApi;
+            _logger = logger;
         }
 
         private string queryUser;
@@ -75,7 +83,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 if (!oldQuery.Success)
                 {
                     await api.SendMessageAsync(message.Endpoint, "无法找到历史数据。");
-                    FLogger.LogException(oldQuery.Exception);
+                    _logger.LogError(oldQuery.Exception, "{}", oldQuery.Exception.Message);
                 }
 
                 var old = oldQuery.EnsureSuccess().Result;
@@ -108,7 +116,7 @@ Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
                 {
                     var addResult = await Database.AddPlusHistoryAsync(userPlus);
                     if (!addResult.Success)
-                        FLogger.LogException(addResult.Exception);
+                        _logger.LogError(addResult.Exception, "{}", addResult.Exception.Message);
                 }
             }
             catch (ExceptionPlus)

@@ -2,13 +2,14 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.Osu;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bleatingsheep.NewHydrant.Osu.Snapshots
 {
-    public class SnapshotUtility : OsuFunction
+    public class SnapshotUtility : Service
     {
         /// <summary>
         /// Query user play records.

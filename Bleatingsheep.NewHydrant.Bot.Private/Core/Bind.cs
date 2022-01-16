@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
-using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
     [Component("bind")]
-    public class Bind : OsuFunction, IMessageCommand
+    public class Bind : Service, IMessageCommand
     {
-        public Bind(INewbieDatabase database, OsuMixedApi.OsuApiClient osuApi)
+        public Bind(INewbieDatabase database, OsuMixedApi.OsuApiClient osuApi, ILogger<Bind> logger)
         {
             Database = database;
             OsuApi = osuApi;
+            _logger = logger;
         }
+        private readonly ILogger<Bind> _logger;
 
         private INewbieDatabase Database { get; }
         public OsuMixedApi.OsuApiClient OsuApi { get; }
@@ -46,7 +48,7 @@ namespace Bleatingsheep.NewHydrant.Core
             else
             {
                 await api.SendMessageAsync(message.Endpoint, "数据库访问错误。");
-                FLogger.LogException(dbResult.Exception);
+                _logger.LogError(dbResult.Exception, "{}", dbResult.Exception.Message);
             }
         }
 

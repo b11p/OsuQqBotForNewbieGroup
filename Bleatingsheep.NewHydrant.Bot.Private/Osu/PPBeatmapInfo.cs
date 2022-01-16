@@ -11,7 +11,7 @@ using Sisters.WudiLib.Posts;
 namespace Bleatingsheep.NewHydrant.Osu
 {
     [Component("pp_stars")]
-    internal class PPBeatmapInfo : OsuFunction, IMessageCommand
+    internal class PPBeatmapInfo : Service, IMessageCommand
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
 

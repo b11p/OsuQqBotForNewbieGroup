@@ -5,20 +5,24 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.Osu.PerformancePlus;
 using Bleatingsheep.OsuQqBot.Database.Execution;
+using Microsoft.Extensions.Logging;
 using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Osu
 {
     //[Component("pp+_update")]
-    internal class UpdatePlusData : OsuFunction, IRegularAsync
+    internal class UpdatePlusData : Service, IRegularAsync
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
+        private readonly ILogger<UpdatePlusData> _logger;
 
-        public UpdatePlusData(INewbieDatabase database)
+        public UpdatePlusData(INewbieDatabase database, ILogger<UpdatePlusData> logger)
         {
             Database = database;
+            _logger = logger;
         }
 
         public TimeSpan? OnUtc => new TimeSpan(20, 0, 0);
@@ -32,8 +36,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             var result = await Database.GetPlusRecordedUsersAsync();
             if (!result.Success)
             {
-                FLogger.LogInBackground("更新 PP+ 数据时访问数据库失败。");
-                FLogger.LogException(result.Exception);
+                _logger.LogError(result.Exception, "更新 PP+ 数据时访问数据库失败。");
                 return;
             }
 
@@ -68,8 +71,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var addResult = await Database.AddPlusHistoryRangeAsync(results);
                 if (!addResult.Success)
                 {
-                    FLogger.LogInBackground("添加新的 PP+ 数据失败。");
-                    FLogger.LogException(addResult.Exception);
+                    _logger.LogError(addResult.Exception, "添加新的 PP+ 数据失败。");
                 }
 
                 todo = failed.ToList();
