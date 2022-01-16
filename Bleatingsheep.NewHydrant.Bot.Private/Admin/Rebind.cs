@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Osu;
+using Bleatingsheep.OsuQqBot.Database.Execution;
 using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Admin
@@ -11,9 +12,13 @@ namespace Bleatingsheep.NewHydrant.Admin
     [Component("rebind")]
     class Rebind : OsuFunction, IMessageCommand
     {
-        private static IVerifier Verifier { get; } = new AdminVerifier();
+        public Rebind(INewbieDatabase database)
+        {
+            Database = database;
+        }
 
-        public IMessageCommand Create() => new Rebind();
+        private static IVerifier Verifier { get; } = new AdminVerifier();
+        private INewbieDatabase Database { get; }
 
         private long _qq;
         private string _username;

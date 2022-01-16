@@ -10,14 +10,19 @@ namespace Bleatingsheep.OsuQqBot.Database.Execution
 {
     public sealed class NewbieDatabase : NewbieDatabaseBase
     {
-        private static async Task<IExecutingResult<T>> TryExecuteAsync<T>(Func<NewbieContext, Task<T>> func)
+        private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
+
+        public NewbieDatabase(IDbContextFactory<NewbieContext> dbContextFactory)
+        {
+            _dbContextFactory = dbContextFactory;
+        }
+
+        private async Task<IExecutingResult<T>> TryExecuteAsync<T>(Func<NewbieContext, Task<T>> func)
         {
             try
             {
-                using (var context = new NewbieContext())
-                {
-                    return new ExecutingResult<T>(await func(context));
-                }
+                await using var context = _dbContextFactory.CreateDbContext();
+                return new ExecutingResult<T>(await func(context));
             }
             catch (Exception e)
             {

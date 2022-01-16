@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Osu;
+using Bleatingsheep.OsuQqBot.Database.Execution;
 using Microsoft.EntityFrameworkCore;
 using Sisters.WudiLib;
 
@@ -10,7 +11,13 @@ namespace Bleatingsheep.NewHydrant.Core
     [Component("bind")]
     public class Bind : OsuFunction, IMessageCommand
     {
-        public IMessageCommand Create() => new Bind();
+        public Bind(INewbieDatabase database)
+        {
+            Database = database;
+        }
+
+        private INewbieDatabase Database { get; }
+
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
             // TODO 验证用户名是否合法
@@ -44,6 +51,7 @@ namespace Bleatingsheep.NewHydrant.Core
         private const string StartCommand = "绑定";
         private string _trimed;
         private string _userName;
+
         public bool ShouldResponse(Sisters.WudiLib.Posts.Message message)
         {
             if (message.Content.IsPlaintext)

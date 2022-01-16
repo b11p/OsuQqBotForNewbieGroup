@@ -21,6 +21,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         private static readonly object s_thisLock = new object();
         private static readonly Dictionary<(long group, long qq), DateTime> s_lastCheckTime = new Dictionary<(long group, long qq), DateTime>();
 
+        public NewbieKeeper(INewbieDatabase database)
+        {
+            Database = database;
+        }
+        
+        private INewbieDatabase Database { get; }
+
         public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
             var g = message as GroupMessage;
@@ -115,7 +122,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
         }
 
-        private static async Task<string> AutoBind(HttpApiClient api, GroupMessage g, bool success)
+        private async Task<string> AutoBind(HttpApiClient api, GroupMessage g, bool success)
         {
             string response;
             var memberInfo = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);

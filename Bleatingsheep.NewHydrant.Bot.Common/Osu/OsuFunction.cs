@@ -5,7 +5,6 @@ using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Logging;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuMixedApi;
-using Bleatingsheep.OsuQqBot.Database.Execution;
 using Microsoft.Extensions.Caching.Memory;
 using UserInfo = Bleatingsheep.OsuMixedApi.UserInfo;
 
@@ -19,8 +18,6 @@ namespace Bleatingsheep.NewHydrant.Osu
         protected static IOsuApiClient CreateOsuApi() => s_osuApiFactory.CreateHttpApi();
 
         protected ILegacyDataProvider DataProvider { get; private set; }
-
-        protected static INewbieDatabase Database { get; } = new NewbieDatabase();
 
         protected static ILogger FLogger => FileLogger.Default;
 
