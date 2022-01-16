@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Osu;
 using PuppeteerSharp;
 using Sisters.WudiLib;
@@ -53,11 +54,18 @@ namespace Bleatingsheep.NewHydrant.Osu
         internal static readonly System.Collections.Concurrent.ConcurrentBag<long> SuccessfulElapsed = new System.Collections.Concurrent.ConcurrentBag<long>();
         internal static readonly System.Collections.Concurrent.ConcurrentBag<long> FailedElapsed = new System.Collections.Concurrent.ConcurrentBag<long>();
 
+        private ILegacyDataProvider DataProvider { get; }
+
+        public PpTth2(ILegacyDataProvider dataProvider)
+        {
+            DataProvider = dataProvider;
+        }
+
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
             //await api.SendMessageAsync(context.Endpoint, $"[DEBUG] 比较：{_other}；模式：{_mode}");
 
-            var id = await EnsureGetBindingIdAsync(context.UserId).ConfigureAwait(false);
+            var id = await DataProvider.EnsureGetBindingIdAsync(context.UserId).ConfigureAwait(false);
             //var browser = GetBrowser();
 
             byte[] data = null;

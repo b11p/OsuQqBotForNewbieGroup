@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Sisters.WudiLib;
@@ -21,12 +22,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         private static readonly object s_thisLock = new object();
         private static readonly Dictionary<(long group, long qq), DateTime> s_lastCheckTime = new Dictionary<(long group, long qq), DateTime>();
 
-        public NewbieKeeper(INewbieDatabase database)
+        public NewbieKeeper(INewbieDatabase database, ILegacyDataProvider dataProvider)
         {
             Database = database;
+            DataProvider = dataProvider;
         }
         
         private INewbieDatabase Database { get; }
+        private ILegacyDataProvider DataProvider { get; }
 
         public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {

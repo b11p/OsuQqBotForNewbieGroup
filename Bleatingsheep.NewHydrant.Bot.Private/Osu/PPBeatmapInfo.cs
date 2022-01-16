@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Extentions;
 using Bleatingsheep.Osu.PerformancePlus;
 using Sisters.WudiLib.Posts;
@@ -15,7 +16,13 @@ namespace Bleatingsheep.NewHydrant.Osu
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
 
-        public IMessageCommand Create() => new PPBeatmapInfo();
+        public PPBeatmapInfo(ILegacyDataProvider dataProvider)
+        {
+            DataProvider = dataProvider;
+        }
+
+        private ILegacyDataProvider DataProvider { get; }
+
         public async Task ProcessAsync(Message message, Sisters.WudiLib.HttpApiClient api)
         {
             long id = message.UserId;

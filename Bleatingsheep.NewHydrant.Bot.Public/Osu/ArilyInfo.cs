@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu;
 using PuppeteerSharp;
 using Sisters.WudiLib;
@@ -23,6 +24,11 @@ namespace Bleatingsheep.NewHydrant.Osu
             { Mode.Mania, "mania" },
         };
 
+        public ArilyInfo(ILegacyDataProvider dataProvider)
+        {
+            DataProvider = dataProvider;
+        }
+
         private string _text;
 
         [Parameter("name")]
@@ -30,6 +36,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
         [Parameter("mode")]
         public string ModeString { get; set; }
+        private ILegacyDataProvider DataProvider { get; }
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
@@ -40,7 +47,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
             if (string.IsNullOrEmpty(Name))
             {
-                uid = await EnsureGetBindingIdAsync(context.UserId).ConfigureAwait(false);
+                uid = await DataProvider.EnsureGetBindingIdAsync(context.UserId).ConfigureAwait(false);
             }
             else
             {

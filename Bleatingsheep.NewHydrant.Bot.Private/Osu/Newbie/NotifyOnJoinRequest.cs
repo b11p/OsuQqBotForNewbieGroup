@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
@@ -28,12 +29,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             [514661057] = null,
         };
 
-        public NotifyOnJoinRequest(INewbieDatabase database)
+        public NotifyOnJoinRequest(INewbieDatabase database, ILegacyDataProvider dataProvider)
         {
             Database = database;
+            DataProvider = dataProvider;
         }
 
         private INewbieDatabase Database { get; }
+        private ILegacyDataProvider DataProvider { get; }
 
         private async Task ParseInfoAsync(
             HttpApiClient api,

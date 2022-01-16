@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
+using Bleatingsheep.NewHydrant.Data;
 using Newtonsoft.Json;
 using PuppeteerSharp;
 using Sisters.WudiLib;
@@ -13,9 +14,16 @@ namespace Bleatingsheep.NewHydrant.Osu
     [Component("bpme")]
     internal class BPMe : OsuFunction, IMessageCommand
     {
+        public BPMe(ILegacyDataProvider dataProvider)
+        {
+            DataProvider = dataProvider;
+        }
+
+        private ILegacyDataProvider DataProvider { get; }
+
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            var uid = await EnsureGetBindingIdAsync(context.UserId).ConfigureAwait(false);
+            var uid = await DataProvider.EnsureGetBindingIdAsync(context.UserId).ConfigureAwait(false);
             var apiTask = OsuApi.GetUserInfoAsync(uid, Bleatingsheep.Osu.Mode.Standard).ConfigureAwait(false);
             using (var page = await Chrome.OpenNewPageAsync().ConfigureAwait(false))
             {
