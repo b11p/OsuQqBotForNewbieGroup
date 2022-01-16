@@ -4,7 +4,9 @@ using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.Osu.ApiClient;
+using Bleatingsheep.OsuQqBot.Database.Execution;
 using Bleatingsheep.OsuQqBot.Database.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -24,8 +26,19 @@ namespace Bleatingsheep.NewHydrant
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<NewbieContext>(ServiceLifetime.Transient);
-            services.AddDbContextFactory<NewbieContext>();
+            services.AddDbContext<NewbieContext>(
+                optionsBuilder =>
+                    optionsBuilder.UseMySql(
+                        Configuration.GetConnectionString("NewbieDatabase"),
+                        ServerVersion.Parse("5.7.36-mysql"),
+                        options => options.EnableRetryOnFailure()),
+                ServiceLifetime.Transient);
+            services.AddDbContextFactory<NewbieContext>(
+                optionsBuilder =>
+                    optionsBuilder.UseMySql(
+                        Configuration.GetConnectionString("NewbieDatabase"),
+                        ServerVersion.Parse("5.7.36-mysql"),
+                        options => options.EnableRetryOnFailure()));
             services.AddLogging(b =>
             {
                 b.ClearProviders();
@@ -47,6 +60,9 @@ namespace Bleatingsheep.NewHydrant
 
             services.AddTransient<IDataProvider, DataProvider>();
             services.AddTransient<DataMaintainer>();
+
+            // Legacy
+            services.AddTransient<INewbieDatabase, NewbieDatabase>();
         }
 
         private sealed class LazyService<T> : Lazy<T> where T : class

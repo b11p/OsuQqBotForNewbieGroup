@@ -4,5 +4,8 @@
     "SuperAdmin": 0,
     "ServerPort": 8800,
     "ServerAccessToken": ""
+  },
+  "ConnectionStrings": {
+    "NewbieDatabase": "server=localhost;port=3306;database=newbie;user=root;pwd=123456;"
   }
 }
