@@ -11,12 +11,14 @@ namespace Bleatingsheep.NewHydrant.Core
     [Component("bind")]
     public class Bind : OsuFunction, IMessageCommand
     {
-        public Bind(INewbieDatabase database)
+        public Bind(INewbieDatabase database, OsuMixedApi.OsuApiClient osuApi)
         {
             Database = database;
+            OsuApi = osuApi;
         }
 
         private INewbieDatabase Database { get; }
+        public OsuMixedApi.OsuApiClient OsuApi { get; }
 
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {

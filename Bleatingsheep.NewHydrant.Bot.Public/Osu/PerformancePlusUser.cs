@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu.PerformancePlus;
+using Bleatingsheep.OsuMixedApi;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
@@ -15,16 +16,18 @@ namespace Bleatingsheep.NewHydrant.Osu
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
 
-        public PerformancePlusUser(INewbieDatabase database, ILegacyDataProvider dataProvider)
+        public PerformancePlusUser(INewbieDatabase database, ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
         {
             Database = database;
             DataProvider = dataProvider;
+            OsuApi = osuApi;
         }
 
         private string queryUser;
 
         private INewbieDatabase Database { get; }
         private ILegacyDataProvider DataProvider { get; }
+        private OsuApiClient OsuApi { get; }
 
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
@@ -115,7 +118,7 @@ Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
             }
         }
 
-        private static async Task<(bool success, dynamic key)> GetUserKey(string userName)
+        private async Task<(bool success, dynamic key)> GetUserKey(string userName)
         {
             if (userName.All(c => char.IsDigit(c)))
             {

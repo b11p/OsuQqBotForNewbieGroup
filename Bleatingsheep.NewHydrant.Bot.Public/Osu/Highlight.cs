@@ -21,6 +21,13 @@ namespace Bleatingsheep.NewHydrant.Osu
     [Component("highlight")]
     public sealed class Highlight : OsuFunction, IMessageCommand
     {
+        public Highlight(OsuApiClient osuApi)
+        {
+            OsuApi = osuApi;
+        }
+
+        private OsuApiClient OsuApi { get; }
+
         public async Task ProcessAsync(MessageContext superContext, HttpApiClient api)
         {
             var context = superContext as GroupMessage;
@@ -70,7 +77,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
                 var tasks = fetchIds.Concat(fails.GetConsumingEnumerable()).Select(async bi =>
                 {
-                    var (success, userInfo) = await GetCachedUserInfo(bi, (Bleatingsheep.Osu.Mode)mode).ConfigureAwait(false);
+                    var (success, userInfo) = await OsuApi.GetCachedUserInfo(bi, (Bleatingsheep.Osu.Mode)mode).ConfigureAwait(false);
                     if (!success)
                     {
                         if (cancellationToken.IsCancellationRequested)

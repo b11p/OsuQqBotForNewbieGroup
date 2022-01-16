@@ -40,9 +40,6 @@ namespace Bleatingsheep.NewHydrant
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
             CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
-            // 配置 osu
-            OsuFunction.SetApiKey(s_hydrantConfigure["ApiKey"]);
-
             try
             {
                 // 本应在此设置 HttpApiClient，并启动，但是使用反向 WebSocket 时，无需手动这么做。

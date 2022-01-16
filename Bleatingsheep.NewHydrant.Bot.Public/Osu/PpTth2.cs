@@ -55,10 +55,12 @@ namespace Bleatingsheep.NewHydrant.Osu
         internal static readonly System.Collections.Concurrent.ConcurrentBag<long> FailedElapsed = new System.Collections.Concurrent.ConcurrentBag<long>();
 
         private ILegacyDataProvider DataProvider { get; }
+        private OsuMixedApi.OsuApiClient OsuApi { get; }
 
-        public PpTth2(ILegacyDataProvider dataProvider)
+        public PpTth2(ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
         {
             DataProvider = dataProvider;
+            OsuApi = osuApi;
         }
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)

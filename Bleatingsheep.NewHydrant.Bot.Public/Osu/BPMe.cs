@@ -14,12 +14,14 @@ namespace Bleatingsheep.NewHydrant.Osu
     [Component("bpme")]
     internal class BPMe : OsuFunction, IMessageCommand
     {
-        public BPMe(ILegacyDataProvider dataProvider)
+        public BPMe(ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
         {
             DataProvider = dataProvider;
+            OsuApi = osuApi;
         }
 
         private ILegacyDataProvider DataProvider { get; }
+        private OsuMixedApi.OsuApiClient OsuApi { get; }
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {

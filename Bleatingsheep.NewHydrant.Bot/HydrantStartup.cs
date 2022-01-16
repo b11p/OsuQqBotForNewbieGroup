@@ -72,6 +72,7 @@ namespace Bleatingsheep.NewHydrant
                 dataProvider.OnException += e => logger.LogError(e, "{message}", e.Message);
                 return dataProvider;
             });
+            services.AddSingleton(OsuMixedApi.OsuApiClient.ClientUsingKey(Configuration.GetSection("Hydrant")["ApiKey"]));
         }
 
         private sealed class LazyService<T> : Lazy<T> where T : class

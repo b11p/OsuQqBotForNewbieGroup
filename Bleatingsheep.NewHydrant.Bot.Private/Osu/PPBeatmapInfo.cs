@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
-using Bleatingsheep.NewHydrant.Extentions;
 using Bleatingsheep.Osu.PerformancePlus;
 using Sisters.WudiLib.Posts;
 
@@ -16,12 +15,14 @@ namespace Bleatingsheep.NewHydrant.Osu
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
 
-        public PPBeatmapInfo(ILegacyDataProvider dataProvider)
+        public PPBeatmapInfo(ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
         {
             DataProvider = dataProvider;
+            OsuApi = osuApi;
         }
 
         private ILegacyDataProvider DataProvider { get; }
+        private OsuMixedApi.OsuApiClient OsuApi { get; }
 
         public async Task ProcessAsync(Message message, Sisters.WudiLib.HttpApiClient api)
         {

@@ -29,14 +29,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             [514661057] = null,
         };
 
-        public NotifyOnJoinRequest(INewbieDatabase database, ILegacyDataProvider dataProvider)
+        public NotifyOnJoinRequest(INewbieDatabase database, ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
         {
             Database = database;
             DataProvider = dataProvider;
+            OsuApi = osuApi;
         }
 
         private INewbieDatabase Database { get; }
         private ILegacyDataProvider DataProvider { get; }
+        private OsuMixedApi.OsuApiClient OsuApi { get; }
 
         private async Task ParseInfoAsync(
             HttpApiClient api,

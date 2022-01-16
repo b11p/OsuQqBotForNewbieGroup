@@ -12,13 +12,15 @@ namespace Bleatingsheep.NewHydrant.Admin
     [Component("rebind")]
     class Rebind : OsuFunction, IMessageCommand
     {
-        public Rebind(INewbieDatabase database)
+        public Rebind(INewbieDatabase database, OsuMixedApi.OsuApiClient osuApi)
         {
             Database = database;
+            OsuApi = osuApi;
         }
 
         private static IVerifier Verifier { get; } = new AdminVerifier();
         private INewbieDatabase Database { get; }
+        private OsuMixedApi.OsuApiClient OsuApi { get; }
 
         private long _qq;
         private string _username;

@@ -24,9 +24,10 @@ namespace Bleatingsheep.NewHydrant.Osu
             { Mode.Mania, "mania" },
         };
 
-        public ArilyInfo(ILegacyDataProvider dataProvider)
+        public ArilyInfo(ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
         {
             DataProvider = dataProvider;
+            OsuApi = osuApi;
         }
 
         private string _text;
@@ -37,6 +38,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         [Parameter("mode")]
         public string ModeString { get; set; }
         private ILegacyDataProvider DataProvider { get; }
+        private OsuMixedApi.OsuApiClient OsuApi { get; }
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
@@ -51,7 +53,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             }
             else
             {
-                var user = await EnsureGetUserInfo(Name, Mode.Standard).ConfigureAwait(false);
+                var user = await OsuApi.EnsureGetUserInfo(Name, Mode.Standard).ConfigureAwait(false);
                 uid = user.Id;
             }
             string url = $"https://info.osustuff.ri.mk/cn/users/{uid}/{s_modes.GetValueOrDefault(mode)}";

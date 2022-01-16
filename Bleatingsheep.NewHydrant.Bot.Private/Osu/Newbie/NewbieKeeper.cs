@@ -22,14 +22,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         private static readonly object s_thisLock = new object();
         private static readonly Dictionary<(long group, long qq), DateTime> s_lastCheckTime = new Dictionary<(long group, long qq), DateTime>();
 
-        public NewbieKeeper(INewbieDatabase database, ILegacyDataProvider dataProvider)
+        public NewbieKeeper(INewbieDatabase database, ILegacyDataProvider dataProvider, OsuApiClient osuApi)
         {
             Database = database;
             DataProvider = dataProvider;
+            OsuApi = osuApi;
         }
         
         private INewbieDatabase Database { get; }
         private ILegacyDataProvider DataProvider { get; }
+        private OsuApiClient OsuApi { get; }
 
         public async Task OnMessageAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {

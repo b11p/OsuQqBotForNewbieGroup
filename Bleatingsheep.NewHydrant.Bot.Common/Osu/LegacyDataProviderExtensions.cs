@@ -1,7 +1,9 @@
+using System;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuMixedApi;
+using Microsoft.Extensions.Caching.Memory;
 using UserInfo = Bleatingsheep.OsuMixedApi.UserInfo;
 
 namespace Bleatingsheep.NewHydrant.Osu
@@ -26,6 +28,29 @@ namespace Bleatingsheep.NewHydrant.Osu
             ExecutingException.Ensure(success, "网络错误。");
             ExecutingException.Ensure(result != null, "无此用户！");
             return result;
+        }
+
+        // TODO: Get IMemoryCache from DI.
+        private static readonly IMemoryCache s_cache = new MemoryCache(new MemoryCacheOptions());
+
+        private static readonly TimeSpan CacheAvailable = TimeSpan.FromMinutes(10);
+
+        public static async Task<(bool, UserInfo)> GetCachedUserInfo(this OsuApiClient osuApi, int id, Bleatingsheep.Osu.Mode mode)
+        {
+            var hasCache = s_cache.TryGetValue<UserInfo>((id, mode), out var cachedInfo);
+            if (hasCache)
+            {
+                return (true, cachedInfo);
+            }
+            var (success, userInfo) = await osuApi.GetUserInfoAsync(id, mode);
+            if (success)
+            {
+                s_cache.Set((id, mode), userInfo, CacheAvailable);
+                return (true, userInfo);
+            }
+            else
+                // fail
+                return default;
         }
     }
 }
