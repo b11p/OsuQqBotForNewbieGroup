@@ -1,4 +1,6 @@
-﻿using System;
+﻿global using Message = Sisters.WudiLib.SendingMessage;
+global using MessageContext = Sisters.WudiLib.Posts.Message;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -17,6 +19,9 @@ using PuppeteerSharp;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Sisters.WudiLib.WebSocket.Reverse;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Bleatingsheep.OsuQqBot.Database.Models;
 
 namespace Bleatingsheep.NewHydrant
 {
@@ -29,9 +34,8 @@ namespace Bleatingsheep.NewHydrant
 
         private static void Main(string[] args)
         {
-            ConfigurationBuilder builder = new();
-            builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-            s_configure = builder.Build();
+            var host = CreateHostBuilder(args).Build();
+            s_configure = host.Services.GetService<IConfiguration>();
             s_hydrantConfigure = s_configure.GetSection("Hydrant");
 
             var cultureInfo = CultureInfo.GetCultureInfo("zh-CN");
@@ -94,7 +98,7 @@ namespace Bleatingsheep.NewHydrant
                     bool generalAuth = ReverseWebSocketServer.CreateAuthenticationFunction(s_hydrantConfigure["ServerAccessToken"], null)(r);
                     if (!generalAuth && long.TryParse(r.Headers["X-Self-ID"], out long selfId))
                     {
-                        var auth = await new OsuQqBot.Database.Models.NewbieContext().DuplicateAuthentication.Where(a => a.SelfId == selfId).FirstOrDefaultAsync().ConfigureAwait(false);
+                        var auth = await host.Services.GetService<NewbieContext>().DuplicateAuthentication.Where(a => a.SelfId == selfId).FirstOrDefaultAsync().ConfigureAwait(false);
                         var headValue = r.Headers["Authorization"];
                         if (string.IsNullOrWhiteSpace(headValue))
                             return null;
@@ -186,5 +190,18 @@ namespace Bleatingsheep.NewHydrant
                 Logging.FileLogger.Default.LogException(exception);
             }
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureServices((c, s) =>
+                {
+                    s.AddDbContext<NewbieContext>(
+                        optionsBuilder =>
+                            optionsBuilder.UseMySql(
+                                c.Configuration.GetConnectionString("NewbieDatabase"),
+                                ServerVersion.Parse("5.7.36-mysql"),
+                                options => options.EnableRetryOnFailure()),
+                        ServiceLifetime.Transient);
+                });
     }
 }

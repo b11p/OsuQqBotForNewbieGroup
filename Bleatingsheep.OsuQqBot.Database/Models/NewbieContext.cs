@@ -1,4 +1,5 @@
-﻿using Bleatingsheep.Osu.PerformancePlus;
+﻿using System;
+using Bleatingsheep.Osu.PerformancePlus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using static Bleatingsheep.OsuQqBot.Database.Models.ServerInfo;
@@ -44,7 +45,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql($"server={Server};port={Port};database={ServerInfo.Database};user={User};pwd={Password};SslMode=VerifyCA;",
+                optionsBuilder.UseMySql(Environment.GetEnvironmentVariable("Xfs_ConnectionString"),
                     ServerVersion.Parse("5.7.34-mysql"),
                     options => options.EnableRetryOnFailure());
             }
