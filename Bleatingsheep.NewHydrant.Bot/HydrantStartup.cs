@@ -7,6 +7,7 @@ using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Execution;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,14 +32,18 @@ namespace Bleatingsheep.NewHydrant
                     optionsBuilder.UseMySql(
                         Configuration.GetConnectionString("NewbieDatabase"),
                         ServerVersion.Parse("5.7.36-mysql"),
-                        options => options.EnableRetryOnFailure()),
+                        options => options.EnableRetryOnFailure())
+                    .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug)))
+                    .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))));
                 ServiceLifetime.Transient);
             services.AddDbContextFactory<NewbieContext>(
                 optionsBuilder =>
                     optionsBuilder.UseMySql(
                         Configuration.GetConnectionString("NewbieDatabase"),
                         ServerVersion.Parse("5.7.36-mysql"),
-                        options => options.EnableRetryOnFailure()));
+                        options => options.EnableRetryOnFailure())
+                    .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug)))
+                    .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))));
             services.AddLogging(b =>
             {
                 b.ClearProviders();
