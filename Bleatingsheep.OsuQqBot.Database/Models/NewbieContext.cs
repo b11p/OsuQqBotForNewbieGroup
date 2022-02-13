@@ -1,8 +1,6 @@
 ﻿using System;
 using Bleatingsheep.Osu.PerformancePlus;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using static Bleatingsheep.OsuQqBot.Database.Models.ServerInfo;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models
 {
