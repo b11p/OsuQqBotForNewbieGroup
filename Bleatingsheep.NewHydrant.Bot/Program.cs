@@ -95,13 +95,25 @@ namespace Bleatingsheep.NewHydrant
 
                     Logger logger = LogManager.LogFactory.GetLogger("Replica");
                     logger.Info($"{r.Headers["X-Forwarded-For"]} 尝试连接。");
-                    bool generalAuth = ReverseWebSocketServer.CreateAuthenticationFunction(s_hydrantConfigure["ServerAccessToken"], null)(r);
-                    if (!generalAuth && long.TryParse(r.Headers["X-Self-ID"], out long selfId))
+
+                    // Check self id
+                    if (!long.TryParse(r.Headers["X-Self-ID"], out long selfId))
                     {
-                        var auth = await host.Services.GetService<NewbieContext>().DuplicateAuthentication.Where(a => a.SelfId == selfId).FirstOrDefaultAsync().ConfigureAwait(false);
+                        logger.Info("连接未报告 'X-Self-ID'。");
+                        return null;
+                    }
+
+                    await using var db = host.Services.GetService<NewbieContext>();
+                    var auth = await db.DuplicateAuthentication.Where(a => a.SelfId == selfId).FirstOrDefaultAsync().ConfigureAwait(false);
+                    if (auth != null)
+                    {
+                        // high privilege
                         var headValue = r.Headers["Authorization"];
                         if (string.IsNullOrWhiteSpace(headValue))
+                        {
+                            logger.Info("连接未报告 'Authorization'。");
                             return null;
+                        }
                         int spaceIndex = headValue.IndexOf(' ');
                         if (headValue[(spaceIndex + 1)..] == auth?.AccessToken)
                         {
@@ -111,9 +123,13 @@ namespace Bleatingsheep.NewHydrant
                         }
                         else
                         {
+                            logger.Info($"{selfId} 提权失败。");
                             return null;
                         }
                     }
+
+                    // No need to special auth
+                    bool generalAuth = ReverseWebSocketServer.CreateAuthenticationFunction(s_hydrantConfigure["ServerAccessToken"], null)(r);
                     return generalAuth ? configuration : null;
                 });
                 rServer.Start();
