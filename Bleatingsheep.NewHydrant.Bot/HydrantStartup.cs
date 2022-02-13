@@ -34,7 +34,7 @@ namespace Bleatingsheep.NewHydrant
                         ServerVersion.Parse("5.7.36-mysql"),
                         options => options.EnableRetryOnFailure())
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug)))
-                    .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))));
+                    .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))),
                 ServiceLifetime.Transient);
             services.AddDbContextFactory<NewbieContext>(
                 optionsBuilder =>
