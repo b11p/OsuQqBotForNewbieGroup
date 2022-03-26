@@ -13,7 +13,7 @@ using Sisters.WudiLib.Posts;
 
 namespace Bleatingsheep.NewHydrant.Core
 {
-    public sealed class Hydrant :IDisposable
+    public sealed class Hydrant : IDisposable
     {
         private readonly HttpApiClient _qq;
         private readonly ApiPostListener _listener;
