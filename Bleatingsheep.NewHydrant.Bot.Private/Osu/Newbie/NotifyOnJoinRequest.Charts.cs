@@ -51,21 +51,17 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     var response = await page.GoToAsync($"https://osu.ppy.sh/users/{uid}/osu").ConfigureAwait(false);
                     if (response.Status == System.Net.HttpStatusCode.NotFound) return;
                     // draw history
-                    const string chartSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.js-switchable-mode-page--scrollspy.js-switchable-mode-page--page > div.osu-page.osu-page--users > div > div.profile-detail > div:nth-child(2)";
+                    // const string chartSelector = "div.profile-detail__stats";
+                    // const string chartSelector = "div.profile-detail";
+                    const string chartSelector = "div[data-page-id=\"main\"]";
                     var data = await GetScreenshot(page, chartSelector);
                     messageRankHistory = Message.ByteArrayImage(data);
                     hints.Add(messageRankHistory);
 
                     // draw ranks
-                    const string bestSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.user-profile-pages.ui-sortable > div > div > div:nth-child(2) > div > div.play-detail-list";
-                    const string bestFallbackSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.user_show > div > div > div > div.user-profile-pages.ui-sortable > div > div > div:nth-child(2) > h3 > span.title__count";
+                    const string bestSelector = "div[data-page-id=\"top_ranks\"]";
                     bool noBP = false;
                     ElementHandle bpElement = await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
-                    if (bpElement is null)
-                    {
-                        noBP = true;
-                        bpElement = await page.QuerySelectorAsync(bestFallbackSelector).ConfigureAwait(false);
-                    }
                     if (bpElement != null)
                     {
                         if (noBP)

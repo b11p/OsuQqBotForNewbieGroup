@@ -23,12 +23,20 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
     public partial class NotifyOnJoinRequest : Service, IMessageCommand
     {
         //private const string Pattern = @"^收到新人群加群申请\r\n群号: (\d+)\r\n群类型: .*?\r\n申请者: (\d+)\r\n验证信息: (.*)$"; // 匹配上报申请的消息。
+#if DEBUG
+        private const int NewbieManagementGroupId = 72318078;
+#else
         private const int NewbieManagementGroupId = 695600319;
+#endif
         private static readonly IReadOnlyDictionary<long, double?> ManagedGroups = new Dictionary<long, double?>
         {
             [712603531] = 2500,
+            [928936255] = null,
             [758120648] = null,
             [514661057] = null,
+#if DEBUG
+            [72318078] = null,
+#endif
         };
         private readonly IDbContextFactory<NewbieContext> _contextFactory;
 
@@ -148,7 +156,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             long userId = r.UserId;
             string comment = r.Comment;
 
-            var userLevelTask = api.GetLevelInfo(userId);
+            // This API may cause WS disconnection due to a bug in the API in go-cqhttp 1.0.0-rc1.
+            // var userLevelTask = api.GetLevelInfo(userId);
+            var userLevelTask = ValueTask.FromResult((LevelInfo)default);
 
             await using var newbieContext = _contextFactory.CreateDbContext();
             newbieContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -159,11 +169,19 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             double? performance = default;
             TrustedUserInfo user = null;
 
-            var levelInfo = await userLevelTask.ConfigureAwait(false);
-            var level = levelInfo?.Level;
-            if (levelInfo != null)
+            int? level = default;
+            try
             {
-                sb.Append("QQ 等级为 ").Append(levelInfo.Level).Append("\r\n");
+                var levelInfo = await userLevelTask.ConfigureAwait(false);
+                level = levelInfo?.Level;
+                if (levelInfo != null)
+                {
+                    sb.Append("QQ 等级为 ").Append(levelInfo.Level).Append("\r\n");
+                }
+            }
+            catch (Exception e)
+            {
+                sb.AppendLine($"QQ 等级查询失败：{e.Message}");
             }
 
             if (osuId == null)
@@ -188,15 +206,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
             _ = Task.Run(async () =>
             {
-                    // 提供额外信息
-                    try
+                // 提供额外信息
+                try
                 {
                     await ParseInfoAsync(api, endpoint, r, osuId, user).ConfigureAwait(false);
                 }
 #pragma warning disable CA1031 // 不捕获常规异常类型
-                    catch (Exception e)
+                catch (Exception e)
 #pragma warning restore CA1031 // 不捕获常规异常类型
-                    {
+                {
                     Logger.Warn(e);
                     await api.SendMessageAsync(endpoint, e.Message).ConfigureAwait(false);
                 }
