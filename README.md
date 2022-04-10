@@ -98,3 +98,6 @@ dotnet ef database update
 ```Powershell
 dotnet Bleatingsheep.NewHydrant.Bot.dll
 ```
+
+## 开源协议 (LICENSE)
+项目主体部分使用 AGPL 协议授权，框架部分（Bleatingsheep.NewHydrant 文件夹）使用 MIT 协议授权。
