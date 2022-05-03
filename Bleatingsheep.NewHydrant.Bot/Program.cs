@@ -215,7 +215,7 @@ namespace Bleatingsheep.NewHydrant
                         optionsBuilder =>
                             optionsBuilder.UseMySql(
                                 c.Configuration.GetConnectionString("NewbieDatabase"),
-                                ServerVersion.Parse("5.7.36-mysql"),
+                                ServerVersion.AutoDetect(c.Configuration.GetConnectionString("NewbieDatabase")),
                                 options => options.EnableRetryOnFailure()),
                         ServiceLifetime.Transient);
                 });

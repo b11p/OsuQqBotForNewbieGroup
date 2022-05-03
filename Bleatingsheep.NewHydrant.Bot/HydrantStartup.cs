@@ -31,7 +31,7 @@ namespace Bleatingsheep.NewHydrant
                 optionsBuilder =>
                     optionsBuilder.UseMySql(
                         Configuration.GetConnectionString("NewbieDatabase"),
-                        ServerVersion.Parse("5.7.36-mysql"),
+                        ServerVersion.AutoDetect(Configuration.GetConnectionString("NewbieDatabase")),
                         options => options.EnableRetryOnFailure())
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug)))
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))),
@@ -40,7 +40,7 @@ namespace Bleatingsheep.NewHydrant
                 optionsBuilder =>
                     optionsBuilder.UseMySql(
                         Configuration.GetConnectionString("NewbieDatabase"),
-                        ServerVersion.Parse("5.7.36-mysql"),
+                        ServerVersion.AutoDetect(Configuration.GetConnectionString("NewbieDatabase")),
                         options => options.EnableRetryOnFailure())
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug)))
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))));

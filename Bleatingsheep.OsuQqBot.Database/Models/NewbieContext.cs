@@ -44,7 +44,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseMySql(Environment.GetEnvironmentVariable("Xfs_ConnectionString"),
-                    ServerVersion.Parse("5.7.34-mysql"),
+                    ServerVersion.AutoDetect(Environment.GetEnvironmentVariable("Xfs_ConnectionString")),
                     options => options.EnableRetryOnFailure());
             }
         }
