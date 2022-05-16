@@ -21,7 +21,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
     public class 统计新人群成员 : Service, IMessageCommand
     {
         private const int 管理群号 = 695600319;
-        private const string DestPath = "/root/outputs/statistics_{0}.csv";
+        private const string DestPath = "/outputs/statistics_{0}.csv";
         private const string ResourceUrl = "https://res.bleatingsheep.org/statistics_{0}.csv";
 
         private static readonly Dictionary<string, (long, int)> s_groups = new()

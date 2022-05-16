@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using System.Net.Http;
 using System.ServiceModel.Syndication;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Bleatingsheep.NewHydrant.Attributions;
@@ -17,7 +17,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
     {
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            string url = "https://rsshub.app/pixiv/ranking/day";
+            string url = "https://rss.bleatingsheep.org/pixiv/ranking/day";
             var xmlReader = XmlReader.Create(url);
             var feed = SyndicationFeed.Load(xmlReader);
             var tuple = feed.Items.Select(i =>
@@ -30,14 +30,12 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             if (imgNode != null)
             {
                 var imgUrl = imgNode.Attributes["src"].Value;
-                using var httpClient = new HttpClient();
-                byte[] imgArray = await httpClient
-                    .GetByteArrayAsync(imgUrl)
-                    .ConfigureAwait(false);
+                // Chagne URL host name to xfs-proxy-pixiv.b11p.com whatever the original host is
+                imgUrl = Regex.Replace(imgUrl, @"^https?://.+?/", "https://xfs-proxy-pixiv.b11p.com/");
                 if (await api.SendMessageAsync(
                     endpoint: context.Endpoint,
                     message: new Message(item.Title.Text + "\r\n")
-                        + Message.ByteArrayImage(imgArray)
+                        + Message.NetImage(imgUrl)
                         + new Message("\r\n" + item.Links.FirstOrDefault().Uri)
                     ) == null)
                 {
