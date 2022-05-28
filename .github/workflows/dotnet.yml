@@ -19,3 +19,16 @@ jobs:
         dotnet-version: 6.0.x
     - name: Build
       run: dotnet build -c Release Bleatingsheep.NewHydrant.Bot
+    - name: Publish
+      run: dotnet publish --no-build -c Release -o bin/publish Bleatingsheep.NewHydrant.Bot
+    - name: Push to Other Branches
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: bin/publish
+        publish_branch: build
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: Binary
+        path: bin/publish
