@@ -31,7 +31,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
         private static readonly IReadOnlyDictionary<string, string> s_ReverseProxy = new Dictionary<string, string>
         {
             { "KONACHAN", "https://xfs-proxy-konachan.b11p.com/" },
-            { "YANDERE", "https://xfs-proxy-konachan.b11p.com/" },
+            { "YANDERE", "https://xfs-proxy-yandere.b11p.com/" },
         };
 
         private static readonly IReadOnlyDictionary<string, IEnumerable<string>> s_dissTags = new Dictionary<string, IEnumerable<string>>
@@ -152,7 +152,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
 
         private async Task<bool> TrySendImage(Endpoint endpoint, HttpApiClient api, int id, Uri uri, int length, int width, int height)
         {
-            string url = string.IsNullOrEmpty(_proxyDomain) ? uri.AbsoluteUri : Regex.Replace(uri.AbsoluteUri, @"^https?://.+?/", "https://xfs-proxy-pixiv.b11p.com/");
+            string url = string.IsNullOrEmpty(_proxyDomain) ? uri.AbsoluteUri : Regex.Replace(uri.AbsoluteUri, @"^https?://.+?/", _proxyDomain);
             bool success = await api.SendMessageAsync(endpoint, Message.NetImage(url)).ConfigureAwait(false) != default;
             Logger.Debug($"ID: {id}, length: {length}, {width}x{height}, success={success}, url: {uri} ");
             return success;
