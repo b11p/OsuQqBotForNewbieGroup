@@ -71,8 +71,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var snapshotNoEarlierThan = DateTime.UtcNow.AddDays(-1);
             var snapshots = await _lazyContext.Value.UserSnapshots
                 .Where(s => s.Date > snapshotNoEarlierThan && osuIds.Contains(s.UserId))
+                .AsAsyncEnumerable()
                 .GroupBy(s => s.UserId)
-                .ToDictionaryAsync(g => g.Key, g => g.OrderByDescending(s => s.Date).FirstOrDefault())
+                .ToDictionaryAwaitAsync(g => ValueTask.FromResult(g.Key), g => g.OrderByDescending(s => s.Date).FirstOrDefaultAsync())
                 .ConfigureAwait(false);
             Logger.Info($"Find {snapshots.Count} snapshots.");
 
