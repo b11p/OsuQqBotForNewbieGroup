@@ -68,11 +68,21 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var bindingList = await bindingQuery.ToListAsync().ConfigureAwait(false);
             Logger.Info($"Find {bindingList.Count} binding info.");
 
+            var snapshots = await _lazyContext.Value.UserSnapshots
+                .Where(s => s.Date > DateTimeOffset.UtcNow.AddDays(-1) && bindingList.Select(b => b.OsuId).Contains(s.UserId))
+                .GroupBy(s => s.UserId)
+                .ToDictionaryAsync(g => g.Key, g => g.OrderByDescending(s => s.Date).FirstOrDefault())
+                .ConfigureAwait(false);
+            Logger.Info($"Find {snapshots.Count} snapshots.");
+
             var userInfoTaskArray = bindingList.Select(async b =>
             {
                 var o = b.OsuId;
                 try
                 {
+                    var snapshotInfo = snapshots.GetValueOrDefault(o);
+                    if (snapshotInfo != null)
+                        return (BindingInfo: b, Successful: true, UserInfo: snapshotInfo.UserInfo);
                     var userInfo = await _dataProvider.Value.GetUserInfoRetryAsync(o, Mode.Standard).ConfigureAwait(false);
                     return (BindingInfo: b, Successful: true, UserInfo: userInfo);
                 }
