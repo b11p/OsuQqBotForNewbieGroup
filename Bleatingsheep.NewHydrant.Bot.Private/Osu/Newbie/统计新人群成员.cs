@@ -64,12 +64,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             Logger.Info($"Find {infoList.Length} users.");
             var userIdList = infoList.Select(i => i.UserId).ToList();
             IQueryable<BindingInfo> bindingQuery = _lazyContext.Value.Bindings.Where(b => userIdList.Contains(b.UserId));
-            Logger.Info(bindingQuery.ToQueryString());
             var bindingList = await bindingQuery.ToListAsync().ConfigureAwait(false);
             Logger.Info($"Find {bindingList.Count} binding info.");
 
+            var osuIds = bindingList.Select(b => b.OsuId).Distinct().ToList();
+            var snapshotNoEarlierThan = DateTime.UtcNow.AddDays(-1);
             var snapshots = await _lazyContext.Value.UserSnapshots
-                .Where(s => s.Date > DateTimeOffset.UtcNow.AddDays(-1) && bindingList.Select(b => b.OsuId).Contains(s.UserId))
+                .Where(s => s.Date > snapshotNoEarlierThan && osuIds.Contains(s.UserId))
                 .GroupBy(s => s.UserId)
                 .ToDictionaryAsync(g => g.Key, g => g.OrderByDescending(s => s.Date).FirstOrDefault())
                 .ConfigureAwait(false);
