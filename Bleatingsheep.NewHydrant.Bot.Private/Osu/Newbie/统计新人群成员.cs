@@ -70,7 +70,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var osuIds = bindingList.Select(b => b.OsuId).Distinct().ToList();
             var snapshotNoEarlierThan = DateTime.UtcNow.AddDays(-1);
             var snapshots = await _lazyContext.Value.UserSnapshots
-                .Where(s => s.Date > snapshotNoEarlierThan && osuIds.Contains(s.UserId))
+                .Where(s => s.Date > snapshotNoEarlierThan && osuIds.Contains(s.UserId) && s.Mode == Mode.Standard)
                 .AsAsyncEnumerable()
                 .GroupBy(s => s.UserId)
                 .ToDictionaryAwaitAsync(g => ValueTask.FromResult(g.Key), g => g.OrderByDescending(s => s.Date).FirstOrDefaultAsync())
@@ -93,8 +93,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     return (b, false, null);
                 }
             }).ToArray();
-            Logger.Info("Complete fetching user info.");
             await Task.WhenAll(userInfoTaskArray).ConfigureAwait(false);
+            Logger.Info("Complete fetching user info.");
             var userInfo = userInfoTaskArray.Select(t => t.Result);
             var results = from i in infoList
                           join u in userInfo
