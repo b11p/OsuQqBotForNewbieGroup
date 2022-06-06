@@ -58,7 +58,7 @@ namespace Bleatingsheep.NewHydrant
                     Width = 360,
                     Height = 640,
                 },
-                Args = new[] { "--no-sandbox", "--lang=zh-CN" },
+                Args = new[] { "--no-sandbox", "--lang=zh-CN", "--proxy-server=xfs-proxy:1080" },
             }).ConfigureAwait(false);
             var oldBrowser = Interlocked.Exchange(ref s_browser, browser);
             if (oldBrowser is not null)
