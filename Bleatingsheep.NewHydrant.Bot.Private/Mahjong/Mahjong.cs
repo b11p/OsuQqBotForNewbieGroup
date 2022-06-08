@@ -22,7 +22,7 @@ class MahjongSoulAnalyzer : IMessageCommand
         "/akochan-reviewer/target/release/akochan-reviewer");
     private static readonly MahjongObjectStorage s_storage = new MahjongObjectStorage(
         "/outputs",
-        "https://res.bleatingsheep.org:1443/");
+        "https://res.bleatingsheep.org/");
     private static readonly MajsoulDanPTProvider s_danPTProvider = new MajsoulDanPTProvider();
 
     private string _recordId = string.Empty;
