@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NewHydrantApi</name>
+    </assembly>
+    <members>
+        <member name="M:NewHydrantApi.Controllers.UserPlays.GetUserPlays(System.Int32,Bleatingsheep.Osu.Mode,System.Int32,System.Int32)">
+            <summary>
+            Get user play records.
+            </summary>
+            <param name="userId">User ID.</param>
+            <param name="mode">Mode to query. An integer from 0 to 3.</param>
+            <param name="start">Query play records starting at this number.</param>
+            <param name="limit">Maximum count in results.</param>
+            <returns>Play records.</returns>
+        </member>
+    </members>
+</doc>
