@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.OsuMixedApi", "Bleatingsheep.OsuApiClient\Bleatingsheep.OsuMixedApi.csproj", "{7A8C5120-70EE-4061-8AEC-7405E155A81E}"
 EndProject
@@ -22,6 +22,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.NewHydrant.Bot.Private", "Bleatingsheep.NewHydrant.Bot.Private\Bleatingsheep.NewHydrant.Bot.Private.csproj", "{DF21FAD2-2218-49EC-A516-D31AD75E1731}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bleatingsheep.NewHydrant.Bot.Common", "Bleatingsheep.NewHydrant.Bot.Common\Bleatingsheep.NewHydrant.Bot.Common.csproj", "{6537BC0E-A324-4750-A2AC-514D1A6F19B6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewHydrantApi", "NewHydrantApi\NewHydrantApi.csproj", "{519A4B7E-2874-4230-9E0E-8B7F622E59AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{6537BC0E-A324-4750-A2AC-514D1A6F19B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6537BC0E-A324-4750-A2AC-514D1A6F19B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6537BC0E-A324-4750-A2AC-514D1A6F19B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{519A4B7E-2874-4230-9E0E-8B7F622E59AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{519A4B7E-2874-4230-9E0E-8B7F622E59AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{519A4B7E-2874-4230-9E0E-8B7F622E59AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{519A4B7E-2874-4230-9E0E-8B7F622E59AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
