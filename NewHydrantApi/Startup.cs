@@ -31,8 +31,7 @@ namespace NewHydrantApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<NewbieContext>(
-                options => options.UseMySql(Configuration.GetConnectionString("NewbieDatabase"),
-                    ServerVersion.Parse("8.0.29-mysql"),
+                options => options.UseNpgsql(Configuration.GetConnectionString("NewbieDatabase_Postgres"),
                     options => options.EnableRetryOnFailure()),
                 ServiceLifetime.Transient);
             services.AddControllers();

@@ -11,17 +11,17 @@ using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.NewHydrant.Osu.Newbie;
 using Bleatingsheep.OsuQqBot.Database.Execution;
+using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MySqlConnector;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NLog;
+using Npgsql;
 using PuppeteerSharp;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Sisters.WudiLib.WebSocket.Reverse;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Bleatingsheep.OsuQqBot.Database.Models;
 
 namespace Bleatingsheep.NewHydrant
 {
@@ -188,7 +188,7 @@ namespace Bleatingsheep.NewHydrant
                 );
                 Logging.FileLogger.Default.LogException(e);
             }
-            else if (exception is MySqlException)
+            else if (exception is NpgsqlException)
             {
                 await api.SendMessageAsync(message.Endpoint, "无法访问 MySQL 数据库。");
             }
@@ -213,9 +213,8 @@ namespace Bleatingsheep.NewHydrant
                 {
                     s.AddDbContext<NewbieContext>(
                         optionsBuilder =>
-                            optionsBuilder.UseMySql(
-                                c.Configuration.GetConnectionString("NewbieDatabase"),
-                                ServerVersion.AutoDetect(c.Configuration.GetConnectionString("NewbieDatabase")),
+                            optionsBuilder.UseNpgsql(
+                                c.Configuration.GetConnectionString("NewbieDatabase_Postgres"),
                                 options => options.EnableRetryOnFailure()),
                         ServiceLifetime.Transient);
                 });

@@ -29,18 +29,16 @@ namespace Bleatingsheep.NewHydrant
         {
             services.AddDbContext<NewbieContext>(
                 optionsBuilder =>
-                    optionsBuilder.UseMySql(
-                        Configuration.GetConnectionString("NewbieDatabase"),
-                        ServerVersion.AutoDetect(Configuration.GetConnectionString("NewbieDatabase")),
+                    optionsBuilder.UseNpgsql(
+                        Configuration.GetConnectionString("NewbieDatabase_Postgres"),
                         options => options.EnableRetryOnFailure())
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug)))
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))),
                 ServiceLifetime.Transient);
             services.AddDbContextFactory<NewbieContext>(
                 optionsBuilder =>
-                    optionsBuilder.UseMySql(
-                        Configuration.GetConnectionString("NewbieDatabase"),
-                        ServerVersion.AutoDetect(Configuration.GetConnectionString("NewbieDatabase")),
+                    optionsBuilder.UseNpgsql(
+                        Configuration.GetConnectionString("NewbieDatabase_Postgres"),
                         options => options.EnableRetryOnFailure())
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug)))
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))));
