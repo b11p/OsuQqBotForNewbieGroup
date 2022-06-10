@@ -4,6 +4,9 @@ using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
 
 namespace Bleatingsheep.OsuQqBot.Database.Migrations
 {
@@ -14,37 +17,39 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 64)
-                .HasAnnotation("ProductVersion", "5.0.5");
+                .HasAnnotation("ProductVersion", "6.0.4")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Bleatingsheep.Osu.PerformancePlus.BeatmapPlus", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<float>("Accuracy")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("AimFlow")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("AimJump")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("AimTotal")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("Precision")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("Speed")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("Stamina")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.Property<float>("Stars")
-                        .HasColumnType("float");
+                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -58,11 +63,11 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.Property<int>("OsuId")
                         .IsConcurrencyToken()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Source")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.HasKey("UserId");
 
@@ -73,11 +78,13 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccessToken")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<long>("SelfId")
                         .HasColumnType("bigint");
@@ -94,21 +101,23 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("GroupId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Raw")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -122,26 +131,28 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Operation")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Operator")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<long?>("OperatorId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Remark")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("User")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
@@ -155,16 +166,16 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Mode")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("StartNumber")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -177,38 +188,38 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.PlusHistory", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("Date")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Accuracy")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("AimFlow")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("AimJump")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("AimTotal")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("Performance")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Precision")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Speed")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Stamina")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id", "Date");
 
@@ -219,19 +230,21 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<long>("Left")
                         .HasColumnType("bigint");
 
                     b.Property<int>("Mode")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<long>("Recommendation")
                         .HasColumnType("bigint");
 
                     b.Property<double>("RecommendationDegree")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
@@ -248,11 +261,11 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Relationship")
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Target")
                         .IsConcurrencyToken()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("UserId", "Relationship");
 
@@ -262,21 +275,21 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.UpdateSchedule", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Mode")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ActiveIndex")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("NextUpdate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("Version")
+                    b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("timestamp(6)");
+                        .HasColumnType("bytea");
 
                     b.HasKey("UserId", "Mode");
 
@@ -286,13 +299,13 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.UserPlayRecord", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Mode")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("PlayNumber")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("UserId", "Mode", "PlayNumber");
 
@@ -305,15 +318,17 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
                     b.Property<DateTimeOffset>("Date")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Mode")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -328,25 +343,27 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
                     b.Property<string>("IPAddress")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Kind")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Location")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Token")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("User")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -358,55 +375,55 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                     b.OwnsOne("Bleatingsheep.Osu.ApiClient.UserRecent", "Record", b1 =>
                         {
                             b1.Property<int>("UserPlayRecordUserId")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("UserPlayRecordMode")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("UserPlayRecordPlayNumber")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("BeatmapId")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("Count100")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("Count300")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("Count50")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("CountGeki")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("CountKatu")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("CountMiss")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<DateTime>("Date")
-                                .HasColumnType("datetime(6)");
+                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<int>("EnabledMods")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("MaxCombo")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<bool>("Perfect")
-                                .HasColumnType("tinyint(1)");
+                                .HasColumnType("boolean");
 
                             b1.Property<string>("Rank")
-                                .HasColumnType("longtext");
+                                .HasColumnType("text");
 
                             b1.Property<long>("Score")
                                 .HasColumnType("bigint");
 
                             b1.Property<int>("UserId")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.HasKey("UserPlayRecordUserId", "UserPlayRecordMode", "UserPlayRecordPlayNumber");
 
@@ -428,58 +445,58 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                                 .HasColumnType("bigint");
 
                             b1.Property<double>("AccuracyPercent")
-                                .HasColumnType("double");
+                                .HasColumnType("double precision");
 
                             b1.Property<int>("Count100")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("Count300")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("Count50")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("CountRankA")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("CountRankS")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("CountRankSH")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("CountRankSS")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("CountRankSSH")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<string>("CountryCode")
-                                .HasColumnType("longtext");
+                                .HasColumnType("text");
 
                             b1.Property<int>("CountryRank")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<long>("Id")
                                 .HasColumnType("bigint");
 
                             b1.Property<DateTime>("JoinDate")
-                                .HasColumnType("datetime(6)");
+                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<double>("Level")
-                                .HasColumnType("double");
+                                .HasColumnType("double precision");
 
                             b1.Property<string>("Name")
-                                .HasColumnType("longtext");
+                                .HasColumnType("text");
 
                             b1.Property<double>("Performance")
-                                .HasColumnType("double");
+                                .HasColumnType("double precision");
 
                             b1.Property<int>("PlayCount")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<int>("Rank")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.Property<long>("RankedScore")
                                 .HasColumnType("bigint");
@@ -488,7 +505,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                                 .HasColumnType("bigint");
 
                             b1.Property<int>("TotalSecondsPlayed")
-                                .HasColumnType("int");
+                                .HasColumnType("integer");
 
                             b1.HasKey("UserSnapshotId");
 

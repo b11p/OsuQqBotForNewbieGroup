@@ -43,8 +43,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql(Environment.GetEnvironmentVariable("Xfs_ConnectionString"),
-                    ServerVersion.AutoDetect(Environment.GetEnvironmentVariable("Xfs_ConnectionString")),
+                optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("Xfs_ConnectionString_Postgres"),
                     options => options.EnableRetryOnFailure());
             }
         }
