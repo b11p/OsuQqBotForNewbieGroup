@@ -25,7 +25,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 InitPotantials();
             }
 
-            private static bool GetRandomBool() => DateTimeOffset.Now.ToUnixTimeMilliseconds() % 2 == 0;
+            private static bool GetRandomBool() => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() % 2 == 0;
 
             private void AddCompare(int left, int right, bool leftIsHeavier, bool duplicated)
             {

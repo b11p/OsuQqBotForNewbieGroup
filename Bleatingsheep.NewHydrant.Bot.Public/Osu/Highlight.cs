@@ -145,7 +145,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         private async Task<List<UserSnapshot>> GetHistories(List<int> osuIds, Bleatingsheep.Osu.Mode mode)
         {
             await using var newbieContext = _dbContextFactory.CreateDbContext();
-            var now = DateTimeOffset.Now;
+            var now = DateTimeOffset.UtcNow;
             var snaps = await newbieContext.UserSnapshots
                 .Where(s => now.Subtract(TimeSpan.FromHours(36)) < s.Date && s.Mode == mode && osuIds.Contains(s.UserId))
                 .ToListAsync().ConfigureAwait(false);

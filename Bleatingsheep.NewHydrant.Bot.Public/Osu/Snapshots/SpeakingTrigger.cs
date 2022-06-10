@@ -29,9 +29,10 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
             {
                 return;
             }
-            s_cache.Set(message.UserId, DateTimeOffset.Now, TimeSpan.FromHours(1));
+            s_cache.Set(message.UserId, DateTimeOffset.UtcNow, TimeSpan.FromHours(1));
             var uid = await _dataProvider.GetOsuIdAsync(message.UserId).ConfigureAwait(false);
-            if (uid is null) return;
+            if (uid is null)
+                return;
             var tasks = new[] {
                 _dataMaintainer.UpdateAsync(uid.Value, Mode.Standard),
                 _dataMaintainer.UpdateAsync(uid.Value, Mode.Taiko),

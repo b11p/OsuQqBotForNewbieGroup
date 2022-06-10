@@ -10,7 +10,7 @@ namespace Bleatingsheep.OsuMixedApi
     internal static class HttpMethods
     {
         private static HttpClient s_httpClient = new HttpClient();
-        private static long s_httpClientCreateDate = DateTimeOffset.Now.ToUnixTimeSeconds();
+        private static long s_httpClientCreateDate = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         /// <summary>
         /// Get array with specified URL and arguments.
@@ -64,7 +64,7 @@ namespace Bleatingsheep.OsuMixedApi
         private static void UpdateClientInstanceIfNecessary()
         {
             int outdated = 1800;
-            var now = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             if (now - s_httpClientCreateDate > outdated)
             {
                 s_httpClient = new HttpClient();

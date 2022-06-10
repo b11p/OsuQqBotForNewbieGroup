@@ -13,7 +13,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
         public string Token { get; set; }
 
-        public DateTimeOffset Time { get; set; } = DateTimeOffset.Now;
+        public DateTimeOffset Time { get; set; } = DateTimeOffset.UtcNow;
 
         [Required]
         public string IPAddress { get; set; }
