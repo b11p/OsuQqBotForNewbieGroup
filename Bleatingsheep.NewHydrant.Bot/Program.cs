@@ -155,6 +155,15 @@ namespace Bleatingsheep.NewHydrant
             var hydrant = new Hydrant(httpApiClient, apiPostListener, assemblies)
                 .AddLogger(LogManager.LogFactory);
 
+            hydrant.SetListenerExceptionHandler(handler => e =>
+            {
+                if (e is Newtonsoft.Json.JsonReaderException jre && jre.Path == "message_id")
+                {
+                    return;
+                }
+                handler(e);
+            });
+
             System.Console.WriteLine("正在配置消防栓。(50%)");
             // 设置异常处理。
             hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;

@@ -22,6 +22,7 @@ namespace Bleatingsheep.NewHydrant.Core
         private int _isInitialized = 0;
         private LogFactory? _logFactory;
         private IServiceProvider _serviceProvider = default!;
+        private Action<Exception> _listenerExceptionHandler;
 
         /// <exception cref="ArgumentException">Some of elements in <c>assemblies</c> was <c>null</c>.</exception>
         public Hydrant(HttpApiClient httpApiClient, ApiPostListener listener, params Assembly[] assemblies)
@@ -42,8 +43,8 @@ namespace Bleatingsheep.NewHydrant.Core
             _listener = listener;
 
             // 配置日志
-            //_logger = FileLogger.Default;
-            listener.OnException += e => LogException(nameof(ApiPostListener), "Listener 的异常", e);
+            _listenerExceptionHandler = e => LogException(nameof(ApiPostListener), "Listener 的异常", e);
+            listener.OnException += _listenerExceptionHandler;
 
             // 配置定期任务
             _plan = new Task(() =>
@@ -108,6 +109,22 @@ namespace Bleatingsheep.NewHydrant.Core
 
             var old = Interlocked.CompareExchange(ref _logFactory, logFactory, default);
             if (old != default) throw new InvalidOperationException("Logger can be added only once.");
+            return this;
+        }
+
+        /// <summary>
+        /// 处理 Listener 异常。
+        /// </summary>
+        /// <param name="handlerGenerator">创建新异常处理器的方法。传入旧的异常处理，返回新的异常处理。</param>
+        /// <exception cref="Exception"></exception>
+        /// <returns>该对象，以便链式调用。</returns>
+        public Hydrant SetListenerExceptionHandler(Func<Action<Exception>, Action<Exception>> handlerGenerator)
+        {
+            _listener.OnException -= _listenerExceptionHandler;
+            _listenerExceptionHandler = handlerGenerator(_listenerExceptionHandler);
+            if (_listenerExceptionHandler == null)
+                _listenerExceptionHandler = _ => { };
+            _listener.OnException += _listenerExceptionHandler;
             return this;
         }
 
