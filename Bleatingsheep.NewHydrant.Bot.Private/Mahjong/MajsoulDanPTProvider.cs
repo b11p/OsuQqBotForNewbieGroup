@@ -23,8 +23,12 @@ public class MajsoulDanPTProvider
         {"Gold Room East", new int[] { 40, 20, 0 }},
         {"銀の間南喰赤", new int[] { 40, 20, 0 }},
         {"銀の間東喰赤", new int[] { 20, 10, 0 }},
+        {"Silver Room South", new int[] { 40, 20, 0 }},
+        {"Silver Room East", new int[] { 20, 10, 0 }},
         {"銅の間南喰赤", new int[] { 20, 10, 0 }},
         {"銅の間東喰赤", new int[] { 10, 5, 0 }},
+        {"Bronze Room South", new int[] { 20, 10, 0 }},
+        {"Bronze Room East", new int[] { 10, 5, 0 }},
     };
 
     private static readonly Dictionary<string, int> LastPlacePT4E = new Dictionary<string, int>
@@ -50,9 +54,15 @@ public class MajsoulDanPTProvider
         {"雀士★3", 30},
         {"雀士★2", 20},
         {"雀士★1", 10},
+        {"Adept III", 30},
+        {"Adept II", 20},
+        {"Adept I", 10},
         {"初心★3", 0},
         {"初心★2", 0},
         {"初心★1", 0},
+        {"Novice III", 0},
+        {"Novice II", 0},
+        {"Novice I", 0},
     };
 
     private static readonly Dictionary<string, int> LastPlacePT4S = new Dictionary<string, int>
@@ -78,9 +88,15 @@ public class MajsoulDanPTProvider
         {"雀士★3", 60},
         {"雀士★2", 40},
         {"雀士★1", 20},
+        {"Adept III", 60},
+        {"Adept II", 40},
+        {"Adept I", 20},
         {"初心★3", 0},
         {"初心★2", 0},
         {"初心★1", 0},
+        {"Novice III", 0},
+        {"Novice II", 0},
+        {"Novice I", 0},
     };
 
     public int[] GetPTList(string dan, string roomLevel, int players = 4)
@@ -91,7 +107,7 @@ public class MajsoulDanPTProvider
         }
 
         var result = new int[players];
-        if (roomLevel.Contains("友人戦") || roomLevel.Contains("交流の間"))
+        if (roomLevel.Contains("友人戦") || roomLevel.Contains("交流の間") || roomLevel.Contains("Friendly"))
         {
             result[0] = 100;
             return result;

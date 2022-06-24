@@ -30,7 +30,7 @@ class MahjongSoulAnalyzer : IMessageCommand
         // check if record analyzation already exists
         if (await s_storage.GetUriAsync(_recordId + ".html").ConfigureAwait(false) != null)
         {
-            await api.SendMessageAsync(message.Endpoint, "雀魂记录 {_recordId} 已经被分析过了。").ConfigureAwait(false);
+            await api.SendMessageAsync(message.Endpoint, $"雀魂记录 {_recordId} 已经被分析过了。").ConfigureAwait(false);
             return;
         }
         // check if analyzer busy
@@ -71,7 +71,7 @@ class MahjongSoulAnalyzer : IMessageCommand
             return;
         }
 
-        await api.SendMessageAsync(message.Endpoint, $"即将开始分析，预计20分钟后可以在 https://ts.b11p.com:1443/{_recordId}.html 查看。").ConfigureAwait(false);
+        await api.SendMessageAsync(message.Endpoint, $"即将开始分析，预计20分钟后可以在 https://tx.b11p.com:1443/{_recordId}.html 查看。").ConfigureAwait(false);
         var resultHtml = await s_akochanAnalyzer.AnalyzeAsync(haifuBytes, targetActor.Value, danPt, 0.15, _recordId).ConfigureAwait(false);
         var resultUri = await s_storage.PutFileAsync(_recordId + ".html", resultHtml).ConfigureAwait(false);
         if (resultUri == null)
