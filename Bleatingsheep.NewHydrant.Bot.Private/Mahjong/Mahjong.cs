@@ -60,7 +60,16 @@ class MahjongSoulAnalyzer : IMessageCommand
             return;
         }
 
-        var danPt = s_danPTProvider.GetPTList(targetCheckClass!.Dan[targetActor.Value], targetCheckClass.Rule.Disp, targetCheckClass.Dan.Length);
+        int[] danPt;
+        try
+        {
+            danPt = s_danPTProvider.GetPTList(targetCheckClass!.Dan[targetActor.Value], targetCheckClass.Rule.Disp, targetCheckClass.Dan.Length);
+        }
+        catch (Exception e)
+        {
+            await api.SendMessageAsync(message.Endpoint, "不支持该等级：" + e.Message).ConfigureAwait(false);
+            return;
+        }
 
         await api.SendMessageAsync(message.Endpoint, $"即将开始分析，预计20分钟后可以在 https://ts.b11p.com:1443/{_recordId}.html 查看。").ConfigureAwait(false);
         var resultHtml = await s_akochanAnalyzer.AnalyzeAsync(haifuBytes, targetActor.Value, danPt, 0.15, _recordId).ConfigureAwait(false);
