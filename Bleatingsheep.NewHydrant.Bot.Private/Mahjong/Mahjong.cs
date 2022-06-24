@@ -15,11 +15,9 @@ namespace Bleatingsheep.NewHydrant.Mahjong;
 [Component("mahjong")]
 class MahjongSoulAnalyzer : IMessageCommand
 {
-    private const string TensoulBase = "https://tensoul.b11p.com/convert";
+    private const string TensoulBase = "https://tensoul.azurewebsites.net/convert";
     private static readonly Regex s_regex = new(@"^\s*雀魂\s+(.+)$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-    private static readonly IMajsoulAnalyzer s_akochanAnalyzer = new LocalAkochanReviewer(
-        "/akochan-reviewer",
-        "/akochan-reviewer/target/release/akochan-reviewer");
+    private static readonly IMajsoulAnalyzer s_akochanAnalyzer = new RemoteAkochanReviewer();
     private static readonly MahjongObjectStorage s_storage = new MahjongObjectStorage(
         "/outputs",
         "https://res.bleatingsheep.org/");
@@ -63,7 +61,9 @@ class MahjongSoulAnalyzer : IMessageCommand
         }
 
         var danPt = s_danPTProvider.GetPTList(targetCheckClass!.Dan[targetActor.Value], targetCheckClass.Rule.Disp, targetCheckClass.Dan.Length);
-        var resultHtml = await s_akochanAnalyzer.AnalyzeAsync(haifuBytes, targetActor.Value, danPt, 0.15).ConfigureAwait(false);
+
+        await api.SendMessageAsync(message.Endpoint, $"即将开始分析，预计20分钟后可以在 https://ts.b11p.com:1443/{_recordId}.html 查看。").ConfigureAwait(false);
+        var resultHtml = await s_akochanAnalyzer.AnalyzeAsync(haifuBytes, targetActor.Value, danPt, 0.15, _recordId).ConfigureAwait(false);
         var resultUri = await s_storage.PutFileAsync(_recordId + ".html", resultHtml).ConfigureAwait(false);
         if (resultUri == null)
         {

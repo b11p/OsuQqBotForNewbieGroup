@@ -6,7 +6,7 @@ namespace Bleatingsheep.NewHydrant.Mahjong;
 #nullable enable
 public interface IMajsoulAnalyzer
 {
-    Task<byte[]> AnalyzeAsync(ReadOnlyMemory<byte> logJsonBytes, int targetActor, double[] ptList, double deviationThreshold);
+    Task<byte[]> AnalyzeAsync(ReadOnlyMemory<byte> logJsonBytes, int targetActor, int[] ptList, double deviationThreshold, string id);
 
     bool IsIdle { get; }
 }

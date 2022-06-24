@@ -21,7 +21,7 @@ public class LocalAkochanReviewer : IMajsoulAnalyzer, IDisposable
 
     public bool IsIdle => _semaphore.CurrentCount == 1;
 
-    public Task<byte[]> AnalyzeAsync(ReadOnlyMemory<byte> logJsonBytes, int targetActor, double[] ptList, double deviationThreshold)
+    public Task<byte[]> AnalyzeAsync(ReadOnlyMemory<byte> logJsonBytes, int targetActor, int[] ptList, double deviationThreshold, string id)
     {
         if (!_semaphore.Wait(0))
             throw new InvalidOperationException("Already analyzing.");

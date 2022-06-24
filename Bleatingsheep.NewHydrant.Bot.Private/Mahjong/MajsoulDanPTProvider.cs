@@ -1,29 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Bleatingsheep.NewHydrant.Mahjong;
 
 #nullable enable
 public class MajsoulDanPTProvider
 {
-    private static readonly Dictionary<string, double[]> ExtraDanPT4 = new Dictionary<string, double[]>
+    private static readonly Dictionary<string, int[]> ExtraDanPT4 = new Dictionary<string, int[]>
     {
-        {"王座の間南喰赤", new double[] { 120, 60, 0 }},
-        {"王座の間東喰赤", new double[] { 60, 30, 0 }},
-        {"玉の間南喰赤", new double[] { 110, 55, 0 }},
-        {"玉の間東喰赤", new double[] { 55, 30, 0 }},
-        {"金の間南喰赤", new double[] { 80, 40, 0 }},
-        {"金の間東喰赤", new double[] { 40, 20, 0 }},
-        {"銀の間南喰赤", new double[] { 40, 20, 0 }},
-        {"銀の間東喰赤", new double[] { 20, 10, 0 }},
-        {"銅の間南喰赤", new double[] { 20, 10, 0 }},
-        {"銅の間東喰赤", new double[] { 10, 5, 0 }},
+        {"王座の間南喰赤", new int[] { 120, 60, 0 }},
+        {"王座の間東喰赤", new int[] { 60, 30, 0 }},
+        {"玉の間南喰赤", new int[] { 110, 55, 0 }},
+        {"玉の間東喰赤", new int[] { 55, 30, 0 }},
+        {"金の間南喰赤", new int[] { 80, 40, 0 }},
+        {"金の間東喰赤", new int[] { 40, 20, 0 }},
+        {"銀の間南喰赤", new int[] { 40, 20, 0 }},
+        {"銀の間東喰赤", new int[] { 20, 10, 0 }},
+        {"銅の間南喰赤", new int[] { 20, 10, 0 }},
+        {"銅の間東喰赤", new int[] { 10, 5, 0 }},
     };
 
-    private static readonly Dictionary<string, double> LastPlacePT4E = new Dictionary<string, double>
+    private static readonly Dictionary<string, int> LastPlacePT4E = new Dictionary<string, int>
     {
         {"雀聖★3", 130},
         {"雀聖★2", 120},
@@ -42,7 +40,7 @@ public class MajsoulDanPTProvider
         {"初心★1", 0},
     };
 
-    private static readonly Dictionary<string, double> LastPlacePT4S = new Dictionary<string, double>
+    private static readonly Dictionary<string, int> LastPlacePT4S = new Dictionary<string, int>
     {
         {"雀聖★3", 240},
         {"雀聖★2", 225},
@@ -61,14 +59,14 @@ public class MajsoulDanPTProvider
         {"初心★1", 0},
     };
 
-    public double[] GetPTList(string dan, string roomLevel, int players = 4)
+    public int[] GetPTList(string dan, string roomLevel, int players = 4)
     {
         if (players != 4)
         {
             throw new NotSupportedException("Currently only supports 4 players.");
         }
 
-        var result = new double[players];
+        var result = new int[players];
         if (roomLevel.Contains("友人戦") || roomLevel.Contains("交流の間"))
         {
             result[0] = 100;
