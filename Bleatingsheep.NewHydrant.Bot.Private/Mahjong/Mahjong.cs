@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Bleatingsheep.NewHydrant.Attributions;
 using Sisters.WudiLib;
+using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Mahjong;
@@ -72,14 +73,15 @@ class MahjongSoulAnalyzer : IMessageCommand
         }
 
         await api.SendMessageAsync(message.Endpoint, $"即将开始分析，预计20分钟后可以在 https://tx.b11p.com:1443/{_recordId}.html 查看。").ConfigureAwait(false);
-        var resultHtml = await s_akochanAnalyzer.AnalyzeAsync(haifuBytes, targetActor.Value, danPt, 0.15, _recordId).ConfigureAwait(false);
+        var resultHtml = await s_akochanAnalyzer.AnalyzeAsync(haifuBytes, targetActor.Value, danPt, 0.1, _recordId).ConfigureAwait(false);
         var resultUri = await s_storage.PutFileAsync(_recordId + ".html", resultHtml).ConfigureAwait(false);
         if (resultUri == null)
         {
             await api.SendMessageAsync(message.Endpoint, "保存分析结果失败，请稍后再试。").ConfigureAwait(false);
             return;
         }
-        await api.SendMessageAsync(message.Endpoint, $"雀魂记录 {_recordId} 分析完成，结果已经保存在 {resultUri} 中。").ConfigureAwait(false);
+        var atPrefix = (message.Endpoint is Sisters.WudiLib.Posts.GroupEndpoint ? Message.At(message.UserId) + " " : "");
+        await api.SendMessageAsync(message.Endpoint, atPrefix + $"雀魂记录 {_recordId} 分析完成，结果已经保存在 {resultUri} 中。").ConfigureAwait(false);
     }
 
     public bool ShouldResponse(MessageContext message)
