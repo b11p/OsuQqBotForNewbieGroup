@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -56,33 +55,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
 
             try
             {
-                await using (var db1 = _dbContextFactory.CreateDbContext())
-                {
-                    var snapshotted =
-                        await db1.UserSnapshots
-                        .Select(s => new { s.UserId, s.Mode })
-                        .Distinct()
-                        .ToListAsync()
-                        .ConfigureAwait(false);
-                    var scheduled =
-                        await db1.UpdateSchedules
-                        .Select(s => new { s.UserId, s.Mode })
-                        .ToListAsync()
-                        .ConfigureAwait(false);
-                    var toSchedule = snapshotted.Except(scheduled).Select(i => new UpdateSchedule
-                    {
-                        UserId = i.UserId,
-                        Mode = i.Mode,
-                        NextUpdate = DateTimeOffset.UtcNow,
-                    }).ToList();
-                    if (toSchedule.Count > 0)
-                    {
-                        _logger.LogDebug($"Adding {toSchedule.Count} items to schedule.");
-                        db1.UpdateSchedules.AddRange(toSchedule);
-                        await db1.SaveChangesAsync().ConfigureAwait(false);
-                    }
-                }
-
                 await using var db = _dbContextFactory.CreateDbContext();
                 int scheduledCount = await db.UpdateSchedules.CountAsync(s => s.NextUpdate <= DateTimeOffset.UtcNow).ConfigureAwait(false);
                 var toUpdate = await db.UpdateSchedules
