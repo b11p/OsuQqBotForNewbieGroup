@@ -181,6 +181,16 @@ namespace Bleatingsheep.NewHydrant
                 //apiPostListener.FriendRequestEvent += ApiPostListener.ApproveAllFriendRequests;
                 //apiPostListener.GroupInviteEvent += (api, e) => new GroupRequestResponse { Approve = true };
                 apiPostListener.GroupRequestEvent += hydrant.CreateServiceInstance<NotifyOnJoinRequest>().Monitor;
+                apiPostListener.GroupBanEvent += (api, e) =>
+                {
+                    if (e.Type == GroupBanType.Ban && e.UserId == e.SelfId)
+                    {
+                        _ = api.CallAsync("set_group_leave", new
+                        {
+                            group_id = e.GroupId,
+                        });
+                    }
+                };
             }
 
             Console.WriteLine("init complete.");
