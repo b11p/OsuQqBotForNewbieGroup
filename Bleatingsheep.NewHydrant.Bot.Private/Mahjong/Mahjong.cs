@@ -46,13 +46,8 @@ class MahjongSoulAnalyzer : IMessageCommand
         query.Add("id", _recordId);
         tensoulUri.Query = query.ToString();
         using var httpClient = new HttpClient();
-        var delayingTask = Task.Delay(2000);
         var tensoulTask = httpClient.GetAsync(tensoulUri.Uri, HttpCompletionOption.ResponseHeadersRead);
-        var completedTask = await Task.WhenAny(delayingTask, tensoulTask).ConfigureAwait(false);
-        if (completedTask == delayingTask)
-        {
-            await api.SendMessageAsync(message.Endpoint, "正在获取牌谱，请稍候。").ConfigureAwait(false);
-        }
+        await api.SendMessageAsync(message.Endpoint, "正在获取牌谱，请稍候。").ConfigureAwait(false);
         HttpResponseMessage tensoulResponse_;
         try
         {
