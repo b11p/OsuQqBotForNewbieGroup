@@ -2,21 +2,21 @@
 为 osu! 新人群提供各种功能服务，在其他群也可以使用一些基本的功能。
 
 ## 环境及依赖 (Prerequisites)
-- Ubuntu 18.04 / Docker
+- Ubuntu 22.04 / Docker
 
-- .NET 5.0 (Required)
+- .NET 6.0 (Required)
 
 - [go-cqhttp](https://github.com/Mrs4s/go-cqhttp)
 
-- MySQL / MariaDB (Required)
+- PostgreSQL (Required)
 
-- Chromium-based browser (Recommended)
+- Chromium-based browser (Optional)
 
 ## 服务器准备 (Server Environments)
 1. 运行好 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp)，检查并修改生成的配置文件，确保你理解并正确配置好 `http_config` 部分。
-2. 安装运行好 MySQL，确保可以连接，预留好要使用的数据库名，不要手动创建该数据库。
-3. 安装好 .NET 5.0 Runtime。
-4. (Optional, recommended) 安装一个 Chromium 内核浏览器。
+2. 安装运行好 PostgreSQL，确保可以连接，预留好要使用的数据库名，不要手动创建该数据库。
+3. 安装好 .NET 6.0 Runtime。
+4. (Optional) 安装一个 Chromium 内核浏览器。
 
 ## 本地准备 (Development Environments)
 ### 开发环境
@@ -29,55 +29,21 @@ dotnet tool install --global dotnet-ef
 ### 克隆
 1. 克隆本 repo。
 
-### 补充缺失文件
-1. 使用 Visual Studio 打开 `OsuQqBotHttp.sln`，在 `Bleatingsheep.OsuQqBot.Database/Models` 目录创建 `ServerInfo.cs` 文件，内容如下。
+### 修改配置文件
+待更新。
 
-```C#
-namespace Bleatingsheep.OsuQqBot.Database.Models
-{
-    internal class ServerInfo
-    {
-        public const string Server = "database.server.address";
-        public const int Port = 12345;
-        public const string Database = "database-name";
-        public const string User = "your-database-user";
-        public const string Password = "your-database-password";
-    }
-}
-```
-
-2. 在 `Bleatingsheep.NewHydrant.Bot` 项目创建 `HardcodedConfigure.cs` 文件，内容如下。
-
-```C#
-using System;
-
-namespace Bleatingsheep.NewHydrant
-{
-    public sealed class HardcodedConfigure
-    {
-        public string ApiKey => "your-osu-api-key"; // osu! API key
-
-        public long SuperAdmin => 123456789; // 你的 QQ 账号（非机器人账号）
-
-        public string Listen => "http://+:8876"; // 与 go-cqhttp 配置中 `http_config.post_urls` 部分对应
-        public string ApiAddress => "http://cq:5700"; // 与 go-cqhttp 配置中 `http_config.host` 和 `http_config.host.port` 字段对应。
-        public string AccessToken => "your-access-token"; // 与 go-cqhttp 配置中 `access_token` 字段对应
-        public string Secret => "your-secret"; // 与 go-cqhttp 配置中 `secret` 部分对应
-    }
-}
-```
 #### 参考
 > [go-cqhttp 的配置文件](https://github.com/Mrs4s/go-cqhttp/blob/master/docs/config.md)
 
-3. (Optional) 修改 `Bleatingsheep.NewHydrant.Bot/啥玩意儿啊/Chrome.cs` 文件，将 `ExecutablePath` 改为 Chromium 内核浏览器的可执行文件位置。如果未正确设置，部分功能可能无法使用。
+(Optional) 修改 `Bleatingsheep.NewHydrant.Bot/啥玩意儿啊/Chrome.cs` 文件，将 `ExecutablePath` 改为 Chromium 内核浏览器的可执行文件位置。如果未正确设置，部分功能可能无法使用。
 
-4. 如果 MySQL 服务器未正确配置好 SSL 证书（会验证 CA 及域名是否匹配），在 `Bleatingsheep.OsuQqBot.Database/Models/NewbieContext.cs` 文件中删去 `SslMode=VerifyCA;`。
+尝试编译`Bleatingsheep.NewHydrant.Bot`项目，根据提示消除编译错误
 
-5. 尝试编译`Bleatingsheep.NewHydrant.Bot`项目，根据提示消除编译错误
-
-6. **到这步还没完，先不要运行。**
+待更新。
 
 ### 创建数据库
+待更新。
+
 打开 Powershell，在 `Bleatingsheep.OsuQqBot.Database` 目录运行
 ```Powershell
 dotnet ef migrations script
@@ -101,3 +67,5 @@ dotnet Bleatingsheep.NewHydrant.Bot.dll
 
 ## 开源协议 (LICENSE)
 项目主体部分使用 AGPL 协议授权，框架部分（Bleatingsheep.NewHydrant 文件夹）使用 MIT 协议授权。
+
+项目使用到的其他开源软件列表待更新。
