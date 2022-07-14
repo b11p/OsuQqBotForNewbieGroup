@@ -3,6 +3,8 @@ name: .NET
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'NewHydrantApi/**'
   pull_request:
     branches: [ master ]
 

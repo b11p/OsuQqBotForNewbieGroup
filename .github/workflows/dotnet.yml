@@ -3,6 +3,11 @@ name: .NET
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'Bleatingsheep.NewHydrant.Bot/**'
+      - 'Bleatingsheep.NewHydrant.Bot.Common/**'
+      - 'Bleatingsheep.NewHydrant.Bot.Public/**'
+      - 'Bleatingsheep.NewHydrant.Bot.Private/**'
   pull_request:
     branches: [ master ]
 
