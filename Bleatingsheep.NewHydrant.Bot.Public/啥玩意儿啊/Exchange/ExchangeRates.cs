@@ -22,6 +22,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
             HttpApi.Register<IExchangeRate>();
             HttpApi.Register<ICmbcCreditRate>();
             HttpApi.Register<ICibRate>();
+            HttpApi.Register<IMasterCardRate>();
         }
 
         private static readonly Regex s_regex = new Regex(@"^\s*汇率\s*([A-Za-z]{3})\s*(\d*\.?\d*)\s*$", RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -68,6 +69,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                 checked
                 {
                     // cmbc
+                    var masterCardTask = HttpApi.Resolve<IMasterCardRate>().GetRateToUsd(@base);
                     var cmbcTask = HttpApi.Resolve<ICmbcCreditRate>().GetRates();
 
                     // cib
@@ -91,12 +93,14 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     //cmbc
                     try
                     {
+                        var masterCardResult = await masterCardTask.ConfigureAwait(false);
                         var cmbcResult = await cmbcTask.ConfigureAwait(false);
-                        var price = cmbcResult?.Data?.FirstOrDefault(d => string.Equals(@base, d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
-                        if (price != null)
+                        var usdRate = masterCardResult?.Data?.ConversionRate;
+                        var usdPrice = cmbcResult?.Data?.FirstOrDefault(d => string.Equals("USD", d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
+                        if (usdPrice != null && usdRate != null)
                         {
-                            var cny = amount * price.Value;
-                            results.Add($"CMBC CNY {cny}");
+                            var cny = amount * usdRate.Value * usdPrice.Value;
+                            results.Add($"MasterCard USD CMBC CNY {cny}");
                         }
                     }
                     catch (Exception e)
