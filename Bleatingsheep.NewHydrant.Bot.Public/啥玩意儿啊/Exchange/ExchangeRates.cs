@@ -69,7 +69,9 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                 checked
                 {
                     // cmbc
-                    var masterCardTask = HttpApi.Resolve<IMasterCardRate>().GetRateToUsd(@base);
+                    var masterCardTask = string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase)
+                        ? Task.FromResult<MasterCardRate>(default)
+                        : HttpApi.Resolve<IMasterCardRate>().GetRateToUsd(@base);
                     var cmbcTask = HttpApi.Resolve<ICmbcCreditRate>().GetRates();
 
                     // cib
@@ -93,14 +95,26 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     //cmbc
                     try
                     {
-                        var masterCardResult = await masterCardTask.ConfigureAwait(false);
                         var cmbcResult = await cmbcTask.ConfigureAwait(false);
-                        var usdRate = masterCardResult?.Data?.ConversionRate;
-                        var usdPrice = cmbcResult?.Data?.FirstOrDefault(d => string.Equals("USD", d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
-                        if (usdPrice != null && usdRate != null)
+                        if (string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase))
                         {
-                            var cny = amount * usdRate.Value * usdPrice.Value;
-                            results.Add($"MasterCard USD CMBC CNY {cny}");
+                            var price = cmbcResult?.Data?.FirstOrDefault(d => string.Equals(@base, d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
+                            if (price != null)
+                            {
+                                var cny = amount * price.Value;
+                                results.Add($"CMBC CNY {cny}");
+                            }
+                        }
+                        else
+                        {
+                            var masterCardResult = await masterCardTask.ConfigureAwait(false);
+                            var usdRate = masterCardResult?.Data?.ConversionRate;
+                            var usdPrice = cmbcResult?.Data?.FirstOrDefault(d => string.Equals("USD", d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
+                            if (usdPrice != null && usdRate != null)
+                            {
+                                var cny = amount * usdRate.Value * usdPrice.Value;
+                                results.Add($"MasterCard USD CMBC CNY {cny}");
+                            }
                         }
                     }
                     catch (Exception e)
