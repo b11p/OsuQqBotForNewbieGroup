@@ -23,6 +23,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
             HttpApi.Register<ICmbcCreditRate>();
             HttpApi.Register<ICibRate>();
             HttpApi.Register<IMasterCardRate>();
+            HttpApi.Register<ICmbRateProvider>();
         }
 
         private static readonly Regex s_regex = new Regex(@"^\s*汇率\s*([A-Za-z]{3})\s*(\d*\.?\d*)\s*$", RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -74,6 +75,8 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                         : HttpApi.Resolve<IMasterCardRate>().GetRateToUsd(@base);
                     var cmbcTask = HttpApi.Resolve<ICmbcCreditRate>().GetRates();
 
+                    var cmbTask = HttpApi.Resolve<ICmbRateProvider>().GetRatesInCode();
+
                     // cib
                     var cibTask = HttpApi.Resolve<ICibRate>().GetRates();
 
@@ -92,6 +95,8 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                         results.Add($"{currency} {amount * rate}");
                     }
 
+                    MasterCardRate masterCardResult = default;
+
                     //cmbc
                     try
                     {
@@ -107,7 +112,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                         }
                         else
                         {
-                            var masterCardResult = await masterCardTask.ConfigureAwait(false);
+                            masterCardResult = await masterCardTask.ConfigureAwait(false);
                             var usdRate = masterCardResult?.Data?.ConversionRate;
                             var usdPrice = cmbcResult?.Data?.FirstOrDefault(d => string.Equals("USD", d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
                             if (usdPrice != null && usdRate != null)
@@ -120,6 +125,36 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     catch (Exception e)
                     {
                         results.Add("CMBC 查询失败。");
+                        Logger.Error(e);
+                    }
+
+                    // cmb
+                    try
+                    {
+                        var cmbResult = await cmbTask.ConfigureAwait(false);
+                        if (string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase))
+                        {
+                            var price = cmbResult?.GetValueOrDefault(@base.ToUpperInvariant());
+                            if (price != null)
+                            {
+                                var cny = amount * price.Value;
+                                results.Add($"CMB CNY {cny}");
+                            }
+                        }
+                        else
+                        {
+                            var usdRate = masterCardResult?.Data?.ConversionRate;
+                            var usdPrice = cmbResult?.GetValueOrDefault("USD");
+                            if (usdPrice != null && usdRate != null)
+                            {
+                                var cny = amount * usdRate.Value * usdPrice.Value;
+                                results.Add($"MasterCard USD CMB CNY {cny}");
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        results.Add("CMB 查询失败。");
                         Logger.Error(e);
                     }
 

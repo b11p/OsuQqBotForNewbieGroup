@@ -17,6 +17,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
         private static long s_nextCheck = 0;
         private static string s_cmbcJson = "";
         private static string s_cibJson = "";
+        private static string s_cmbJson = "";
         private static string s_masterCardJson = "";
         private readonly ILogger<ExchangeLogger> _logger;
 
@@ -58,6 +59,14 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                 {
                     s_masterCardJson = masterCardJson;
                     _logger.LogInformation($"MasterCard Changed: {masterCardJson}");
+                }
+
+                var cmb = await HttpApi.Resolve<ICmbRateProvider>().GetRatesInCode().ConfigureAwait(false);
+                var cmbJson = JsonSerializer.Serialize(cmb);
+                if (cmbJson != s_cmbJson)
+                {
+                    s_cmbJson = cmbJson;
+                    _logger.LogInformation($"CMB Changed: {cmbJson}");
                 }
             }
         }
