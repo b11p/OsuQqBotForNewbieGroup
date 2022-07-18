@@ -105,7 +105,7 @@ public static class CmbRateProviderExtensions
         {
             if (s_chineseToCodeMap.TryGetValue(data.ZCcyNbr, out var code))
             {
-                result[code] = decimal.Parse(data.ZRthOfr);
+                result[code] = decimal.Parse(data.ZRthOfr) / 100;
             }
         }
         return result;
