@@ -119,6 +119,10 @@ namespace Bleatingsheep.NewHydrant
                         {
                             elevated = true;
                             logger.Info($"{selfId} 已提权。");
+                            if ((await db.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
+                            {
+                                logger.Warn("数据库还有未完成的迁移，请确认数据库迁移已完成。");
+                            }
                             return configuration;
                         }
                         else
