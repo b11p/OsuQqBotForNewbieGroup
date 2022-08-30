@@ -122,6 +122,8 @@ namespace Bleatingsheep.NewHydrant
                             if ((await db.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
                             {
                                 logger.Warn("数据库还有未完成的迁移，请确认数据库迁移已完成。");
+                                await db.Database.MigrateAsync().ConfigureAwait(false);
+                                logger.Info("自动迁移完成。");
                             }
                             return configuration;
                         }
