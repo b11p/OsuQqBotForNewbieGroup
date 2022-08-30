@@ -18,6 +18,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<OperationHistory> Histories { get; private set; }
         public DbSet<BindingInfo> Bindings { get; private set; }
         public DbSet<BotUserField> BotUserFields { get; private set; }
+        public DbSet<BotGroupField> BotGroupFields { get; private set; }
 
         public DbSet<PlusHistory> PlusHistories { get; private set; }
         public DbSet<RelationshipInfo> Relationships { get; private set; }
@@ -102,6 +103,11 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
             modelBuilder.Entity<BotUserField>()
                 .HasKey(f => new { f.UserId, f.FieldName });
             modelBuilder.Entity<BotUserField>()
+                .HasIndex(f => f.FieldName);
+
+            modelBuilder.Entity<BotGroupField>()
+                .HasKey(f => new { f.GroupId, f.FieldName });
+            modelBuilder.Entity<BotGroupField>()
                 .HasIndex(f => f.FieldName);
         }
     }

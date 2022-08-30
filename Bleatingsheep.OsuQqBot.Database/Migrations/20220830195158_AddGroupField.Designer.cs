@@ -4,6 +4,7 @@ using System.Text.Json;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Bleatingsheep.OsuQqBot.Database.Migrations
 {
     [DbContext(typeof(NewbieContext))]
-    partial class NewbieContextModelSnapshot : ModelSnapshot
+    [Migration("20220830195158_AddGroupField")]
+    partial class AddGroupField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,6 +90,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea");
 
@@ -111,6 +114,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
+                        .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("bytea");
 

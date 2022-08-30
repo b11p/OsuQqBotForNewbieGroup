@@ -3,9 +3,9 @@ using System.Text.Json;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models;
 #nullable enable
-public class BotUserField
+public class BotGroupField
 {
-    public long UserId { get; set; }
+    public long GroupId { get; set; }
     public string FieldName { get; set; } = null!;
     public JsonDocument? Data { get; set; }
     [Timestamp]
