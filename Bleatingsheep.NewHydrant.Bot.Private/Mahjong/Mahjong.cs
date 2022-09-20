@@ -59,7 +59,13 @@ class MahjongSoulAnalyzer : IMessageCommand
             return;
         }
         using var tensoulResponse = tensoulResponse_;
-        if (!tensoulResponse.IsSuccessStatusCode)
+        if ((nint)tensoulResponse.StatusCode is >= 500 and < 600)
+        {
+            // 5xx
+            await api.SendMessageAsync(message.Endpoint, "获取牌谱失败，请联系开发者处理。").ConfigureAwait(false);
+            return;
+        }
+        else if (!tensoulResponse.IsSuccessStatusCode)
         {
             await api.SendMessageAsync(message.Endpoint, "请确保传入了正确的雀魂牌谱ID。").ConfigureAwait(false);
             return;
