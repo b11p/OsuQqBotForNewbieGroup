@@ -124,6 +124,7 @@ namespace Bleatingsheep.NewHydrant.Osu
             {
                 var increase = cps.Find(cp => cp.Old.Performance != 0 && cp.New.Performance != cp.Old.Performance);
                 var mostPlay = cps.OrderByDescending(cp => cp.New.TotalHits - cp.Old.TotalHits).First();
+                var longestPlay = cps.OrderByDescending(cp => cp.New.TotalSecondsPlayed - cp.Old.TotalSecondsPlayed).First();
                 var sb = new StringBuilder(100);
                 sb.AppendLine("最飞升：");
                 if (increase != null)
@@ -136,7 +137,8 @@ namespace Bleatingsheep.NewHydrant.Osu
                 sb.AppendLine("最肝：")
                     // .Append($"{mostPlay.New.Name} 打了 {mostPlay.New.TotalHits - mostPlay.Old.TotalHits} 下。");
                     .Append(mostPlay.New.Name).Append(" 打了 ").Append(mostPlay.New.TotalHits - mostPlay.Old.TotalHits).Append(" 下。");
-
+                sb.AppendLine();
+                sb.Append($"{longestPlay.New.Name} 玩儿了 {TimeSpan.FromSeconds(longestPlay.New.TotalSecondsPlayed - longestPlay.Old.TotalSecondsPlayed).TotalHours:#.##} 小时。");
 
                 await api.SendMessageAsync(context.Endpoint, sb.ToString());
             }
