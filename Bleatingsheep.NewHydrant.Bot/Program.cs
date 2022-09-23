@@ -144,11 +144,14 @@ namespace Bleatingsheep.NewHydrant
             }
             catch (Exception e)
             {
-                var logPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "fatal.log");
-                new Logging.FileLogger(logPath).LogException(e);
-                LogManager.Shutdown();
+                var logger = LogManager.LogFactory.GetCurrentClassLogger();
+                logger.Fatal(e);
 
                 Console.WriteLine(e);
+            }
+            finally
+            {
+                LogManager.Shutdown();
             }
 
             // 阻止自动重启
@@ -211,7 +214,6 @@ namespace Bleatingsheep.NewHydrant
                     endpoint: message.Endpoint,
                     message: e.Message ?? (e.InnerException is DbUpdateConcurrencyException ? "数据库太忙。" : "无法访问数据库。")
                 );
-                Logging.FileLogger.Default.LogException(e);
             }
             else if (exception is NpgsqlException)
             {
@@ -228,7 +230,6 @@ namespace Bleatingsheep.NewHydrant
             else
             {
                 await api.SendMessageAsync(message.Endpoint, "有一些不好的事发生了。");
-                Logging.FileLogger.Default.LogException(exception);
             }
         }
 
