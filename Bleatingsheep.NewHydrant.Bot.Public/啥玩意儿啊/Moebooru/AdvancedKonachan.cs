@@ -25,7 +25,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
         private static readonly IReadOnlyDictionary<string, IBooruClient> s_Booru = new Dictionary<string, IBooruClient>
         {
             { "KONACHAN", BooruFactory.CreateClient("https://xfs-proxy-konachan.b11p.com") },
-            { "YANDERE", BooruFactory.CreateClient("https://xfs-proxy-yandere.b11p.com") },
+            { "YANDERE", BooruFactory.Yandere },
         };
 
         private static readonly IReadOnlyDictionary<string, string> s_ReverseProxy = new Dictionary<string, string>
