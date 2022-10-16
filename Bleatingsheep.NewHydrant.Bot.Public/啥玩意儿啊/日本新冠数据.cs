@@ -20,7 +20,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 Width = 360,
                 Height = 8000,
             }).ConfigureAwait(false);
-            await page.GoToAsync("https://toyokeizai.net/sp/visual/tko/covid19/en.html").ConfigureAwait(false);
+            await page.GoToAsync("https://toyokeizai.net/sp/visual/tko/covid19/index.html").ConfigureAwait(false);
             await page.WaitForSelectorAsync("#main-block > div:nth-child(2) > div:nth-child(1) > div > div.charts-wrapper > div.main-chart-wrapper > div > canvas").ConfigureAwait(false);
             var element = await page.QuerySelectorAsync("#main-block > div:nth-child(2)").ConfigureAwait(false);
             await page.SetViewportAsync(new ViewPortOptions
