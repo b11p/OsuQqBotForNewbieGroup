@@ -24,7 +24,7 @@ internal class 美国新冠数据 : IMessageCommand
         await page.WaitForSelectorAsync("#us-covid-cases > div > div > main > div.g-columns-outer.svelte-hfvvmm > div:nth-child(2) > section:nth-child(1)").ConfigureAwait(false);
         var deleteElement = await page.QuerySelectorAsync("#standalone-footer > div > div").ConfigureAwait(false);
         await deleteElement.EvaluateFunctionAsync("b => b.remove()").ConfigureAwait(false);
-        var element = await page.QuerySelectorAsync("#us-covid-cases > div > div > main > div.g-columns-outer.svelte-hfvvmm > div:nth-child(2) > section:nth-child(1)").ConfigureAwait(false);
+        var element = await page.QuerySelectorAsync("#__covidtracker__ > main > div.g-columns-outer.svelte-hfvvmm > div:nth-child(1) > section:nth-child(1)").ConfigureAwait(false);
         await page.SetViewportAsync(new ViewPortOptions
         {
             DeviceScaleFactor = 2,
