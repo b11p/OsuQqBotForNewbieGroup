@@ -27,9 +27,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         private async Task ScreenShotsAsync(List<Message> hints, int uid)
         {
-            async Task<byte[]> GetScreenshot(Page page, string selector)
+            static async Task<byte[]> GetScreenshot(IPage page, string selector)
             {
-                ElementHandle detailElement = await page.WaitForSelectorAsync(selector);
+                var detailElement = await page.WaitForSelectorAsync(selector);
                 var data = await detailElement
                     .ScreenshotDataAsync(new ScreenshotOptions
                     {
@@ -61,7 +61,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     // draw ranks
                     const string bestSelector = "div[data-page-id=\"top_ranks\"]";
                     bool noBP = false;
-                    ElementHandle bpElement = await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
+                    var bpElement = await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
                     if (bpElement != null)
                     {
                         if (noBP)

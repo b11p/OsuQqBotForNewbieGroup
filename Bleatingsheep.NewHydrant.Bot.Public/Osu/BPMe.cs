@@ -12,7 +12,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 namespace Bleatingsheep.NewHydrant.Osu
 {
 #nullable enable
-    [Component("bpme")]
+    //[Component("bpme")]
     internal class BPMe : Service, IMessageCommand
     {
         public BPMe(ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
@@ -46,8 +46,8 @@ namespace Bleatingsheep.NewHydrant.Osu
                 //ElementHandle bpsElement = await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
 
                 const string buttonSelector = "body > div.osu-layout__section.osu-layout__section--full.js-content.community_profile > div > div > div > div.osu-layout__section.osu-layout__section--users-extra > div > div > div > div:nth-child(2) > div > div.profile-extra-entries__item > button";
-                ElementHandle button = await page.QuerySelectorAsync(buttonSelector).ConfigureAwait(false);
-                ElementHandle[]? bpList = default;
+                var button = await page.QuerySelectorAsync(buttonSelector).ConfigureAwait(false);
+                IElementHandle[]? bpList = default;
                 int maxTryTimes = 4;
                 while (button != null && maxTryTimes-- != 0)
                 {
@@ -103,7 +103,7 @@ bpList.forEach((element) => { var dateTime = element.querySelector("div.play-det
                 //ElementHandle printElement = await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
                 var printElement =
                     await (await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false))
-                    .EvaluateFunctionHandleAsync("(element) => element.parentNode.parentNode").ConfigureAwait(false) as ElementHandle;
+                    .EvaluateFunctionHandleAsync("(element) => element.parentNode.parentNode").ConfigureAwait(false) as IElementHandle;
                 printElement ??= await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
                 var data = await printElement.ScreenshotDataAsync(new ScreenshotOptions()).ConfigureAwait(false);
 

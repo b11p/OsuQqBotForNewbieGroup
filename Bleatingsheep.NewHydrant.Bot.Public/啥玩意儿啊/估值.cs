@@ -55,11 +55,11 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
 
 
                 const string detailSelector = "#app > div.ant-layout-main.ant-layout-main-f > div.ant-layout-container.safe-padding-bottom > div > div > div > div.index__29fc4";
-                ElementHandle detailElement = await page.WaitForSelectorAsync(detailSelector).ConfigureAwait(false);
+                var detailElement = await page.WaitForSelectorAsync(detailSelector).ConfigureAwait(false);
 
                 // delete advertisement
                 const string adSelector = "#app > div > div.ant-layout-container > div > div > div > div.index__29fc4 > a > img";
-                ElementHandle adElement = await page.QuerySelectorAsync(adSelector).ConfigureAwait(false);
+                var adElement = await page.QuerySelectorAsync(adSelector).ConfigureAwait(false);
                 if (!(adElement is null))
                     await adElement.EvaluateFunctionAsync(@"(element) => { element.parentElement.remove(); }").ConfigureAwait(false);
 
