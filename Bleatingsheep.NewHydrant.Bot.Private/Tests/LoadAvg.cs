@@ -31,7 +31,9 @@ class LoadAvg : IMessageCommand
             messageList.Add($"Memory Pressure avg300: some {pressureMemArray[3][7..]}, full {pressureMemArray[8][7..]}");
         }
 
-        await api.SendMessageAsync(context.Endpoint, string.Join("\r\n", messageList)).ConfigureAwait(false);
+        var sendrsp = await api.SendMessageAsync(context.Endpoint, string.Join("\r\n", messageList)).ConfigureAwait(false);
+        await Task.Delay(5000).ConfigureAwait(false);
+        await api.SendMessageAsync(context.Endpoint, sendrsp is null ? "No sent response data." : $"Response message ID: {sendrsp.MessageId}").ConfigureAwait(false);
     }
 
     public bool ShouldResponse(MessageContext context)
