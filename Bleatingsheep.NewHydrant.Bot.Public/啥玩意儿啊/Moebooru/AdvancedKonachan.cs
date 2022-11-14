@@ -71,6 +71,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
             661021255,
             338371278,
             184128198,
+            750899485,
         };
 
         private static Task<IEnumerable<long>> GetPromotedGroupsAsync() => Task.FromResult(_promotedGroups as IEnumerable<long>);
