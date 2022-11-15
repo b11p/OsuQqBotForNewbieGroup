@@ -30,7 +30,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 #endif
         private static readonly IReadOnlyDictionary<long, double?> ManagedGroups = new Dictionary<long, double?>
         {
-            [712603531] = 2500,
+            [595985887] = 2500,
             [928936255] = null,
             [758120648] = null,
             [514661057] = null,

@@ -27,7 +27,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         private static readonly Dictionary<string, (long, int)> s_groups = new()
         {
-            { "新人群", (712603531, 2800) },
+            { "新人群", (595985887, 2800) },
             { "进阶群", (928936255, 4500) },
         };
 

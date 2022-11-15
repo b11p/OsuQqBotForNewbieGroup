@@ -59,7 +59,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             97512825, // a9
         };
 
-        private const long NewbieGroupId = 712603531;
+        private const long NewbieGroupId = 595985887;
 
         public static INewbieInfoProvider GetProvider() => new HardcodedProvider();
 
