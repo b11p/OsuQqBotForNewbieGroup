@@ -29,6 +29,7 @@ namespace Bleatingsheep.NewHydrant.Admin
             1172482284, // UselessPlayer
             1528769425, // m u s e
             2624161473, // guozi
+            630060047, // CYCLC
         };
 
         public AdminVerifier()
