@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Data;
@@ -70,6 +71,42 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             if (playList.Count == 0)
                 return;
 
+            // favorite mapper
+            var playedBeatmaps = playList.Select(r => r.Record.BeatmapId).Distinct().ToHashSet();
+            var cachedBeatmapInfo = await _newbieContext.BeatmapInfoCache.Where(e => e.Mode == _mode && playedBeatmaps.Contains(e.BeatmapId)).ToListAsync().ConfigureAwait(false);
+            var remainingBeatmaps = playedBeatmaps.Except(cachedBeatmapInfo.Select(e => e.BeatmapInfo.Id));
+            var beatmapInfoList = cachedBeatmapInfo.ConvertAll(e => e.BeatmapInfo);
+            string? favoriteMapperName = default;
+            int favoriteMapperPlayCount = default;
+            using var mapperCompleteSemaphore = new SemaphoreSlim(0, 1);
+            var mapperTask = Task.Run(async () =>
+            {
+                try
+                {
+                    foreach (var beatmapId in remainingBeatmaps)
+                    {
+                        var current = await _dataProvider.GetBeatmapInfoAsync(beatmapId, _mode).ConfigureAwait(false);
+                        if (current != null)
+                        {
+                            beatmapInfoList.Add(current);
+                        }
+                    }
+                    var beatmapToCreatorDic = beatmapInfoList.ToDictionary(i => i.Id, i => i.CreatorId);
+                    var favoriteMapperId = playedBeatmaps.GroupBy(bid => beatmapToCreatorDic.GetValueOrDefault(bid)).OrderByDescending(g => g.Count()).SkipWhile(g => g.Key == 0).FirstOrDefault()?.Key;
+                    if (favoriteMapperId != null)
+                    {
+                        var favoriteMapperBeatmaps = beatmapInfoList.Where(b => b.CreatorId == favoriteMapperId).ToList();
+                        favoriteMapperName = favoriteMapperBeatmaps.OrderByDescending(b => b.ApprovedDate).FirstOrDefault()?.Creator;
+                        var favoriteMapperBeatmapIds = favoriteMapperBeatmaps.Select(b => b.Id).ToHashSet();
+                        favoriteMapperPlayCount = playList.Count(r => favoriteMapperBeatmapIds.Contains(r.Record.BeatmapId));
+                    }
+                }
+                finally
+                {
+                    _ = mapperCompleteSemaphore.Release();
+                }
+            });
+
             // assign data to fields.
             _userPlayRecords = playList;
             {
@@ -82,6 +119,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 (int bid, int count, BeatmapInfo? beatmap) = await GetMostPlayedBeatmapAsync().ConfigureAwait(false);
                 _ = await api.SendMessageAsync(context.Endpoint, $"你最常打的一张图是 {bid}，打了 {count} 次。" +
                     $"{beatmap}").ConfigureAwait(false);
+            }
+            {
+                // favorite mapper
+                await mapperCompleteSemaphore.WaitAsync().ConfigureAwait(false);
+                if (favoriteMapperName != null)
+                {
+                    _ = await api.SendMessageAsync(context.Endpoint, $"你最喜欢的 mapper 是 {favoriteMapperName}，打了她/他的图 {favoriteMapperPlayCount} 次。").ConfigureAwait(false);
+                }
             }
             {
                 // most playing hour

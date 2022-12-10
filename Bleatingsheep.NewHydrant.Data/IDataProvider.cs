@@ -15,5 +15,7 @@ namespace Bleatingsheep.NewHydrant.Data
         Task<UserInfo> GetUserInfoRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default);
 
         Task<int?> GetOsuIdAsync(long qq);
+
+        ValueTask<BeatmapInfo?> GetBeatmapInfoAsync(int beatmapId, Mode mode, CancellationToken cancellationToken = default);
     }
 }

@@ -65,6 +65,37 @@ namespace Bleatingsheep.NewHydrant.Data
             return policy.ExecuteAsync(_ => _osuApiClient.GetUser(userId, mode), cancellationToken);
         }
 
+        public async ValueTask<BeatmapInfo?> GetBeatmapInfoAsync(int beatmapId, Mode mode, CancellationToken cancellationToken = default)
+        {
+            var result = await _dbContext.BeatmapInfoCache.FirstOrDefaultAsync(c => c.BeatmapId == beatmapId && c.Mode == mode, cancellationToken).ConfigureAwait(false);
+            if (result != null)
+            {
+                return result.BeatmapInfo;
+            }
+            var currentDate = DateTimeOffset.UtcNow;
+            var beatmap = await _osuApiClient.GetBeatmap(beatmapId, mode).ConfigureAwait(false);
+            if (beatmap != null)
+            {
+                var newEntry = new BeatmapInfoCacheEntry
+                {
+                    BeatmapId = beatmapId,
+                    Mode = mode,
+                    CacheDate = currentDate,
+                    BeatmapInfo = beatmap,
+                };
+                _ = _dbContext.BeatmapInfoCache.Add(newEntry);
+                try
+                {
+                    _ = await _dbContext.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+                }
+                catch
+                {
+                    // ignore this exception
+                }
+            }
+            return beatmap;
+        }
+
         public void Dispose()
         {
             (_randomLocal as IDisposable)?.Dispose();
