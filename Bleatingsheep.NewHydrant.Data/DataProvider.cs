@@ -74,8 +74,9 @@ namespace Bleatingsheep.NewHydrant.Data
             }
             var currentDate = DateTimeOffset.UtcNow;
             var beatmap = await _osuApiClient.GetBeatmap(beatmapId, mode).ConfigureAwait(false);
-            if (beatmap != null)
+            if (beatmap?.Approved is Approved.Ranked or Approved.Approved)
             {
+                // not null and ranked
                 var newEntry = new BeatmapInfoCacheEntry
                 {
                     BeatmapId = beatmapId,
