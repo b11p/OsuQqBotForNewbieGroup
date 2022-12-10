@@ -26,6 +26,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<WebLog> WebLogs { get; private set; }
         public DbSet<DuplicateAuthentication> DuplicateAuthentication { get; private set; }
 
+        public DbSet<BeatmapInfoCacheEntry> BeatmapInfoCache { get; private set; }
+
         #region User snapshots and play records.
         public DbSet<UserPlayRecord> UserPlayRecords { get; private set; }
         public DbSet<UserSnapshot> UserSnapshots { get; private set; }
@@ -109,6 +111,9 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
                 .HasKey(f => new { f.GroupId, f.FieldName });
             modelBuilder.Entity<BotGroupField>()
                 .HasIndex(f => f.FieldName);
+
+            modelBuilder.Entity<BeatmapInfoCacheEntry>()
+                .HasKey(c => new { c.BeatmapId, c.Mode });
         }
     }
 }
