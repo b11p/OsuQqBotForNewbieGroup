@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
+using Bleatingsheep.Osu;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -36,12 +37,17 @@ public class SyncSchedule : Service, IRegularAsync
             .Distinct()
             .ToListAsync()
             .ConfigureAwait(false);
+        var binded = await
+            (from b in db1.Bindings
+             from m in new[] { Mode.Standard, Mode.Taiko, Mode.Catch, Mode.Mania }
+             select new { UserId = b.OsuId, Mode = m })
+            .ToListAsync().ConfigureAwait(false);
         var scheduled =
             await db1.UpdateSchedules
             .Select(s => new { s.UserId, s.Mode })
             .ToListAsync()
             .ConfigureAwait(false);
-        var toSchedule = snapshotted.Except(scheduled).Select(i => new UpdateSchedule
+        var toSchedule = snapshotted.Intersect(binded).Except(scheduled).Select(i => new UpdateSchedule
         {
             UserId = i.UserId,
             Mode = i.Mode,
@@ -49,7 +55,7 @@ public class SyncSchedule : Service, IRegularAsync
         }).ToList();
         if (toSchedule.Count > 0)
         {
-            _logger.LogDebug($"Adding {toSchedule.Count} items to schedule.");
+            _logger.LogDebug("Adding {toSchedule.Count} items to schedule.", toSchedule.Count);
             db1.UpdateSchedules.AddRange(toSchedule);
             await db1.SaveChangesAsync().ConfigureAwait(false);
         }

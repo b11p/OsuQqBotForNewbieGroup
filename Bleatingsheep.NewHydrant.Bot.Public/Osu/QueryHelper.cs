@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Utilities;
 using Bleatingsheep.Osu;
 using Bleatingsheep.Osu.ApiClient;
@@ -16,11 +17,13 @@ namespace Bleatingsheep.NewHydrant.Osu
     {
         private readonly IOsuApiClient _osuApi;
         private readonly NewbieContext _newbieContext;
+        private readonly DataMaintainer _dataMaintainer;
 
-        public QueryHelper(IOsuApiClient osuApi, NewbieContext newbieContext)
+        public QueryHelper(IOsuApiClient osuApi, NewbieContext newbieContext, DataMaintainer dataMaintainer)
         {
             _osuApi = osuApi;
             _newbieContext = newbieContext;
+            _dataMaintainer = dataMaintainer;
         }
 
         private async ValueTask<(bool, UserSnapshot?)> GetComparedData(int userId, Mode mode)
@@ -35,6 +38,11 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var history = snapshots
                     .OrderBy(s => Utilities.DateUtility.GetError(now - TimeSpan.FromHours(24), s.Date))
                     .FirstOrDefault();
+                if (history == null)
+                {
+                    // 当用户比较数据不存在时，强制更新
+                    _ = _dataMaintainer.UpdateAsync(userId, mode);
+                }
                 return (true, history);
             }
             catch (Exception)

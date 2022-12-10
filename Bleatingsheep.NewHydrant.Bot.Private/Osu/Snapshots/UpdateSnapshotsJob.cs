@@ -64,25 +64,25 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
                     .ToListAsync().ConfigureAwait(false);
                 if (scheduledCount == 0)
                     return;
-                _logger.LogDebug($"Updating {toUpdate.Count} of {scheduledCount} snapshots.");
+                _logger.LogDebug("Updating {toUpdate.Count} of {scheduledCount} snapshots.", toUpdate.Count, scheduledCount);
                 int successCount = 0;
                 foreach (var schedule in toUpdate)
                 {
                     try
                     {
-                        await _dataMaintainer.UpdateAsync(schedule.UserId, schedule.Mode).ConfigureAwait(false);
+                        await _dataMaintainer.UpdateNowAsync(schedule.UserId, schedule.Mode).ConfigureAwait(false);
                         schedule.NextUpdate = DateTimeOffset.UtcNow + TimeSpan.FromHours(6);
                         successCount++;
                     }
                     catch (Exception e)
                     {
-                        _logger.LogInformation(e, $"Update error on user id {schedule.UserId} mode {schedule.Mode}");
+                        _logger.LogInformation(e, "Update error on user id {schedule.UserId} mode {schedule.Mode}", schedule.UserId, schedule.Mode);
                         if (e.Message.Contains("429 Too Many Requests"))
                             break;
                     }
                 }
                 await db.SaveChangesAsync().ConfigureAwait(false);
-                _logger.LogDebug($"Update schedule completed. Success {successCount} of {toUpdate.Count}");
+                _logger.LogDebug("Update schedule completed. Success {successCount} of {toUpdate.Count}", successCount, toUpdate.Count);
             }
             finally
             {

@@ -23,6 +23,34 @@ namespace Bleatingsheep.NewHydrant.Data
 
         public async Task UpdateAsync(int osuId, Mode mode)
         {
+            await using var dbContext = _contextFactory.CreateDbContext();
+            var schedule = await dbContext.UpdateSchedules.Where(s => s.UserId == osuId && s.Mode == mode).FirstOrDefaultAsync().ConfigureAwait(false);
+            if (schedule == null)
+            {
+                schedule = new UpdateSchedule
+                {
+                    UserId = osuId,
+                    Mode = mode,
+                    NextUpdate = DateTimeOffset.UnixEpoch,
+                };
+                _ = dbContext.Add(schedule);
+            }
+            else
+            {
+                schedule.NextUpdate = DateTimeOffset.UnixEpoch;
+            }
+            try
+            {
+                _ = await dbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // ignore this exception.
+            }
+        }
+
+        public async Task UpdateNowAsync(int osuId, Mode mode)
+        {
             // 开始通过 API 获取用户信息和最近游玩记录。
             var osuApi = _osuApiClient;
             var getUserTask = osuApi.GetUser(osuId, mode);
