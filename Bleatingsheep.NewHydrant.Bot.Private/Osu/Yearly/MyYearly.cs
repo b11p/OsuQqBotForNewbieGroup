@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
@@ -90,7 +91,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 .Where(r => r.UserId == osuId && r.Mode == _mode && r.PlayNumber > startPC)
                 .OrderBy(r => r.PlayNumber)
                 .ToListAsync().ConfigureAwait(false);
-            _ = await api.SendMessageAsync(context.Endpoint, $"当前模式：{_mode}，数据完整度：{playList.Count} of {currentPC - startPC}。功能制作中。正在生成报告，请稍候。").ConfigureAwait(false);
+            _ = await api.SendMessageAsync(context.Endpoint, $"{userInfo.Name}。当前模式：{_mode}，数据完整度：{playList.Count} of {currentPC - startPC}。功能制作中。正在生成报告，请稍候。").ConfigureAwait(false);
             if (playList.Count == 0)
             {
                 await api.SendMessageAsync(context.Endpoint, "你在过去一年没有玩儿过 osu!，或无数据记录。").ConfigureAwait(false);
@@ -120,16 +121,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
 
             // assign data to fields.
             _userPlayRecords = playList;
+            var sb = new StringBuilder();
             {
                 // days played
                 (int days, int totalDays) = GetPlayedDays();
-                _ = await api.SendMessageAsync(context.Endpoint, $"你在过去一年中有 {days} 天打了图。").ConfigureAwait(false);
+                sb.AppendLine($"你在过去一年中有 {days} 天打了图。");
             }
             {
                 // most played
                 (int bid, int count, BeatmapInfo? beatmap) = await GetMostPlayedBeatmapAsync().ConfigureAwait(false);
-                _ = await api.SendMessageAsync(context.Endpoint, $"你最常打的一张图是 {bid}，打了 {count} 次。" +
-                    $"{beatmap}").ConfigureAwait(false);
+                sb.AppendLine($"你最常打的一张图是 {bid}，打了 {count} 次。{beatmap}");
             }
             {
                 // mods
@@ -139,19 +140,19 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 {
                     modsString = "None";
                 }
-                _ = await api.SendMessageAsync(context.Endpoint, $"你最喜欢的 mods 是 {modsString}，贡献了你 {(double)count / _userPlayRecords.Count:P0} 的游玩次数。").ConfigureAwait(false);
+                sb.AppendLine($"你最喜欢的 mods 是 {modsString}，贡献了你 {(double)count / _userPlayRecords.Count:P0} 的游玩次数。");
             }
             {
                 (string? favoriteMapperName, int favoriteMapperPlayCount) = GetFavoriteMapper();
                 if (favoriteMapperName != null)
                 {
-                    _ = await api.SendMessageAsync(context.Endpoint, $"你最喜欢的 mapper 是 {favoriteMapperName}，打了她/他的图 {favoriteMapperPlayCount} 次。").ConfigureAwait(false);
+                    sb.AppendLine($"你最喜欢的 mapper 是 {favoriteMapperName}，打了她/他的图 {favoriteMapperPlayCount} 次。");
                 }
             }
             {
                 // most playing hour
                 var mostPlayingHour = GetMostPlayingHours();
-                _ = await api.SendMessageAsync(context.Endpoint, $"你最常在 {mostPlayingHour}-{mostPlayingHour + 1} 时打图。").ConfigureAwait(false);
+                sb.AppendLine($"你最常在 {mostPlayingHour}-{mostPlayingHour + 1} 时打图。");
             }
             {
                 // most played beatmap of the day
@@ -162,8 +163,10 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                     ? "都没全连，真菜。"
                     : string.Empty;
                 var beatmapInfo = _beatmapInfoDict.GetValueOrDefault(bid);
-                await api.SendMessageAsync(context.Endpoint, $"{date.ToShortDateString()}，你把 {bid} 打了 {count} 次。{fcString}{beatmapInfo}").ConfigureAwait(false);
+                sb.AppendLine($"{date.ToShortDateString()}，你把 {bid} 打了 {count} 次。{fcString}{beatmapInfo}");
             }
+            sb.Append($"{userInfo.Name} 的年度 osu! 记录。");
+            await api.SendMessageAsync(context.Endpoint, sb.ToString()).ConfigureAwait(false);
         }
 
         /// <summary>
