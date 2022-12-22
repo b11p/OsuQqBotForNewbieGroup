@@ -141,7 +141,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 // days played
                 (int days, int totalDays) = GetPlayedDays();
                 sb.Append($"你在过去一年中有 {days} 天打了图，合计 {userInfo.PlayCount - snap.UserInfo.PlayCount} 次，{userInfo.TotalHits - snap.UserInfo.TotalHits} TTH，{(userInfo.PlayTime - snap.UserInfo.PlayTime).TotalHours:#.##} 小时。");
-                sb.AppendLine($"增长了 {userInfo.Performance - snap.UserInfo.Performance}PP。");
+                sb.AppendLine($"增长了 {userInfo.Performance - snap.UserInfo.Performance:#.##}PP。");
             }
             {
                 // most played
