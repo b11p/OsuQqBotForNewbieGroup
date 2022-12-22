@@ -186,7 +186,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 var (start1, end, pc, tth) = GetLongestContinuousPlay(out var periods);
                 if (start1 != end)
                 {
-                    sb.AppendLine($"{start1:M-d H:mm} 到 {end:M-d H:mm}，你连续打了 {pc} 次，是你连续游玩时间最长的一次，你一定玩儿得热血沸腾。");
+                    sb.AppendLine($"{start1.ToOffset(_timeZone):M-d H:mm} 到 {end.ToOffset(_timeZone):M-d H:mm}，你连续打了 {pc} 次，是你连续游玩时间最长的一次，你一定玩儿得热血沸腾。");
                 }
                 if (periods.Count > 0)
                 {
