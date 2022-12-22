@@ -101,7 +101,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 .Where(r => r.UserId == osuId && r.Mode == _mode && r.PlayNumber > startPC)
                 .OrderBy(r => r.PlayNumber)
                 .ToListAsync().ConfigureAwait(false);
-            _ = await api.SendMessageAsync(context.Endpoint, $"{userInfo.Name}。当前模式：{_mode}，数据完整度：{playList.Count} of {currentPC - startPC}。功能制作中。正在生成报告，请稍候。").ConfigureAwait(false);
+            _ = await api.SendMessageAsync(context.Endpoint, $"{userInfo.Name}。当前模式：{_mode}，数据始于{snap.Date.ToOffset(_timeZone):M月d日}，完整度：{playList.Count}/{currentPC - startPC}。功能制作中。正在生成报告，请稍候。").ConfigureAwait(false);
             if (playList.Count == 0)
             {
                 await api.SendMessageAsync(context.Endpoint, "你在过去一年没有玩儿过 osu!，或无数据记录。").ConfigureAwait(false);
@@ -144,7 +144,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             }
             {
                 // most played
-                (int bid, int count, BeatmapInfo? beatmap) = await GetMostPlayedBeatmapAsync().ConfigureAwait(false);
+                (int bid, int count, BeatmapInfo? beatmap) = GetMostPlayedBeatmap();
                 sb.AppendLine($"你最常打的一张图是 {bid}，打了 {count} 次。{beatmap}");
             }
             {
@@ -180,6 +180,29 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 var beatmapInfo = _beatmapInfoDict.GetValueOrDefault(bid);
                 sb.AppendLine($"{date.ToShortDateString()}，你把 {bid} 打了 {count} 次。{fcString}{beatmapInfo}");
             }
+            {
+                // longest continuous play
+                var (start1, end, pc, tth) = GetLongestContinuousPlay(out var periods);
+                if (start1 != end)
+                {
+                    sb.AppendLine($"{start1:M-d H:mm} 到 {end:M-d H:mm}，你连续打了 {pc} 次，是你连续游玩时间最长的一次，你一定玩儿得热血沸腾。");
+                }
+                if (periods.Count > 0)
+                {
+                    var mostNight = periods.OrderByDescending(t => t.end.AddHours(-5).ToOffset(_timeZone).TimeOfDay).First();
+                    var dtoff = mostNight.end.ToOffset(_timeZone);
+                    var date = dtoff.Date;
+                    var time = dtoff.TimeOfDay;
+                    var comment = time.Hours switch
+                    {
+                        < 2 => "要注意休息。",
+                        < 5 => "osu! 陪你度过不眠夜。",
+                        < 18 => "大好的晚上不能浪费在 osu! 上。",
+                        _ => "除了 osu!，你还有人生，健康作息很重要。",
+                    };
+                    sb.AppendLine($"{date.ToShortDateString()}，你{time.Hours}点{time.Minutes}分还在打 osu!，是最晚的一次，{comment}");
+                }
+            }
             sb.Append($"{userInfo.Name} 的年度 osu! 记录。");
             await api.SendMessageAsync(context.Endpoint, sb.ToString()).ConfigureAwait(false);
         }
@@ -194,7 +217,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             return (days.Count, 365);
         }
 
-        private async Task<(int bid, int count, BeatmapInfo? beatmapInfo)> GetMostPlayedBeatmapAsync()
+        private (int bid, int count, BeatmapInfo? beatmapInfo) GetMostPlayedBeatmap()
         {
             IGrouping<int, UserPlayRecord>? mostPlayed = _userPlayRecords
                 .GroupBy(r => r.Record.BeatmapId)
@@ -252,6 +275,40 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 fullCombo = mostPlayedOfTheDay.Any(r => r.Record.CountMiss == 0 && r.Record.Count100 + r.Record.Count50 > maxCombo - r.Record.MaxCombo);
             }
             return (bid, date, mostPlayedOfTheDay.Count(), fullCombo);
+        }
+
+        private (DateTimeOffset start, DateTimeOffset end, int pc, int tth) GetLongestContinuousPlay(out List<(DateTimeOffset start, DateTimeOffset end, int pc, int tth)> periods)
+        {
+            periods = new List<(DateTimeOffset start, DateTimeOffset end, int pc, int tth)>();
+            var start = _userPlayRecords[0].Record.Date;
+            int pc = 0;
+            int tth = 0;
+            var last = _userPlayRecords[0].Record.Date;
+            foreach (var r in _userPlayRecords)
+            {
+                if (last < r.Record.Date.AddHours(2))
+                {
+                    if (start != last)
+                    {
+                        periods.Add((start, last, pc, tth));
+                    }
+                    start = r.Record.Date;
+                    last = r.Record.Date;
+                    pc = 0;
+                    tth = 0;
+                }
+                else
+                {
+                    pc++;
+                    tth += r.Record.Count300 + r.Record.Count100 + r.Record.Count50;
+                    last = r.Record.Date;
+                }
+            }
+            if (start != last)
+            {
+                periods.Add((start, last, pc, tth));
+            }
+            return periods.Count == 0 ? default : periods.MaxBy(t => t.end - t.start);
         }
 
         [GeneratedRegex("^我的年度(?:屙屎|osu[!！]?)\\s*(?:[,，]\\s*(?<mode>.+?)\\s*)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
