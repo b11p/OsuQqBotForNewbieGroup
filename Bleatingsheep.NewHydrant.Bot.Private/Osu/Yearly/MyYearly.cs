@@ -29,6 +29,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
         private Mode _mode = Mode.Standard;
         private IReadOnlyList<UserPlayRecord> _userPlayRecords = default!;
         private IReadOnlyDictionary<int, BeatmapInfo> _beatmapInfoDict = default!;
+        private bool _hasError = false;
 
         public MyYearly(IDataProvider dataProvider, IOsuApiClient osuApiClient, NewbieContext newbieContext)
         {
@@ -76,7 +77,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             }
 
             // get current state
-            UserInfo? userInfo = await _osuApiClient.GetUser(osuId.Value, _mode).ConfigureAwait(false);
+            UserInfo? userInfo = default;
+            try
+            {
+                userInfo = await _osuApiClient.GetUser(osuId.Value, _mode).ConfigureAwait(false);
+            }
+            catch
+            {
+                // ignore, use local data
+                _hasError = true;
+            }
             if (userInfo is null)
             {
                 // user may be banned
@@ -103,9 +113,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             var cachedBeatmapInfo = await _newbieContext.BeatmapInfoCache.Where(e => e.Mode == _mode && playedBeatmaps.Contains(e.BeatmapId)).ToListAsync().ConfigureAwait(false);
             var noCacheBeatmaps = playedBeatmaps.Except(cachedBeatmapInfo.Select(e => e.BeatmapInfo.Id));
             var beatmapInfoList = cachedBeatmapInfo.ConvertAll(e => e.BeatmapInfo);
-            try
+            foreach (var beatmapId in noCacheBeatmaps)
             {
-                foreach (var beatmapId in noCacheBeatmaps)
+                try
                 {
                     var current = await _dataProvider.GetBeatmapInfoAsync(beatmapId, _mode).ConfigureAwait(false);
                     if (current != null)
@@ -113,15 +123,20 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                         beatmapInfoList.Add(current);
                     }
                 }
-            }
-            catch
-            {
+                catch
+                {
+                    _hasError = true;
+                }
             }
             _beatmapInfoDict = beatmapInfoList.ToDictionary(bi => bi.Id);
 
             // assign data to fields.
             _userPlayRecords = playList;
             var sb = new StringBuilder();
+            if (_hasError)
+            {
+                sb.AppendLine("由于请求量过高，有错误发生，数据可能不准确。");
+            }
             {
                 // days played
                 (int days, int totalDays) = GetPlayedDays();
@@ -186,7 +201,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 .OrderByDescending(g => g.Count())
                 .First();
             (int bid, int count) = (mostPlayed.Key, mostPlayed.Count());
-            BeatmapInfo? beatmap = await _osuApiClient.GetBeatmap(bid, _mode).ConfigureAwait(false);
+            BeatmapInfo? beatmap = _beatmapInfoDict.GetValueOrDefault(bid);
             return (bid, count, beatmap);
         }
 
