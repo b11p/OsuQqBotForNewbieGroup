@@ -194,14 +194,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                     var dtoff = mostNight.end.ToOffset(_timeZone);
                     var date = dtoff.Date;
                     var time = dtoff.TimeOfDay;
-                    var comment = time.Hours switch
-                    {
-                        < 2 => "要注意休息。",
-                        < 5 => "osu! 陪你度过不眠夜。",
-                        < 18 => "大好的晚上不能浪费在 osu! 上。",
-                        _ => "除了 osu!，你还有人生，健康作息很重要。",
-                    };
-                    sb.AppendLine($"{date.ToShortDateString()}，你{time.Hours}点{time.Minutes}分还在打 osu!，是最晚的一次，{comment}");
+                    // var comment = time.Hours switch
+                    // {
+                    //     < 2 => "要注意休息。",
+                    //     < 5 => "osu! 陪你度过不眠夜。",
+                    //     < 18 => "大好的晚上不能浪费在 osu! 上。",
+                    //     _ => "除了 osu!，你还有人生，健康作息很重要。",
+                    // };
+                    sb.AppendLine($"{date.ToShortDateString()}，你{time.Hours}点{time.Minutes}分还在打 osu!，是最晚的一次。");
                 }
             }
             sb.Append($"{userInfo.Name} 的年度 osu! 记录。");
