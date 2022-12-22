@@ -287,23 +287,19 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             var last = _userPlayRecords[0].Record.Date;
             foreach (var r in _userPlayRecords)
             {
-                if (last < r.Record.Date.AddHours(2))
+                if (last.AddHours(2) < r.Record.Date)
                 {
                     if (start != last)
                     {
                         periods.Add((start, last, pc, tth));
                     }
                     start = r.Record.Date;
-                    last = r.Record.Date;
                     pc = 0;
                     tth = 0;
                 }
-                else
-                {
-                    pc++;
-                    tth += r.Record.Count300 + r.Record.Count100 + r.Record.Count50;
-                    last = r.Record.Date;
-                }
+                pc++;
+                tth += r.Record.Count300 + r.Record.Count100 + r.Record.Count50;
+                last = r.Record.Date;
             }
             if (start != last)
             {
