@@ -67,24 +67,38 @@ namespace Bleatingsheep.NewHydrant.Data
 
         public async ValueTask<BeatmapInfo?> GetBeatmapInfoAsync(int beatmapId, Mode mode, CancellationToken cancellationToken = default)
         {
-            var result = await _dbContext.BeatmapInfoCache.FirstOrDefaultAsync(c => c.BeatmapId == beatmapId && c.Mode == mode, cancellationToken).ConfigureAwait(false);
-            if (result != null)
+            var cached = await _dbContext.BeatmapInfoCache.AsTracking().FirstOrDefaultAsync(c => c.BeatmapId == beatmapId && c.Mode == mode, cancellationToken).ConfigureAwait(false);
+            if (cached != null)
             {
-                return result.BeatmapInfo;
+                if (cached.BeatmapInfo.Approved is Approved.Ranked or Approved.Approved
+                    || (cached.BeatmapInfo.Approved == Approved.Loved && cached.CacheDate > DateTimeOffset.UtcNow.AddDays(-31))
+                    || cached.CacheDate > DateTimeOffset.UtcNow.AddDays(-7))
+                {
+                    return cached.BeatmapInfo;
+                }
             }
             var currentDate = DateTimeOffset.UtcNow;
             var beatmap = await _osuApiClient.GetBeatmap(beatmapId, mode).ConfigureAwait(false);
-            if (beatmap?.Approved is Approved.Ranked or Approved.Approved)
+            if (beatmap != null)
             {
-                // not null and ranked
-                var newEntry = new BeatmapInfoCacheEntry
+                // not null
+                // if it is not ranked, info may change.
+                if (cached == null)
                 {
-                    BeatmapId = beatmapId,
-                    Mode = mode,
-                    CacheDate = currentDate,
-                    BeatmapInfo = beatmap,
-                };
-                _ = _dbContext.BeatmapInfoCache.Add(newEntry);
+                    var newEntry = new BeatmapInfoCacheEntry
+                    {
+                        BeatmapId = beatmapId,
+                        Mode = mode,
+                        CacheDate = currentDate,
+                        BeatmapInfo = beatmap,
+                    };
+                    _ = _dbContext.BeatmapInfoCache.Add(newEntry);
+                }
+                else
+                {
+                    cached.CacheDate = currentDate;
+                    cached.BeatmapInfo = beatmap;
+                }
                 try
                 {
                     _ = await _dbContext.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
