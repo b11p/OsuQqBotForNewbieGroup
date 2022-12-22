@@ -157,7 +157,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                     ? "都没全连，真菜。"
                     : string.Empty;
                 var beatmapInfo = _beatmapInfoDict.GetValueOrDefault(bid);
-                await api.SendMessageAsync(context.Endpoint, $"{date.ToShortDateString()}，你把 {bid} 打了 {count} 次。{fcString}（{beatmapInfo}）").ConfigureAwait(false);
+                await api.SendMessageAsync(context.Endpoint, $"{date.ToShortDateString()}，你把 {bid} 打了 {count} 次。{fcString}{beatmapInfo}").ConfigureAwait(false);
             }
         }
 
