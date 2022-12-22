@@ -134,7 +134,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             {
                 // mods
                 var (mods, count) = GetFavoriteMods();
-                _ = await api.SendMessageAsync(context.Endpoint, $"你最喜欢的 mods 是 {mods.Display()}，贡献了你 {(double)count / _userPlayRecords.Count:P0} 的游玩次数。").ConfigureAwait(false);
+                var modsString = mods.Display();
+                if (string.IsNullOrEmpty(modsString))
+                {
+                    modsString = "None";
+                }
+                _ = await api.SendMessageAsync(context.Endpoint, $"你最喜欢的 mods 是 {modsString}，贡献了你 {(double)count / _userPlayRecords.Count:P0} 的游玩次数。").ConfigureAwait(false);
             }
             {
                 (string? favoriteMapperName, int favoriteMapperPlayCount) = GetFavoriteMapper();
