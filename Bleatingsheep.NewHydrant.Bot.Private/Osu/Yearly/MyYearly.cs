@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Data;
@@ -17,12 +17,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
 {
 #nullable enable
     [Component("MyYearly")]
-    public class MyYearly : IMessageCommand
+    public partial class MyYearly : IMessageCommand
     {
         private readonly IDataProvider _dataProvider;
         private readonly IOsuApiClient _osuApiClient;
         private readonly NewbieContext _newbieContext;
-        private readonly Mode _mode = Mode.Standard;
+        private Mode _mode = Mode.Standard;
         private readonly TimeSpan _timeZone = TimeSpan.FromHours(8);
 
         private IReadOnlyList<UserPlayRecord> _userPlayRecords = Array.Empty<UserPlayRecord>();
@@ -34,8 +34,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             _newbieContext = newbieContext;
         }
 
+        private string ModeString { get; set; }
+
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
+            // check binding
             DateTimeOffset now = DateTimeOffset.UtcNow;
             DateTimeOffset start = now.AddYears(-1);
             int? osuId = await _dataProvider.GetOsuIdAsync(context.UserId).ConfigureAwait(false);
@@ -44,6 +47,18 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 _ = await api.SendMessageAsync(context.Endpoint, "未绑定").ConfigureAwait(false);
                 return;
             }
+
+            // apply mode
+            try
+            {
+                _mode = Bleatingsheep.Osu.ModeExtensions.Parse(ModeString);
+            }
+            catch
+            {
+                await api.SendMessageAsync(context.Endpoint, $"未知游戏模式{ModeString}。将生成 std 模式的报告。").ConfigureAwait(false);
+            }
+
+            // retrieve data from local snapshots.
             UserSnapshot? snap = await _newbieContext.UserSnapshots
                 .Where(s => s.UserId == osuId && s.Mode == _mode && s.Date > start)
                 .OrderBy(s => s.Date)
@@ -53,9 +68,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 _ = await api.SendMessageAsync(context.Endpoint, "没有找到数据").ConfigureAwait(false);
                 return;
             }
+
+            // get current state
             UserInfo? userInfo = await _osuApiClient.GetUser(osuId.Value, _mode).ConfigureAwait(false);
             if (userInfo is null)
             {
+                // user may be banned
                 userInfo = (await _newbieContext.UserSnapshots
                     .Where(s => s.UserId == osuId && s.Mode == _mode)
                     .OrderByDescending(s => s.Date)
@@ -67,7 +85,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 .Where(r => r.UserId == osuId && r.Mode == _mode && r.PlayNumber > startPC)
                 .OrderBy(r => r.PlayNumber)
                 .ToListAsync().ConfigureAwait(false);
-            _ = await api.SendMessageAsync(context.Endpoint, $"数据完整度：{playList.Count} of {currentPC - startPC}。功能制作中。").ConfigureAwait(false);
+            _ = await api.SendMessageAsync(context.Endpoint, $"当前模式：{_mode}数据完整度：{playList.Count} of {currentPC - startPC}。功能制作中。正在生成报告，请稍候。").ConfigureAwait(false);
             if (playList.Count == 0)
                 return;
 
@@ -78,34 +96,34 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             var beatmapInfoList = cachedBeatmapInfo.ConvertAll(e => e.BeatmapInfo);
             string? favoriteMapperName = default;
             int favoriteMapperPlayCount = default;
-            using var mapperCompleteSemaphore = new SemaphoreSlim(0, 1);
             var mapperTask = Task.Run(async () =>
             {
-                try
+                foreach (var beatmapId in remainingBeatmaps)
                 {
-                    foreach (var beatmapId in remainingBeatmaps)
+                    var current = await _dataProvider.GetBeatmapInfoAsync(beatmapId, _mode).ConfigureAwait(false);
+                    if (current != null)
                     {
-                        var current = await _dataProvider.GetBeatmapInfoAsync(beatmapId, _mode).ConfigureAwait(false);
-                        if (current != null)
-                        {
-                            beatmapInfoList.Add(current);
-                        }
-                    }
-                    var beatmapToCreatorDic = beatmapInfoList.ToDictionary(i => i.Id, i => i.CreatorId);
-                    var favoriteMapperId = playedBeatmaps.GroupBy(bid => beatmapToCreatorDic.GetValueOrDefault(bid)).OrderByDescending(g => g.Count()).SkipWhile(g => g.Key == 0).FirstOrDefault()?.Key;
-                    if (favoriteMapperId != null)
-                    {
-                        var favoriteMapperBeatmaps = beatmapInfoList.Where(b => b.CreatorId == favoriteMapperId).ToList();
-                        favoriteMapperName = favoriteMapperBeatmaps.OrderByDescending(b => b.ApprovedDate).FirstOrDefault()?.Creator;
-                        var favoriteMapperBeatmapIds = favoriteMapperBeatmaps.Select(b => b.Id).ToHashSet();
-                        favoriteMapperPlayCount = playList.Count(r => favoriteMapperBeatmapIds.Contains(r.Record.BeatmapId));
+                        beatmapInfoList.Add(current);
                     }
                 }
-                finally
+                var beatmapToCreatorDic = beatmapInfoList.ToDictionary(i => i.Id, i => i.CreatorId);
+                var favoriteMapperId = playedBeatmaps.GroupBy(bid => beatmapToCreatorDic.GetValueOrDefault(bid)).OrderByDescending(g => g.Count()).SkipWhile(g => g.Key == 0).FirstOrDefault()?.Key;
+                if (favoriteMapperId != null)
                 {
-                    _ = mapperCompleteSemaphore.Release();
+                    var favoriteMapperBeatmaps = beatmapInfoList.Where(b => b.CreatorId == favoriteMapperId).ToList();
+                    favoriteMapperName = favoriteMapperBeatmaps.OrderByDescending(b => b.ApprovedDate).FirstOrDefault()?.Creator;
+                    var favoriteMapperBeatmapIds = favoriteMapperBeatmaps.Select(b => b.Id).ToHashSet();
+                    favoriteMapperPlayCount = playList.Count(r => favoriteMapperBeatmapIds.Contains(r.Record.BeatmapId));
                 }
             });
+            try
+            {
+                // favorite mapper
+                await mapperTask.ConfigureAwait(false);
+            }
+            catch
+            {
+            }
 
             // assign data to fields.
             _userPlayRecords = playList;
@@ -121,8 +139,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                     $"{beatmap}").ConfigureAwait(false);
             }
             {
-                // favorite mapper
-                await mapperCompleteSemaphore.WaitAsync().ConfigureAwait(false);
                 if (favoriteMapperName != null)
                 {
                     _ = await api.SendMessageAsync(context.Endpoint, $"你最喜欢的 mapper 是 {favoriteMapperName}，打了她/他的图 {favoriteMapperPlayCount} 次。").ConfigureAwait(false);
@@ -133,12 +149,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 var mostPlayingHour = GetMostPlayingHours();
                 _ = await api.SendMessageAsync(context.Endpoint, $"你最常在 {mostPlayingHour}-{mostPlayingHour + 1} 时打图。").ConfigureAwait(false);
             }
-        }
-
-        public bool ShouldResponse(MessageContext context)
-        {
-            return context.Content.TryGetPlainText(out string text)
-                && text == "我的年度屙屎";
         }
 
         /// <summary>
@@ -170,6 +180,26 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 .First()
                 .Key;
             return mostPlayingHour;
+        }
+
+        [GeneratedRegex("^我的年度(?:屙屎|osu[!！]?)\\s*(?:[,，]\\s*(?<mode>.+?)\\s*)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+        private static partial Regex MatchingRegex();
+        private static readonly Regex s_regex = MatchingRegex();
+
+        public bool ShouldResponse(MessageContext context)
+        {
+            if (!context.Content.TryGetPlainText(out string text))
+            {
+                return false;
+            }
+            var match = s_regex.Match(text.Trim());
+            if (!match.Success)
+            {
+                return false;
+            }
+            var modeGroup = match.Groups["mode"];
+            ModeString = modeGroup.Value;
+            return true;
         }
     }
 #nullable restore
