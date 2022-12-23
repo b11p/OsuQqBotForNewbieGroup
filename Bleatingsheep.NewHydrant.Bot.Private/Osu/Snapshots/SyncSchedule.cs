@@ -49,8 +49,8 @@ public class SyncSchedule : Service, IRegularAsync
                 .ToListAsync()
                 .ConfigureAwait(false);
             var binded = await
-                (from b in db1.Bindings
-                 from m in new[] { Mode.Standard, Mode.Taiko, Mode.Catch, Mode.Mania }
+                (from b in db1.Bindings.AsAsyncEnumerable()
+                 from m in new[] { Mode.Standard, Mode.Taiko, Mode.Catch, Mode.Mania }.ToAsyncEnumerable()
                  select new { UserId = b.OsuId, Mode = m })
                 .ToListAsync().ConfigureAwait(false);
             var scheduled =
@@ -70,17 +70,6 @@ public class SyncSchedule : Service, IRegularAsync
                 db1.UpdateSchedules.AddRange(toSchedule);
                 await db1.SaveChangesAsync().ConfigureAwait(false);
             }
-
-            // cache beatmap information
-            var played = await db1.UserPlayRecords.AsNoTracking().Select(r => new { r.Record.BeatmapId, r.Mode }).Distinct().ToListAsync().ConfigureAwait(false);
-            var cached = await db1.BeatmapInfoCache.AsNoTracking().Select(c => new { c.BeatmapId, c.Mode }).Distinct().ToListAsync().ConfigureAwait(false);
-            var noCache = played.Except(cached).ToList();
-            _logger.LogInformation("Need {noCacheBid.Count} new cache.", noCache.Count);
-            foreach (var beatmap in noCache)
-            {
-                _ = await _dataProvider.GetBeatmapInfoAsync(beatmap.BeatmapId, beatmap.Mode).ConfigureAwait(false);
-            }
-            _logger.LogInformation("Caching complete.");
         }
         finally
         {
