@@ -66,15 +66,7 @@ namespace Bleatingsheep.NewHydrant
 
             // Legacy
             services.AddTransient<INewbieDatabase, NewbieDatabase>();
-            services.AddTransient<ILegacyDataProvider, DataProvider>(sp =>
-            {
-                var logger = sp.GetService<ILogger<ILegacyDataProvider>>();
-                var dbContext = sp.GetService<NewbieContext>();
-                var osuApiClient = sp.GetService<IOsuApiClient>();
-                var dataProvider = new DataProvider(dbContext, osuApiClient);
-                dataProvider.OnException += e => logger.LogError(e, "{message}", e.Message);
-                return dataProvider;
-            });
+            services.AddTransient<ILegacyDataProvider, DataProvider>();
             services.AddSingleton(OsuMixedApi.OsuApiClient.ClientUsingKey(Configuration.GetSection("Hydrant")["ApiKey"]));
         }
 

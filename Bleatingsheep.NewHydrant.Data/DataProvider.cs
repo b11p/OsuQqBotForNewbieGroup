@@ -6,32 +6,36 @@ using Bleatingsheep.Osu;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Polly;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
     public class DataProvider : IDataProvider, IDisposable, ILegacyDataProvider
     {
-        private readonly NewbieContext _dbContext;
+        private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
         private readonly IOsuApiClient _osuApiClient;
+        private readonly ILogger<DataProvider> _logger;
         private readonly ThreadLocal<Random> _randomLocal = new(() => new Random());
 
-        public DataProvider(NewbieContext newbieContext, IOsuApiClient osuApiClient)
+        public DataProvider(IOsuApiClient osuApiClient, IDbContextFactory<NewbieContext> dbContextFactory, ILogger<DataProvider> logger)
         {
-            _dbContext = newbieContext;
             _osuApiClient = osuApiClient;
+            _dbContextFactory = dbContextFactory;
+            _logger = logger;
         }
 
         public async Task<(bool success, BindingInfo? result)> GetBindingInfoAsync(long qq)
         {
             try
             {
-                var result = await _dbContext.Bindings.SingleOrDefaultAsync(b => b.UserId == qq).ConfigureAwait(false);
+                await using var db = _dbContextFactory.CreateDbContext();
+                var result = await db.Bindings.SingleOrDefaultAsync(b => b.UserId == qq).ConfigureAwait(false);
                 return (true, result);
             }
             catch (Exception e)
             {
-                OnException?.Invoke(e);
+                _logger.LogError(e, "{message}", e.Message);
                 return (false, default);
             }
         }
@@ -43,13 +47,10 @@ namespace Bleatingsheep.NewHydrant.Data
         }
 
         public async Task<int?> GetOsuIdAsync(long qq)
-            => (await _dbContext.Bindings.AsNoTracking().SingleOrDefaultAsync(b => b.UserId == qq).ConfigureAwait(false))?.OsuId;
-
-        /// <summary>
-        /// 只在调用 <see cref="GetBindingIdAsync(long)"/> 和
-        /// <see cref="GetBindingInfoAsync(long)"/> 时可能触发。
-        /// </summary>
-        public event Action<Exception>? OnException;
+        {
+            await using var db = _dbContextFactory.CreateDbContext();
+            return (await db.Bindings.AsNoTracking().FirstOrDefaultAsync(b => b.UserId == qq).ConfigureAwait(false))?.OsuId;
+        }
 
         public Task<UserBest[]> GetUserBestRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default)
         {
@@ -67,12 +68,13 @@ namespace Bleatingsheep.NewHydrant.Data
 
         public async ValueTask<BeatmapInfo?> GetBeatmapInfoAsync(int beatmapId, Mode mode, CancellationToken cancellationToken = default)
         {
-            var cached = await _dbContext.BeatmapInfoCache.AsTracking().FirstOrDefaultAsync(c => c.BeatmapId == beatmapId && c.Mode == mode, cancellationToken).ConfigureAwait(false);
+            await using var db = _dbContextFactory.CreateDbContext();
+            var cached = await db.BeatmapInfoCache.AsTracking().FirstOrDefaultAsync(c => c.BeatmapId == beatmapId && c.Mode == mode, cancellationToken).ConfigureAwait(false);
             if (cached != null)
             {
                 if (cached.BeatmapInfo.Approved is Approved.Ranked or Approved.Approved
-                    || (cached.BeatmapInfo.Approved == Approved.Loved && cached.CacheDate > DateTimeOffset.UtcNow.AddDays(-31))
-                    || cached.CacheDate > DateTimeOffset.UtcNow.AddDays(-7))
+                    || (cached.BeatmapInfo.Approved == Approved.Loved && cached.CacheDate > DateTimeOffset.UtcNow.AddDays(-183))
+                    || cached.CacheDate > DateTimeOffset.UtcNow.AddDays(-14))
                 {
                     return cached.BeatmapInfo;
                 }
@@ -92,7 +94,7 @@ namespace Bleatingsheep.NewHydrant.Data
                         CacheDate = currentDate,
                         BeatmapInfo = beatmap,
                     };
-                    _ = _dbContext.BeatmapInfoCache.Add(newEntry);
+                    _ = db.BeatmapInfoCache.Add(newEntry);
                 }
                 else
                 {
@@ -101,7 +103,7 @@ namespace Bleatingsheep.NewHydrant.Data
                 }
                 try
                 {
-                    _ = await _dbContext.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+                    _ = await db.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
                 }
                 catch
                 {
