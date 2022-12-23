@@ -61,7 +61,7 @@ public class YearlyCachePreparation : IMessageCommand
     {
         return context.UserId == 962549599
             && context.Content.TryGetPlainText(out var text)
-            && text == "缓存测试";
+            && text == "准备年度osu缓存";
     }
 
     public async Task ProcessAsync(MessageContext context, HttpApiClient api)
