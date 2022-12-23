@@ -111,7 +111,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             // beatmap info
             var playedBeatmaps = playList.Select(r => r.Record.BeatmapId).Distinct().ToHashSet();
             var cachedBeatmapInfo = await _newbieContext.BeatmapInfoCache.Where(e => e.Mode == _mode && playedBeatmaps.Contains(e.BeatmapId)).ToListAsync().ConfigureAwait(false);
-            var noCacheBeatmaps = playedBeatmaps.Except(cachedBeatmapInfo.Select(e => e.BeatmapInfo.Id));
+            var noCacheBeatmaps = playedBeatmaps.Except(cachedBeatmapInfo.Select(e => e.BeatmapId));
             var beatmapInfoList = cachedBeatmapInfo.ConvertAll(e => e.BeatmapInfo);
             foreach (var beatmapId in noCacheBeatmaps)
             {
@@ -201,7 +201,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                     //     < 18 => "大好的晚上不能浪费在 osu! 上。",
                     //     _ => "除了 osu!，你还有人生，健康作息很重要。",
                     // };
-                    sb.AppendLine($"{date.ToShortDateString()}，你{time.Hours}点{time.Minutes}分还在打 osu!，是最晚的一次。");
+                    sb.AppendLine($"{date.ToShortDateString()}，你{time.Hours}点{time.Minutes}分还在打图，是最晚的一次。");
                 }
             }
             sb.Append($"{userInfo.Name} 的年度 osu! 记录。");

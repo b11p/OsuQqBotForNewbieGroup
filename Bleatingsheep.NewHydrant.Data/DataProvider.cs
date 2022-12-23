@@ -72,8 +72,8 @@ namespace Bleatingsheep.NewHydrant.Data
             var cached = await db.BeatmapInfoCache.AsTracking().FirstOrDefaultAsync(c => c.BeatmapId == beatmapId && c.Mode == mode, cancellationToken).ConfigureAwait(false);
             if (cached != null)
             {
-                if (cached.BeatmapInfo.Approved is Approved.Ranked or Approved.Approved
-                    || (cached.BeatmapInfo.Approved == Approved.Loved && cached.CacheDate > DateTimeOffset.UtcNow.AddDays(-183))
+                if (cached.BeatmapInfo?.Approved is Approved.Ranked or Approved.Approved
+                    || (cached.BeatmapInfo?.Approved == Approved.Loved && cached.CacheDate > DateTimeOffset.UtcNow.AddDays(-183))
                     || cached.CacheDate > DateTimeOffset.UtcNow.AddDays(-14))
                 {
                     return cached.BeatmapInfo;
@@ -81,35 +81,43 @@ namespace Bleatingsheep.NewHydrant.Data
             }
             var currentDate = DateTimeOffset.UtcNow;
             var beatmap = await _osuApiClient.GetBeatmap(beatmapId, mode).ConfigureAwait(false);
-            if (beatmap != null)
+
+            // add to cache
+            // null result is also cached
+            // if the beatmap is not ranked, info may change.
+            TimeSpan? expiresIn = beatmap?.Approved is Approved.Ranked or Approved.Approved
+                ? null
+                : beatmap?.Approved == Approved.Loved
+                ? TimeSpan.FromDays(183)
+                : TimeSpan.FromDays(14);
+            var expireDate = DateTimeOffset.UtcNow + expiresIn;
+            if (cached == null)
             {
-                // not null
-                // if it is not ranked, info may change.
-                if (cached == null)
+                var newEntry = new BeatmapInfoCacheEntry
                 {
-                    var newEntry = new BeatmapInfoCacheEntry
-                    {
-                        BeatmapId = beatmapId,
-                        Mode = mode,
-                        CacheDate = currentDate,
-                        BeatmapInfo = beatmap,
-                    };
-                    _ = db.BeatmapInfoCache.Add(newEntry);
-                }
-                else
-                {
-                    cached.CacheDate = currentDate;
-                    cached.BeatmapInfo = beatmap;
-                }
-                try
-                {
-                    _ = await db.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
-                }
-                catch
-                {
-                    // ignore this exception
-                }
+                    BeatmapId = beatmapId,
+                    Mode = mode,
+                    CacheDate = currentDate,
+                    ExpirationDate = expireDate,
+                    BeatmapInfo = beatmap,
+                };
+                _ = db.BeatmapInfoCache.Add(newEntry);
             }
+            else
+            {
+                cached.CacheDate = currentDate;
+                cached.ExpirationDate = expireDate;
+                cached.BeatmapInfo = beatmap;
+            }
+            try
+            {
+                _ = await db.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            }
+            catch
+            {
+                // ignore this exception
+            }
+
             return beatmap;
         }
 
