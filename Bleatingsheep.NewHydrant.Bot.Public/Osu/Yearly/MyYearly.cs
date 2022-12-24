@@ -165,19 +165,19 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 {
                     modsString = "None";
                 }
-                sb.AppendLine($"你最喜欢的 mods 是 {modsString}，贡献了你 {(double)count / _userPlayRecords.Count:P0} 的游玩次数。");
+                sb.AppendLine($"{modsString} 是你最喜欢的 mods，贡献了你 {(double)count / _userPlayRecords.Count:P0} 的游玩次数。");
             }
             {
                 (string? favoriteMapperName, int favoriteMapperPlayCount) = GetFavoriteMapper();
                 if (favoriteMapperName != null)
                 {
-                    sb.AppendLine($"你最喜欢的 mapper 是 {favoriteMapperName}，打了她/他的图 {favoriteMapperPlayCount} 次。");
+                    sb.AppendLine($"{favoriteMapperName} 是你最喜欢的 mapper，打了她/他的图 {favoriteMapperPlayCount} 次。");
                 }
             }
             {
                 // most playing hour
                 var mostPlayingHour = GetMostPlayingHours();
-                sb.AppendLine($"你最常在 {mostPlayingHour}-{mostPlayingHour + 1} 时打图。");
+                sb.AppendLine($"{mostPlayingHour}-{mostPlayingHour + 1} 时是你最常打图的时间。");
             }
             {
                 // most played beatmap of the day
@@ -198,7 +198,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 var (start1, end, pc, tth) = GetLongestContinuousPlay(out var periods);
                 if (start1 != end)
                 {
-                    sb.AppendLine($"{start1.ToOffset(_timeZone):M-d H:mm} 到 {end.ToOffset(_timeZone):M-d H:mm}，你连续打了 {pc} 次，是你连续游玩时间最长的一次，你一定玩儿得热血沸腾。");
+                    sb.AppendLine($"{start1.ToOffset(_timeZone):M-d H:mm} 到 {end.ToOffset(_timeZone):M-d H:mm}，你连续打了 {pc} 次，{(end - start1).TotalHours:0.#} 小时，是你连续游玩时间最长的一次。");
                 }
                 if (periods.Count > 0)
                 {
