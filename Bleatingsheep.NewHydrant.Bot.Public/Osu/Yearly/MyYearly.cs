@@ -182,13 +182,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             {
                 // most played beatmap of the day
                 var (bid, date, count, fc) = GetMostPlayedBeatmapOfDay();
-                string fcString = fc == true
-                    ? "全连了，真不容易。"
-                    : fc == false
-                    ? "都没全连，真菜。"
-                    : string.Empty;
-                var beatmapInfo = _beatmapInfoDict.GetValueOrDefault(bid);
-                sb.AppendLine($"{date.ToShortDateString()}，你把 b/{bid} 挑战了 {count} 次。{fcString}{beatmapInfo}");
+                if (bid != default)
+                {
+                    string fcString = fc == true
+                        ? "全连了，真不容易。"
+                        : fc == false
+                        ? "都没全连，真菜。"
+                        : string.Empty;
+                    var beatmapInfo = _beatmapInfoDict.GetValueOrDefault(bid);
+                    sb.AppendLine($"{date.ToShortDateString()}，你把 b/{bid} 挑战了 {count} 次。{fcString}{beatmapInfo}");
+                }
             }
             {
                 // longest continuous play
@@ -285,7 +288,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 {
                     var adjustedDate = new DateTimeOffset(r.Record.Date).ToOffset(_timeZone).AddHours(-5).Date;
                     return (r.Record.BeatmapId, adjustedDate);
-                }).OrderByDescending(g => g.Count()).First();
+                }).OrderByDescending(g => g.Count()).FirstOrDefault();
+            if (mostPlayedOfTheDay == null)
+                return default;
             var (bid, date) = mostPlayedOfTheDay.Key;
             var beatmapInfo = _beatmapInfoDict.GetValueOrDefault(bid);
             bool? fullCombo = default;
