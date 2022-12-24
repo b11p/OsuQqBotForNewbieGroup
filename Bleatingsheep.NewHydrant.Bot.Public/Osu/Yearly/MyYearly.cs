@@ -102,11 +102,27 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 .Where(r => r.UserId == osuId && r.Mode == _mode && r.PlayNumber > startPC)
                 .OrderBy(r => r.PlayNumber)
                 .ToListAsync().ConfigureAwait(false);
-            _ = await api.SendMessageAsync(context.Endpoint, $"{userInfo.Name}。当前模式：{_mode}，数据始于{snap.Date.ToOffset(_timeZone):M月d日}，完整度：{playList.Count}/{currentPC - startPC}。功能制作中。正在生成报告，请稍候。").ConfigureAwait(false);
+
             if (playList.Count == 0)
             {
                 await api.SendMessageAsync(context.Endpoint, "你在过去一年没有玩儿过 osu!，或无数据记录。").ConfigureAwait(false);
                 return;
+            }
+
+            // assign data to fields.
+            _userPlayRecords = playList;
+            {
+                // first response
+                var frsb = new StringBuilder();
+                frsb.AppendLine($"{userInfo.Name}。当前模式：{_mode}，数据始于{snap.Date.ToOffset(_timeZone):M月d日}，完整度：{playList.Count}/{currentPC - startPC}。");
+                {
+                    // days played
+                    (int days, int totalDays) = GetPlayedDays();
+                    frsb.Append($"你在过去一年中有 {days} 天打了图，合计 {userInfo.PlayCount - snap.UserInfo.PlayCount} 次，{userInfo.TotalHits - snap.UserInfo.TotalHits} TTH，{(userInfo.PlayTime - snap.UserInfo.PlayTime).TotalHours:#.##} 小时。");
+                    frsb.AppendLine($"增长了 {userInfo.Performance - snap.UserInfo.Performance:#.##}PP。");
+                }
+                frsb.Append("正在生成报告，请稍候。");
+                _ = await api.SendMessageAsync(context.Endpoint, frsb.ToString()).ConfigureAwait(false);
             }
 
             // beatmap info
@@ -131,23 +147,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             }
             _beatmapInfoDict = beatmapInfoList.ToDictionary(bi => bi.Id);
 
-            // assign data to fields.
-            _userPlayRecords = playList;
             var sb = new StringBuilder();
             if (_hasError)
             {
                 sb.AppendLine("由于请求量过高，有错误发生，数据可能不准确。");
             }
             {
-                // days played
-                (int days, int totalDays) = GetPlayedDays();
-                sb.Append($"你在过去一年中有 {days} 天打了图，合计 {userInfo.PlayCount - snap.UserInfo.PlayCount} 次，{userInfo.TotalHits - snap.UserInfo.TotalHits} TTH，{(userInfo.PlayTime - snap.UserInfo.PlayTime).TotalHours:#.##} 小时。");
-                sb.AppendLine($"增长了 {userInfo.Performance - snap.UserInfo.Performance:#.##}PP。");
-            }
-            {
                 // most played
                 (int bid, int count, BeatmapInfo? beatmap) = GetMostPlayedBeatmap();
-                sb.AppendLine($"你最常打的一张图是 {bid}，打了 {count} 次。{beatmap}");
+                sb.AppendLine($"你最常打的一张图是 b/{bid}，打了 {count} 次。{beatmap}");
             }
             {
                 // mods
@@ -180,7 +188,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                     ? "都没全连，真菜。"
                     : string.Empty;
                 var beatmapInfo = _beatmapInfoDict.GetValueOrDefault(bid);
-                sb.AppendLine($"{date.ToShortDateString()}，你把 {bid} 打了 {count} 次。{fcString}{beatmapInfo}");
+                sb.AppendLine($"{date.ToShortDateString()}，你把 b/{bid} 挑战了 {count} 次。{fcString}{beatmapInfo}");
             }
             {
                 // longest continuous play
@@ -269,11 +277,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
 
         private (int beatmapId, DateTime date, int count, bool? fullCombo) GetMostPlayedBeatmapOfDay()
         {
-            var mostPlayedOfTheDay = _userPlayRecords.GroupBy(r =>
-            {
-                var adjustedDate = new DateTimeOffset(r.Record.Date).ToOffset(_timeZone).AddHours(-5).Date;
-                return (r.Record.BeatmapId, adjustedDate);
-            }).OrderByDescending(g => g.Count()).First();
+            var mostPlayedOfTheDay = _userPlayRecords
+                .Where(r =>
+                    r.Record.Date >= _beatmapInfoDict.GetValueOrDefault(r.Record.BeatmapId)?.LastUpdate
+                    && _beatmapInfoDict.GetValueOrDefault(r.Record.BeatmapId)?.Approved is Approved.Approved or Approved.Qualified or Approved.Loved)
+                .GroupBy(r =>
+                {
+                    var adjustedDate = new DateTimeOffset(r.Record.Date).ToOffset(_timeZone).AddHours(-5).Date;
+                    return (r.Record.BeatmapId, adjustedDate);
+                }).OrderByDescending(g => g.Count()).First();
             var (bid, date) = mostPlayedOfTheDay.Key;
             var beatmapInfo = _beatmapInfoDict.GetValueOrDefault(bid);
             bool? fullCombo = default;
