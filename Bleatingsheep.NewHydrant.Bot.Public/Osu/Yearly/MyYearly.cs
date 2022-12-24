@@ -25,6 +25,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
         private readonly IOsuApiClient _osuApiClient;
         private readonly NewbieContext _newbieContext;
         private readonly TimeSpan _timeZone = TimeSpan.FromHours(8);
+        // private static readonly TimeZoneInfo _timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Asia/Shanghai");
 
         private Mode _mode = Mode.Standard;
         private IReadOnlyList<UserPlayRecord> _userPlayRecords = default!;
@@ -112,7 +113,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             var playedBeatmaps = playList.Select(r => r.Record.BeatmapId).Distinct().ToHashSet();
             var cachedBeatmapInfo = await _newbieContext.BeatmapInfoCache.Where(e => e.Mode == _mode && playedBeatmaps.Contains(e.BeatmapId)).ToListAsync().ConfigureAwait(false);
             var noCacheBeatmaps = playedBeatmaps.Except(cachedBeatmapInfo.Select(e => e.BeatmapId));
-            var beatmapInfoList = cachedBeatmapInfo.ConvertAll(e => e.BeatmapInfo);
+            var beatmapInfoList = cachedBeatmapInfo.Where(e => e.BeatmapInfo != null).Select(e => e.BeatmapInfo!).ToList();
             foreach (var beatmapId in noCacheBeatmaps)
             {
                 try
@@ -190,8 +191,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 }
                 if (periods.Count > 0)
                 {
-                    var mostNight = periods.OrderByDescending(t => t.end.AddHours(-5).ToOffset(_timeZone).TimeOfDay).First();
-                    var dtoff = mostNight.end.ToOffset(_timeZone);
+                    var (dtoff, isOvernight) = GetLatestPlay(periods);
                     var date = dtoff.Date;
                     var time = dtoff.TimeOfDay;
                     // var comment = time.Hours switch
@@ -201,7 +201,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                     //     < 18 => "大好的晚上不能浪费在 osu! 上。",
                     //     _ => "除了 osu!，你还有人生，健康作息很重要。",
                     // };
-                    sb.AppendLine($"{date.ToShortDateString()}，你{time.Hours}点{time.Minutes}分还在打图，是最晚的一次。");
+                    if (isOvernight)
+                    {
+                        sb.AppendLine($"{date.ToShortDateString()}，你通宵打图打到{time.Hours}点{time.Minutes}分，是最晚的一次。");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"{date.ToShortDateString()}，你{time.Hours}点{time.Minutes}分还在打图，是最晚的一次。");
+                    }
                 }
             }
             sb.Append($"{userInfo.Name} 的年度 osu! 记录。");
@@ -306,6 +313,51 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 periods.Add((start, last, pc, tth));
             }
             return periods.Count == 0 ? default : periods.MaxBy(t => t.end - t.start);
+        }
+
+        private (DateTimeOffset, bool isOvernight) GetLatestPlay(List<(DateTimeOffset start, DateTimeOffset end, int pc, int tth)> periods)
+        {
+            var mostNight = periods.OrderByDescending(t =>
+            {
+                var (start, end, _, _) = t;
+                start = start.ToOffset(_timeZone);
+                end = end.ToOffset(_timeZone);
+                return IsOvernight(start, end)
+                    ? end.TimeOfDay + TimeSpan.FromHours(24 - 5)
+                    : t.end.AddHours(-5).ToOffset(_timeZone).TimeOfDay;
+            }).First();
+            return (mostNight.end.ToOffset(_timeZone), IsOvernight(mostNight.start.ToOffset(_timeZone), mostNight.end.ToOffset(_timeZone)));
+        }
+
+        private static bool IsOvernight(DateTimeOffset start, DateTimeOffset end)
+        {
+            TimeSpan am5 = TimeSpan.FromHours(5);
+            TimeSpan noon = TimeSpan.FromHours(12);
+            if (end.TimeOfDay < am5 || end.TimeOfDay >= noon)
+            {
+                // earlier than 5 AM.
+                return false;
+            }
+            if (start.Date != end.Date)
+            {
+                // overnight?
+                return true;
+            }
+            var am415 = new TimeSpan(4, 15, 0);
+            if (start.TimeOfDay < am415 && end.TimeOfDay > am415)
+            {
+                // also maybe overnight
+                // condition: period before 4:15am is longer than after 4:15am
+                // otherwise, morning.
+                var lengthBefore415 = am415 - start.TimeOfDay;
+                var lengthAfter415 = end.TimeOfDay - am415;
+                if (lengthBefore415 > lengthAfter415)
+                {
+                    return true;
+                }
+            }
+            // morning
+            return false;
         }
 
         [GeneratedRegex("^我的年度(?:屙屎|osu[!！]?)\\s*(?:[,，]\\s*(?<mode>.+?)\\s*)?$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
