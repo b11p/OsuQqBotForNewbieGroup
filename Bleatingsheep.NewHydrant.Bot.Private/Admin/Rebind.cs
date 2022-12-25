@@ -3,8 +3,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Osu;
-using Bleatingsheep.OsuQqBot.Database.Execution;
+using Microsoft.Extensions.Logging;
 using Sisters.WudiLib;
 
 namespace Bleatingsheep.NewHydrant.Admin
@@ -12,14 +13,19 @@ namespace Bleatingsheep.NewHydrant.Admin
     [Component("rebind")]
     class Rebind : Service, IMessageCommand
     {
-        public Rebind(INewbieDatabase database, OsuMixedApi.OsuApiClient osuApi)
+        private readonly IOsuDataUpdator _osuDataUpdator;
+        private readonly IDataProvider _dataProvider;
+        private readonly ILogger<Rebind> _logger;
+
+        public Rebind(OsuMixedApi.OsuApiClient osuApi, IOsuDataUpdator osuDataUpdator, IDataProvider dataProvider, ILogger<Rebind> logger)
         {
-            Database = database;
             OsuApi = osuApi;
+            _osuDataUpdator = osuDataUpdator;
+            _dataProvider = dataProvider;
+            _logger = logger;
         }
 
         private static IVerifier Verifier { get; } = new AdminVerifier();
-        private INewbieDatabase Database { get; }
         private OsuMixedApi.OsuApiClient OsuApi { get; }
 
         private long _qq;
@@ -31,14 +37,34 @@ namespace Bleatingsheep.NewHydrant.Admin
         {
             var osuApi = OsuApi;
 
-            // 获取操作者信息。
-            var operatorBind = await Database.GetBindingIdAsync(_operator);
-            if (!operatorBind.Success)
+            string operatorName;
+            try
+            {  // 获取操作者信息。
+                var operatorBind = await _dataProvider.GetOsuIdAsync(_operator).ConfigureAwait(false);
+                if (operatorBind == null)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "操作者未绑定 osu! 账号，请先为自己绑定。").ConfigureAwait(false);
+                    return;
+                }
+                var (succeed, operatorUserInfo) = await osuApi.GetUserInfoAsync(operatorBind.Value, OsuMixedApi.Mode.Standard).ConfigureAwait(false);
+                if (!succeed)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "访问 osu! API 失败。").ConfigureAwait(false);
+                    return;
+                }
+                if (operatorUserInfo == null)
+                {
+                    await api.SendMessageAsync(message.Endpoint, "无法获取到操作者的用户名，可能是因为操作者被 ban 了。").ConfigureAwait(false);
+                    return;
+                }
+                operatorName = operatorUserInfo.Name;
+            }
+            catch (Exception e)
             {
-                await api.SendMessageAsync(message.Endpoint, "查询数据库失败，无法记录日志。");
+                _logger.LogError(e, "重新绑定时，获取操作者信息失败。");
+                await api.SendMessageAsync(message.Endpoint, "查询操作者信息失败，请稍后再尝试。").ConfigureAwait(false);
                 return;
             }
-            string operatorName = (await osuApi.GetUserInfoAsync(operatorBind.Result.Value, OsuMixedApi.Mode.Standard)).Item2?.Name ?? "未知";
 
             // 获取此用户名的相关信息。
             var (networkSuccess, newUser) = await osuApi.GetUserInfoAsync(_username, OsuMixedApi.Mode.Standard);
@@ -50,20 +76,25 @@ namespace Bleatingsheep.NewHydrant.Admin
             ExecutingException.Cannot(newUser == null, "没有这个用户。");
 
             // 绑定。
-            var oldBind = (await Database.ResetBindingAsync(
+            var (isChanged, oldOsuId, _) = await _osuDataUpdator.AddOrUpdateBindingInfoAsync(
                 qq: _qq,
                 osuId: newUser.Id,
                 osuName: newUser.Name,
                 source: "由管理员修改",
                 operatorId: _operator,
                 operatorName: operatorName,
-                reason: _reason
-            )).EnsureSuccess("绑定失败，数据库访问出错。");
+                reason: _reason,
+                true
+            ).ConfigureAwait(false);
 
-            ExecutingException.Cannot(oldBind.Result == newUser.Id, "未更改绑定，因为已经绑定了该账号。");
+            if (!isChanged)
+            {
+                await api.SendMessageAsync(message.Endpoint, "未更改绑定，因为已经绑定了该账号。").ConfigureAwait(false);
+                return;
+            }
 
             SendingMessage message1 = new SendingMessage("将") + SendingMessage.At(_qq) + new SendingMessage($"绑定为{newUser.Name}。");
-            if (oldBind.Result == null)
+            if (oldOsuId == null)
             {
                 await api.SendMessageAsync(message.Endpoint, message1);
                 return;
@@ -71,9 +102,9 @@ namespace Bleatingsheep.NewHydrant.Admin
 
             // 获取旧的用户信息。
             OsuMixedApi.UserInfo oldUser;
-            (networkSuccess, oldUser) = await osuApi.GetUserInfoAsync(oldBind.Result.Value, OsuMixedApi.Mode.Standard);
-            if (!networkSuccess) message1 += new SendingMessage($"因网络问题，无法获取旧的用户名（id: {oldBind.Result.Value}）。");
-            else if (oldUser == null) message1 += new SendingMessage($"以前绑定的用户已经被 Ban（id: {oldBind.Result.Value}）。");
+            (networkSuccess, oldUser) = await osuApi.GetUserInfoAsync(oldOsuId.Value, OsuMixedApi.Mode.Standard);
+            if (!networkSuccess) message1 += new SendingMessage($"因网络问题，无法获取旧的用户名（id: {oldOsuId}）。");
+            else if (oldUser == null) message1 += new SendingMessage($"以前绑定的用户已经被 Ban（id: {oldOsuId}）。");
             else message1 += new SendingMessage($"取代{oldUser.Name}({oldUser.Id})。");
             await api.SendMessageAsync(message.Endpoint, message1);
         }

@@ -25,12 +25,11 @@ namespace Bleatingsheep.NewHydrant.Data
             _logger = logger;
         }
 
-        public async Task<(bool success, BindingInfo? result)> GetBindingInfoAsync(long qq)
+        private async Task<(bool success, BindingInfo? result)> GetBindingInfoLegacyAsync(long qq)
         {
             try
             {
-                await using var db = _dbContextFactory.CreateDbContext();
-                var result = await db.Bindings.SingleOrDefaultAsync(b => b.UserId == qq).ConfigureAwait(false);
+                var result = await GetBindingInfoAsync(qq).ConfigureAwait(false);
                 return (true, result);
             }
             catch (Exception e)
@@ -40,9 +39,18 @@ namespace Bleatingsheep.NewHydrant.Data
             }
         }
 
+        public async ValueTask<BindingInfo?> GetBindingInfoAsync(long qq)
+        {
+            var db = _dbContextFactory.CreateDbContext();
+            await using (db.ConfigureAwait(false))
+            {
+                return await db.Bindings.FirstOrDefaultAsync(b => b.UserId == qq).ConfigureAwait(false);
+            }
+        }
+
         public async Task<(bool success, int? result)> GetBindingIdAsync(long qq)
         {
-            var (success, bi) = await GetBindingInfoAsync(qq).ConfigureAwait(false);
+            var (success, bi) = await GetBindingInfoLegacyAsync(qq).ConfigureAwait(false);
             return (success, bi?.OsuId);
         }
 

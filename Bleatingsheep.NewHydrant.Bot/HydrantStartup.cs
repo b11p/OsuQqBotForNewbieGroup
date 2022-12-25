@@ -62,6 +62,7 @@ namespace Bleatingsheep.NewHydrant
             services.AddMemoryCache();
 
             services.AddTransient<IDataProvider, DataProvider>();
+            services.AddTransient<IOsuDataUpdator, OsuDataUpdator>();
             services.AddTransient<DataMaintainer>();
 
             // Legacy

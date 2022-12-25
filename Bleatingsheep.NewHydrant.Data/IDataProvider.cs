@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Bleatingsheep.Osu;
 using Bleatingsheep.Osu.ApiClient;
+using Bleatingsheep.OsuQqBot.Database.Models;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
@@ -13,6 +14,8 @@ namespace Bleatingsheep.NewHydrant.Data
         Task<UserBest[]> GetUserBestRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default);
 
         Task<UserInfo> GetUserInfoRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default);
+
+        ValueTask<BindingInfo?> GetBindingInfoAsync(long qq);
 
         Task<int?> GetOsuIdAsync(long qq);
 

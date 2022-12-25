@@ -22,13 +22,16 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         private static readonly object s_thisLock = new object();
         private static readonly Dictionary<(long group, long qq), DateTime> s_lastCheckTime = new Dictionary<(long group, long qq), DateTime>();
 
-        public NewbieKeeper(INewbieDatabase database, ILegacyDataProvider dataProvider, OsuApiClient osuApi)
+        private readonly IOsuDataUpdator _osuDataUpdator;
+
+        public NewbieKeeper(INewbieDatabase database, ILegacyDataProvider dataProvider, OsuApiClient osuApi, IOsuDataUpdator osuDataUpdator)
         {
             Database = database;
             DataProvider = dataProvider;
             OsuApi = osuApi;
+            _osuDataUpdator = osuDataUpdator;
         }
-        
+
         private INewbieDatabase Database { get; }
         private ILegacyDataProvider DataProvider { get; }
         private OsuApiClient OsuApi { get; }
@@ -61,8 +64,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             if (osuId == null)
             {// 在没有绑定的情况下尝试自动绑定。
                 string response;
-                response = await AutoBind(api, g, success);
-                await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage("\r\n您好，" + response));
+                response = await AutoBind(api, g);
+                if (!string.IsNullOrEmpty(response))
+                {
+                    await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage("\r\n您好，" + response));
+                }
                 return;
             }
 
@@ -127,7 +133,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 await api.SendGroupMessageAsync(g.GroupId, SendingMessage.At(g.UserId) + new SendingMessage($"\r\n{name}，您好。" + hint));
         }
 
-        private async Task<string> AutoBind(HttpApiClient api, GroupMessage g, bool success)
+        private async Task<string> AutoBind(HttpApiClient api, GroupMessage g)
         {
             string response;
             var memberInfo = await api.GetGroupMemberInfoAsync(g.GroupId, g.UserId);
@@ -145,8 +151,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             var validUsers = new List<UserInfo>();
             foreach (var username in usernames)
             {
-                UserInfo info;
-                (success, info) = await OsuApi.GetUserInfoAsync(username, Mode.Standard);
+                var (success, info) = await OsuApi.GetUserInfoAsync(username, Mode.Standard);
                 ExecutingException.Ensure(success, string.Empty);
                 if (info != null)
                     validUsers.Add(info);
@@ -161,8 +166,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
             else
             {
-                (await Database.AddNewBindAsync(g.UserId, validUsers[0].Id, validUsers[0].Name, "Auto", null, null) as IExecutingResult<object>).EnsureSuccess();
-                response = $"欢迎来到新人群，已自动绑定 osu! 游戏账号 {validUsers[0].Name}。";
+                var (isChanged, _, _) = await _osuDataUpdator.AddOrUpdateBindingInfoAsync(g.UserId, validUsers[0].Id, validUsers[0].Name, "Auto", null, null).ConfigureAwait(false);
+                response = isChanged ? $"欢迎来到新人群，已自动绑定 osu! 游戏账号 {validUsers[0].Name}。" : "";
             }
 
             return response;

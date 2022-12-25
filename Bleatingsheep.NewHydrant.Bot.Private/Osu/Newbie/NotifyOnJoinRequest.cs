@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
-using Bleatingsheep.OsuQqBot.Database.Execution;
+using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Sisters.WudiLib;
@@ -39,15 +39,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 #endif
         };
         private readonly IDbContextFactory<NewbieContext> _contextFactory;
+        private readonly IOsuDataUpdator _osuDataUpdator;
 
-        public NotifyOnJoinRequest(INewbieDatabase database, OsuMixedApi.OsuApiClient osuApi, IDbContextFactory<NewbieContext> contextFactory)
+        public NotifyOnJoinRequest(OsuMixedApi.OsuApiClient osuApi, IDbContextFactory<NewbieContext> contextFactory, IOsuDataUpdator osuDataUpdator)
         {
-            Database = database;
             OsuApi = osuApi;
             _contextFactory = contextFactory;
+            _osuDataUpdator = osuDataUpdator;
         }
 
-        private INewbieDatabase Database { get; }
         private OsuMixedApi.OsuApiClient OsuApi { get; }
 
         private async Task ParseInfoAsync(
@@ -97,14 +97,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                             && comment.TrimEnd().EndsWith($"答案：{name}", StringComparison.Ordinal)
                             && info != null)
                         {
-                            var bindingResult = await Database.AddNewBindAsync(
+                            var (isChanged, oldOsuId, bindingInfo) = await _osuDataUpdator.AddOrUpdateBindingInfoAsync(
                                 qq: r.UserId,
                                 osuId: info.Id,
                                 osuName: info.Name,
                                 source: "Auto (Request)",
                                 operatorId: r.UserId,
                                 operatorName: info.Name).ConfigureAwait(false);
-                            if (bindingResult.Success)
+                            if (isChanged)
                             {
                                 hints.Add(new Message($"自动绑定为 {info.Name}"));
                                 goto binding_end;
@@ -130,7 +130,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                             ms.Write(md5.ComputeHash(ms.ToArray()));
                             var bytes = ms.ToArray();
                             var base64 = Convert.ToBase64String(bytes);
-                            await api.SendMessageAsync(sendBackEndpoint, $"（占位）绑定为 {info.Name} 并放行：#{base64}#").ConfigureAwait(false);
+                            // await api.SendMessageAsync(sendBackEndpoint, $"（占位）绑定为 {info.Name} 并放行：#{base64}#").ConfigureAwait(false);
                         }
                     binding_end:
                         ;
