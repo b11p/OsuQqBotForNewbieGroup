@@ -70,7 +70,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                 checked
                 {
                     // cmbc
-                    var masterCardTask = string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase)
+                    var masterCardTask = string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase) || string.Equals("CNY", @base, StringComparison.OrdinalIgnoreCase)
                         ? Task.FromResult<MasterCardRate>(default)
                         : HttpApi.Resolve<IMasterCardRate>().GetRateToUsd(@base);
                     var cmbcTask = HttpApi.Resolve<ICmbcCreditRate>().GetRates();
@@ -100,25 +100,28 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     //cmbc
                     try
                     {
-                        var cmbcResult = await cmbcTask.ConfigureAwait(false);
-                        if (string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase))
+                        if (context.UserId == 962549599 && !string.Equals("CNY", @base, StringComparison.OrdinalIgnoreCase))
                         {
-                            var price = cmbcResult?.Data?.FirstOrDefault(d => string.Equals(@base, d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
-                            if (price != null)
+                            var cmbcResult = await cmbcTask.ConfigureAwait(false);
+                            if (string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase))
                             {
-                                var cny = amount * price.Value;
-                                results.Add($"CMBC CNY {cny}");
+                                var price = cmbcResult?.Data?.FirstOrDefault(d => string.Equals(@base, d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
+                                if (price != null)
+                                {
+                                    var cny = amount * price.Value;
+                                    results.Add($"CMBC CNY {cny}");
+                                }
                             }
-                        }
-                        else
-                        {
-                            masterCardResult = await masterCardTask.ConfigureAwait(false);
-                            var usdRate = masterCardResult?.Data?.ConversionRate;
-                            var usdPrice = cmbcResult?.Data?.FirstOrDefault(d => string.Equals("USD", d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
-                            if (usdPrice != null && usdRate != null)
+                            else
                             {
-                                var cny = amount * usdRate.Value * usdPrice.Value;
-                                results.Add($"MasterCard USD CMBC CNY {cny}");
+                                masterCardResult = await masterCardTask.ConfigureAwait(false);
+                                var usdRate = masterCardResult?.Data?.ConversionRate;
+                                var usdPrice = cmbcResult?.Data?.FirstOrDefault(d => string.Equals("USD", d?.Remark, StringComparison.OrdinalIgnoreCase))?.Price;
+                                if (usdPrice != null && usdRate != null)
+                                {
+                                    var cny = amount * usdRate.Value * usdPrice.Value;
+                                    results.Add($"MasterCard USD CMBC CNY {cny}");
+                                }
                             }
                         }
                     }
@@ -131,24 +134,27 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     // cmb
                     try
                     {
-                        var cmbResult = await cmbTask.ConfigureAwait(false);
-                        if (string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase))
+                        if (context.UserId == 962549599 && !string.Equals("CNY", @base, StringComparison.OrdinalIgnoreCase))
                         {
-                            var price = cmbResult?.GetValueOrDefault(@base.ToUpperInvariant());
-                            if (price != null)
+                            var cmbResult = await cmbTask.ConfigureAwait(false);
+                            if (string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase))
                             {
-                                var cny = amount * price.Value;
-                                results.Add($"CMB CNY {cny}");
+                                var price = cmbResult?.GetValueOrDefault(@base.ToUpperInvariant());
+                                if (price != null)
+                                {
+                                    var cny = amount * price.Value;
+                                    results.Add($"CMB CNY {cny}");
+                                }
                             }
-                        }
-                        else
-                        {
-                            var usdRate = masterCardResult?.Data?.ConversionRate;
-                            var usdPrice = cmbResult?.GetValueOrDefault("USD");
-                            if (usdPrice != null && usdRate != null)
+                            else
                             {
-                                var cny = amount * usdRate.Value * usdPrice.Value;
-                                results.Add($"MasterCard USD CMB CNY {cny}");
+                                var usdRate = masterCardResult?.Data?.ConversionRate;
+                                var usdPrice = cmbResult?.GetValueOrDefault("USD");
+                                if (usdPrice != null && usdRate != null)
+                                {
+                                    var cny = amount * usdRate.Value * usdPrice.Value;
+                                    results.Add($"MasterCard USD CMB CNY {cny}");
+                                }
                             }
                         }
                     }
@@ -161,13 +167,16 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     // cib
                     try
                     {
-                        var cibResult = await cibTask.ConfigureAwait(false);
-
-                        var price = cibResult[@base];
-                        if (price != null)
+                        if (context.UserId == 962549599 && !string.Equals("CNY", @base, StringComparison.OrdinalIgnoreCase))
                         {
-                            var cny = amount * price.Value;
-                            results.Add($"CIB CNY {cny}");
+                            var cibResult = await cibTask.ConfigureAwait(false);
+
+                            var price = cibResult[@base];
+                            if (price != null)
+                            {
+                                var cny = amount * price.Value;
+                                results.Add($"CIB CNY {cny}");
+                            }
                         }
                     }
                     catch (Exception e)

@@ -396,6 +396,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             ModeString = modeGroup.Value;
             return true;
         }
+
+        // TODO:
+        // 最常打的 mod 是 None 时不显示（或者 > 50% 时不显示）
+        // 年度谱面：打图次数最多的
+        // 最容易刷出 PP 的时间段
+        // 春天，你打 xx；夏天，你打 xx；秋天，你打 xx；冬天，你打 xx。
+        // 打图年代分布图：你最常打 xx 年代的图（先把所有人的数据混一起，手动划分几个合适的时间段，再设计文案）
+        // 你的打图品味超过 xx% 的用户（越小众超的人越多）【什么鬼
+        // b/xx 是你曾经打了很多遍但没有 FC 的图，你似乎把它遗忘了。
     }
 #nullable restore
 }
