@@ -76,9 +76,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Snapshots
                     }
                     catch (Exception e)
                     {
-                        _logger.LogInformation(e, "Update error on user id {schedule.UserId} mode {schedule.Mode}", schedule.UserId, schedule.Mode);
                         if (e.Message.Contains("429 Too Many Requests"))
-                            break;
+                        {
+                            _logger.LogInformation("Reached API rate limit on user id {schedule.UserId} mode {schedule.Mode}", schedule.UserId, schedule.Mode);
+                        }
+                        else
+                        {
+                            _logger.LogError(e, "Update error on user id {schedule.UserId} mode {schedule.Mode}", schedule.UserId, schedule.Mode);
+                        }
+                        break;
                     }
                 }
                 await db.SaveChangesAsync().ConfigureAwait(false);
