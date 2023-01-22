@@ -62,7 +62,7 @@ public class Bind : Service, IMessageCommand
         }
         else
         {
-            await api.SendMessageAsync(message.Endpoint, "在已绑定的情况下不允许修改，如需修改请联系 bleatingsheep。").ConfigureAwait(false);
+            await api.SendMessageAsync(message.Endpoint, "在已绑定的情况下不允许修改，如需修改请加群 563180497。").ConfigureAwait(false);
         }
     }
 
