@@ -48,7 +48,7 @@ public class Bind : Service, IMessageCommand
         }
         if (userInfo.Id > int.MaxValue)
         {
-            await api.SendMessageAsync(message.Endpoint, "osu! id 大于 32 位整型最大值。这游戏真有这么多人玩儿？请联系开发者处理。").ConfigureAwait(false);
+            await api.SendMessageAsync(message.Endpoint, "osu! id 大于 32 位整型最大值。这游戏真有这么多人玩儿？请加群 563180497 联系开发者处理。").ConfigureAwait(false);
             return;
         }
         var (isChanged, oldOsuId, _) = await _osuDataUpdator.AddOrUpdateBindingInfoAsync(message.UserId, (int)userInfo.Id, userInfo.Name, "自己绑定", message.UserId, userInfo.Name).ConfigureAwait(false);
@@ -62,7 +62,7 @@ public class Bind : Service, IMessageCommand
         }
         else
         {
-            await api.SendMessageAsync(message.Endpoint, "在已绑定的情况下不允许修改，如需修改请加群 563180497。").ConfigureAwait(false);
+            await api.SendMessageAsync(message.Endpoint, "在已绑定的情况下不允许修改，如需修改请联系新人群管理（新人群相关）或加群 563180497（新人群以外）。").ConfigureAwait(false);
         }
     }
 
