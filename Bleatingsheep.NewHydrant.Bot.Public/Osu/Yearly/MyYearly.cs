@@ -43,6 +43,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
+            await api.SendMessageAsync(context.Endpoint, "活动已结束，请明年再来！").ConfigureAwait(false);
+            return;
+
             // check binding
             DateTimeOffset now = DateTimeOffset.UtcNow;
             DateTimeOffset start = now.AddYears(-1);
