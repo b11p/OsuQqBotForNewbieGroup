@@ -29,6 +29,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         {
             { "新人群", (595985887, 2800) },
             { "进阶群", (928936255, 4500) },
+            { "高阶群", (281624271, 6000) },
         };
 
         private static readonly Regex s_regex = new Regex("^统计(?<group>.+?)玩家$", RegexOptions.CultureInvariant | RegexOptions.Compiled);

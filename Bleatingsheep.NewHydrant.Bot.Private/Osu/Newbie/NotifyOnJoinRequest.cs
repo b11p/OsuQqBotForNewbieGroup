@@ -32,6 +32,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         {
             [595985887] = 2500,
             [928936255] = null,
+            [281624271] = null,
             [758120648] = null,
             [514661057] = null,
 #if DEBUG
