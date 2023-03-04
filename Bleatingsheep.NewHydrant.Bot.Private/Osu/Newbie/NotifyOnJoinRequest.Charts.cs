@@ -79,6 +79,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                             {
                                 _ = await banner.EvaluateFunctionAsync("b => b.remove()").ConfigureAwait(false);
                             }
+
+                            // scroll to bp and wait lazy load
+                            await bpElement.HoverAsync();
+                            const string bpLoadDetectionSelector = """
+                                div[data-page-id="top_ranks"] > div > div.lazy-load > h3
+                                """;
+                            await page.WaitForSelectorAsync(bpLoadDetectionSelector);
+
                             // screenshot bests
                             data = await bpElement.ScreenshotDataAsync();
                             //data = await GetScreenshot(page, bestSelector).ConfigureAwait(false);

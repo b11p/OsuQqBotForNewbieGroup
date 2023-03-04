@@ -255,7 +255,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         public bool ShouldResponse(MessageContext context)
             => context switch
             {
-                GroupMessage g when g.GroupId == 695600319 && g.Content.TryGetPlainText(out _content) && _content.StartsWith("shotu", StringComparison.OrdinalIgnoreCase) => true,
+                GroupMessage g when (g.GroupId == 695600319 || g.GroupId == 72318078) && g.Content.TryGetPlainText(out _content) && _content.StartsWith("shotu", StringComparison.OrdinalIgnoreCase) => true,
                 _ => false
             };
 
