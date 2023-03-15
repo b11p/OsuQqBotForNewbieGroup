@@ -62,7 +62,9 @@ internal partial class PostToMemeRepository : IMessageCommand
             Debug.Fail(null);
             return;
         }
-        var info = await db.BotGroupFields.AsNoTracking().FirstOrDefaultAsync(f => f.GroupId == g.GroupId && f.FieldName == "MemePostInformation");
+        // this is null-safe. Dispose() is only called on non-null objects
+        // https://stackoverflow.com/questions/2522822/will-dispose-be-called-in-a-using-statement-with-a-null-object
+        using var info = await db.BotGroupFields.AsNoTracking().FirstOrDefaultAsync(f => f.GroupId == g.GroupId && f.FieldName == "MemePostInformation");
         if (info?.Data is null || info.Data.Deserialize<MemePostInformation>() is not MemePostInformation pushData)
         {
             // for now, silently return.
