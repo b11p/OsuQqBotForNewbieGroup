@@ -55,7 +55,11 @@ internal partial class PostToMemeRepository : IMessageCommand
 
         // 获取推送信息
         await using var db = _dbContextFactory.CreateDbContext();
-        Debug.Assert(context is GroupMessage g);
+        if (context is not GroupMessage g)
+        {
+            Debug.Fail(null);
+            return;
+        }
         var info = await db.BotGroupFields.AsNoTracking().FirstOrDefaultAsync(f => f.GroupId == g.GroupId && f.FieldName == "MemePostInformation");
         if (info?.Data is null || info.Data.Deserialize<MemePostInformation>() is not MemePostInformation pushData)
         {
