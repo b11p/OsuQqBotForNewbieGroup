@@ -40,13 +40,13 @@ internal partial class PostToMemeRepository : IMessageCommand
         var command = _command.Trim();
         var match = regex.Match(command);
         Debug.Assert(match.Success);
-        if (match.Length != command.Length || string.IsNullOrWhiteSpace(match.Captures[1].Value))
+        if (match.Length != command.Length || string.IsNullOrWhiteSpace(match.Groups[1].Value))
         {
             // 可能是有多行，或者未填写文件名。
             await api.SendMessageAsync(context.Endpoint, "命令格式错误，正确格式为“/post 标签”");
             return;
         }
-        var fileName = match.Captures[1].Value;
+        var fileName = match.Groups[1].Value;
         if (fileName.IndexOfAny(s_invalidFileNameChars) != -1)
         {
             await api.SendMessageAsync(context.Endpoint, "命令格式错误，正确格式为“/post 标签”，标签必须可以用作文件名。");
