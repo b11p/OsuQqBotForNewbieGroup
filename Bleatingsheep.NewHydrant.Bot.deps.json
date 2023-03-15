@@ -989,6 +989,14 @@
           }
         }
       },
+      "SixLabors.ImageSharp/3.0.0": {
+        "runtime": {
+          "lib/net6.0/SixLabors.ImageSharp.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.0.0.0"
+          }
+        }
+      },
       "System.AppContext/4.1.0": {
         "dependencies": {
           "System.Runtime": "4.1.0"
@@ -2080,6 +2088,7 @@
           "Bleatingsheep.Osu.Helper": "1.0.0",
           "CsvHelper": "30.0.1",
           "Octokit": "5.0.2",
+          "SixLabors.ImageSharp": "3.0.0",
           "System.Linq.Async": "6.0.1",
           "System.ServiceModel.Syndication": "7.0.0"
         },
@@ -2686,6 +2695,13 @@
       "sha512": "sha512-P1XysdRpQN/B7kb8W3lNdgo/ue1dhTmO4xt77p+UPe+XiYiW0NP4wF8flXiMNWFUOzFtONEDg1XehLR5bpKrEQ==",
       "path": "sisters.wudilib.websocket/0.2.1",
       "hashPath": "sisters.wudilib.websocket.0.2.1.nupkg.sha512"
+    },
+    "SixLabors.ImageSharp/3.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ETEHRfUAn/rExqdmj2GDayPkW9zr3BruO9S4WF9ULpWmdydewIjoJqinbQc+o4DsM3X0wGZPyJLlj6N3uxV/aw==",
+      "path": "sixlabors.imagesharp/3.0.0",
+      "hashPath": "sixlabors.imagesharp.3.0.0.nupkg.sha512"
     },
     "System.AppContext/4.1.0": {
       "type": "package",
