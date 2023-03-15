@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Octokit;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
+using SixLabors.ImageSharp;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊.MemePost;
@@ -86,7 +87,7 @@ internal partial class PostToMemeRepository : IMessageCommand
         }
         if (message.Sections is not [{ Type: "image" } s])
         {
-            await api.SendMessageAsync(context.Endpoint, "引用的消息不是单条消息，请重新选择。");
+            await api.SendMessageAsync(context.Endpoint, "引用的消息不是单张图片，请重新选择。");
             return;
         }
         if (!s.Data.TryGetValue("url", out var url))
@@ -94,16 +95,34 @@ internal partial class PostToMemeRepository : IMessageCommand
             await api.SendMessageAsync(context.Endpoint, "获取图片 URL 失败。");
             return;
         }
+        string? ext;
         try
         {
             using var httpClient = new HttpClient();
-            var image = await httpClient.GetByteArrayAsync(url);
+            _logger.LogInformation("Image url: {url}", url);
+            var imageBytes = await httpClient.GetByteArrayAsync(url);
             var gitHubClient = new GitHubClient(new ProductHeaderValue("LoadBalancerScripts"))
             {
                 Credentials = new Credentials(pushData.GitHubToken),
             };
-            var ext = url[(url.LastIndexOf('.') + 1)..];
-            var createFile = await gitHubClient.Repository.Content.CreateFile(pushData.Repository.Owner, pushData.Repository.Name, Path.Combine(pushData.Path, $"{fileName}.{ext}"), new CreateFileRequest("Bot upload", Convert.ToBase64String(image), false));
+
+            // get file extension.
+            var imageFormat = Image.DetectFormat(imageBytes);
+            ext = imageFormat.FileExtensions.FirstOrDefault();
+
+            var createFile = await gitHubClient.Repository.Content.CreateFile(pushData.Repository.Owner, pushData.Repository.Name, Path.Combine(pushData.Path, $"{fileName}.{ext}"), new CreateFileRequest("Bot upload", Convert.ToBase64String(imageBytes), false));
+        }
+        catch (ImageFormatException e)
+        {
+            _logger.LogError(e, "图片格式检测失败，URL：{url}", url);
+            await api.SendMessageAsync(g.Endpoint, "图片格式检测失败，请联系开发者并提供图片。");
+            return;
+        }
+        catch (ApiValidationException e)
+        {
+            _logger.LogError(e, "推送图片时出现错误。");
+            await api.SendMessageAsync(g.Endpoint, $"推送图片时出现错误，可能是已有同名文件。\r\n{e.Message}");
+            return;
         }
         catch (Exception e)
         {
@@ -113,7 +132,7 @@ internal partial class PostToMemeRepository : IMessageCommand
         }
 
         _logger.LogInformation("Post complete");
-        await api.SendMessageAsync(g.Endpoint, "推送图片成功。");
+        await api.SendMessageAsync(g.Endpoint, $"推送图片成功。{fileName}.{ext}");
     }
 
     public bool ShouldResponse(MessageContext context)
