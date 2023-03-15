@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -132,7 +133,15 @@ internal partial class PostToMemeRepository : IMessageCommand
         }
 
         _logger.LogInformation("Post complete");
-        await api.SendMessageAsync(g.Endpoint, $"推送图片成功。{fileName}.{ext}");
+        var sb = new StringBuilder();
+        sb.Append($"推送图片成功。{fileName}.{ext}");
+        if (pushData.HomePage is not null)
+        {
+            sb.AppendLine();
+            sb.Append($"更多精彩尽在 {pushData.HomePage}");
+        }
+
+        await api.SendMessageAsync(g.Endpoint, sb.ToString());
     }
 
     public bool ShouldResponse(MessageContext context)

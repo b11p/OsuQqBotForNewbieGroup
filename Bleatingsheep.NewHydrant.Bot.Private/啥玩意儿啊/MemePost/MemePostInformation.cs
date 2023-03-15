@@ -5,6 +5,7 @@ internal class MemePostInformation
     public required MemePostRepositoryInformation Repository { get; init; }
     public required string GitHubToken { get; init; }
     public required string Path { get; init; }
+    public string? HomePage { get; init; }
 
     internal record class MemePostRepositoryInformation(string Owner, string Name);
 }
