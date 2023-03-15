@@ -9,6 +9,6 @@ public class BotUserField
     public string FieldName { get; set; } = null!;
     public JsonDocument? Data { get; set; }
     [Timestamp]
-    public byte[]? Version { get; set; }
+    public uint Version { get; set; }
 }
 #nullable restore

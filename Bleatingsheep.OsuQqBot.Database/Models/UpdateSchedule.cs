@@ -11,6 +11,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DateTimeOffset NextUpdate { get; set; }
         public int ActiveIndex { get; set; }
         [Timestamp]
-        public byte[] Version { get; set; }
+        public uint Version { get; set; }
     }
 }
