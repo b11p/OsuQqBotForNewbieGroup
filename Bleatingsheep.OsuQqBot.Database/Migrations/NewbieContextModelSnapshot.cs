@@ -55,7 +55,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BeatmapPlusCache");
+                    b.ToTable("BeatmapPlusCache", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.BeatmapInfoCacheEntry", b =>
@@ -79,7 +79,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasIndex("ExpirationDate");
 
-                    b.ToTable("BeatmapInfoCache");
+                    b.ToTable("BeatmapInfoCache", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.BindingInfo", b =>
@@ -97,7 +97,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Bindings");
+                    b.ToTable("Bindings", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.BotGroupField", b =>
@@ -111,17 +111,11 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                     b.Property<JsonDocument>("Data")
                         .HasColumnType("jsonb");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("GroupId", "FieldName");
 
                     b.HasIndex("FieldName");
 
-                    b.ToTable("BotGroupFields");
+                    b.ToTable("BotGroupFields", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.BotUserField", b =>
@@ -135,17 +129,11 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                     b.Property<JsonDocument>("Data")
                         .HasColumnType("jsonb");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("UserId", "FieldName");
 
                     b.HasIndex("FieldName");
 
-                    b.ToTable("BotUserFields");
+                    b.ToTable("BotUserFields", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.DuplicateAuthentication", b =>
@@ -168,7 +156,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                     b.HasIndex("SelfId")
                         .IsUnique();
 
-                    b.ToTable("DuplicateAuthentication");
+                    b.ToTable("DuplicateAuthentication", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.MessageEntry", b =>
@@ -198,7 +186,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.OperationHistory", b =>
@@ -233,7 +221,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Histories");
+                    b.ToTable("Histories", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.PlayRecordQueryTemp", b =>
@@ -256,7 +244,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                     b.HasIndex("UserId", "Mode")
                         .IsUnique();
 
-                    b.ToTable("PlayRecordQueryTemps");
+                    b.ToTable("PlayRecordQueryTemps", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.PlusHistory", b =>
@@ -297,7 +285,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("Id", "Date");
 
-                    b.ToTable("PlusHistories");
+                    b.ToTable("PlusHistories", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.RecommendationEntry", b =>
@@ -326,7 +314,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasIndex("Mode", "Left");
 
-                    b.ToTable("Recommendations");
+                    b.ToTable("Recommendations", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.RelationshipInfo", b =>
@@ -343,7 +331,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("UserId", "Relationship");
 
-                    b.ToTable("Relationships");
+                    b.ToTable("Relationships", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.UpdateSchedule", b =>
@@ -360,15 +348,9 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                     b.Property<DateTimeOffset>("NextUpdate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("UserId", "Mode");
 
-                    b.ToTable("UpdateSchedules");
+                    b.ToTable("UpdateSchedules", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.UserPlayRecord", b =>
@@ -384,7 +366,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("UserId", "Mode", "PlayNumber");
 
-                    b.ToTable("UserPlayRecords");
+                    b.ToTable("UserPlayRecords", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.UserSnapshot", b =>
@@ -409,7 +391,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasIndex("UserId", "Mode", "Date");
 
-                    b.ToTable("UserSnapshots");
+                    b.ToTable("UserSnapshots", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.WebLog", b =>
@@ -442,12 +424,12 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WebLogs");
+                    b.ToTable("WebLogs", (string)null);
                 });
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.UserPlayRecord", b =>
                 {
-                    b.OwnsOne("Bleatingsheep.Osu.ApiClient.UserRecent", "Record", b1 =>
+                    b.OwnsOne("Bleatingsheep.OsuQqBot.Database.Models.UserPlayRecord.Record#Bleatingsheep.Osu.ApiClient.UserRecent", "Record", b1 =>
                         {
                             b1.Property<int>("UserPlayRecordUserId")
                                 .HasColumnType("integer");
@@ -502,7 +484,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                             b1.HasKey("UserPlayRecordUserId", "UserPlayRecordMode", "UserPlayRecordPlayNumber");
 
-                            b1.ToTable("UserPlayRecords");
+                            b1.ToTable("UserPlayRecords", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserPlayRecordUserId", "UserPlayRecordMode", "UserPlayRecordPlayNumber");
@@ -514,7 +496,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
             modelBuilder.Entity("Bleatingsheep.OsuQqBot.Database.Models.UserSnapshot", b =>
                 {
-                    b.OwnsOne("Bleatingsheep.Osu.ApiClient.UserInfo", "UserInfo", b1 =>
+                    b.OwnsOne("Bleatingsheep.OsuQqBot.Database.Models.UserSnapshot.UserInfo#Bleatingsheep.Osu.ApiClient.UserInfo", "UserInfo", b1 =>
                         {
                             b1.Property<long>("UserSnapshotId")
                                 .HasColumnType("bigint");
@@ -584,7 +566,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                             b1.HasKey("UserSnapshotId");
 
-                            b1.ToTable("UserSnapshots");
+                            b1.ToTable("UserSnapshots", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("UserSnapshotId");

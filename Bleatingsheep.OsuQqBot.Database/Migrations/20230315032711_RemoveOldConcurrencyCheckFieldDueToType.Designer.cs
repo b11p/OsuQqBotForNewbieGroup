@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Bleatingsheep.OsuQqBot.Database.Migrations
 {
     [DbContext(typeof(NewbieContext))]
-    [Migration("20230315030615_Adapt PGSQL concurrent check version")]
-    partial class AdaptPGSQLconcurrentcheckversion
+    [Migration("20230315032711_RemoveOldConcurrencyCheckFieldDueToType")]
+    partial class RemoveOldConcurrencyCheckFieldDueToType
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -114,12 +114,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                     b.Property<JsonDocument>("Data")
                         .HasColumnType("jsonb");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("GroupId", "FieldName");
 
                     b.HasIndex("FieldName");
@@ -137,12 +131,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.Property<JsonDocument>("Data")
                         .HasColumnType("jsonb");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("UserId", "FieldName");
 
@@ -362,12 +350,6 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.Property<DateTimeOffset>("NextUpdate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("UserId", "Mode");
 
