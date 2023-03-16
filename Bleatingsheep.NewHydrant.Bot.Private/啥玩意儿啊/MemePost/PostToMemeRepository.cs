@@ -40,9 +40,9 @@ internal partial class PostToMemeRepository : IMessageCommand
     {
         if (string.IsNullOrWhiteSpace(_command))
         {
-            _logger.LogInformation("Raw message: {raw}", context.Content.Raw);
-            _logger.LogInformation("Sections: {sections}", JsonConvert.SerializeObject(context.Content.Sections));
-            _logger.LogInformation("Merged sections: {mergedSections}", JsonConvert.SerializeObject(context.Content.MergeContinuousTextSections().Sections));
+            _logger.LogWarning("Raw message: {raw}", context.Content.Raw);
+            _logger.LogWarning("Sections: {sections}", JsonConvert.SerializeObject(context.Content.Sections));
+            _logger.LogWarning("Merged sections: {mergedSections}", JsonConvert.SerializeObject(context.Content.MergeContinuousTextSections().Sections));
             return;
         }
 
@@ -160,11 +160,11 @@ internal partial class PostToMemeRepository : IMessageCommand
         var regex = GetCommandRegex();
         var command = context switch
         {
-            GroupMessage g => g.Content.MergeContinuousTextSections() switch
+            GroupMessage g => g.Content.MergeContinuousTextSections().Sections.Where(s => s.Type != Section.TextType || !string.IsNullOrWhiteSpace(s.Data[Section.TextParamName])).ToList() switch
             {
-                { Sections: [{ Type: "reply" }, { Type: "at" }, { Type: "text" } s, ..] } => s.Data["text"],
-                { Sections: [{ Type: "reply" }, { Type: "text" } split, { Type: "at" }, { Type: "text" } s, ..] } => string.IsNullOrWhiteSpace(split.Data["text"]) ? s.Data["text"] : default,
-                { Sections: [{ Type: "reply" }, { Type: "text" } s, ..] } => s.Data["text"],
+                [{ Type: "reply" }, { Type: "at" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
+                [{ Type: "reply" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
+                [{ Type: "reply" }, { Type: "text" } s, ..] => s.Data["text"],
                 _ => default,
             },
             _ => default,
