@@ -113,7 +113,7 @@ internal partial class PostToMemeRepository : IMessageCommand
             var imageFormat = Image.DetectFormat(imageBytes);
             ext = imageFormat.FileExtensions.FirstOrDefault();
 
-            var createFile = await gitHubClient.Repository.Content.CreateFile(pushData.Repository.Owner, pushData.Repository.Name, Path.Combine(pushData.Path, $"{fileName}.{ext}"), new CreateFileRequest("Bot upload", Convert.ToBase64String(imageBytes), false));
+            var createFile = await gitHubClient.Repository.Content.CreateFile(pushData.Repository.Owner, pushData.Repository.Name, Path.Combine(pushData.Path, $"{fileName}.{ext}"), new CreateFileRequest($"Bot upload. Group {g.GroupId}, User {g.UserId}", Convert.ToBase64String(imageBytes), false));
         }
         catch (ImageFormatException e)
         {
