@@ -25,7 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Release'">
-		<PackageReference Include="Sisters.WudiLib" Version="0.4.2-alpha" />
+		<PackageReference Include="Sisters.WudiLib" Version="0.4.2-alpha2" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">

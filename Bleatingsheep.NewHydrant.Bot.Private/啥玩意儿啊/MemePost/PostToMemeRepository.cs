@@ -151,10 +151,11 @@ internal partial class PostToMemeRepository : IMessageCommand
         var regex = GetCommandRegex();
         var command = context switch
         {
-            GroupMessage g => g switch
+            GroupMessage g => g.Content.MergeContinuousTextSections() switch
             {
-                { Content.Sections: [{ Type: "reply" }, { Type: "text" } s, ..] } => s.Data["text"],
-                { Content.Sections: [{ Type: "reply" }, { Type: "at" }, { Type: "text" } s, ..] } => s.Data["text"],
+                { Sections: [{ Type: "reply" }, { Type: "at" }, { Type: "text" } s, ..] } => s.Data["text"],
+                { Sections: [{ Type: "reply" }, { Type: "text" } split, { Type: "at" }, { Type: "text" } s, ..] } => string.IsNullOrWhiteSpace(split.Data["text"]) ? s.Data["text"] : default,
+                { Sections: [{ Type: "reply" }, { Type: "text" } s, ..] } => s.Data["text"],
                 _ => default,
             },
             _ => default,
