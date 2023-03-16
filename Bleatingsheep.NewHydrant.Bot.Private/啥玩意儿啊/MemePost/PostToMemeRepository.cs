@@ -11,6 +11,7 @@ using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Octokit;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
@@ -37,6 +38,14 @@ internal partial class PostToMemeRepository : IMessageCommand
 
     public async Task ProcessAsync(MessageContext context, HttpApiClient api)
     {
+        if (string.IsNullOrWhiteSpace(_command))
+        {
+            _logger.LogInformation("Raw message: {raw}", context.Content.Raw);
+            _logger.LogInformation("Sections: {sections}", JsonConvert.SerializeObject(context.Content.Sections));
+            _logger.LogInformation("Merged sections: {mergedSections}", JsonConvert.SerializeObject(context.Content.MergeContinuousTextSections().Sections));
+            return;
+        }
+
         // 获取文件名
         var regex = GetParsingRegex();
         var command = _command.Trim();
@@ -162,6 +171,11 @@ internal partial class PostToMemeRepository : IMessageCommand
         };
         if (string.IsNullOrWhiteSpace(command))
         {
+            if (context.Content.Raw.Contains("/post", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // only for debug.
+                return true;
+            }
             return false;
         }
         if (regex.IsMatch(command))
