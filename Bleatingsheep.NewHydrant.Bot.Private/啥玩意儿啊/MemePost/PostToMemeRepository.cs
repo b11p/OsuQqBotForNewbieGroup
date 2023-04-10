@@ -121,6 +121,11 @@ internal partial class PostToMemeRepository : IMessageCommand
             // get file extension.
             var imageFormat = Image.DetectFormat(imageBytes);
             ext = imageFormat.FileExtensions.FirstOrDefault();
+            if (ext is null || !GetExtensionNameCheckingRegex().IsMatch(ext))
+            {
+                await api.SendMessageAsync(g.Endpoint, $"图片格式{ext}未知，请联系开发者并提供图片。");
+                return;
+            }
 
             var createFile = await gitHubClient.Repository.Content.CreateFile(pushData.Repository.Owner, pushData.Repository.Name, Path.Combine(pushData.Path, $"{fileName}.{ext}"), new CreateFileRequest($"Bot upload. Group {g.GroupId}, User {g.UserId}", Convert.ToBase64String(imageBytes), false));
         }
@@ -188,6 +193,8 @@ internal partial class PostToMemeRepository : IMessageCommand
 
     [GeneratedRegex(@"^\s*/post(?:\s|$)", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex GetCommandRegex();
-    [GeneratedRegex("^\\s*/post\\s*(.*)", RegexOptions.IgnoreCase | RegexOptions.Compiled, "zh-CN")]
+    [GeneratedRegex(@"^\s*/post\s*(.*?)\s*$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Multiline, "zh-CN")]
     private static partial Regex GetParsingRegex();
+    [GeneratedRegex(@"^(?:jpg|png|jfif|webp|gif)$", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant)]
+    private static partial Regex GetExtensionNameCheckingRegex();
 }
