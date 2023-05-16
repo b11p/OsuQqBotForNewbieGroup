@@ -32,6 +32,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
     private readonly DataMaintainer _dataMaintainer;
     private readonly ILogger<UpdateSnapshotsJob> _logger;
     //#mark Bleatingsheep.NewHydrant.Bot.Private/Osu/Newbie/统计新人群成员.cs
-    
+    //#mark http get $"https://osu.ppy.sh/users/{uid}/scores/best?mode=osu&limit=1&offset=0"
   }
 }
