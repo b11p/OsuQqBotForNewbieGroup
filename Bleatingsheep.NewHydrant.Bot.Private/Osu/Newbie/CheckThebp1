@@ -22,8 +22,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
 #nullable enable
   [Component("CheckTheBP1Job")]
-  public class CheckTheBP1Job : Service, IRegularAsync
-  {
+  public class CheckTheBP1Job : Service, IRegularAsync {
     private static UpdateSnapshotsJob? s_main;
     private static DateTimeOffset s_lastSeen;
     private static int s_running = 0;
@@ -33,5 +32,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
     private readonly ILogger<UpdateSnapshotsJob> _logger;
     //#mark Bleatingsheep.NewHydrant.Bot.Private/Osu/Newbie/统计新人群成员.cs
     //#mark http get $"https://osu.ppy.sh/users/{uid}/scores/best?mode=osu&limit=1&offset=0"
+    private static readonly Regex regex = new Regex($@"\"pp\":([0-9]+\.?[0-9]*),");
+    private float getPP(string body) {
+      Match match = regex.Match(body);
+      float pp = 0;
+      if (match.Success){
+        pp = float.Parse(match.Groups[1].Value);
+      }
+      return pp;
+    }
   }
 }
