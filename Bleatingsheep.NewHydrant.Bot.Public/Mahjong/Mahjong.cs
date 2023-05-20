@@ -6,6 +6,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Bleatingsheep.NewHydrant.Attributions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Sisters.WudiLib;
 using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
@@ -16,15 +18,21 @@ namespace Bleatingsheep.NewHydrant.Mahjong;
 [Component("mahjong")]
 class MahjongSoulAnalyzer : IMessageCommand
 {
-    private const string TensoulBase = "https://tensoul.azurewebsites.net/convert";
     private static readonly Regex s_regex = new(@"^\s*雀魂\s*([0-9a-zA-Z-_]+)$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
     private static readonly IMajsoulAnalyzer s_akochanAnalyzer = new RemoteAkochanReviewer();
     private static readonly MahjongObjectStorage s_storage = new MahjongObjectStorage(
         "/outputs",
         "https://res.bleatingsheep.org/");
     private static readonly MajsoulDanPTProvider s_danPTProvider = new MajsoulDanPTProvider();
-
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<MahjongSoulAnalyzer> _logger;
     private string _recordId = string.Empty;
+
+    public MahjongSoulAnalyzer(IConfiguration configuration, ILogger<MahjongSoulAnalyzer> logger)
+    {
+        _configuration = configuration;
+        _logger = logger;
+    }
 
     public async Task ProcessAsync(MessageContext message, HttpApiClient api)
     {
@@ -41,7 +49,13 @@ class MahjongSoulAnalyzer : IMessageCommand
             return;
         }
 
-        var tensoulUri = new UriBuilder(TensoulBase);
+        var tensoulBase = _configuration.GetSection(MahjongOptions.Mahjong).Get<MahjongOptions>()?.TensoulBase;
+        if (tensoulBase == null)
+        {
+            _logger.LogError("未找到正确的 TensoulBase 配置");
+            return;
+        }
+        var tensoulUri = new UriBuilder(tensoulBase);
         var query = HttpUtility.ParseQueryString(tensoulUri.Query);
         query.Add("id", _recordId);
         tensoulUri.Query = query.ToString();
