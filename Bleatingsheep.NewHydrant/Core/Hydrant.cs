@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using Sisters.WudiLib;
@@ -140,13 +141,12 @@ namespace Bleatingsheep.NewHydrant.Core
         #endregion
 
         #region init and run
-        public void Init() => Init<IHydrantStartup>(default!);
-
-        public void Init<T>(T startup) where T : IHydrantStartup
+        public void Init<T>(T startup, IConfiguration configuration) where T : IHydrantStartup
         {
             if (Interlocked.Exchange(ref _isInitialized, 1) == 0)
             {
                 var services = new ServiceCollection();
+                services.AddSingleton(configuration);
                 startup?.ConfigureServices(services);
                 Init(_assemblies, services);
             }

@@ -177,7 +177,7 @@ namespace Bleatingsheep.NewHydrant
             // 设置异常处理。
             hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
 
-            hydrant.Init<HydrantStartup>(new HydrantStartup(s_configure));
+            hydrant.Init<HydrantStartup>(new HydrantStartup(s_configure), s_configure);
 
             // 添加必要的事件处理。
             // Public
