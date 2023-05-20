@@ -848,11 +848,11 @@
           }
         }
       },
-      "NLog/5.1.0": {
+      "NLog/5.1.4": {
         "runtime": {
           "lib/netstandard2.0/NLog.dll": {
             "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.1.0.1480"
+            "fileVersion": "5.1.4.1703"
           }
         }
       },
@@ -860,7 +860,7 @@
         "dependencies": {
           "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
           "Microsoft.Extensions.Logging": "7.0.0",
-          "NLog": "5.1.0"
+          "NLog": "5.1.4"
         },
         "runtime": {
           "lib/net6.0/NLog.Extensions.Logging.dll": {
@@ -2051,8 +2051,9 @@
       "Bleatingsheep.NewHydrant/1.0.0": {
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "7.0.0",
+          "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
           "Microsoft.Extensions.DependencyInjection": "7.0.0",
-          "NLog": "5.1.0",
+          "NLog": "5.1.4",
           "Sisters.WudiLib": "0.4.2-alpha2"
         },
         "runtime": {
@@ -2582,12 +2583,12 @@
       "path": "newtonsoft.json/13.0.3",
       "hashPath": "newtonsoft.json.13.0.3.nupkg.sha512"
     },
-    "NLog/5.1.0": {
+    "NLog/5.1.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-oW7ekrkRG9okpDMUcEglunWj8Qf2RY8qkgl+/chJoavzg3dbT13y32t19R54FKkmq80fKzw4ZekZkCrRGanKgQ==",
-      "path": "nlog/5.1.0",
-      "hashPath": "nlog.5.1.0.nupkg.sha512"
+      "sha512": "sha512-Ki0XThITEd//RrQ21yi1HB/Uid4pzTRE5YLvEpk91d0vDXp3OPtVCvWgrYsqqcpTwiipFSOLSsU1RblaexrFiA==",
+      "path": "nlog/5.1.4",
+      "hashPath": "nlog.5.1.4.nupkg.sha512"
     },
     "NLog.Extensions.Logging/5.2.0": {
       "type": "package",
