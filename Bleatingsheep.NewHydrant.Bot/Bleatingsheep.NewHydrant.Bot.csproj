@@ -13,15 +13,16 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Release'">
+	<!-- <ItemGroup Condition="'$(Configuration)'=='Release'"> -->
+	<ItemGroup>
     <PackageReference Include="Sisters.WudiLib" Version="0.4.2-alpha2" />
     <PackageReference Include="Sisters.WudiLib.WebSocket" Version="0.2.1" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+  <!-- <ItemGroup Condition="'$(Configuration)'=='Debug'">
     <ProjectReference Include="..\..\Sisters.WudiLib\Sisters.WudiLib\Sisters.WudiLib.csproj" />
     <ProjectReference Include="..\..\Sisters.WudiLib\Sisters.WudiLib.WebSocket\Sisters.WudiLib.WebSocket.csproj" />
-  </ItemGroup>
+  </ItemGroup> -->
 
   <ItemGroup>
     <ProjectReference Include="..\Bleatingsheep.NewHydrant.Bot.Private\Bleatingsheep.NewHydrant.Bot.Private.csproj" />

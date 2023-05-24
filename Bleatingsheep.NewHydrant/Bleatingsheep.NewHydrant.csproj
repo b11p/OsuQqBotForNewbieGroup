@@ -25,12 +25,13 @@
 		<PackageReference Include="NLog" Version="5.1.4" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='Release'">
+	<!-- <ItemGroup Condition="'$(Configuration)'=='Release'"> -->
+	<ItemGroup>
 		<PackageReference Include="Sisters.WudiLib" Version="0.4.2-alpha2" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+	<!-- <ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<ProjectReference Include="..\..\Sisters.WudiLib\Sisters.WudiLib\Sisters.WudiLib.csproj" />
-	</ItemGroup>
+	</ItemGroup> -->
 
 </Project>
