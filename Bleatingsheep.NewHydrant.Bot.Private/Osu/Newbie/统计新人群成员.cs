@@ -123,7 +123,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                               pp = user?.Performance,
                               card = i.DisplayName,
                               bp1pp = bp1,
-                              remark = getTipMessage(b, netOk, user, user.Performance >= limitSum, bp1 >= limitBp1)
+                              remark = getTipMessage(b, netOk, user, limitSum, bp1, limitBp1)
                               /*
                               remark = b == null ? "未绑定" :
                                   !netOk ? "API 错误" :
@@ -168,7 +168,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         /***
          * 方便阅读
          */
-        private static string getTipMessage(BindingInfo? bid, bool netOk, UserInfo? user, bool sumLimit, bool bp1Limit)
+        private static string getTipMessage(BindingInfo? bid, bool netOk, UserInfo? user, int limitSum,double? bp1, int limitBp1)
         {
             string remark;
             if (bid == null)
@@ -187,11 +187,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             {
                 remark = "可能不活跃";
             }
-            else if (sumLimit)
+            else if (user.Performance >= limitSum)
             {
                 remark = "超限";
             }
-            else if (bp1Limit)
+            else if (bp1 >= limitBp1)
             {
                 remark = "超限BP1";
             }
