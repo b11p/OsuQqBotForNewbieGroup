@@ -9,6 +9,7 @@ using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu;
+using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -25,11 +26,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         private const string DestPath = "/outputs/statistics_{0}.csv";
         private const string ResourceUrl = "https://res.bleatingsheep.org/statistics_{0}.csv";
 
-        private static readonly Dictionary<string, (long, int)> s_groups = new()
+        private static readonly Dictionary<string, (long, int, int)> s_groups = new()
         {
-            { "新人群", (595985887, 2800) },
-            { "进阶群", (928936255, 4500) },
-            { "高阶群", (281624271, 6000) },
+            { "新人群", (595985887, 2800, 190) },
+            { "进阶群", (928936255, 4500, 280) },
+            { "高阶群", (281624271, 6000, 360) },
         };
 
         private static readonly Regex s_regex = new Regex("^统计(?<group>.+?)玩家$", RegexOptions.CultureInvariant | RegexOptions.Compiled);
@@ -52,8 +53,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         {
             if (s_groups.TryGetValue(ProcessingGroupName, out var t))
             {
-                var (groupId, limit) = t;
-                return AnalyzeGroupMember(context, api, limit, groupId);
+                var (groupId, limitSum, limitBp1) = t;
+                return AnalyzeGroupMember(context, api, limitSum,limitBp1, groupId);
             }
             else
             {
@@ -61,9 +62,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
         }
 
-        private async Task AnalyzeGroupMember(MessageContext context, HttpApiClient api, int limit, long groupId)
+        private async Task AnalyzeGroupMember(MessageContext context, HttpApiClient api, int limitSum, int limitBp1, long groupId)
         {
-            await api.SendMessageAsync(context.Endpoint, $"即将统计新人群玩家列表，PP 超过 {limit} 将标记为超限。");
+            await api.SendMessageAsync(context.Endpoint, $"即将统计新人群玩家列表，PP 超过 {limitSum} 将标记为超限。");
 
             var dbContext = _contextFactory.CreateDbContext();
             dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -84,7 +85,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 .ConfigureAwait(false);
             Logger.Info($"Find {snapshots.Count} snapshots.");
 
-            var userInfoTaskArray = bindingList.Select(async b =>
+            // 
+            Task<(BindingInfo BindingInfo, bool Successful, UserInfo UserInfo, UserBest bp1)>[] userInfoTaskArray = bindingList.Select(async b =>
             {
                 var o = b.OsuId;
                 try
@@ -93,13 +95,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     if (snapshotInfo != null)
                         return (BindingInfo: b, Successful: true, UserInfo: snapshotInfo.UserInfo);
                     var userInfo = await _dataProvider.Value.GetUserInfoRetryAsync(o, Mode.Standard).ConfigureAwait(false);
-                    return (BindingInfo: b, Successful: true, UserInfo: userInfo);
+                    var bp1 = await _dataProvider.Value.GetUserBestRetryLimitAsync(o, Mode.Standard, 1);
+                    return (BindingInfo: b, Successful: true, UserInfo: userInfo,bp1[0]);
                 }
                 catch (Exception)
                 {
-                    return (b, false, null);
+                    return (b, false, null, null);
                 }
-            }).ToArray();
+            })
+                .ToArray();
             await Task.WhenAll(userInfoTaskArray).ConfigureAwait(false);
             Logger.Info("Complete fetching user info.");
             var userInfo = userInfoTaskArray.Select(t => t.Result);
@@ -110,6 +114,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                           let b = v.BindingInfo
                           let netOk = v.Successful
                           let user = v.UserInfo
+                          let bp1=v.bp1.Performance
                           select new
                           {
                               qq = i.UserId,
@@ -117,10 +122,17 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                               name = user?.Name,
                               pp = user?.Performance,
                               card = i.DisplayName,
+                              bp1pp = bp1,
+                              remark = getTipMessage(b, netOk, user, user.Performance >= limitSum, bp1 >= limitBp1)
+                              /*
                               remark = b == null ? "未绑定" :
                                   !netOk ? "API 错误" :
                                   user == null ? "被 ban 了" :
-                                  (user.Performance == 0 ? "可能不活跃" : (user.Performance >= limit ? "超限" : "正常")),
+                                  (user.Performance == 0 ? "可能不活跃" : (user.Performance >= limitSum ? "超限" : (
+                                      bp1 >= limitBp1
+                                          ? "超限BP1"
+                                          : "正常"))),
+                                          */
                           };
             var writer = new StringWriter();
             using (var csvWriter = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture))
@@ -151,6 +163,44 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 dbContext.UpdateSchedules.AddRange(newSchedules);
                 await dbContext.SaveChangesAsync().ConfigureAwait(false);
             }
+        }
+
+        /***
+         * 方便阅读
+         */
+        private static string getTipMessage(BindingInfo? bid, bool netOk, UserInfo? user, bool sumLimit, bool bp1Limit)
+        {
+            string remark;
+            if (bid == null)
+            {
+                remark = "未绑定";
+            }
+            else if (!netOk)
+            {
+                remark = "API 错误";
+            }
+            else if (user == null)
+            {
+                remark = "被 ban 了";
+            }
+            else if (user.Performance == 0)
+            {
+                remark = "可能不活跃";
+            }
+            else if (sumLimit)
+            {
+                remark = "超限";
+            }
+            else if (bp1Limit)
+            {
+                remark = "超限BP1";
+            }
+            else
+            {
+                remark = "正常";
+            }
+
+            return remark;
         }
 
         public bool ShouldResponse(MessageContext context)
