@@ -9,6 +9,7 @@ using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu;
+using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
 {
+#nullable enable
     [Component("newbie_statistics")]
     public class 统计新人群成员 : Service, IMessageCommand
     {
@@ -25,11 +27,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         private const string DestPath = "/outputs/statistics_{0}.csv";
         private const string ResourceUrl = "https://res.bleatingsheep.org/statistics_{0}.csv";
 
-        private static readonly Dictionary<string, (long, int)> s_groups = new()
+        private static readonly Dictionary<string, (long, int, int)> s_groups = new()
         {
-            { "新人群", (595985887, 2800) },
-            { "进阶群", (928936255, 4500) },
-            { "高阶群", (281624271, 6000) },
+            { "新人群", (595985887, 2800, 190) },
+            { "进阶群", (928936255, 4500, 280) },
+            { "高阶群", (281624271, 6000, 360) },
         };
 
         private static readonly Regex s_regex = new Regex("^统计(?<group>.+?)玩家$", RegexOptions.CultureInvariant | RegexOptions.Compiled);
@@ -46,14 +48,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         }
 
         [Parameter("group")]
-        public string ProcessingGroupName { get; set; }
+        public string ProcessingGroupName { get; set; } = default!;
 
         public Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
             if (s_groups.TryGetValue(ProcessingGroupName, out var t))
             {
-                var (groupId, limit) = t;
-                return AnalyzeGroupMember(context, api, limit, groupId);
+                var (groupId, limitSum, limitBp1) = t;
+                return AnalyzeGroupMember(context, api, limitSum, limitBp1, groupId);
             }
             else
             {
@@ -61,11 +63,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             }
         }
 
-        private async Task AnalyzeGroupMember(MessageContext context, HttpApiClient api, int limit, long groupId)
+        private async Task AnalyzeGroupMember(MessageContext context, HttpApiClient api, int limitSum, int limitBp1, long groupId)
         {
-            await api.SendMessageAsync(context.Endpoint, $"即将统计新人群玩家列表，PP 超过 {limit} 将标记为超限。");
+            await api.SendMessageAsync(context.Endpoint, $"即将统计新人群玩家列表，PP 超过 {limitSum} 将标记为超限。");
 
-            var dbContext = _contextFactory.CreateDbContext();
+            await using var dbContext = _contextFactory.CreateDbContext();
             dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             var infoList = await api.GetGroupMemberListAsync(groupId);
             Logger.Info($"Find {infoList.Length} users.");
@@ -84,22 +86,27 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 .ConfigureAwait(false);
             Logger.Info($"Find {snapshots.Count} snapshots.");
 
-            var userInfoTaskArray = bindingList.Select(async b =>
+            // 
+            Task<(BindingInfo BindingInfo, bool Successful, UserInfo? UserInfo, UserBest? bp1)>[] userInfoTaskArray = bindingList.Select(async b =>
             {
                 var o = b.OsuId;
+                UserInfo? userInfo = default;
                 try
                 {
                     var snapshotInfo = snapshots.GetValueOrDefault(o);
-                    if (snapshotInfo != null)
-                        return (BindingInfo: b, Successful: true, UserInfo: snapshotInfo.UserInfo);
-                    var userInfo = await _dataProvider.Value.GetUserInfoRetryAsync(o, Mode.Standard).ConfigureAwait(false);
-                    return (BindingInfo: b, Successful: true, UserInfo: userInfo);
+                    userInfo = snapshotInfo == null
+                        ? (UserInfo?)await _dataProvider.Value.GetUserInfoRetryAsync(o, Mode.Standard)
+                        : snapshotInfo.UserInfo;
+                    var bp1 = await _dataProvider.Value.GetUserBestLimitRetryAsync(o, Mode.Standard, 1);
+                    return (BindingInfo: b, Successful: true, UserInfo: userInfo, bp1?.FirstOrDefault());
                 }
                 catch (Exception)
                 {
-                    return (b, false, null);
+                    // 即使出现异常，userInfo也可能是可用的。
+                    return (b, false, userInfo, null);
                 }
-            }).ToArray();
+            })
+                .ToArray();
             await Task.WhenAll(userInfoTaskArray).ConfigureAwait(false);
             Logger.Info("Complete fetching user info.");
             var userInfo = userInfoTaskArray.Select(t => t.Result);
@@ -110,6 +117,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                           let b = v.BindingInfo
                           let netOk = v.Successful
                           let user = v.UserInfo
+                          let bp1 = v.bp1?.Performance
                           select new
                           {
                               qq = i.UserId,
@@ -117,17 +125,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                               name = user?.Name,
                               pp = user?.Performance,
                               card = i.DisplayName,
-                              remark = b == null ? "未绑定" :
-                                  !netOk ? "API 错误" :
-                                  user == null ? "被 ban 了" :
-                                  (user.Performance == 0 ? "可能不活跃" : (user.Performance >= limit ? "超限" : "正常")),
+                              bp1pp = bp1,
+                              remark = GetTipMessage(b, netOk, user, limitSum, bp1, limitBp1)
                           };
             var writer = new StringWriter();
             using (var csvWriter = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture))
                 await csvWriter.WriteRecordsAsync(results).ConfigureAwait(false);
             var message = writer.ToString();
             Logger.Info(message);
-            File.WriteAllText(string.Format(DestPath, groupId), message, new System.Text.UTF8Encoding(true));
+            await File.WriteAllTextAsync(string.Format(DestPath, groupId), message, new System.Text.UTF8Encoding(true));
             await api.SendMessageAsync(context.Endpoint, $"统计完成，前往 {string.Format(ResourceUrl, groupId)} 查看结果。");
 
             // add users not having snapshots to schedule
@@ -151,6 +157,44 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 dbContext.UpdateSchedules.AddRange(newSchedules);
                 await dbContext.SaveChangesAsync().ConfigureAwait(false);
             }
+        }
+
+        /***
+         * 方便阅读
+         */
+        private static string GetTipMessage(BindingInfo? bid, bool netOk, UserInfo? user, int limitSum, double? bp1, int limitBp1)
+        {
+            string remark;
+            if (bid == null)
+            {
+                remark = "未绑定";
+            }
+            else if (!netOk)
+            {
+                remark = "API 错误";
+            }
+            else if (user == null)
+            {
+                remark = "被 ban 了";
+            }
+            else if (user.Performance == 0)
+            {
+                remark = "可能不活跃";
+            }
+            else if (user.Performance >= limitSum)
+            {
+                remark = "超限";
+            }
+            else if (bp1 >= limitBp1)
+            {
+                remark = "超限BP1";
+            }
+            else
+            {
+                remark = "正常";
+            }
+
+            return remark;
         }
 
         public bool ShouldResponse(MessageContext context)
