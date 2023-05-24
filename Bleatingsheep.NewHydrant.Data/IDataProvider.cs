@@ -12,8 +12,8 @@ namespace Bleatingsheep.NewHydrant.Data
     public interface IDataProvider
     {
         Task<UserBest[]> GetUserBestRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default);
-        
-        Task<UserBest[]> GetUserBestRetryLimitAsync(int userId, Mode mode,int limit, CancellationToken cancellationToken = default);
+
+        Task<UserBest[]> GetUserBestLimitRetryAsync(int userId, Mode mode, int limit, CancellationToken cancellationToken = default);
 
         Task<UserInfo> GetUserInfoRetryAsync(int userId, Mode mode, CancellationToken cancellationToken = default);
 
