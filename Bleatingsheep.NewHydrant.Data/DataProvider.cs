@@ -13,12 +13,11 @@ using Polly;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
-    public class DataProvider : IDataProvider, IDisposable, ILegacyDataProvider
+    public class DataProvider : IDataProvider, ILegacyDataProvider
     {
         private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
         private readonly IOsuApiClient _osuApiClient;
         private readonly ILogger<DataProvider> _logger;
-        private readonly ThreadLocal<Random> _randomLocal = new(() => new Random());
 
         public DataProvider(IOsuApiClient osuApiClient, IDbContextFactory<NewbieContext> dbContextFactory, ILogger<DataProvider> logger)
         {
@@ -136,11 +135,6 @@ namespace Bleatingsheep.NewHydrant.Data
             return beatmap;
         }
 
-        public void Dispose()
-        {
-            (_randomLocal as IDisposable)?.Dispose();
-        }
-
         #region Utility functions
         private static TimeSpan GetExponentialBackoffDuration(int retryCount, int baseMilliseconds = 50, int maxMilliseconds = 1000)
         {
@@ -149,8 +143,8 @@ namespace Bleatingsheep.NewHydrant.Data
             Debug.Assert(maxMilliseconds > 0);
             var random = Random.Shared;
             return BitOperations.Log2((uint)(maxMilliseconds / baseMilliseconds)) < retryCount - 1
-                ? TimeSpan.FromMilliseconds(random.Next(maxMilliseconds))
-                : TimeSpan.FromMilliseconds(random.Next(baseMilliseconds << (retryCount - 1)));
+                ? TimeSpan.FromMilliseconds(random.Next(maxMilliseconds) + 1)
+                : TimeSpan.FromMilliseconds(random.Next(baseMilliseconds << (retryCount - 1)) + 1);
         }
         #endregion
     }
