@@ -260,4 +260,4 @@ dotnet_naming_style.begins_with_s_.word_separator =
 dotnet_naming_style.begins_with_s_.capitalization = camel_case
 
 #custom
-dotnet_diagnostic.CA2007.severity = suggestion
+dotnet_diagnostic.CA2007.severity = none
