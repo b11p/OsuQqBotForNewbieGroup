@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Bleatingsheep.Osu;
@@ -147,7 +148,7 @@ namespace Bleatingsheep.NewHydrant.Data
             Debug.Assert(baseMilliseconds > 0);
             Debug.Assert(maxMilliseconds > 0);
             var random = Random.Shared;
-            return maxMilliseconds / baseMilliseconds < retryCount
+            return BitOperations.Log2((uint)(maxMilliseconds / baseMilliseconds)) < retryCount - 1
                 ? TimeSpan.FromMilliseconds(random.Next(maxMilliseconds))
                 : TimeSpan.FromMilliseconds(random.Next(baseMilliseconds << (retryCount - 1)));
         }
