@@ -6,6 +6,7 @@ using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.Osu;
+using Bleatingsheep.Osu.ApiClient;
 using PuppeteerSharp;
 using Sisters.WudiLib;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -24,11 +25,12 @@ namespace Bleatingsheep.NewHydrant.Osu
             { Mode.Catch, "fruits" },
             { Mode.Mania, "mania" },
         };
+        private readonly IOsuApiClient _osuApiClient;
 
-        public ArilyInfo(ILegacyDataProvider dataProvider, OsuMixedApi.OsuApiClient osuApi)
+        public ArilyInfo(ILegacyDataProvider dataProvider, IOsuApiClient osuApiClient)
         {
             DataProvider = dataProvider;
-            OsuApi = osuApi;
+            _osuApiClient = osuApiClient;
         }
 
         private string _text;
@@ -39,14 +41,19 @@ namespace Bleatingsheep.NewHydrant.Osu
         [Parameter("mode")]
         public string ModeString { get; set; }
         private ILegacyDataProvider DataProvider { get; }
-        private OsuMixedApi.OsuApiClient OsuApi { get; }
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            int uid;
+            long uid;
             Mode mode;
-            try { mode = ModeExtensions.Parse(ModeString); }
-            catch { mode = default; }
+            try
+            {
+                mode = ModeExtensions.Parse(ModeString);
+            }
+            catch
+            {
+                mode = default;
+            }
 
             if (string.IsNullOrEmpty(Name))
             {
@@ -54,11 +61,16 @@ namespace Bleatingsheep.NewHydrant.Osu
             }
             else
             {
-                var user = await OsuApi.EnsureGetUserInfo(Name, Mode.Standard).ConfigureAwait(false);
-                uid = user.Id;
+                var userInfo = await _osuApiClient.GetUser(Name, Mode.Standard);
+                if (userInfo == null)
+                {
+                    await api.SendMessageAsync(context.Endpoint, "没有找到此用户名对应的用户。");
+                    return;
+                }
+                uid = userInfo.Id;
             }
             string url = $"https://info.osustuff.ri.mk/cn/users/{uid}/{s_modes.GetValueOrDefault(mode)}";
-            using var page = await Chrome.OpenNewPageAsync().ConfigureAwait(false);
+            await using var page = await Chrome.OpenNewPageAsync().ConfigureAwait(false);
             await page.SetViewportAsync(new ViewPortOptions
             {
                 DeviceScaleFactor = Math.Sqrt(0.5),
