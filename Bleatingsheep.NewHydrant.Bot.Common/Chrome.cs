@@ -3,83 +3,74 @@ using System.Threading;
 using System.Threading.Tasks;
 using PuppeteerSharp;
 
-namespace Bleatingsheep.NewHydrant
+namespace Bleatingsheep.NewHydrant;
+#nullable enable
+public static class Chrome
 {
-    public static class Chrome
+    private static readonly SemaphoreSlim s_semaphoreSlim = new(1, 1);
+
+    private static IBrowser? s_browser;
+
+    public static string? ChromePath { get; set; }
+
+    private static Task<IBrowser> LaunchBrowser()
     {
-        private static readonly object s_launchLock = new object();
-
-        private static IBrowser s_browser;
-
-        public static Func<IBrowser> GetBrowser { get; private set; } = () =>
+        if (ChromePath == null)
         {
-            lock (s_launchLock)
-            {
-                if (s_browser == null)
-                {
-                    s_browser = Puppeteer.LaunchAsync(new LaunchOptions
-                    {
-                        Headless = true,
-                        //ExecutablePath = @"/opt/google/chrome/google-chrome",
-                        //ExecutablePath = @"/usr/bin/chromium-browser",
-#if DEBUG
-                        ExecutablePath = @"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-#else
-                        ExecutablePath = @"/usr/bin/microsoft-edge",
-#endif
-                        //ExecutablePath = @"/usr/bin/chromium",
-                        DefaultViewport = new ViewPortOptions
-                        {
-                            DeviceScaleFactor = 1,
-                            Width = 360,
-                            Height = 640,
-                        },
-                        Args = new[] { "--no-sandbox", "--lang=zh-CN" },
-                    }).GetAwaiter().GetResult();
-                }
-                if (s_browser != null)
-                    GetBrowser = () => s_browser;
-                return s_browser;
-            }
-        };
-
-        public static async Task RefreashBrowserAsync()
-        {
-            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-            {
-                Headless = true,
-                //ExecutablePath = @"/opt/google/chrome/google-chrome",
-                //ExecutablePath = @"/usr/bin/chromium-browser",
-                ExecutablePath = @"/usr/bin/microsoft-edge",
-                //ExecutablePath = @"/usr/bin/chromium",
-                DefaultViewport = new ViewPortOptions
-                {
-                    DeviceScaleFactor = 1,
-                    Width = 360,
-                    Height = 640,
-                },
-                Args = new[] { "--no-sandbox", "--lang=zh-CN" },
-            }).ConfigureAwait(false);
-            var oldBrowser = Interlocked.Exchange(ref s_browser, browser);
-            if (oldBrowser is not null)
-            {
-                await oldBrowser.DisposeAsync().ConfigureAwait(false);
-            }
+            throw new InvalidOperationException("未设置 Chrome 浏览器的路径。");
         }
 
-        public static async Task<IPage[]> GetTabsAsync()
-            => await GetBrowser().DefaultContext.PagesAsync().ConfigureAwait(false);
-
-        private static readonly System.Collections.Generic.Dictionary<string, string> s_extraHeaders = new System.Collections.Generic.Dictionary<string, string>()
+        return Puppeteer.LaunchAsync(new LaunchOptions
         {
-            ["Accept-Language"] = "zh-CN",
-        };
+            Headless = true,
+            ExecutablePath = ChromePath,
+            DefaultViewport = new ViewPortOptions
+            {
+                DeviceScaleFactor = 1,
+                Width = 360,
+                Height = 640,
+            },
+            Args = new[] { "--no-sandbox", "--lang=zh-CN" },
+        });
+    }
 
-        public static async Task<IPage> OpenNewPageAsync()
+    private static Func<ValueTask<IBrowser>> GetBrowser { get; set; } = async () =>
+    {
+        await s_semaphoreSlim.WaitAsync();
+        try
         {
-            var page = await GetBrowser().NewPageAsync().ConfigureAwait(false);
-            await page.SetExtraHttpHeadersAsync(s_extraHeaders).ConfigureAwait(false);
-            return page;
+            s_browser ??= await LaunchBrowser();
+            GetBrowser = () => ValueTask.FromResult(s_browser);
+            return s_browser;
         }
+        finally
+        {
+            s_semaphoreSlim.Release();
+        }
+    };
+
+    public static async Task RefreashBrowserAsync()
+    {
+        IBrowser browser = await LaunchBrowser();
+        var oldBrowser = Interlocked.Exchange(ref s_browser, browser);
+        if (oldBrowser is not null)
+        {
+            await oldBrowser.DisposeAsync().ConfigureAwait(false);
+        }
+    }
+
+    public static async Task<IPage[]> GetTabsAsync()
+        => await (await GetBrowser()).DefaultContext.PagesAsync().ConfigureAwait(false);
+
+    private static readonly System.Collections.Generic.Dictionary<string, string> s_extraHeaders = new()
+    {
+        ["Accept-Language"] = "zh-CN",
+    };
+
+    public static async Task<IPage> OpenNewPageAsync()
+    {
+        var page = await (await GetBrowser()).NewPageAsync().ConfigureAwait(false);
+        await page.SetExtraHttpHeadersAsync(s_extraHeaders).ConfigureAwait(false);
+        return page;
     }
 }

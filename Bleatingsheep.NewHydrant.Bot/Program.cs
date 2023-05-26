@@ -31,11 +31,13 @@ namespace Bleatingsheep.NewHydrant
 
         private static int s_connectedClinetCount = 0;
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
             s_configure = host.Services.GetService<IConfiguration>();
             s_hydrantConfigure = s_configure.GetSection("Hydrant");
+            Chrome.ChromePath = s_hydrantConfigure.GetValue<string>("Chrome.Path");
+            await ApplyPendingMigrations(host.Services.GetService<NewbieContext>(), LogManager.LogFactory.GetLogger("Migrations"));
 
             var cultureInfo = CultureInfo.GetCultureInfo("zh-CN");
             CultureInfo.CurrentCulture = cultureInfo;
@@ -46,18 +48,11 @@ namespace Bleatingsheep.NewHydrant
             try
             {
                 // 本应在此设置 HttpApiClient，并启动，但是使用反向 WebSocket 时，无需手动这么做。
-#if DEBUG
-                var rServer = new ReverseWebSocketServer("http://localhost:9191");
-#else
                 var rServer = new ReverseWebSocketServer(int.Parse(s_hydrantConfigure["ServerPort"]));
-#endif
                 rServer.SetListenerAuthenticationAndConfiguration(async r =>
                 {
-#if DEBUG
-                    bool elevated = true;
-#else
                     bool elevated = false;
-#endif
+                    // 这是接下来要执行的配置，根据不同权限初始化消防栓实例。
                     Action<NegativeWebSocketEventListener, long> configuration = (l, selfId) =>
                     {
                         var logger = LogManager.LogFactory.GetLogger("Replica");
@@ -111,26 +106,30 @@ namespace Bleatingsheep.NewHydrant
                         if (string.IsNullOrWhiteSpace(headValue))
                         {
                             logger.Info("连接未报告 'Authorization'。");
-                            return null;
                         }
-                        int spaceIndex = headValue.IndexOf(' ');
-                        if (headValue[(spaceIndex + 1)..] == auth?.AccessToken)
+                        else if (headValue[(headValue.IndexOf(' ') + 1)..] == auth?.AccessToken)
                         {
                             elevated = true;
-                            logger.Info($"{selfId} 已提权。");
-                            if ((await db.Database.GetPendingMigrationsAsync().ConfigureAwait(false)).Any())
-                            {
-                                logger.Warn("数据库还有未完成的迁移，请确认数据库迁移已完成。");
-                                await db.Database.MigrateAsync().ConfigureAwait(false);
-                                logger.Info("自动迁移完成。");
-                            }
-                            return configuration;
                         }
                         else
                         {
                             logger.Info($"{selfId} 提权失败。");
-                            return null;
                         }
+                    }
+#if DEBUG
+                    logger.Info("权限提升验证为{elevated}，但是当然是 DEBUG 模式，强制开启高仅限。");
+                    elevated = true;
+#endif
+                    if (elevated)
+                    {
+                        logger.Info($"{selfId} 已提权。");
+                        return configuration;
+                    }
+
+                    if (auth != null)
+                    {
+                        // 会进入这里说明数据库中有提权条目，但是验证失败。为了防止有权限账号误用低权限模式，阻止连接。
+                        return null;
                     }
 
                     // No need to special auth
@@ -139,7 +138,7 @@ namespace Bleatingsheep.NewHydrant
                 });
                 rServer.Start();
 
-                Task.Delay(-1).Wait();
+                await Task.Delay(-1);
             }
             catch (Exception e)
             {
@@ -155,6 +154,16 @@ namespace Bleatingsheep.NewHydrant
 
             // 阻止自动重启
             Task.Delay(-1).Wait();
+        }
+
+        private static async ValueTask ApplyPendingMigrations(NewbieContext db, Logger logger)
+        {
+            if ((await db.Database.GetPendingMigrationsAsync()).Any())
+            {
+                logger.Warn("数据库还有未完成的迁移，即将开始迁移。");
+                await db.Database.MigrateAsync();
+                logger.Info("自动迁移完成。");
+            }
         }
 
         private static Hydrant ConfigureHost(HttpApiClient httpApiClient, ApiPostListener apiPostListener, bool elevated, params Assembly[] assemblies)

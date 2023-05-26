@@ -1,12 +1,15 @@
 {
   "Hydrant": {
-    "ApiKey": "",
+    "ApiKey": "osu! API v1 key",
     "SuperAdmin": 0,
     "ServerPort": 8800,
-    "ServerAccessToken": ""
+    "ServerAccessToken": "reverse ws token.",
+    "Chrome": {
+      "Path": null
+    }
   },
   "ConnectionStrings": {
-    "NewbieDatabase": "server=localhost;port=3306;database=newbie;user=root;pwd=123456;"
+    "NewbieDatabase_Postgres": "Server=localhost;Port=5432;Database=xfs;User Id=xfs;Password=123456;"
   },
   "Mahjong": {
     "TensoulBase": "https://tensoul.b11p.com/convert"
