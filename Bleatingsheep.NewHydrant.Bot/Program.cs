@@ -36,7 +36,7 @@ namespace Bleatingsheep.NewHydrant
             var host = CreateHostBuilder(args).Build();
             s_configure = host.Services.GetService<IConfiguration>();
             s_hydrantConfigure = s_configure.GetSection("Hydrant");
-            Chrome.ChromePath = s_hydrantConfigure.GetValue<string>("Chrome.Path");
+            Chrome.ChromePath = s_hydrantConfigure.GetSection("Chrome").GetValue<string>("Path");
             await ApplyPendingMigrations(host.Services.GetService<NewbieContext>(), LogManager.LogFactory.GetLogger("Migrations"));
 
             var cultureInfo = CultureInfo.GetCultureInfo("zh-CN");
