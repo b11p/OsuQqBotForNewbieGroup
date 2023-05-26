@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
+using Bleatingsheep.NewHydrant.Data.Results;
 using Bleatingsheep.Osu.PerformancePlus;
 using Bleatingsheep.OsuMixedApi;
-using Bleatingsheep.OsuQqBot.Database.Execution;
+using Bleatingsheep.OsuQqBot.Database.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
@@ -17,23 +19,26 @@ namespace Bleatingsheep.NewHydrant.Osu
     internal class PerformancePlusUser : Service, IMessageCommand
     {
         private static readonly PerformancePlusSpider s_spider = new PerformancePlusSpider();
+        private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
+        private readonly IOsuDataUpdator _osuDataUpdator;
         private readonly ILogger<PerformancePlusUser> _logger;
 
         public PerformancePlusUser(
-            INewbieDatabase database,
             ILegacyDataProvider dataProvider,
             OsuApiClient osuApi,
+            IDbContextFactory<NewbieContext> dbContextFactory,
+            IOsuDataUpdator osuDataUpdator,
             ILogger<PerformancePlusUser> logger)
         {
-            Database = database;
             DataProvider = dataProvider;
             OsuApi = osuApi;
+            _dbContextFactory = dbContextFactory;
+            _osuDataUpdator = osuDataUpdator;
             _logger = logger;
         }
 
         private string queryUser;
 
-        private INewbieDatabase Database { get; }
         private ILegacyDataProvider DataProvider { get; }
         private OsuApiClient OsuApi { get; }
 
@@ -79,14 +84,20 @@ namespace Bleatingsheep.NewHydrant.Osu
                     return;
                 }
 
-                var oldQuery = await Database.GetRecentPlusHistory(userPlus.Id);
-                if (!oldQuery.Success)
+                PlusHistory old = null;
+                try
+                {
+                    await using var db = _dbContextFactory.CreateDbContext();
+                    old = await db.PlusHistories
+                        .Where(ph => ph.Id == userPlus.Id)
+                        .OrderByDescending(ph => ph.Date)
+                        .FirstOrDefaultAsync();
+                }
+                catch (Exception e)
                 {
                     await api.SendMessageAsync(message.Endpoint, "无法找到历史数据。");
-                    _logger.LogError(oldQuery.Exception, "{}", oldQuery.Exception.Message);
+                    _logger.LogError(e, "查找 PP+ 历史数据时数据库访问错误");
                 }
-
-                var old = oldQuery.EnsureSuccess().Result;
 
                 var responseMessage = old == null
                     ? $@"{userPlus.Name} 的 PP+ 数据
@@ -114,9 +125,9 @@ Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
 
                 if (old == null)
                 {
-                    var addResult = await Database.AddPlusHistoryAsync(userPlus);
-                    if (!addResult.Success)
-                        _logger.LogError(addResult.Exception, "{}", addResult.Exception.Message);
+                    var addResult = await _osuDataUpdator.AddPlusHistoryAsync(userPlus);
+                    if (addResult.TryGetError(out var error))
+                        _logger.LogError(error.Exception, "储存最新 PP+ 结果时出现错误。");
                 }
             }
             catch (ExceptionPlus)

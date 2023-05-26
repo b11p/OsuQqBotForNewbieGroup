@@ -6,7 +6,6 @@ using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuMixedApi;
-using Bleatingsheep.OsuQqBot.Database.Execution;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Sisters.WudiLib.Responses;
@@ -24,15 +23,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         private readonly IOsuDataUpdator _osuDataUpdator;
 
-        public NewbieKeeper(INewbieDatabase database, ILegacyDataProvider dataProvider, OsuApiClient osuApi, IOsuDataUpdator osuDataUpdator)
+        public NewbieKeeper(ILegacyDataProvider dataProvider, OsuApiClient osuApi, IOsuDataUpdator osuDataUpdator)
         {
-            Database = database;
             DataProvider = dataProvider;
             OsuApi = osuApi;
             _osuDataUpdator = osuDataUpdator;
         }
 
-        private INewbieDatabase Database { get; }
         private ILegacyDataProvider DataProvider { get; }
         private OsuApiClient OsuApi { get; }
 

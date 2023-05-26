@@ -9,7 +9,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         {
         }
 
-        internal PlusHistory(IUserPlus history)
+        public PlusHistory(IUserPlus history)
         {
             Id = history.Id;
             Name = history.Name;

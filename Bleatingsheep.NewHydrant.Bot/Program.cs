@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.NewHydrant.Osu.Newbie;
-using Bleatingsheep.OsuQqBot.Database.Execution;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -208,14 +207,7 @@ namespace Bleatingsheep.NewHydrant
 
         private static async Task Hydrant_ExceptionCaught_Command(string funcName, Exception exception, HttpApiClient api, Sisters.WudiLib.Posts.Message message)
         {
-            if (exception is DatabaseFailException e)
-            {
-                await api.SendMessageAsync(
-                    endpoint: message.Endpoint,
-                    message: e.Message ?? (e.InnerException is DbUpdateConcurrencyException ? "数据库太忙。" : "无法访问数据库。")
-                );
-            }
-            else if (exception is NpgsqlException)
+            if (exception is NpgsqlException)
             {
                 await api.SendMessageAsync(message.Endpoint, "无法访问 MySQL 数据库。");
             }

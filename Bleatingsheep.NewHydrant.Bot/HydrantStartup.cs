@@ -4,7 +4,6 @@ using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.NewHydrant.Osu;
 using Bleatingsheep.Osu.ApiClient;
-using Bleatingsheep.OsuQqBot.Database.Execution;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -66,7 +65,6 @@ namespace Bleatingsheep.NewHydrant
             services.AddTransient<DataMaintainer>();
 
             // Legacy
-            services.AddTransient<INewbieDatabase, NewbieDatabase>();
             services.AddTransient<ILegacyDataProvider, DataProvider>();
             services.AddSingleton(OsuMixedApi.OsuApiClient.ClientUsingKey(Configuration.GetSection("Hydrant")["ApiKey"]));
         }

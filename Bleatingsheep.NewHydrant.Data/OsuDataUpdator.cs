@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Bleatingsheep.Osu.PerformancePlus;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -61,5 +63,26 @@ public class OsuDataUpdator : IOsuDataUpdator
         }).ConfigureAwait(false);
         await db.SaveChangesAsync().ConfigureAwait(false);
         return (true, oldOsuId, binding);
+    }
+
+    public async ValueTask<IXfsDataResult<int, XfsDataError>> AddPlusHistoryAsync(IUserPlus userPlus)
+    {
+        ArgumentNullException.ThrowIfNull(userPlus);
+
+        try
+        {
+            await using var db = _dbContextFactory.CreateDbContext();
+            db.PlusHistories.Add(new(userPlus));
+            await db.SaveChangesAsync();
+            return Result.Ok(0);
+        }
+        catch (DbUpdateConcurrencyException e)
+        {
+            return Result.Error(new XfsDataError(XfsDataError.ErrorKind.DatabaseConcurrencyError, e));
+        }
+        catch (Exception e)
+        {
+            return Result.Error(new XfsDataError(XfsDataError.ErrorKind.DatabaseError, e));
+        }
     }
 }
