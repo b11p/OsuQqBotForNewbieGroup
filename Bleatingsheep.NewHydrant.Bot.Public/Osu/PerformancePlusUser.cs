@@ -89,6 +89,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 {
                     await using var db = _dbContextFactory.CreateDbContext();
                     old = await db.PlusHistories
+                        .AsNoTracking()
                         .Where(ph => ph.Id == userPlus.Id)
                         .OrderByDescending(ph => ph.Date)
                         .FirstOrDefaultAsync();
@@ -123,12 +124,9 @@ Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
                 }
                 await api.SendMessageAsync(message.Endpoint, responseMessage);
 
-                if (old == null)
-                {
-                    var addResult = await _osuDataUpdator.AddPlusHistoryAsync(userPlus);
-                    if (addResult.TryGetError(out var error))
-                        _logger.LogError(error.Exception, "储存最新 PP+ 结果时出现错误。");
-                }
+                var addResult = await _osuDataUpdator.AddPlusHistoryAsync(userPlus);
+                if (addResult.TryGetError(out var error))
+                    _logger.LogError(error.Exception, "储存最新 PP+ 结果时出现错误。");
             }
             catch (ExceptionPlus)
             {
