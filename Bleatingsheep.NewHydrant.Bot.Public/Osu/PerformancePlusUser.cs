@@ -90,7 +90,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                     await using var db = _dbContextFactory.CreateDbContext();
                     old = await db.PlusHistories
                         .AsNoTracking()
-                        .Where(ph => ph.Id == userPlus.Id)
+                        .Where(ph => ph.Id == userPlus.Id && ph.Date < DateTimeOffset.UtcNow.AddHours(-16))
                         .OrderByDescending(ph => ph.Date)
                         .FirstOrDefaultAsync();
                 }
@@ -100,23 +100,36 @@ namespace Bleatingsheep.NewHydrant.Osu
                     _logger.LogError(e, "查找 PP+ 历史数据时数据库访问错误");
                 }
 
-                var responseMessage = old == null
-                    ? $@"{userPlus.Name} 的 PP+ 数据
-Performance: {userPlus.Performance}
-Aim (Jump): {userPlus.AimJump}
-Aim (Flow): {userPlus.AimFlow}
-Precision: {userPlus.Precision}
-Speed: {userPlus.Speed}
-Stamina: {userPlus.Stamina}
-Accuracy: {userPlus.Accuracy}"
-                    : $@"{userPlus.Name} 的 PP+ 数据
-Performance: {userPlus.Performance}{userPlus.Performance - old.Performance: (+#); (-#); ;}
-Aim (Jump): {userPlus.AimJump}{userPlus.AimJump - old.AimJump: (+#); (-#); ;}
-Aim (Flow): {userPlus.AimFlow}{userPlus.AimFlow - old.AimFlow: (+#); (-#); ;}
-Precision: {userPlus.Precision}{userPlus.Precision - old.Precision: (+#); (-#); ;}
-Speed: {userPlus.Speed}{userPlus.Speed - old.Speed: (+#); (-#); ;}
-Stamina: {userPlus.Stamina}{userPlus.Stamina - old.Stamina: (+#); (-#); ;}
-Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}";
+                string responseMessage;
+                if (old == null)
+                {
+                    responseMessage = $"""
+                        {userPlus.Name} 的 PP+ 数据
+                        Performance: {userPlus.Performance}
+                        Aim (Jump): {userPlus.AimJump}
+                        Aim (Flow): {userPlus.AimFlow}
+                        Precision: {userPlus.Precision}
+                        Speed: {userPlus.Speed}
+                        Stamina: {userPlus.Stamina}
+                        Accuracy: {userPlus.Accuracy}
+                        """;
+                }
+                else
+                {
+                    var durationSinceOldData = DateTimeOffset.UtcNow - old.Date;
+                    responseMessage = $"""
+                        {userPlus.Name} 的 PP+ 数据
+                        Performance: {userPlus.Performance}{userPlus.Performance - old.Performance: (+#); (-#); ;}
+                        Aim (Jump): {userPlus.AimJump}{userPlus.AimJump - old.AimJump: (+#); (-#); ;}
+                        Aim (Flow): {userPlus.AimFlow}{userPlus.AimFlow - old.AimFlow: (+#); (-#); ;}
+                        Precision: {userPlus.Precision}{userPlus.Precision - old.Precision: (+#); (-#); ;}
+                        Speed: {userPlus.Speed}{userPlus.Speed - old.Speed: (+#); (-#); ;}
+                        Stamina: {userPlus.Stamina}{userPlus.Stamina - old.Stamina: (+#); (-#); ;}
+                        Accuracy: {userPlus.Accuracy}{userPlus.Accuracy - old.Accuracy: (+#); (-#); ;}
+                        对比于 {durationSinceOldData.Days} 天 {durationSinceOldData.Hours} 小时前
+                        """;
+                }
+
                 if (message is GroupMessage g && g.GroupId == 758120648)
                 {
                     //responseMessage += $"\r\n化学式没付钱指数：{C8Mod.CostOf(userPlus):0.0}";
