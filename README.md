@@ -8,12 +8,12 @@
 > 本页内容仅在贡献代码或二次开发时才需要。请注意遵守开源协议。
 
 ## 环境及依赖 (Prerequisites)
-- .NET 7.0 (Required)
+- .NET 7.0
 - [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) 或任何 OneBot v11 实现
-- PostgreSQL (Required)
-- Chromium-based browser (Optional)
+- PostgreSQL
+- Chromium-based browser
 
-## 本地开发及调度 (Development)
+## 本地开发及调试 (Development)
 ### 开发环境 (Environments)
 1. 配置 Prerequisites 中所需的工具。注意 .NET 必须安装 SDK。
 2. 安装最新版本的 Visual Studio，确保选中 “.NET Core 跨平台开发”。
@@ -27,7 +27,7 @@
 3. 将 `ApiKey` 修改为 osu! API v1 key。
 4. 将 `SuperAdmin` 修改为你的 QQ 号（非 bot 账号，该账号具有最高权限）。
 5. 将 `ServerPort` 修改为反向 ws 监听端口。
-6. (Optional) `Chrome` 下的 `Path` 修改为 Chrome 浏览器的路径，如果未正确设置，部分功能可能无法使用。
+6. 将 `Chrome` 下的 `Path` 修改为 Chrome 浏览器的路径，如果未正确设置，部分功能可能无法使用。
 
 #### 参考 (Reference)
 > [go-cqhttp 的配置文件](https://github.com/Mrs4s/go-cqhttp/blob/master/docs/config.md)
