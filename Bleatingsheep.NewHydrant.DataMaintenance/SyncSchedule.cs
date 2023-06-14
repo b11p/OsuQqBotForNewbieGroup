@@ -3,6 +3,9 @@ using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bleatingsheep.NewHydrant.DataMaintenance;
+/// <summary>
+/// Sync snapshot schedule from binded users to update schedules.
+/// </summary>
 public sealed class SyncSchedule : BackgroundService
 {
     private static readonly SemaphoreSlim s_semaphore = new(1);
@@ -19,8 +22,7 @@ public sealed class SyncSchedule : BackgroundService
 
     public async Task RunAsync()
     {
-        var db1 = _dbContextFactory.CreateDbContext();
-        await using var dispose1_ = db1.ConfigureAwait(false);
+        await using var db1 = _dbContextFactory.CreateDbContext();
         var snapshotted =
             await db1.UserSnapshots
             .Select(s => new { s.UserId, s.Mode })

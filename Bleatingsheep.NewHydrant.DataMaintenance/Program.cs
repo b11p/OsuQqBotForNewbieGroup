@@ -7,6 +7,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((ctx, services) =>
     {
         services.AddHostedService<Worker>();
+        services.AddHostedService<SyncSchedule>();
         services.AddDbContext<NewbieContext>(optionsBuilder =>
             optionsBuilder.UseNpgsql(
                 ctx.Configuration.GetConnectionString("NewbieDatabase_Postgres"),

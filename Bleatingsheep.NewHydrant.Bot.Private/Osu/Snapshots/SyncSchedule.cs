@@ -14,7 +14,7 @@ using Sisters.WudiLib;
 namespace Bleatingsheep.NewHydrant.Osu.Snapshots;
 
 #nullable enable
-[Component("SyncSchedule")]
+//[Component("SyncSchedule")]
 public class SyncSchedule : Service, IRegularAsync
 {
     private static readonly SemaphoreSlim s_semaphore = new(1);
@@ -77,4 +77,3 @@ public class SyncSchedule : Service, IRegularAsync
         }
     }
 }
-#nullable restore
