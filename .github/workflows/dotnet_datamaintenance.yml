@@ -1,0 +1,47 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'Bleatingsheep.NewHydrant.DataMaintenance/**'
+      - 'Bleatingsheep.OsuQqBot.Database'
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 7.0.x
+    - name: Build
+      run: dotnet build -c Release Bleatingsheep.NewHydrant.DataMaintenance
+    - name: Publish
+      run: dotnet publish --no-build -c Release -o bin/publish Bleatingsheep.NewHydrant.DataMaintenance
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: Binary
+        path: bin/publish
+  deploy:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: Binary
+          path: bin/publish
+      - name: Push to Other Branches
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: bin/publish
+          publish_branch: build_datamaintenance

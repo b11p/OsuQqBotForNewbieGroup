@@ -47,7 +47,7 @@ public sealed class SyncSchedule : BackgroundService
         }).ToList();
         if (toSchedule.Count > 0)
         {
-            _logger.LogDebug("Adding {toSchedule.Count} items to schedule.", toSchedule.Count);
+            _logger.LogInformation("Adding {toSchedule.Count} items to schedule.", toSchedule.Count);
             db1.UpdateSchedules.AddRange(toSchedule);
             await db1.SaveChangesAsync().ConfigureAwait(false);
         }
