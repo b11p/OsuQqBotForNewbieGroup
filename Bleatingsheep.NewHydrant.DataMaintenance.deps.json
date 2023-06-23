@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v7.0": {
       "Bleatingsheep.NewHydrant.DataMaintenance/1.0.0": {
         "dependencies": {
+          "Bleatingsheep.NewHydrant.Data": "1.0.0",
           "Bleatingsheep.OsuQqBot.Database": "1.0.0",
           "Microsoft.Extensions.Hosting": "7.0.0",
           "System.Linq.Async": "6.0.1"
@@ -795,6 +796,14 @@
           "lib/net7.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll": {
             "assemblyVersion": "7.0.0.0",
             "fileVersion": "7.0.0.0"
+          }
+        }
+      },
+      "Polly/7.2.3": {
+        "runtime": {
+          "lib/netstandard2.0/Polly.dll": {
+            "assemblyVersion": "7.0.0.0",
+            "fileVersion": "7.2.3.0"
           }
         }
       },
@@ -1888,6 +1897,16 @@
           }
         }
       },
+      "Bleatingsheep.NewHydrant.Data/1.0.0": {
+        "dependencies": {
+          "Bleatingsheep.Osu.ApiClient": "0.6.21",
+          "Bleatingsheep.OsuQqBot.Database": "1.0.0",
+          "Polly": "7.2.3"
+        },
+        "runtime": {
+          "Bleatingsheep.NewHydrant.Data.dll": {}
+        }
+      },
       "Bleatingsheep.OsuQqBot.Database/1.0.0": {
         "dependencies": {
           "Bleatingsheep.Osu.ApiClient": "0.6.21",
@@ -2312,6 +2331,13 @@
       "sha512": "sha512-CyUNlFZmtX2Kmw8XK5Tlx5eVUCzWJ+zJHErxZiMo2Y8zCRuH9+/OMGwG+9Mmp5zD5p3Ifbi5Pp3btsqoDDkSZQ==",
       "path": "npgsql.entityframeworkcore.postgresql/7.0.0",
       "hashPath": "npgsql.entityframeworkcore.postgresql.7.0.0.nupkg.sha512"
+    },
+    "Polly/7.2.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-DeCY0OFbNdNxsjntr1gTXHJ5pKUwYzp04Er2LLeN3g6pWhffsGuKVfMBLe1lw7x76HrPkLxKEFxBlpRxS2nDEQ==",
+      "path": "polly/7.2.3",
+      "hashPath": "polly.7.2.3.nupkg.sha512"
     },
     "runtime.native.System/4.0.0": {
       "type": "package",
@@ -2991,6 +3017,11 @@
       "sha512": "sha512-Tane0Q9bJ1vQRgYxZ5OBuK3NT46hR3P6bZ1dXQVxOgiBtac64v88iJOWuMvszF3DiKPT9XM5V+m76tCk2CX8JQ==",
       "path": "webapiclient.aot/1.1.3",
       "hashPath": "webapiclient.aot.1.1.3.nupkg.sha512"
+    },
+    "Bleatingsheep.NewHydrant.Data/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "Bleatingsheep.OsuQqBot.Database/1.0.0": {
       "type": "project",
