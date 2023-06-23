@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bleatingsheep.NewHydrant.Data\Bleatingsheep.NewHydrant.Data.csproj" />
     <ProjectReference Include="..\Bleatingsheep.OsuQqBot.Database\Bleatingsheep.OsuQqBot.Database.csproj" />
   </ItemGroup>
 </Project>

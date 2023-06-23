@@ -6,15 +6,15 @@ namespace Bleatingsheep.NewHydrant.DataMaintenance;
 /// <summary>
 /// Sync snapshot schedule from binded users to update schedules.
 /// </summary>
-public sealed class SyncSchedule : BackgroundService
+public sealed class SyncScheduleService : BackgroundService
 {
     private static readonly SemaphoreSlim s_semaphore = new(1);
     private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
-    private readonly ILogger<SyncSchedule> _logger;
+    private readonly ILogger<SyncScheduleService> _logger;
 
     public static TimeSpan OnUtc => new(19, 29, 59);
 
-    public SyncSchedule(IDbContextFactory<NewbieContext> dbContextFactory, ILogger<SyncSchedule> logger)
+    public SyncScheduleService(IDbContextFactory<NewbieContext> dbContextFactory, ILogger<SyncScheduleService> logger)
     {
         _dbContextFactory = dbContextFactory;
         _logger = logger;
