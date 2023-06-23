@@ -4,6 +4,7 @@ using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using NLog.Extensions.Hosting;
 using WebApiClient;
 
 IHost host = Host.CreateDefaultBuilder(args)
@@ -32,6 +33,12 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IHttpApiFactory<IOsuApiClient>>(factory);
         services.AddScoped(c => c.GetRequiredService<IHttpApiFactory<IOsuApiClient>>().CreateHttpApi());
     })
+    .ConfigureLogging(logging =>
+    {
+        logging.ClearProviders();
+        logging.SetMinimumLevel(LogLevel.Trace);
+    })
+    .UseNLog()
     .Build();
 
 await host.RunAsync().ConfigureAwait(false);
