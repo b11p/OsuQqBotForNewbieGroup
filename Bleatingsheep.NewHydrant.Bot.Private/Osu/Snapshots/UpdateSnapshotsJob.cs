@@ -14,7 +14,7 @@ using Sisters.WudiLib;
 namespace Bleatingsheep.NewHydrant.Osu.Snapshots
 {
 #nullable enable
-    [Component("UpdateSnapshotsJob")]
+    //[Component("UpdateSnapshotsJob")]
     public class UpdateSnapshotsJob : Service, IRegularAsync
     {
         private static UpdateSnapshotsJob? s_main;
