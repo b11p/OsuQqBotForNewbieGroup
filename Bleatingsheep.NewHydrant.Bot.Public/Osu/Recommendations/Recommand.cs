@@ -21,6 +21,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
         private readonly IOsuApiClient _osuApiClient;
         private readonly NewbieContext _newbieContext;
 
+        public Recommand(IOsuApiClient osuApiClient, NewbieContext newbieContext)
+        {
+            _osuApiClient = osuApiClient;
+            _newbieContext = newbieContext;
+        }
+
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
             var bi = await _newbieContext.Bindings.Where(b => b.UserId == context.UserId).FirstOrDefaultAsync().ConfigureAwait(false);
@@ -31,7 +37,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             var sb = new StringBuilder();
             foreach (var b in best.Take(4))
             {
-                sb.Append("根据您的 BP b/").Append(b.BeatmapId).Append(" + ").Append(b.EnabledMods.Display()).AppendLine(" 推荐：");
+                sb.Append("根据您的 BP b/").Append(b.BeatmapId).Append(GetModsString(b.EnabledMods)).AppendLine(" 推荐：");
                 var id = RecommendationBeatmapId.Create(b, Mode.Standard);
                 var rec = await _newbieContext.Recommendations
                     .Where(r => r.Left == id)
@@ -39,15 +45,18 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                     .Take(4)
                     .ToListAsync().ConfigureAwait(false);
 
-                _ = rec.Aggregate(sb, (sb, r) => sb.Append("b/").Append(r.Recommendation.BeatmapId).Append(" + ").AppendLine(r.Recommendation.ValidMods.Display()));
+                _ = rec.Aggregate(sb, (sb, r) =>
+                    sb.Append("b/").Append(r.Recommendation.BeatmapId).Append(GetModsString(r.Recommendation.ValidMods)).AppendLine($"({r.Performance} PP)"));
             }
             await api.SendMessageAsync(context.Endpoint, sb.ToString()).ConfigureAwait(false);
         }
 
-        public Recommand(IOsuApiClient osuApiClient, NewbieContext newbieContext)
+        public static string GetModsString(Mods mods)
         {
-            _osuApiClient = osuApiClient;
-            _newbieContext = newbieContext;
+            var s = mods.Display();
+            return string.IsNullOrEmpty(s)
+                ? string.Empty
+                : " + " + s;
         }
 
         public bool ShouldResponse(MessageContext context)

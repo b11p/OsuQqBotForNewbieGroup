@@ -97,12 +97,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                     (from x1 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(leftRange))
                      from x2 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(rightRange))
                      where x1.b.Date > x2.b.Date
+                     let recommendationDegree = Math.Pow(0.95, x1.i + x2.i - 1)
                      select new RecommendationEntry
                      {
                          Mode = u.Mode,
                          Left = RecommendationBeatmapId.Create(x1.b, u.Mode),
                          Recommendation = RecommendationBeatmapId.Create(x2.b, u.Mode),
-                         RecommendationDegree = Math.Pow(0.95, x1.i + x2.i - 2),
+                         RecommendationDegree = recommendationDegree,
+                         Performance = x2.b.Performance,
                      }).ToList();
                 }
                 catch (Exception e)
@@ -126,12 +128,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             await _api.SendMessageAsync(_context.Endpoint, $"展开完成，共{expanded.Count}项。").ConfigureAwait(false);
             var recent = expanded.FirstOrDefault();
             var degree = 0.0;
+            var performance = 0.0;
             var recommendationList = new List<RecommendationEntry>();
             foreach (var current in expanded)
             {
                 if ((current.Left, current.Recommendation) == (recent!.Left, recent.Recommendation))
                 {
                     degree += current.RecommendationDegree;
+                    performance += current.Performance * current.RecommendationDegree;
                 }
                 else
                 {
@@ -141,8 +145,10 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                         Left = recent.Left,
                         Recommendation = recent.Recommendation,
                         RecommendationDegree = degree,
+                        Performance = performance / degree,
                     });
                     degree = 0;
+                    performance = 0;
                     recent = current;
                 }
             }
