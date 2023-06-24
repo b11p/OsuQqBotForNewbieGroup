@@ -4,11 +4,14 @@ on:
   push:
     branches: [ master ]
     paths:
+      - 'Bleatingsheep.NewHydrant/**'
       - 'Bleatingsheep.NewHydrant.Bot/**'
       - 'Bleatingsheep.NewHydrant.Bot.Common/**'
-      - 'Bleatingsheep.NewHydrant.Bot.Public/**'
       - 'Bleatingsheep.NewHydrant.Bot.Private/**'
+      - 'Bleatingsheep.NewHydrant.Bot.Public/**'
       - 'Bleatingsheep.NewHydrant.Data/**'
+      - 'Bleatingsheep.OsuMixedApi/**'
+      - 'Bleatingsheep.OsuQqBot.Database/**'
   pull_request:
     branches: [ master ]
 

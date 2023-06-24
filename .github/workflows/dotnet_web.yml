@@ -4,6 +4,7 @@ on:
   push:
     branches: [ master ]
     paths:
+      - 'Bleatingsheep.OsuQqBot.Database/**'
       - 'NewHydrantApi/**'
   pull_request:
     branches: [ master ]

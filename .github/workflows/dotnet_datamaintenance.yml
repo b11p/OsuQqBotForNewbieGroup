@@ -4,8 +4,9 @@ on:
   push:
     branches: [ master ]
     paths:
+      - 'Bleatingsheep.NewHydrant.Data/**'
       - 'Bleatingsheep.NewHydrant.DataMaintenance/**'
-      - 'Bleatingsheep.OsuQqBot.Database'
+      - 'Bleatingsheep.OsuQqBot.Database/**'
   pull_request:
     branches: [ master ]
 
