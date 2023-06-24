@@ -46,7 +46,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                     .ToListAsync().ConfigureAwait(false);
 
                 _ = rec.Aggregate(sb, (sb, r) =>
-                    sb.Append("b/").Append(r.Recommendation.BeatmapId).Append(GetModsString(r.Recommendation.ValidMods)).AppendLine($" ({r.Performance} PP)"));
+                    sb.Append("b/").Append(r.Recommendation.BeatmapId).Append(GetModsString(r.Recommendation.ValidMods)).AppendLine(GetPerformanceString(r.Performance)));
             }
             await api.SendMessageAsync(context.Endpoint, sb.ToString()).ConfigureAwait(false);
         }
@@ -57,6 +57,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             return string.IsNullOrEmpty(s)
                 ? string.Empty
                 : " + " + s;
+        }
+
+        public static string GetPerformanceString(double performance)
+        {
+            return double.IsNaN(performance)
+                ? string.Empty
+                : $" ({performance:0} PP)";
         }
 
         public bool ShouldResponse(MessageContext context)

@@ -114,22 +114,43 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                     {
                         await _api.SendMessageAsync(_context.Endpoint, e.ToString()).ConfigureAwait(false);
                     }
+                    return Array.Empty<RecommendationEntry>();
                 }
                 finally
                 {
                     Interlocked.Decrement(ref queueCount);
                 }
-                return Array.Empty<RecommendationEntry>();
             });
             var r = await Task.WhenAll(taskList).ConfigureAwait(false);
             var expanded = r.SelectMany(e => e)
                 .OrderBy(e => ((long)e.Left.GetHashCode() << 32) | (e.Recommendation.GetHashCode() & 0xffffffff))
                 .ToList();
             await _api.SendMessageAsync(_context.Endpoint, $"展开完成，共{expanded.Count}项。").ConfigureAwait(false);
+            var recommendations = MergeRecommendationEnumerable(expanded, mode);
+
+            // 先清除当前的推荐数据，再添加新的
+            var deleteCount = await _newbieContext.Recommendations.Where(r => r.Mode == mode).ExecuteDeleteAsync();
+            _logger.LogInformation("清除 {deleteCount} 条旧的推荐图数据。", deleteCount);
+
+            var recommendationsChunks = recommendations.Chunk(6000);
+            var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+            await Parallel.ForEachAsync(recommendationsChunks, parallelOptions, async (chunk, cancellationToken) =>
+            {
+                // 不这么干不行，因为 EF Core 追踪实体需要消耗大量内存。
+                // 现在这样可以限制同时追踪的实体数，10000 条消耗大约 600M 内存。
+                // 实际限制的数量应根据内存大小和 CPU 核心数调整。
+                var toAdd = chunk;
+                await using var db = _dbContextFactory.CreateDbContext();
+                db.Recommendations.AddRange(toAdd);
+                await db.SaveChangesAsync(cancellationToken);
+            });
+        }
+
+        public IEnumerable<RecommendationEntry> MergeRecommendationEnumerable(IList<RecommendationEntry> expanded, Mode mode)
+        {
             var recent = expanded.FirstOrDefault();
             var degree = 0.0;
             var performance = 0.0;
-            var recommendationList = new List<RecommendationEntry>();
             foreach (var current in expanded)
             {
                 if ((current.Left, current.Recommendation) == (recent!.Left, recent.Recommendation))
@@ -139,35 +160,24 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 }
                 else
                 {
-                    recommendationList.Add(new RecommendationEntry
+                    if (double.IsNaN(performance / degree))
+                    {
+                        _logger.LogDebug("Find null PP. Left: {id}+{mods}, right: {id}+{mods}", recent.Left.BeatmapId, recent.Left.ValidMods, recent.Recommendation.BeatmapId, recent.Recommendation.ValidMods);
+                        _logger.LogDebug("Degree: {degree}. PP: {perforamnce}", degree, performance);
+                    }
+                    yield return new RecommendationEntry
                     {
                         Mode = mode,
                         Left = recent.Left,
                         Recommendation = recent.Recommendation,
                         RecommendationDegree = degree,
                         Performance = performance / degree,
-                    });
+                    };
                     degree = 0;
                     performance = 0;
                     recent = current;
                 }
             }
-
-            // 先清除当前的推荐数据，再添加新的
-            var deleteCount = await _newbieContext.Recommendations.Where(r => r.Mode == mode).ExecuteDeleteAsync();
-            _logger.LogInformation("清除 {deleteCount} 条旧的推荐图数据。", deleteCount);
-
-            var recommendationsChunks = recommendationList.Chunk(10000);
-            var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
-            await Parallel.ForEachAsync(recommendationsChunks, parallelOptions, async (chunk, cancellationToken) =>
-            {
-                // 不这么干不行，因为 EF Core 追踪实体需要消耗大量内存。
-                // 现在这样可以把同时追踪的实体数限制在一万，消耗大约 600M 内存。
-                var toAdd = chunk;
-                await using var db = _dbContextFactory.CreateDbContext();
-                db.Recommendations.AddRange(toAdd);
-                await db.SaveChangesAsync(cancellationToken);
-            });
         }
 
         public bool ShouldResponse(MessageContext context)
