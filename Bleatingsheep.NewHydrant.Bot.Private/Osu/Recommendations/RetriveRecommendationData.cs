@@ -74,6 +74,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
         {
             var mode = Mode.Standard;
             var userList = await _newbieContext.UserSnapshots.Where(s => s.Mode == mode).Select(s => new { s.UserId, s.Mode }).Distinct().ToListAsync().ConfigureAwait(false);
+
+            // 配置
+            var mustUpdatedIn = TimeSpan.FromDays(186); // 必须在此期间内更新过 BP
+            var leftRange = TimeSpan.FromDays(744); // 在此期间内的作为参考BP
+            var rightRange = TimeSpan.FromDays(372); // 在此期间内的BP作为推荐BP
+
             queueCount = userList.Count;
             errorCount = 0;
             var taskList = userList.Select(async u =>
@@ -81,15 +87,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 try
                 {
                     IEnumerable<UserBest> bests = await _dataProvider.GetUserBestRetryAsync(u.UserId, u.Mode).ConfigureAwait(false);
-                    if (bests?.All(b => b.Date < DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(31))) != false)
-                    {// must have bp updated in recent 31 days.
+                    if (bests?.All(b => b.Date < DateTimeOffset.UtcNow.Subtract(mustUpdatedIn)) != false)
+                    {// 必须在此期间内更新过 BP
                         return Array.Empty<RecommendationEntry>();
                     }
                     // only get bps in recent half year.
-                    var filteredBest = bests.Select((b, i) => (b, i)).Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(186))).ToList();
+                    var filteredBest = bests.Select((b, i) => (b, i)).ToList();
                     return (IList<RecommendationEntry>)
-                    (from x1 in filteredBest
-                     from x2 in filteredBest
+                    (from x1 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(leftRange))
+                     from x2 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(rightRange))
                      where x1.b.Date > x2.b.Date
                      select new RecommendationEntry
                      {
