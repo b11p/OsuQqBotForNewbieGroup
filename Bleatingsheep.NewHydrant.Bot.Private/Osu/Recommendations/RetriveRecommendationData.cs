@@ -123,16 +123,17 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             });
             var r = await Task.WhenAll(taskList).ConfigureAwait(false);
             var expanded = r.SelectMany(e => e)
-                .OrderBy(e => ((long)e.Left.GetHashCode() << 32) | (e.Recommendation.GetHashCode() & 0xffffffff))
+                .OrderBy(e => ((ulong)(uint)e.Left.GetHashCode() << 32) | ((uint)e.Recommendation.GetHashCode() & 0xffffffffUL))
                 .ToList();
-            await _api.SendMessageAsync(_context.Endpoint, $"展开完成，共{expanded.Count}项。").ConfigureAwait(false);
+            var expandedZeroCount = expanded.Count(e => e.RecommendationDegree == 0);
+            _logger.LogInformation("展开完成，共 {expandedCount} 项，{expandedZeroCount} 项的推荐度为 0。", expanded, expandedZeroCount);
             var recommendations = MergeRecommendationEnumerable(expanded, mode);
 
             // 先清除当前的推荐数据，再添加新的
             var deleteCount = await _newbieContext.Recommendations.Where(r => r.Mode == mode).ExecuteDeleteAsync();
             _logger.LogInformation("清除 {deleteCount} 条旧的推荐图数据。", deleteCount);
 
-            var recommendationsChunks = recommendations.Chunk(6000);
+            var recommendationsChunks = recommendations.Chunk(5000);
             var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
             await Parallel.ForEachAsync(recommendationsChunks, parallelOptions, async (chunk, cancellationToken) =>
             {
@@ -160,11 +161,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 }
                 else
                 {
-                    if (double.IsNaN(performance / degree))
-                    {
-                        _logger.LogDebug("Find null PP. Left: {id}+{mods}, right: {id}+{mods}", recent.Left.BeatmapId, recent.Left.ValidMods, recent.Recommendation.BeatmapId, recent.Recommendation.ValidMods);
-                        _logger.LogDebug("Degree: {degree}. PP: {perforamnce}", degree, performance);
-                    }
                     yield return new RecommendationEntry
                     {
                         Mode = mode,
@@ -173,8 +169,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                         RecommendationDegree = degree,
                         Performance = performance / degree,
                     };
-                    degree = 0;
-                    performance = 0;
+                    degree = current.RecommendationDegree;
+                    performance = current.Performance * current.RecommendationDegree;
                     recent = current;
                 }
             }
