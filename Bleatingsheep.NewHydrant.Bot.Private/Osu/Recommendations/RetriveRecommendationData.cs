@@ -142,19 +142,20 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             }
 
             // 先清除当前的推荐数据，再添加新的
-            var deleteCount = await _newbieContext.Recommendations.ExecuteDeleteAsync();
+            var deleteCount = await _newbieContext.Recommendations.Where(r => r.Mode == mode).ExecuteDeleteAsync();
             _logger.LogInformation("清除 {deleteCount} 条旧的推荐图数据。", deleteCount);
 
             var recommendationsChunks = recommendationList.Chunk(10000);
-            foreach (var chunk in recommendationsChunks)
+            var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+            await Parallel.ForEachAsync(recommendationsChunks, parallelOptions, async (chunk, cancellationToken) =>
             {
                 // 不这么干不行，因为 EF Core 追踪实体需要消耗大量内存。
                 // 现在这样可以把同时追踪的实体数限制在一万，消耗大约 600M 内存。
                 var toAdd = chunk;
                 await using var db = _dbContextFactory.CreateDbContext();
                 db.Recommendations.AddRange(toAdd);
-                await db.SaveChangesAsync();
-            }
+                await db.SaveChangesAsync(cancellationToken);
+            });
         }
 
         public bool ShouldResponse(MessageContext context)
