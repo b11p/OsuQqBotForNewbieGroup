@@ -9,6 +9,7 @@ using Bleatingsheep.Osu;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Sisters.WudiLib;
 using static Bleatingsheep.Osu.Mods;
 using MessageContext = Sisters.WudiLib.Posts.Message;
@@ -33,15 +34,17 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
         private readonly IDataProvider _dataProvider;
         private readonly NewbieContext _newbieContext;
         private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
+        private readonly ILogger<RetriveRecommendationData> _logger;
         private bool _start = false;
         private HttpApiClient _api = default!;
         private MessageContext _context = default!;
 
-        public RetriveRecommendationData(IDataProvider dataProvider, NewbieContext newbieContext, IDbContextFactory<NewbieContext> dbContextFactory)
+        public RetriveRecommendationData(IDataProvider dataProvider, NewbieContext newbieContext, IDbContextFactory<NewbieContext> dbContextFactory, ILogger<RetriveRecommendationData> logger)
         {
             _dataProvider = dataProvider;
             _newbieContext = newbieContext;
             _dbContextFactory = dbContextFactory;
+            _logger = logger;
         }
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
@@ -137,6 +140,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                     recent = current;
                 }
             }
+
+            // 先清除当前的推荐数据，再添加新的
+            var deleteCount = await _newbieContext.Recommendations.ExecuteDeleteAsync();
+            _logger.LogInformation("清除 {deleteCount} 条旧的推荐图数据。", deleteCount);
+
             var recommendationsChunks = recommendationList.Chunk(10000);
             foreach (var chunk in recommendationsChunks)
             {
