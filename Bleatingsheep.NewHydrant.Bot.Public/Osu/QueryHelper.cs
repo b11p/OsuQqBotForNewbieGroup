@@ -155,6 +155,11 @@ namespace Bleatingsheep.NewHydrant.Osu
 {userInfo.PlayCount} 游玩次数{IncrementUtility.FormatIncrement(userInfo.PlayCount - compared?.PlayCount)}
 {userInfo.TotalHits:#,##0} 总命中次数{IncrementUtility.FormatIncrement(userInfo.TotalHits - compared?.TotalHits, "#,###")}
 {userInfo.PlayTime.Days * 24 + userInfo.PlayTime.Hours} 小时 {userInfo.PlayTime.Minutes} 分钟 {userInfo.PlayTime.Seconds} 秒游玩时间{IncrementUtility.FormatIncrement(userInfo.PlayTime.TotalSeconds - compared?.PlayTime.TotalSeconds, "#,###")}";
+            // 广告
+            if (mode == Mode.Standard && DateTime.UtcNow < new DateTime(2023, 7, 10))
+            {
+                text += "\r\n打什么图";
+            }
             return new Message(text);
         }
 
