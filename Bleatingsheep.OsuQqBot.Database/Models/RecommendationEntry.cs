@@ -15,6 +15,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public RecommendationBeatmapId Left { get; set; }
         public RecommendationBeatmapId Recommendation { get; set; }
         public double RecommendationDegree { get; set; }
+        public double Performance { get; set; }
     }
 
     [Owned]
