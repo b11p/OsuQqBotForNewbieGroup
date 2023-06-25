@@ -236,14 +236,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     query.Add("u1", user.Name);
                     query.Add("mode", "o");
                     yumuUri.Query = query.ToString();
-                    await api.SendMessageAsync(endpoint, SendingMessage.NetImage(yumuUri.ToString())).ConfigureAwait(false);
+                    await api.SendMessageAsync(endpoint, SendingMessage.NetImage(yumuUri.Uri.AbsoluteUri)).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
                     Logger.Warn(e);
                     await api.SendMessageAsync(endpoint, "查询 ppm 失败,请参阅日志").ConfigureAwait(false);
                 }
-                
             });
             _ = api.SendMessageAsync(endpoint, sb.ToString()).ConfigureAwait(false);
             return (performance, level);
