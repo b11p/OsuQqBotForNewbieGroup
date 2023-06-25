@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -98,7 +99,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                     (from x1 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(leftRange))
                      from x2 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(rightRange))
                      where x1.b.Date > x2.b.Date
-                     let recommendationDegree = Math.Pow(0.95, x1.i + x2.i - 1)
+                     let recommendationDegree = Math.Pow(0.95, x1.i + x2.i - 1) // x1 和 x2 必定不同，x1.i + x2.i 最小为 0 + 1，所以要减 1，使最大权重为 1
                      select new RecommendationEntry
                      {
                          Mode = u.Mode,
@@ -155,7 +156,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             var performance = 0.0;
             foreach (var current in expanded)
             {
-                if ((current.Left, current.Recommendation) == (recent!.Left, recent.Recommendation))
+                Debug.Assert(recent != null);
+                if ((current.Left, current.Recommendation) == (recent.Left, recent.Recommendation))
                 {
                     degree += current.RecommendationDegree;
                     performance += current.Performance * current.RecommendationDegree;

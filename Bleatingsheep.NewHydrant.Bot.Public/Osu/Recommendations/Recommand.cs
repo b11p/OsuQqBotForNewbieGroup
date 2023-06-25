@@ -34,19 +34,40 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 return;
             var osuId = bi.OsuId;
             var best = await _osuApiClient.GetUserBest(osuId).ConfigureAwait(false);
+            if (best?.Length is not > 0)
+            {
+                await api.SendMessageAsync(context.Endpoint, "你并没有 BP 哦，所以无法找到可以推荐的图。").ConfigureAwait(false);
+                return;
+            }
+
+            var userName = _newbieContext.UserSnapshots
+                .AsNoTracking()
+                .Where(s => s.UserId == osuId)
+                .OrderByDescending(s => s.Date)
+                .Select(s => s.UserInfo.Name)
+                .FirstOrDefault();
+            userName ??= $"u/{osuId}";
+
             var sb = new StringBuilder();
+            sb.AppendLine($"根据 BP 关联度，给 {userName} 推荐的图如下：");
             foreach (var b in best.Take(4))
             {
-                sb.Append("根据您的 BP b/").Append(b.BeatmapId).Append(GetModsString(b.EnabledMods)).AppendLine(" 推荐：");
                 var id = RecommendationBeatmapId.Create(b, Mode.Standard);
                 var rec = await _newbieContext.Recommendations
                     .Where(r => r.Left == id)
                     .OrderByDescending(r => r.RecommendationDegree)
                     .Take(4)
                     .ToListAsync().ConfigureAwait(false);
-
-                _ = rec.Aggregate(sb, (sb, r) =>
-                    sb.Append("b/").Append(r.Recommendation.BeatmapId).Append(GetModsString(r.Recommendation.ValidMods)).AppendLine(GetPerformanceString(r.Performance)));
+                if (rec.Count > 0)
+                {
+                    sb.Append("根据您的 BP b/").Append(b.BeatmapId).Append(GetModsString(b.EnabledMods)).AppendLine(" 推荐：");
+                    _ = rec.Aggregate(sb, (sb, r) =>
+                        sb.Append("b/").Append(r.Recommendation.BeatmapId).Append(GetModsString(r.Recommendation.ValidMods)).AppendLine(GetPerformanceString(r.Performance)));
+                }
+                else
+                {
+                    sb.AppendLine($"没有找到与 b/{b.BeatmapId}{GetModsString(b.EnabledMods)} 相关的图，可能是你太强了，别人都打不出这个 BP。");
+                }
             }
             await api.SendMessageAsync(context.Endpoint, sb.ToString()).ConfigureAwait(false);
         }
