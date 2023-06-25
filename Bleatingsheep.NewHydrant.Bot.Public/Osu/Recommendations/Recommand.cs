@@ -62,7 +62,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 {
                     sb.Append("根据您的 BP b/").Append(b.BeatmapId).Append(GetModsString(b.EnabledMods)).AppendLine(" 推荐：");
                     _ = rec.Aggregate(sb, (sb, r) =>
-                        sb.Append("b/").Append(r.Recommendation.BeatmapId).Append(GetModsString(r.Recommendation.ValidMods)).AppendLine(GetPerformanceString(r.Performance)));
+                        sb.Append("b/").Append(r.Recommendation.BeatmapId).Append(GetModsString(r.Recommendation.ValidMods)).AppendLine(GetPerformanceString(r, best)));
                 }
                 else
                 {
@@ -80,11 +80,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 : " + " + s;
         }
 
-        public static string GetPerformanceString(double performance)
+        public static string GetPerformanceString(RecommendationEntry recommendation, IEnumerable<UserBest> bpList)
         {
+            double performance = recommendation.Performance;
+            var currentPP = bpList.FirstOrDefault(b => b.BeatmapId == recommendation.Recommendation.BeatmapId)?.Performance;
             return double.IsNaN(performance)
                 ? string.Empty
-                : $" ({performance:0} PP)";
+                : $" ({performance:0} PP{(currentPP != null ? $", 当前 {currentPP}" : string.Empty)})";
         }
 
         public bool ShouldResponse(MessageContext context)
