@@ -19,7 +19,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
     }
 
     [Owned]
-    public class RecommendationBeatmapId : IEquatable<RecommendationBeatmapId>
+    public sealed class RecommendationBeatmapId : IEquatable<RecommendationBeatmapId>
     {
         private static readonly IList<Mods> s_modFilters = new Mods[4]
         {

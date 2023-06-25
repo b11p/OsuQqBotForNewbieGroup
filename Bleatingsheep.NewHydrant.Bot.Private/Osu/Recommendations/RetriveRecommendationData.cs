@@ -73,7 +73,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
         private async Task Retrive()
         {
             var mode = Mode.Standard;
-            var userList = await _newbieContext.UserSnapshots.Where(s => s.Mode == mode).Select(s => new { s.UserId, s.Mode }).Distinct().ToListAsync().ConfigureAwait(false);
+            var userList = await _newbieContext.UpdateSchedules.Where(s => s.Mode == mode).Select(s => new { s.UserId, s.Mode }).ToListAsync();
+            _logger.LogInformation("即将获取 {count} 名用户的 BP", userList.Count);
 
             // 配置
             var mustUpdatedIn = TimeSpan.FromDays(186); // 必须在此期间内更新过 BP
@@ -126,7 +127,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 .OrderBy(e => ((ulong)(uint)e.Left.GetHashCode() << 32) | ((uint)e.Recommendation.GetHashCode() & 0xffffffffUL))
                 .ToList();
             var expandedZeroCount = expanded.Count(e => e.RecommendationDegree == 0);
-            _logger.LogInformation("展开完成，共 {expandedCount} 项，{expandedZeroCount} 项的推荐度为 0。", expanded, expandedZeroCount);
+            _logger.LogInformation("展开完成，共 {expandedCount} 项，{expandedZeroCount} 项的推荐度为 0。", expanded.Count, expandedZeroCount);
             var recommendations = MergeRecommendationEnumerable(expanded, mode);
 
             // 先清除当前的推荐数据，再添加新的
