@@ -2087,6 +2087,7 @@
           "Bleatingsheep.Osu.ApiClient": "0.6.21",
           "Bleatingsheep.SimpleBooru": "0.3.0",
           "HtmlAgilityPack": "1.11.48",
+          "System.Linq.Async": "6.0.1",
           "System.ServiceModel.Syndication": "7.0.0",
           "WebApiClient.AOT": "1.1.4"
         },
