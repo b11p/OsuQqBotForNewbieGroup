@@ -31,13 +31,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
         };
 
         private static readonly SemaphoreSlim s_startSemaphore = new(1);
-        private static int queueCount = 0;
-        private static int errorCount = 0;
+        private static int s_queueCount = 0;
+        private static int s_errorCount = 0;
         private readonly IDataProvider _dataProvider;
         private readonly NewbieContext _newbieContext;
         private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
         private readonly ILogger<RetriveRecommendationData> _logger;
         private bool _start = false;
+        private Mode _mode;
         private HttpApiClient _api = default!;
         private MessageContext _context = default!;
 
@@ -58,13 +59,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
 
             if (!_start || !s_startSemaphore.Wait(0))
             {
-                await api.SendMessageAsync(context.Endpoint, $"当前队列：{queueCount}, 错误：{errorCount}").ConfigureAwait(false);
+                await api.SendMessageAsync(context.Endpoint, $"当前队列：{s_queueCount}, 错误：{s_errorCount}").ConfigureAwait(false);
                 return;
             }
 
             try
             {
-                await Retrive().ConfigureAwait(false);
+                await Retrive(_mode).ConfigureAwait(false);
             }
             finally
             {
@@ -72,9 +73,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             }
         }
 
-        private async Task Retrive()
+        private async Task Retrive(Mode mode)
         {
-            var mode = Mode.Standard;
             var userList = await _newbieContext.UpdateSchedules.Where(s => s.Mode == mode).Select(s => new { s.UserId, s.Mode }).ToListAsync();
             _logger.LogInformation("即将获取 {count} 名用户的 BP", userList.Count);
 
@@ -83,8 +83,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             var leftRange = TimeSpan.FromDays(744); // 在此期间内的作为参考BP
             var rightRange = TimeSpan.FromDays(372); // 在此期间内的BP作为推荐BP
 
-            queueCount = userList.Count;
-            errorCount = 0;
+            s_queueCount = userList.Count;
+            s_errorCount = 0;
 
             var recommendationChannel = Channel.CreateUnbounded<IEnumerable<RecommendationEntry>>();
             var writer = recommendationChannel.Writer;
@@ -118,7 +118,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 }
                 catch (Exception e)
                 {
-                    var v = Interlocked.Increment(ref errorCount);
+                    var v = Interlocked.Increment(ref s_errorCount);
                     if (v <= 1)
                     {
                         await _api.SendMessageAsync(_context.Endpoint, e.ToString()).ConfigureAwait(false);
@@ -126,7 +126,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 }
                 finally
                 {
-                    Interlocked.Decrement(ref queueCount);
+                    Interlocked.Decrement(ref s_queueCount);
                 }
             });
             _ = Task.Run(async () =>
@@ -172,7 +172,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             });
         }
 
-        public IEnumerable<RecommendationEntry> MergeRecommendationEnumerable(IList<RecommendationEntry> expanded, Mode mode)
+        public static IEnumerable<RecommendationEntry> MergeRecommendationEnumerable(IList<RecommendationEntry> expanded, Mode mode)
         {
             var recent = expanded.FirstOrDefault();
             var degree = 0.0;
@@ -208,9 +208,18 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             {
                 if (context.Content.Text == "采集数据")
                     return true;
-                if (context.Content.Text == "开始采集数据")
+                if (context.Content.Text.StartsWith("开始采集数据"))
                 {
                     _start = true;
+                    var modeString = context.Content.Text["开始采集数据".Length..].Trim();
+                    try
+                    {
+                        _mode = ModeExtensions.Parse(modeString);
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
                     return true;
                 }
             }
