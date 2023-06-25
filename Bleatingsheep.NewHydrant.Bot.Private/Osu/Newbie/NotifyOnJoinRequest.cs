@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
@@ -220,7 +221,30 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     await api.SendMessageAsync(endpoint, e.Message).ConfigureAwait(false);
                 }
             });
-
+            _ = Task.Run(async () =>
+            {
+                if (user == null || user.Name == null)
+                {
+                    return;
+                }
+                try
+                {
+                    // 尝试查询 yumu ppm
+                    // https://bot.365246692.xyz/pub/ppm?u1=-spring%20night-&mode=o
+                    var yumuUri = new UriBuilder("https://bot.365246692.xyz/pub/ppm");
+                    var query = HttpUtility.ParseQueryString(yumuUri.Query);
+                    query.Add("u1", user.Name);
+                    query.Add("mode", "o");
+                    yumuUri.Query = query.ToString();
+                    await api.SendMessageAsync(endpoint, SendingMessage.NetImage(yumuUri.ToString())).ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    Logger.Warn(e);
+                    await api.SendMessageAsync(endpoint, "查询 ppm 失败,请参阅日志").ConfigureAwait(false);
+                }
+                
+            });
             _ = api.SendMessageAsync(endpoint, sb.ToString()).ConfigureAwait(false);
             return (performance, level);
         }
