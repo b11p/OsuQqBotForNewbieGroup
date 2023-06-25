@@ -40,6 +40,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                 return;
             }
 
+            var currentPP = best.Select(b => new { b.BeatmapId, b.Performance }).ToList();
+
             var userName = _newbieContext.UserSnapshots
                 .AsNoTracking()
                 .Where(s => s.UserId == osuId)
@@ -53,11 +55,15 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
             foreach (var b in best.Take(4))
             {
                 var id = RecommendationBeatmapId.Create(b, Mode.Standard);
-                var rec = await _newbieContext.Recommendations
-                    .Where(r => r.Left == id)
-                    .OrderByDescending(r => r.RecommendationDegree)
+                var rec = await
+                    (from r in _newbieContext.Recommendations.Where(r_ => r_.Left == id).AsAsyncEnumerable()
+                     join c in currentPP.ToAsyncEnumerable() on r.Recommendation.BeatmapId equals c.BeatmapId into current
+                     from c in current.DefaultIfEmpty()
+                     where c == null || c.Performance < r.Performance * 0.99
+                     orderby r.RecommendationDegree descending
+                     select r)
                     .Take(4)
-                    .ToListAsync().ConfigureAwait(false);
+                    .ToListAsync();
                 if (rec.Count > 0)
                 {
                     sb.Append("根据您的 BP b/").Append(b.BeatmapId).Append(GetModsString(b.EnabledMods)).AppendLine(" 推荐：");
