@@ -19,7 +19,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
     }
 
     [Owned]
-    public sealed class RecommendationBeatmapId : IEquatable<RecommendationBeatmapId>
+    public sealed class RecommendationBeatmapId : IEquatable<RecommendationBeatmapId>, IComparable<RecommendationBeatmapId>
     {
         private static readonly IList<Mods> s_modFilters = new Mods[4]
         {
@@ -52,6 +52,22 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public override bool Equals(object obj) => Equals(obj as RecommendationBeatmapId);
         public bool Equals(RecommendationBeatmapId other) => other != null && BeatmapId == other.BeatmapId && ValidMods == other.ValidMods;
         public override int GetHashCode() => HashCode.Combine(BeatmapId, ValidMods);
+
+        public int CompareTo(RecommendationBeatmapId other)
+        {
+            if (other is null)
+                return 1;
+            if (ReferenceEquals(this, other))
+                return 0;
+            return (BeatmapId.CompareTo(other.BeatmapId), ValidMods.CompareTo(other.ValidMods)) switch
+            {
+                ( > 0, _) => 1,
+                ( < 0, _) => -1,
+                (_, > 0) => 1,
+                (_, < 0) => -1,
+                _ => 0,
+            };
+        }
 
         public static bool operator ==(RecommendationBeatmapId left, RecommendationBeatmapId right) => EqualityComparer<RecommendationBeatmapId>.Default.Equals(left, right);
         public static bool operator !=(RecommendationBeatmapId left, RecommendationBeatmapId right) => !(left == right);

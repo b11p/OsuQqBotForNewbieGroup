@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Data;
@@ -84,30 +85,36 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
 
             queueCount = userList.Count;
             errorCount = 0;
-            var taskList = userList.Select(async u =>
+
+            var recommendationChannel = Channel.CreateUnbounded<IEnumerable<RecommendationEntry>>();
+            var writer = recommendationChannel.Writer;
+            var reader = recommendationChannel.Reader;
+
+            var taskList = Parallel.ForEachAsync(userList, async (u, cancellationToken) =>
             {
                 try
                 {
-                    IEnumerable<UserBest> bests = await _dataProvider.GetUserBestRetryAsync(u.UserId, u.Mode).ConfigureAwait(false);
+                    IEnumerable<UserBest> bests = await _dataProvider.GetUserBestRetryAsync(u.UserId, u.Mode, cancellationToken);
                     if (bests?.All(b => b.Date < DateTimeOffset.UtcNow.Subtract(mustUpdatedIn)) != false)
                     {// 必须在此期间内更新过 BP
-                        return Array.Empty<RecommendationEntry>();
+                        return;
                     }
                     // only get bps in recent half year.
                     var filteredBest = bests.Select((b, i) => (b, i)).ToList();
-                    return (IList<RecommendationEntry>)
-                    (from x1 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(leftRange))
-                     from x2 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(rightRange))
-                     where x1.b.Date > x2.b.Date
-                     let recommendationDegree = Math.Pow(0.95, x1.i + x2.i - 1) // x1 和 x2 必定不同，x1.i + x2.i 最小为 0 + 1，所以要减 1，使最大权重为 1
-                     select new RecommendationEntry
-                     {
-                         Mode = u.Mode,
-                         Left = RecommendationBeatmapId.Create(x1.b, u.Mode),
-                         Recommendation = RecommendationBeatmapId.Create(x2.b, u.Mode),
-                         RecommendationDegree = recommendationDegree,
-                         Performance = x2.b.Performance,
-                     }).ToList();
+                    var result =
+                        from x1 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(leftRange))
+                        from x2 in filteredBest.Where(x => x.b.Date >= DateTimeOffset.UtcNow.Subtract(rightRange))
+                        where x1.b.Date > x2.b.Date
+                        let recommendationDegree = Math.Pow(0.95, x1.i + x2.i - 1) // x1 和 x2 必定不同，x1.i + x2.i 最小为 0 + 1，所以要减 1，使最大权重为 1
+                        select new RecommendationEntry
+                        {
+                            Mode = u.Mode,
+                            Left = RecommendationBeatmapId.Create(x1.b, u.Mode),
+                            Recommendation = RecommendationBeatmapId.Create(x2.b, u.Mode),
+                            RecommendationDegree = recommendationDegree,
+                            Performance = x2.b.Performance,
+                        };
+                    await writer.WriteAsync(result, cancellationToken);
                 }
                 catch (Exception e)
                 {
@@ -116,17 +123,33 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
                     {
                         await _api.SendMessageAsync(_context.Endpoint, e.ToString()).ConfigureAwait(false);
                     }
-                    return Array.Empty<RecommendationEntry>();
                 }
                 finally
                 {
                     Interlocked.Decrement(ref queueCount);
                 }
             });
-            var r = await Task.WhenAll(taskList).ConfigureAwait(false);
-            var expanded = r.SelectMany(e => e)
-                .OrderBy(e => ((ulong)(uint)e.Left.GetHashCode() << 32) | ((uint)e.Recommendation.GetHashCode() & 0xffffffffUL))
-                .ToList();
+            _ = Task.Run(async () =>
+            {
+                await taskList;
+                writer.Complete();
+            });
+            //var r = await Task.WhenAll(taskList).ConfigureAwait(false);
+            var r = reader.ReadAllAsync();
+            var expanded = await r.SelectMany(e => e.ToAsyncEnumerable())
+                //.OrderBy(e => ((ulong)(uint)e.Left.GetHashCode() << 32) | ((uint)e.Recommendation.GetHashCode() & 0xffffffffUL))
+                .ToListAsync();
+            expanded.Sort((l, r) =>
+            {
+                return (l.Left.CompareTo(r.Left), l.Recommendation.CompareTo(r.Recommendation)) switch
+                {
+                    ( > 0, _) => 1,
+                    ( < 0, _) => -1,
+                    (_, > 0) => 1,
+                    (_, < 0) => -1,
+                    _ => 0,
+                };
+            });
             var expandedZeroCount = expanded.Count(e => e.RecommendationDegree == 0);
             _logger.LogInformation("展开完成，共 {expandedCount} 项，{expandedZeroCount} 项的推荐度为 0。", expanded.Count, expandedZeroCount);
             var recommendations = MergeRecommendationEnumerable(expanded, mode);
