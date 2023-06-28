@@ -30,9 +30,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Recommendations
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            var bi = await _newbieContext.Bindings.Where(b => b.UserId == context.UserId).FirstOrDefaultAsync().ConfigureAwait(false);
+            var bi = await _newbieContext.Bindings.AsNoTracking().Where(b => b.UserId == context.UserId).FirstOrDefaultAsync().ConfigureAwait(false);
             if (bi == null)
+            {
+                await api.SendMessageAsync(context.Endpoint, "未绑定 osu! 账号，发送“绑定 你的osuid”绑定。");
                 return;
+            }
             var osuId = bi.OsuId;
             var best = await _osuApiClient.GetUserBest(osuId, _mode).ConfigureAwait(false);
             if (best?.Length is not > 0)
