@@ -24,6 +24,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.MemePost;
 internal partial class PostToMemeRepository : IMessageCommand
 {
     private static readonly char[] s_invalidFileNameChars = Path.GetInvalidFileNameChars();
+    private static readonly char[] s_invalidFileNameCharsExtra = new[] { '?' };
 
     private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
     private readonly ILogger<PostToMemeRepository> _logger;
@@ -61,6 +62,12 @@ internal partial class PostToMemeRepository : IMessageCommand
         if (fileName.IndexOfAny(s_invalidFileNameChars) != -1)
         {
             await api.SendMessageAsync(context.Endpoint, "命令格式错误，正确格式为“/post 标签”，标签必须可以用作文件名。");
+            return;
+        }
+        int invalidIndex = fileName.IndexOfAny(s_invalidFileNameCharsExtra);
+        if (invalidIndex != -1)
+        {
+            await api.SendMessageAsync(context.Endpoint, $"命令格式错误，标签中含有不可用字符“{fileName[invalidIndex]}”。");
             return;
         }
 
