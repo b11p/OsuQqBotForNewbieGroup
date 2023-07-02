@@ -31,7 +31,7 @@ public class UpdateSnapshotsService : BackgroundService
                     .Take(200)
                     .ToListAsync(stoppingToken);
                 if (scheduledCount == 0)
-                    return;
+                    continue;
                 _logger.LogDebug("Updating {toUpdate.Count} of {scheduledCount} snapshots.", toUpdate.Count, scheduledCount);
                 int successCount = 0;
                 foreach (var schedule in toUpdate)
