@@ -1,4 +1,4 @@
-name: .NET
+name: Build and deploy xfs data maintenance service
 
 on:
   push:
