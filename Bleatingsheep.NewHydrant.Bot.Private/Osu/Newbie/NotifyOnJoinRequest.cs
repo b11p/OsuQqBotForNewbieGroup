@@ -238,18 +238,21 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     query.Add("u1", user.Name);
                     query.Add("mode", "o");
                     yumuUri.Query = query.ToString();
-                    using var httpClient = new HttpClient();
-                    httpClient.Timeout = TimeSpan.FromSeconds(60);
-                    var ppmTask = httpClient.GetAsync(yumuUri.Uri);
-                    var response = await ppmTask;
-                    if (response.StatusCode != HttpStatusCode.OK)
+                    using(HttpClient client = new HttpClient())
                     {
-                        // throw new Exception(""); 抛错开销有点大?
-                        await api.SendMessageAsync(endpoint, "查询失败,服务器错误: " + response.StatusCode).ConfigureAwait(false);
-                        return;
+                        try
+                        {
+                            client.Timeout = TimeSpan.FromSeconds(60);
+                            byte[] result = await client.GetByteArrayAsync(yumuUri.Uri);
+                            await api.SendMessageAsync(endpoint, SendingMessage.ByteArrayImage(data)).ConfigureAwait(false);
+                        }
+                        catch (HttpRequestException ex)
+                        {
+                            await api.SendMessageAsync(endpoint, "查询 ppm 失败").ConfigureAwait(false);
+                            Logger.Warn(ex);
+                            return;
+                        }
                     }
-                    var data = await response.Content.ReadAsByteArrayAsync();
-                    await api.SendMessageAsync(endpoint, SendingMessage.ByteArrayImage(data)).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
