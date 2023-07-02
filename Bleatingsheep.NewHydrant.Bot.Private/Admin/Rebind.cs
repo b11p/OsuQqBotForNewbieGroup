@@ -35,6 +35,13 @@ namespace Bleatingsheep.NewHydrant.Admin
 
         public async Task ProcessAsync(Sisters.WudiLib.Posts.Message message, HttpApiClient api)
         {
+            // 验证是否具有改绑权限
+            if (!await Verifier.IsAdminAsync(message.UserId))
+            {
+                await api.SendMessageAsync(message.Endpoint, "你没有更改绑定的权限。如果你是管理成员，请查看管理群公告获取权限。");
+                return;
+            }
+
             var osuApi = OsuApi;
 
             string operatorName;
@@ -111,7 +118,6 @@ namespace Bleatingsheep.NewHydrant.Admin
 
         public bool ShouldResponse(Sisters.WudiLib.Posts.Message message)
         {
-            if (!Verifier.IsAdminAsync(message.UserId).GetAwaiter().GetResult()) return false;
             _operator = message.UserId;
 
             var content = message.Content;
