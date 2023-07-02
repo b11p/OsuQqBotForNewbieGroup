@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -236,7 +238,21 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     query.Add("u1", user.Name);
                     query.Add("mode", "o");
                     yumuUri.Query = query.ToString();
-                    await api.SendMessageAsync(endpoint, SendingMessage.NetImage(yumuUri.Uri.AbsoluteUri)).ConfigureAwait(false);
+                    using(HttpClient client = new HttpClient())
+                    {
+                        try
+                        {
+                            client.Timeout = TimeSpan.FromSeconds(60);
+                            byte[] data = await client.GetByteArrayAsync(yumuUri.Uri);
+                            await api.SendMessageAsync(endpoint, SendingMessage.ByteArrayImage(data)).ConfigureAwait(false);
+                        }
+                        catch (HttpRequestException ex)
+                        {
+                            await api.SendMessageAsync(endpoint, "查询 ppm 失败").ConfigureAwait(false);
+                            Logger.Warn(ex);
+                            return;
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
