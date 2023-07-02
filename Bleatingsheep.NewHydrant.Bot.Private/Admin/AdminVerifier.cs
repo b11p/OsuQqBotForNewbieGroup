@@ -30,6 +30,7 @@ namespace Bleatingsheep.NewHydrant.Admin
             1528769425, // m u s e
             2624161473, // guozi
             630060047, // CYCLC
+            365246692, // -Spring Night-
         };
 
         public AdminVerifier()
