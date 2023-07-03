@@ -63,12 +63,17 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         };
 
         private const long NewbieGroupId = 595985887;
+        private const long NewbieGroup2Id = 928936255;
 
         public static INewbieInfoProvider GetProvider() => new HardcodedProvider();
 
         public string Name => "ignore";
 
-        public IEnumerable<long> MonitoredGroups { get; } = new List<long> { NewbieGroupId }.AsReadOnly();
+        public IEnumerable<long> MonitoredGroups { get; } = new List<long>
+        {
+            NewbieGroupId,
+            NewbieGroup2Id,
+        }.AsReadOnly();
 
 #pragma warning disable CS1998
         public async Task<bool> ShouldIgnoreAsync(long qq) => IgnoreList.Contains(qq);
