@@ -8,7 +8,7 @@ namespace Bleatingsheep.NewHydrant.Admin
     {
         private static readonly HashSet<long> AdminCollection = new HashSet<long>
         {
-            962549599, //
+            962549599, // 咩咩羊
             1208604740, // iron
             // 1239219529, // taolex
             1061566571, // dalou
@@ -31,6 +31,7 @@ namespace Bleatingsheep.NewHydrant.Admin
             2624161473, // guozi
             630060047, // CYCLC
             365246692, // -Spring Night-
+            1120180945, // n0000000000o
         };
 
         public AdminVerifier()
