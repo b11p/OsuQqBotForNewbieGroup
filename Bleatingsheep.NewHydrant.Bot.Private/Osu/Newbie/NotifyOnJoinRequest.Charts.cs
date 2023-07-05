@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using PuppeteerSharp;
+using Sisters.WudiLib;
+using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
@@ -107,6 +111,40 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 hints.Add(new Message(ex.Message));
             }
 #pragma warning restore CA1031 // Do not catch general exception types
+        }
+
+        private async Task GetForPPM(string userName, List<Message> hints) 
+        {
+            try
+            {
+                // 尝试查询 yumu ppm
+                // https://bot.365246692.xyz/pub/ppm?u1=-spring%20night-&mode=o
+                var yumuUri = new UriBuilder("https://bot.365246692.xyz/pub/ppm");
+                var query = HttpUtility.ParseQueryString(yumuUri.Query);
+                query.Add("u1", userName);
+                query.Add("mode", "o");
+                yumuUri.Query = query.ToString();
+                using(HttpClient client = new HttpClient())
+                {
+                    try
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(60);
+                        byte[] data = await client.GetByteArrayAsync(yumuUri.Uri);
+                        hints.Add(Message.ByteArrayImage(data));
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        hints.Add("yumu 服务器连接异常, 查询 ppm 失败");
+                        Logger.Warn(ex);
+                        return;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Warn(e);
+                hints.Add("查询 ppm 失败,请参阅日志");
+            }
         }
     }
 }

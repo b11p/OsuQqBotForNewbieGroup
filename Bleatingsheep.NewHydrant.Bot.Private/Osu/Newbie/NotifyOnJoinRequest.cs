@@ -14,6 +14,7 @@ using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using NLog;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -223,43 +224,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     await api.SendMessageAsync(endpoint, e.Message).ConfigureAwait(false);
                 }
             });
-            _ = Task.Run(async () =>
-            {
-                if (user == null || user.Name == null)
-                {
-                    return;
-                }
-                try
-                {
-                    // 尝试查询 yumu ppm
-                    // https://bot.365246692.xyz/pub/ppm?u1=-spring%20night-&mode=o
-                    var yumuUri = new UriBuilder("https://bot.365246692.xyz/pub/ppm");
-                    var query = HttpUtility.ParseQueryString(yumuUri.Query);
-                    query.Add("u1", user.Name);
-                    query.Add("mode", "o");
-                    yumuUri.Query = query.ToString();
-                    using(HttpClient client = new HttpClient())
-                    {
-                        try
-                        {
-                            client.Timeout = TimeSpan.FromSeconds(60);
-                            byte[] data = await client.GetByteArrayAsync(yumuUri.Uri);
-                            await api.SendMessageAsync(endpoint, SendingMessage.ByteArrayImage(data)).ConfigureAwait(false);
-                        }
-                        catch (HttpRequestException ex)
-                        {
-                            await api.SendMessageAsync(endpoint, "查询 ppm 失败").ConfigureAwait(false);
-                            Logger.Warn(ex);
-                            return;
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Warn(e);
-                    await api.SendMessageAsync(endpoint, "查询 ppm 失败,请参阅日志").ConfigureAwait(false);
-                }
-            });
             _ = api.SendMessageAsync(endpoint, sb.ToString()).ConfigureAwait(false);
             return (performance, level);
         }
@@ -300,10 +264,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            var uid = int.Parse(_content.Substring(5).Trim(), CultureInfo.InvariantCulture);
+            string userName = _content.Substring(5).Trim();
+            var uid = int.Parse(userName, CultureInfo.InvariantCulture);
             var hints = new List<Message>();
             await ScreenShotsAsync(hints, uid).ConfigureAwait(false);
             var newLine = new Message("\r\n");
+            await GetForPPM(userName, hints);
             Message message = hints.Count > 0
                 ? hints.Aggregate((m1, m2) => m1 + newLine + m2)
                 : new Message("没有结果。");
