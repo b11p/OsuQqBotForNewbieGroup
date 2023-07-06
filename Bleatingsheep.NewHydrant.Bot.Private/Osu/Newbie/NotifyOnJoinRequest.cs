@@ -75,10 +75,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     {// 可能的重试。
                         (success, userInfo) = await OsuApi.GetUserInfoAsync(osuId.Value, Mode.Standard).ConfigureAwait(false);
                     }
+                    
+                    GetForPPM(userNames.First(), message => hints.Add(message)).Wait();
                     _ = await ProcessApplicantReportAsync(hints, null, (success, userInfo)).ConfigureAwait(false);
                     if (userInfo != null && !userNames.Any(n => string.Equals(userInfo.Name, n, StringComparison.OrdinalIgnoreCase)))
                     {// 绑定不一致
                         hints.Add(new Message("警告：其绑定的账号与申请不符。"));
+                        GetForPPM(userInfo.Name, message => hints.Add(message)).Wait();
                     }
                 }
                 else

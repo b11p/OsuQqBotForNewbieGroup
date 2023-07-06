@@ -113,7 +113,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 #pragma warning restore CA1031 // Do not catch general exception types
         }
 
-        private async Task GetForPPM(string userName, List<Message> hints) 
+        private async Task GetForPPM(string userName, Action<Message> send) 
         {
             try
             {
@@ -130,11 +130,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     {
                         client.Timeout = TimeSpan.FromSeconds(60);
                         byte[] data = await client.GetByteArrayAsync(yumuUri.Uri);
-                        hints.Add(Message.ByteArrayImage(data));
+                        send(Message.ByteArrayImage(data));
                     }
                     catch (HttpRequestException ex)
                     {
-                        hints.Add("yumu 服务器连接异常, 查询 ppm 失败");
+                        send("yumu 服务器连接异常, 查询 ppm 失败");
                         Logger.Warn(ex);
                         return;
                     }
@@ -143,7 +143,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             catch (Exception e)
             {
                 Logger.Warn(e);
-                hints.Add("查询 ppm 失败,请参阅日志");
+                send("查询 ppm 失败,请参阅日志");
             }
         }
     }
