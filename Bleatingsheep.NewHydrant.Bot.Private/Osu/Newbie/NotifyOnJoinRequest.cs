@@ -68,20 +68,23 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             if (!string.IsNullOrEmpty(comment))
             {
                 var userNames = OsuHelper.DiscoverUsernames(comment).Where(n => !string.Equals(n, "osu", StringComparison.OrdinalIgnoreCase));
+                foreach (string name in userNames)
+                {
+                    // 由于有绑定的情况下并未进入查询user name 的循环,所以直接提出来单独做循环
+                    await GetForPPM(name, message => hints.Add(message));
+                }
                 if (osuId != null)
                 {
                     bool success = userInfo != null; // 由于当前未从调用方法处获得上级 API 是否调用成功，在信息不为 null 时默认成功。
-                    if (userInfo == null)
+                    if (!success)
                     {// 可能的重试。
                         (success, userInfo) = await OsuApi.GetUserInfoAsync(osuId.Value, Mode.Standard).ConfigureAwait(false);
                     }
-                    
-                    GetForPPM(userNames.First(), message => hints.Add(message)).Wait();
                     _ = await ProcessApplicantReportAsync(hints, null, (success, userInfo)).ConfigureAwait(false);
                     if (userInfo != null && !userNames.Any(n => string.Equals(userInfo.Name, n, StringComparison.OrdinalIgnoreCase)))
                     {// 绑定不一致
-                        hints.Add(new Message("警告：其绑定的账号与申请不符。"));
                         GetForPPM(userInfo.Name, message => hints.Add(message)).Wait();
+                        hints.Add(new Message("警告：其绑定的账号与申请不符。"));
                     }
                 }
                 else
