@@ -270,12 +270,10 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            string userName = _content.Substring(5).Trim();
-            var uid = int.Parse(userName, CultureInfo.InvariantCulture);
+            var uid = int.Parse(_content.Substring(5).Trim(), CultureInfo.InvariantCulture);
             var hints = new List<Message>();
             await ScreenShotsAsync(hints, uid).ConfigureAwait(false);
             var newLine = new Message("\r\n");
-            await GetForPPM(userName, hints);
             Message message = hints.Count > 0
                 ? hints.Aggregate((m1, m2) => m1 + newLine + m2)
                 : new Message("没有结果。");
