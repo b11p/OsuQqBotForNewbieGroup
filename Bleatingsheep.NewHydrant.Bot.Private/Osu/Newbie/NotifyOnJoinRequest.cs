@@ -83,7 +83,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                     _ = await ProcessApplicantReportAsync(hints, null, (success, userInfo)).ConfigureAwait(false);
                     if (userInfo != null && !userNames.Any(n => string.Equals(userInfo.Name, n, StringComparison.OrdinalIgnoreCase)))
                     {// 绑定不一致
-                        GetForPPM(userInfo.Name, message => hints.Add(message)).Wait();
+                        await GetForPPM(userInfo.Name, message => hints.Add(message));
                         hints.Add(new Message("警告：其绑定的账号与申请不符。"));
                     }
                 }
