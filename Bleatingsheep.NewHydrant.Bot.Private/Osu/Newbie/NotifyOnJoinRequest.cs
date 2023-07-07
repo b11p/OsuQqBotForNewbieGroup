@@ -14,6 +14,7 @@ using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Data;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using NLog;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -67,16 +68,22 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             if (!string.IsNullOrEmpty(comment))
             {
                 var userNames = OsuHelper.DiscoverUsernames(comment).Where(n => !string.Equals(n, "osu", StringComparison.OrdinalIgnoreCase));
+                foreach (string name in userNames)
+                {
+                    // 由于有绑定的情况下并未进入查询user name 的循环,所以直接提出来单独做循环
+                    await GetForPPM(name, message => hints.Add(message));
+                }
                 if (osuId != null)
                 {
                     bool success = userInfo != null; // 由于当前未从调用方法处获得上级 API 是否调用成功，在信息不为 null 时默认成功。
-                    if (userInfo == null)
+                    if (!success)
                     {// 可能的重试。
                         (success, userInfo) = await OsuApi.GetUserInfoAsync(osuId.Value, Mode.Standard).ConfigureAwait(false);
                     }
                     _ = await ProcessApplicantReportAsync(hints, null, (success, userInfo)).ConfigureAwait(false);
                     if (userInfo != null && !userNames.Any(n => string.Equals(userInfo.Name, n, StringComparison.OrdinalIgnoreCase)))
                     {// 绑定不一致
+                        await GetForPPM(userInfo.Name, message => hints.Add(message));
                         hints.Add(new Message("警告：其绑定的账号与申请不符。"));
                     }
                 }
@@ -221,43 +228,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 {
                     Logger.Warn(e);
                     await api.SendMessageAsync(endpoint, e.Message).ConfigureAwait(false);
-                }
-            });
-            _ = Task.Run(async () =>
-            {
-                if (user == null || user.Name == null)
-                {
-                    return;
-                }
-                try
-                {
-                    // 尝试查询 yumu ppm
-                    // https://bot.365246692.xyz/pub/ppm?u1=-spring%20night-&mode=o
-                    var yumuUri = new UriBuilder("https://bot.365246692.xyz/pub/ppm");
-                    var query = HttpUtility.ParseQueryString(yumuUri.Query);
-                    query.Add("u1", user.Name);
-                    query.Add("mode", "o");
-                    yumuUri.Query = query.ToString();
-                    using(HttpClient client = new HttpClient())
-                    {
-                        try
-                        {
-                            client.Timeout = TimeSpan.FromSeconds(60);
-                            byte[] data = await client.GetByteArrayAsync(yumuUri.Uri);
-                            await api.SendMessageAsync(endpoint, SendingMessage.ByteArrayImage(data)).ConfigureAwait(false);
-                        }
-                        catch (HttpRequestException ex)
-                        {
-                            await api.SendMessageAsync(endpoint, "查询 ppm 失败").ConfigureAwait(false);
-                            Logger.Warn(ex);
-                            return;
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Warn(e);
-                    await api.SendMessageAsync(endpoint, "查询 ppm 失败,请参阅日志").ConfigureAwait(false);
                 }
             });
             _ = api.SendMessageAsync(endpoint, sb.ToString()).ConfigureAwait(false);
