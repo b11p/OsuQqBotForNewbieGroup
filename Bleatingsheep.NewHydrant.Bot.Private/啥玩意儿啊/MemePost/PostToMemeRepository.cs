@@ -24,7 +24,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.MemePost;
 internal partial class PostToMemeRepository : IMessageCommand
 {
     private static readonly char[] s_invalidFileNameChars = Path.GetInvalidFileNameChars();
-    private static readonly char[] s_invalidFileNameCharsExtra = new[] { '?' };
+    private static readonly char[] s_invalidFileNameCharsExtra = new[] { '?', '\'', '"' };
 
     private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
     private readonly ILogger<PostToMemeRepository> _logger;
