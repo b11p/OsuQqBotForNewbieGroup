@@ -13,5 +13,8 @@
   },
   "Mahjong": {
     "TensoulBase": "https://tensoul.b11p.com/convert"
+  },
+  "Services": {
+    "random.org": "40af626d-27b3-4dae-b7f5-4cd73ac436b4"
   }
 }
