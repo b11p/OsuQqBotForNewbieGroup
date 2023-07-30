@@ -24,7 +24,8 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.MemePost;
 internal partial class PostToMemeRepository : IMessageCommand
 {
     private static readonly char[] s_invalidFileNameChars = Path.GetInvalidFileNameChars();
-    private static readonly char[] s_invalidFileNameCharsExtra = new[] { '?', '\'', '"' };
+    private static readonly char[] s_invalidFileNameCharsExtra = { '?', '\'', '"', '*' };
+    private static readonly string s_invalidFileNameCharsWindows = "\u0022\u003C\u003E|\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b\t\n\u000B\f\r\u000E\u000F\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001A\u001B\u001C\u001D\u001E\u001F:*?\\/";
 
     private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
     private readonly ILogger<PostToMemeRepository> _logger;
@@ -65,6 +66,12 @@ internal partial class PostToMemeRepository : IMessageCommand
             return;
         }
         int invalidIndex = fileName.IndexOfAny(s_invalidFileNameCharsExtra);
+        if (invalidIndex != -1)
+        {
+            await api.SendMessageAsync(context.Endpoint, $"命令格式错误，标签中含有不可用字符“{fileName[invalidIndex]}”。");
+            return;
+        }
+        invalidIndex = fileName.AsSpan().IndexOfAny(s_invalidFileNameCharsWindows);
         if (invalidIndex != -1)
         {
             await api.SendMessageAsync(context.Endpoint, $"命令格式错误，标签中含有不可用字符“{fileName[invalidIndex]}”。");
