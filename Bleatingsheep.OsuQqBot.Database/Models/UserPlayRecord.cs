@@ -1,11 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Bleatingsheep.Osu.ApiClient;
+using Microsoft.EntityFrameworkCore;
 using Mode = Bleatingsheep.Osu.Mode;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models
 {
+    [Index(nameof(UserId), nameof(Mode), nameof(PlayNumber))]
     public class UserPlayRecord
     {
+        public long Id { get; set; }
         public int UserId { get; set; }
         public int PlayNumber { get; set; }
         public Mode Mode { get; set; }
