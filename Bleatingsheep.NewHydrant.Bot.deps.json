@@ -13,7 +13,7 @@
           "Bleatingsheep.NewHydrant.Bot.Public": "1.0.0",
           "Microsoft.Extensions.Configuration.Json": "7.0.0",
           "Microsoft.Extensions.Hosting": "7.0.1",
-          "NLog.Extensions.Logging": "5.3.0",
+          "NLog.Extensions.Logging": "5.3.3",
           "Sisters.WudiLib": "0.4.2-alpha2",
           "Sisters.WudiLib.WebSocket": "0.2.1"
         },
@@ -92,11 +92,11 @@
           }
         }
       },
-      "HtmlAgilityPack/1.11.48": {
+      "HtmlAgilityPack/1.11.51": {
         "runtime": {
           "lib/netstandard2.0/HtmlAgilityPack.dll": {
-            "assemblyVersion": "1.11.48.0",
-            "fileVersion": "1.11.48.0"
+            "assemblyVersion": "1.11.51.0",
+            "fileVersion": "1.11.51.0"
           }
         }
       },
@@ -849,24 +849,24 @@
           }
         }
       },
-      "NLog/5.2.0": {
+      "NLog/5.2.3": {
         "runtime": {
           "lib/netstandard2.0/NLog.dll": {
             "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.2.0.1813"
+            "fileVersion": "5.2.3.1999"
           }
         }
       },
-      "NLog.Extensions.Logging/5.3.0": {
+      "NLog.Extensions.Logging/5.3.3": {
         "dependencies": {
           "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
           "Microsoft.Extensions.Logging": "7.0.0",
-          "NLog": "5.2.0"
+          "NLog": "5.2.3"
         },
         "runtime": {
           "lib/net6.0/NLog.Extensions.Logging.dll": {
             "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.3.0.360"
+            "fileVersion": "5.3.3.381"
           }
         }
       },
@@ -895,11 +895,11 @@
           }
         }
       },
-      "Octokit/6.1.0": {
+      "Octokit/7.1.0": {
         "runtime": {
           "lib/netstandard2.0/Octokit.dll": {
-            "assemblyVersion": "6.1.0.0",
-            "fileVersion": "6.1.0.0"
+            "assemblyVersion": "7.1.0.0",
+            "fileVersion": "7.1.0.0"
           }
         }
       },
@@ -911,7 +911,7 @@
           }
         }
       },
-      "PuppeteerSharp/10.1.0": {
+      "PuppeteerSharp/10.1.2": {
         "dependencies": {
           "Microsoft.AspNetCore.WebUtilities": "2.2.0",
           "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
@@ -921,8 +921,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/PuppeteerSharp.dll": {
-            "assemblyVersion": "10.1.0.0",
-            "fileVersion": "10.1.0.0"
+            "assemblyVersion": "10.1.2.0",
+            "fileVersion": "10.1.2.0"
           }
         }
       },
@@ -2044,7 +2044,7 @@
           "Microsoft.Extensions.Caching.Memory": "7.0.0",
           "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
           "Microsoft.Extensions.DependencyInjection": "7.0.0",
-          "NLog": "5.2.0",
+          "NLog": "5.2.3",
           "Sisters.WudiLib": "0.4.2-alpha2"
         },
         "runtime": {
@@ -2057,7 +2057,7 @@
           "Bleatingsheep.NewHydrant.Data": "1.0.0",
           "Bleatingsheep.Osu.ApiClient": "0.6.21",
           "Bleatingsheep.OsuMixedApi": "1.0.0",
-          "PuppeteerSharp": "10.1.0"
+          "PuppeteerSharp": "10.1.2"
         },
         "runtime": {
           "Bleatingsheep.NewHydrant.Bot.Common.dll": {}
@@ -2070,7 +2070,7 @@
           "Bleatingsheep.Osu.ApiClient": "0.6.21",
           "Bleatingsheep.Osu.Helper": "1.0.0",
           "CsvHelper": "30.0.1",
-          "Octokit": "6.1.0",
+          "Octokit": "7.1.0",
           "SixLabors.ImageSharp": "3.0.1",
           "System.Linq.Async": "6.0.1",
           "System.ServiceModel.Syndication": "7.0.0"
@@ -2086,7 +2086,7 @@
           "Bleatingsheep.NewHydrant.Bot.Common": "1.0.0",
           "Bleatingsheep.Osu.ApiClient": "0.6.21",
           "Bleatingsheep.SimpleBooru": "0.3.0",
-          "HtmlAgilityPack": "1.11.48",
+          "HtmlAgilityPack": "1.11.51",
           "System.Linq.Async": "6.0.1",
           "System.ServiceModel.Syndication": "7.0.0",
           "WebApiClient.AOT": "1.1.4"
@@ -2183,12 +2183,12 @@
       "path": "csvhelper/30.0.1",
       "hashPath": "csvhelper.30.0.1.nupkg.sha512"
     },
-    "HtmlAgilityPack/1.11.48": {
+    "HtmlAgilityPack/1.11.51": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-BTYfqMoTtnlUz5hqJZ3qxh/SDWMtJAulcz2vIr2TRj5BhfdJZD1E1HSpNI9rvIQiYJzl2xoVtCNzCcANjzbScQ==",
-      "path": "htmlagilitypack/1.11.48",
-      "hashPath": "htmlagilitypack.1.11.48.nupkg.sha512"
+      "sha512": "sha512-yRn0Vd6Smu69xGyRWIZVl/Ley2OMMCMwC9tZRR/GdXfxGYj1sGMT4KskWd8OP9dGlqaXPkyB0NzBHKejtZdbow==",
+      "path": "htmlagilitypack/1.11.51",
+      "hashPath": "htmlagilitypack.1.11.51.nupkg.sha512"
     },
     "Libuv/1.9.1": {
       "type": "package",
@@ -2575,19 +2575,19 @@
       "path": "newtonsoft.json/13.0.3",
       "hashPath": "newtonsoft.json.13.0.3.nupkg.sha512"
     },
-    "NLog/5.2.0": {
+    "NLog/5.2.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-uYBgseY0m/9lQUbZYGsQsTBFOWrfs3iaekzzYMH6vFmpoOAvV8/bp1XxG/suZkwB5h8nAiTJAp7VENWRDKtKPA==",
-      "path": "nlog/5.2.0",
-      "hashPath": "nlog.5.2.0.nupkg.sha512"
+      "sha512": "sha512-rHTNRtQF5qYqLutSR9ldUWXglKym/KA1R6GKw4JtDvza8i5+kgfmeKH75Ccn1noeJIOjHLXorphMxKk3EiN2tg==",
+      "path": "nlog/5.2.3",
+      "hashPath": "nlog.5.2.3.nupkg.sha512"
     },
-    "NLog.Extensions.Logging/5.3.0": {
+    "NLog.Extensions.Logging/5.3.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-OocvBR+MqVMGWaBcGdvg2O/ZZOXyDzEtJHXc9ZbXawxspkQzTugsjngGH4EJ0mIUNw2wqJGKdsoSzc2A0b01dg==",
-      "path": "nlog.extensions.logging/5.3.0",
-      "hashPath": "nlog.extensions.logging.5.3.0.nupkg.sha512"
+      "sha512": "sha512-o3V1oUr0izjhU1djuVqN5JdmNUGmunTs3Amjhumt/nxva8kG9QWjOdba+ciwkP//QOjv+KkGklZtI9o4qz50hQ==",
+      "path": "nlog.extensions.logging/5.3.3",
+      "hashPath": "nlog.extensions.logging.5.3.3.nupkg.sha512"
     },
     "Npgsql/7.0.4": {
       "type": "package",
@@ -2603,12 +2603,12 @@
       "path": "npgsql.entityframeworkcore.postgresql/7.0.4",
       "hashPath": "npgsql.entityframeworkcore.postgresql.7.0.4.nupkg.sha512"
     },
-    "Octokit/6.1.0": {
+    "Octokit/7.1.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ZGXknnmO+PaKkw9BU/ysSjuDnvIFpzQjIdUQy62k7nllmqh3sxkkU8XHgfThav3UuPKW7sEMsVJqRWYfYU3dUw==",
-      "path": "octokit/6.1.0",
-      "hashPath": "octokit.6.1.0.nupkg.sha512"
+      "sha512": "sha512-v2qhKBe1Zlssa4XOmpOXNDFBrOAMw2tBmr8L8YMSrEi+PlF/L/PboZcXHSkZuhIxIeOGxEFiwkuJLkvG4aHNHQ==",
+      "path": "octokit/7.1.0",
+      "hashPath": "octokit.7.1.0.nupkg.sha512"
     },
     "Polly/7.2.4": {
       "type": "package",
@@ -2617,12 +2617,12 @@
       "path": "polly/7.2.4",
       "hashPath": "polly.7.2.4.nupkg.sha512"
     },
-    "PuppeteerSharp/10.1.0": {
+    "PuppeteerSharp/10.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-6CN7AhihyC1YD5ibQ8R+92vmDYvk1toG5Llbgy+awdwWZCVIp6ppIoRPHzYznogyoFPxD/GHpUH2cgO/7x6jmg==",
-      "path": "puppeteersharp/10.1.0",
-      "hashPath": "puppeteersharp.10.1.0.nupkg.sha512"
+      "sha512": "sha512-GMPNlLAo/ySPR23QWtCgx2BSbnVOZf8KLrwrQ35MCL6jHclpGAVqb8I7f601W0zb+6TYJX85KdpQsYvRYjn0JA==",
+      "path": "puppeteersharp/10.1.2",
+      "hashPath": "puppeteersharp.10.1.2.nupkg.sha512"
     },
     "runtime.native.System/4.0.0": {
       "type": "package",
