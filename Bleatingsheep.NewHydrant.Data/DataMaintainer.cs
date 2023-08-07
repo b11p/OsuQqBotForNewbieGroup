@@ -93,13 +93,15 @@ namespace Bleatingsheep.NewHydrant.Data
                 var nowMinus2Day = DateTimeOffset.UtcNow.AddDays(-2);
                 // 获取已有的游玩记录，按时间倒序
                 var existingRecords = await dbContext.UserPlayRecords
-                    .Where(r => r.UserId == osuId && r.Mode == mode && r.Record.Date >= nowMinus2Day)
+                    .Where(r => r.UserId == osuId && r.Mode == mode)
                     .OrderByDescending(r => r.Record.Date)
                     .Take(userRecent.Length + 1)
                     .ToListAsync();
 
                 // 获取当前最大游玩编号
-                var existingMaxPlayNumber = existingRecords.Max(r => r.PlayNumber);
+                var existingMaxPlayNumber = existingRecords.Count > 0
+                    ? existingRecords.Max(r => r.PlayNumber)
+                    : 0;
                 if (existingMaxPlayNumber > userInfo1.PlayCount)
                 {
                     // 这种情况可能是号数据被重置等，比较少见
