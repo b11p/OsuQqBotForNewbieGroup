@@ -7,6 +7,7 @@ using Bleatingsheep.Osu;
 using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Bleatingsheep.NewHydrant.Data
 {
@@ -14,11 +15,13 @@ namespace Bleatingsheep.NewHydrant.Data
     {
         private readonly IDbContextFactory<NewbieContext> _contextFactory;
         private readonly IOsuApiClient _osuApiClient;
+        private readonly ILogger<DataMaintainer> _logger;
 
-        public DataMaintainer(IDbContextFactory<NewbieContext> contextFactory, IOsuApiClient osuApiClient)
+        public DataMaintainer(IDbContextFactory<NewbieContext> contextFactory, IOsuApiClient osuApiClient, ILogger<DataMaintainer> logger)
         {
             _contextFactory = contextFactory;
             _osuApiClient = osuApiClient;
+            _logger = logger;
         }
 
         public async Task UpdateAsync(int osuId, Mode mode)
@@ -75,40 +78,67 @@ namespace Bleatingsheep.NewHydrant.Data
                 await dbContext.SaveChangesAsync().ConfigureAwait(false);
             }
 
-            var userRecent = await osuApi.GetUserRecent(osuId, mode, 50).ConfigureAwait(false);
+            var userRecent = await osuApi.GetUserRecent(osuId, mode, 100).ConfigureAwait(false);
             if (userRecent is null || userRecent.Length == 0)
             {// The user didn't play, no need to check play number.
                 return;
             }
+            // 确保按日期升序排列
+            Array.Sort(userRecent, (a, b) => a.Date.CompareTo(b.Date));
 
             // Confirm play number.
             var userInfo2 = await osuApi.GetUser(osuId, mode).ConfigureAwait(false);
             if (userInfo2?.PlayCount == userInfo1.PlayCount)
             {
-                var records = userRecent.OrderByDescending(r => r.Date)
-                    .Zip(CreateDescendingSequence(userInfo1.PlayCount),
-                         (r, n) => UserPlayRecord.Create(osuId, mode, n, r))
-                    .ToList();
+                var nowMinus2Day = DateTimeOffset.UtcNow.AddDays(-2);
+                // 获取已有的游玩记录，按时间倒序
+                var existingRecords = await dbContext.UserPlayRecords
+                    .Where(r => r.UserId == osuId && r.Mode == mode && r.Record.Date >= nowMinus2Day)
+                    .OrderByDescending(r => r.Record.Date)
+                    .Take(userRecent.Length + 1)
+                    .ToListAsync();
 
-                var currentMinPlayNumber = records.Last().PlayNumber;
-
-                var strategy = dbContext.Database.CreateExecutionStrategy();
-                await strategy.ExecuteAsync(async () =>
+                // 获取当前最大游玩编号
+                var existingMaxPlayNumber = existingRecords.Max(r => r.PlayNumber);
+                if (existingMaxPlayNumber > userInfo1.PlayCount)
                 {
-                    // Filter existing data.
-                    var existed = await dbContext.UserPlayRecords
-                        .Where(r => r.UserId == osuId && r.Mode == mode && r.PlayNumber >= currentMinPlayNumber)
-                        .Select(r => r.PlayNumber)
-                        .ToListAsync().ConfigureAwait(false);
-                    var inserting = records.Where(r => !existed.Contains(r.PlayNumber)).ToList();
+                    // 这种情况可能是号数据被重置等，比较少见
+                    _logger.LogInformation("API返回的游玩次数少于记录中的最大 PlayNumber，Uid {uid}, Mode {mode}", osuId, mode);
+                    existingMaxPlayNumber = existingRecords.Where(r => r.PlayNumber <= userInfo1.PlayCount).Max(r => r.PlayNumber);
+                }
 
-                    // Insert data.
-                    if (inserting.Count > 0)
-                    {
-                        await dbContext.UserPlayRecords.AddRangeAsync(inserting).ConfigureAwait(false);
-                        await dbContext.SaveChangesAsync().ConfigureAwait(false);
-                    }
-                }).ConfigureAwait(false);
+                ArraySegment<UserRecent> recentToAdd = userRecent.Where(r => !existingRecords.Any(e => PropertyEquals(r, e.Record))).ToArray();
+                if (recentToAdd.Count == 0)
+                {
+                    // 全部已添加，什么也不做。
+                    return;
+                }
+
+                var toAdd = new List<UserPlayRecord>();
+                // 判断新获取的是否比之前的都更新
+                if (existingRecords.Count != 0 && recentToAdd[0].Date <= existingRecords[0].Record.Date)
+                {
+                    _logger.LogWarning("API返回的数据有早于数据库记录的信息，Uid {uid}, Mode {mode}", osuId, mode);
+                    int newerStartIndex = 0;
+                    for (; recentToAdd[newerStartIndex].Date <= existingRecords[0].Record.Date; newerStartIndex++)
+                    { }
+                    toAdd.AddRange(recentToAdd[..newerStartIndex].Select(r => UserPlayRecord.Create(osuId, mode, default, r)));
+                    recentToAdd = recentToAdd[newerStartIndex..];
+                }
+                // 取最多这么多个，按号添加
+                var sequentialToAdd = recentToAdd.Count <= userInfo1.PlayCount - existingMaxPlayNumber
+                    ? recentToAdd
+                    : recentToAdd[..(userInfo1.PlayCount - existingMaxPlayNumber)];
+                toAdd.AddRange(sequentialToAdd.Zip(CreateDescendingSequence(userInfo1.PlayCount),
+                             (r, n) => UserPlayRecord.Create(osuId, mode, n, r)));
+                if (sequentialToAdd.Count < recentToAdd.Count)
+                {
+                    _logger.LogInformation("API 返回的游玩记录数量超过游玩次数增量，Uid {uid}, Mode {mode}", osuId, mode);
+                    // API 返回的数量超过游玩次数增量。
+                    var extraToAdd = recentToAdd[(userInfo1.PlayCount - existingMaxPlayNumber)..];
+                    toAdd.AddRange(extraToAdd.Select(r => UserPlayRecord.Create(osuId, mode, userInfo1.PlayCount, r)));
+                }
+                await dbContext.SaveChangesAsync();
             }
             else
             {
