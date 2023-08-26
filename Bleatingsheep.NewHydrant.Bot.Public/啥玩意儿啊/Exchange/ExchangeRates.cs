@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
+using Microsoft.Extensions.Caching.Memory;
 using Sisters.WudiLib;
-using Sisters.WudiLib.Posts;
 using WebApiClient;
 using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
@@ -36,7 +35,26 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
             "USD",
         }.AsReadOnly();
 
+        private readonly IMemoryCache _cache;
         private string _text;
+
+        public ExchangeRates(IMemoryCache cache)
+        {
+            _cache = cache;
+        }
+
+        private record struct ExchangeCacheKey(string Base)
+        {
+            private readonly string _name = nameof(ExchangeCacheKey); // 改变 hash 值，减少碰撞
+        }
+        private static async ValueTask<ExchangeResponse> GetExchangeRatesWithCache(string @base, IExchangeRate exchangeRate, IMemoryCache memoryCache)
+        {
+            return await memoryCache.GetOrCreateAsync(new ExchangeCacheKey(@base), async e =>
+            {
+                e.AbsoluteExpirationRelativeToNow = new TimeSpan(1, 0, 0);
+                return await exchangeRate.GetExchangeRates(@base);
+            });
+        }
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
@@ -57,6 +75,8 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
             {
                 return;
             }
+            // convert to upper case
+            @base = @base.ToUpperInvariant();
 
             if (!decimal.TryParse(amountString, out decimal amount))
             {
@@ -70,7 +90,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                 checked
                 {
                     // cmbc
-                    var masterCardTask = string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase) || string.Equals("CNY", @base, StringComparison.OrdinalIgnoreCase)
+                    var masterCardTask = string.Equals("USD", @base, StringComparison.Ordinal) || string.Equals("CNY", @base, StringComparison.Ordinal)
                         ? Task.FromResult<MasterCardRate>(default)
                         : HttpApi.Resolve<IMasterCardRate>().GetRateToUsd(@base);
                     var cmbcTask = HttpApi.Resolve<ICmbcCreditRate>().GetRates();
@@ -83,7 +103,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     // boc
                     //var bocTask = BocRateClient.GetExchangeSellingRateAsync(@base);
 
-                    var response = await exRateApi.GetExchangeRates(@base).ConfigureAwait(false);
+                    var response = await GetExchangeRatesWithCache(@base, exRateApi, _cache);
                     var results = new List<string>(3);
                     foreach (var currency in s_currencies)
                     {
