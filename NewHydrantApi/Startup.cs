@@ -76,7 +76,7 @@ namespace NewHydrantApi
                     options.KnownNetworks.Add(new IPNetwork(ip, 64));
                 }
 
-                options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("127.16.0.0"), 12)); // dockerr internal
+                options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("172.16.0.0"), 12)); // dockerr internal
                 options.ForwardLimit = 1;
                 options.ForwardedHeaders = ForwardedHeaders.All;
             });
