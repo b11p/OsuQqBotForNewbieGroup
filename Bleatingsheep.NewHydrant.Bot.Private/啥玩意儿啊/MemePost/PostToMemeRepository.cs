@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Octokit;
+using Polly;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using SixLabors.ImageSharp;
@@ -98,29 +99,7 @@ internal partial class PostToMemeRepository : IMessageCommand
         _logger.LogInformation("Run command /post {fileName}, to group {groupId}", fileName, info.GroupId);
 
         // 获取图片
-        if (!g.Content.Sections[0].Data.TryGetValue("id", out var strMessageId) || !int.TryParse(strMessageId, out int messageId))
-        {
-            _logger.LogError("获取消息 ID 失败，引用消息 ID {MessageId}.", g.MessageId);
-            await api.SendMessageAsync(context.Endpoint, "获取消息 ID 失败，可能需要重新发送图片。");
-            return;
-        }
-        var messageResponse = await api.GetMessage(messageId);
-        if (messageResponse?.Message is not ReceivedMessage message)
-        {
-            _logger.LogError("获取消息失败，消息 ID：{messageId}", messageId);
-            await api.SendMessageAsync(context.Endpoint, "获取消息内容失败，可能需要重新发送图片。");
-            return;
-        }
-        if (message.Sections is not [{ Type: "image" } s])
-        {
-            await api.SendMessageAsync(context.Endpoint, "引用的消息不是单张图片，请重新选择。");
-            return;
-        }
-        if (!s.Data.TryGetValue("url", out var url))
-        {
-            await api.SendMessageAsync(context.Endpoint, "获取图片 URL 失败。");
-            return;
-        }
+        var url = await CitedImageUrlUtility.GetCitedImageUrlAsync(context, api, _logger);
         string? ext;
         try
         {
