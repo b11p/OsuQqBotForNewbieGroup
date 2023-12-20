@@ -52,11 +52,17 @@ namespace Bleatingsheep.NewHydrant.Data
             }
         }
 
-        public async Task UpdateNowAsync(int osuId, Mode mode)
+        public async Task<UpdateReport> UpdateNowAsync(int osuId, Mode mode)
         {
             // 开始通过 API 获取用户信息和最近游玩记录。
             var osuApi = _osuApiClient;
             var getUserTask = osuApi.GetUser(osuId, mode);
+
+            var report = new UpdateReport
+            {
+                UserRecents = Array.Empty<UserRecent>(),
+                AddedPlayRecords = Array.Empty<UserPlayRecord>(),
+            };
 
             // Create database context instance.
             using var dbContext = _contextFactory.CreateDbContext();
@@ -69,20 +75,31 @@ namespace Bleatingsheep.NewHydrant.Data
 
             // Save snapshot to database.
             var userInfo1 = await getUserTask.ConfigureAwait(false);
-            if (userInfo1 is null) return;
-            if (userInfo1.PlayCount == snap?.PlayCount && userInfo1.Performance == 0) return; // Inactive player.
+            if (userInfo1 is null)
+            {
+                report.UserNotExists = true;
+                return report;
+            }
+            if (userInfo1.PlayCount == snap?.PlayCount && userInfo1.Performance == 0)
+            {
+                // Inactive player.
+                report.Inactive = true;
+                return report;
+            }
             userInfo1.Events = null; // Set to null to help compare.
             if (!PropertyEquals(userInfo1, snap))
             {
                 await dbContext.UserSnapshots.AddAsync(UserSnapshot.Create(osuId, mode, userInfo1)).ConfigureAwait(false);
                 await dbContext.SaveChangesAsync().ConfigureAwait(false);
+                report.AddedSnapshot = true;
             }
 
             var userRecent = await osuApi.GetUserRecent(osuId, mode, 100).ConfigureAwait(false);
             if (userRecent is null || userRecent.Length == 0)
             {// The user didn't play, no need to check play number.
-                return;
+                return report;
             }
+            report.UserRecents = userRecent;
             // 确保按日期升序排列
             Array.Sort(userRecent, (a, b) => a.Date.CompareTo(b.Date));
 
@@ -113,7 +130,7 @@ namespace Bleatingsheep.NewHydrant.Data
                 if (recentToAdd.Count == 0)
                 {
                     // 全部已添加，什么也不做。
-                    return;
+                    return report;
                 }
 
                 var toAdd = new List<UserPlayRecord>();
@@ -127,7 +144,13 @@ namespace Bleatingsheep.NewHydrant.Data
                     toAdd.AddRange(recentToAdd[..newerStartIndex].Select(r => UserPlayRecord.Create(osuId, mode, default, r)));
                     recentToAdd = recentToAdd[newerStartIndex..];
                 }
-                // 取最多这么多个，按号添加
+
+                if (recentToAdd.Count >= 90)
+                    _logger.LogInformation("用户{osuId}在模式{mode}的游玩数量超过阈值，请注意漏数据风险。游玩数量为{recentToAdd_Count}", osuId, mode, recentToAdd.Count);
+                if (recentToAdd.Count >= 100)
+                    _logger.LogWarning("用户{osuId}在模式{mode}的游玩数量超过阈值，请注意漏数据风险。游玩数量为{recentToAdd_Count}", osuId, mode, recentToAdd.Count);
+
+                // 根据最新的玩家 PC 数和数据库中已有的最大 PC 数计算新的游玩记录数量，按号添加
                 var sequentialToAdd = recentToAdd.Count <= userInfo1.PlayCount - existingMaxPlayNumber
                     ? recentToAdd
                     : recentToAdd[..(userInfo1.PlayCount - existingMaxPlayNumber)];
@@ -140,13 +163,16 @@ namespace Bleatingsheep.NewHydrant.Data
                     var extraToAdd = recentToAdd[(userInfo1.PlayCount - existingMaxPlayNumber)..];
                     toAdd.AddRange(extraToAdd.Select(r => UserPlayRecord.Create(osuId, mode, userInfo1.PlayCount, r)));
                 }
+                dbContext.UserPlayRecords.AddRange(toAdd);
                 await dbContext.SaveChangesAsync();
+                report.AddedPlayRecords = toAdd;
             }
             else
             {
-                //Logger.Info($"Concurrent error! Get different play_count in two queries. ({userInfo1.PlayCount}, {userInfo2?.PlayCount})");
-                //Logger.Info($"The user is {userInfo1.Name}({userInfo1.Id}); the mode is {mode}");
+                _logger.LogWarning("Concurrent error! Get different play_count in two queries. ({userInfo1_PlayCount}, {userInfo2_PlayCount})", userInfo1.PlayCount, userInfo2?.PlayCount);
+                _logger.LogWarning("The user is {userInfo1.Name}({userInfo1.Id}); the mode is {mode}", userInfo1.Name, userInfo1.Id, mode);
             }
+            return report;
         }
 
         /// <summary>
@@ -161,6 +187,15 @@ namespace Bleatingsheep.NewHydrant.Data
             {
                 yield return start;
             }
+        }
+
+        public struct UpdateReport
+        {
+            public bool AddedSnapshot { get; set; }
+            public bool UserNotExists { get; set; }
+            public bool Inactive { get; set; }
+            public required UserRecent[] UserRecents { get; set; }
+            public required IList<UserPlayRecord> AddedPlayRecords { get; set; }
         }
 
         private static bool PropertyEquals<T>(T left, T right) => PropertyEquals(left, right, typeof(T));

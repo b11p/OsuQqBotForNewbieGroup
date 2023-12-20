@@ -5,6 +5,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Bleatingsheep.NewHydrant.DataMaintenance;
 public class UpdateSnapshotsService : BackgroundService
 {
+    private static readonly TimeSpan s_updateScheduleDefault = TimeSpan.FromHours(4);
+    private static readonly TimeSpan s_updateScheduleActive = TimeSpan.FromHours(2); // when active within the interval
+    private static readonly TimeSpan s_updateScheduleSemiActive = TimeSpan.FromHours(2); // when API returns some recent play
+    private static readonly TimeSpan s_updateScheduleInactive = TimeSpan.FromDays(2); // when banned or inactive
+    private static readonly TimeSpan s_updateScheduleNotAdded = TimeSpan.FromHours(2); // when not added snapshots (due to API failure etc.)
+
     private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
     private readonly DataMaintainer _dataMaintainer;
     private readonly ILogger<UpdateSnapshotsService> _logger;
@@ -34,12 +40,43 @@ public class UpdateSnapshotsService : BackgroundService
                     continue;
                 _logger.LogDebug("Updating {toUpdate.Count} of {scheduledCount} snapshots.", toUpdate.Count, scheduledCount);
                 int successCount = 0;
+                int normalCount = 0;
+                int activeCount = 0;
+                int semiActiveCount = 0;
+                int inactiveCount = 0;
+                int apiFailureCount = 0;
                 foreach (var schedule in toUpdate)
                 {
                     try
                     {
-                        await _dataMaintainer.UpdateNowAsync(schedule.UserId, schedule.Mode);
-                        schedule.NextUpdate = DateTimeOffset.UtcNow + TimeSpan.FromHours(6);
+                        var report = await _dataMaintainer.UpdateNowAsync(schedule.UserId, schedule.Mode);
+                        TimeSpan nextDelay;
+                        if (report.UserNotExists || report.Inactive)
+                        {
+                            nextDelay = s_updateScheduleInactive;
+                            inactiveCount++;
+                        }
+                        else if (!report.AddedSnapshot)
+                        {
+                            nextDelay = s_updateScheduleNotAdded;
+                            apiFailureCount++;
+                        }
+                        else if (report.AddedPlayRecords.Count > 0)
+                        {
+                            nextDelay = s_updateScheduleActive;
+                            activeCount++;
+                        }
+                        else if (report.UserRecents.Length > 0)
+                        {
+                            nextDelay = s_updateScheduleSemiActive;
+                            semiActiveCount++;
+                        }
+                        else
+                        {
+                            nextDelay = s_updateScheduleDefault;
+                            normalCount++;
+                        }
+                        schedule.NextUpdate = DateTimeOffset.UtcNow + nextDelay;
                         successCount++;
                     }
                     catch (Exception e)
@@ -56,7 +93,8 @@ public class UpdateSnapshotsService : BackgroundService
                     }
                 }
                 await db.SaveChangesAsync(stoppingToken).ConfigureAwait(false);
-                _logger.LogDebug("Update schedule completed. Success {successCount} of {toUpdate.Count}", successCount, toUpdate.Count);
+                _logger.LogDebug("Update schedule completed. Success {successCount} of {toUpdate.Count}.", successCount, toUpdate.Count);
+                _logger.LogDebug("Normal: {normalCount}, Active: {activeCount}, SemiActive: {semiActiveCount}, inactive: {inactiveCount}, API failure: {apiFailureCount}", normalCount, activeCount, semiActiveCount, inactiveCount, apiFailureCount);
             }
             catch (Exception e)
             {
