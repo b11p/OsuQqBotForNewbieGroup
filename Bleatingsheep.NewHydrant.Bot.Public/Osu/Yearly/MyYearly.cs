@@ -73,7 +73,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 .FirstOrDefaultAsync().ConfigureAwait(false);
             if (snap is null)
             {
-                _ = await api.SendMessageAsync(context.Endpoint, "没有找到数据").ConfigureAwait(false);
+                _ = await api.SendMessageAsync(context.Endpoint, "没有找到快照数据。*请注意，由于一项 bug，未收集部分用户的数据，对此非常抱歉，欢迎明年再查xd*").ConfigureAwait(false);
                 return;
             }
 
@@ -105,7 +105,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
 
             if (playList.Count == 0)
             {
-                await api.SendMessageAsync(context.Endpoint, "你在过去一年没有玩儿过 osu!，或无数据记录。").ConfigureAwait(false);
+                await api.SendMessageAsync(context.Endpoint, "你在过去一年没有玩儿过 osu!，或无游玩数据记录。*请注意，由于一项 bug，未收集部分用户的数据，对此非常抱歉，欢迎明年再查xd*").ConfigureAwait(false);
                 return;
             }
 
