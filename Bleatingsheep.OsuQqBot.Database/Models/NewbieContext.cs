@@ -76,8 +76,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
             modelBuilder.Entity<BeatmapPlus>().Property(bp => bp.Id).ValueGeneratedNever();
 
-            modelBuilder.Entity<UserPlayRecord>().HasKey(r => new { r.UserId, r.Mode, r.PlayNumber });
             modelBuilder.Entity<UserPlayRecord>().OwnsOne(r => r.Record);
+            //modelBuilder.Entity<UserPlayRecord>().HasIndex(nameof(UserPlayRecord.UserId), nameof(UserPlayRecord.Mode), nameof(UserPlayRecord.Record) + "_" + nameof(UserRecent.Date));
 
             modelBuilder.Entity<UserSnapshot>().OwnsOne(r => r.UserInfo);
             modelBuilder.Entity<UserSnapshot>().HasIndex(r => new { r.UserId, r.Mode, r.Date });
