@@ -39,7 +39,7 @@ public sealed class SyncScheduleService : BackgroundService
             .Select(s => new { s.UserId, s.Mode })
             .ToListAsync()
             .ConfigureAwait(false);
-        var toSchedule = snapshotted.Intersect(binded).Except(scheduled).Select(i => new UpdateSchedule
+        var toSchedule = snapshotted.Union(binded).Except(scheduled).Select(i => new UpdateSchedule
         {
             UserId = i.UserId,
             Mode = i.Mode,
