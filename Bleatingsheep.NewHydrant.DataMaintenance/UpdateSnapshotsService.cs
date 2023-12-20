@@ -9,7 +9,7 @@ public class UpdateSnapshotsService : BackgroundService
     private static readonly TimeSpan s_updateScheduleActive = TimeSpan.FromHours(2); // when active within the interval
     private static readonly TimeSpan s_updateScheduleSemiActive = TimeSpan.FromHours(2); // when API returns some recent play
     private static readonly TimeSpan s_updateScheduleInactive = TimeSpan.FromDays(2); // when banned or inactive
-    private static readonly TimeSpan s_updateScheduleNotAdded = TimeSpan.FromHours(2); // when not added snapshots (due to API failure etc.)
+    private static readonly TimeSpan s_updateScheduleNotAdded = TimeSpan.FromHours(4); // when not added snapshots (due to completely same profile with most recent snapshot)
 
     private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
     private readonly DataMaintainer _dataMaintainer;
@@ -44,7 +44,7 @@ public class UpdateSnapshotsService : BackgroundService
                 int activeCount = 0;
                 int semiActiveCount = 0;
                 int inactiveCount = 0;
-                int apiFailureCount = 0;
+                int noChangeCount = 0;
                 foreach (var schedule in toUpdate)
                 {
                     try
@@ -56,11 +56,6 @@ public class UpdateSnapshotsService : BackgroundService
                             nextDelay = s_updateScheduleInactive;
                             inactiveCount++;
                         }
-                        else if (!report.AddedSnapshot)
-                        {
-                            nextDelay = s_updateScheduleNotAdded;
-                            apiFailureCount++;
-                        }
                         else if (report.AddedPlayRecords.Count > 0)
                         {
                             nextDelay = s_updateScheduleActive;
@@ -70,6 +65,11 @@ public class UpdateSnapshotsService : BackgroundService
                         {
                             nextDelay = s_updateScheduleSemiActive;
                             semiActiveCount++;
+                        }
+                        else if (!report.AddedSnapshot)
+                        {
+                            nextDelay = s_updateScheduleNotAdded;
+                            noChangeCount++;
                         }
                         else
                         {
@@ -94,7 +94,7 @@ public class UpdateSnapshotsService : BackgroundService
                 }
                 await db.SaveChangesAsync(stoppingToken).ConfigureAwait(false);
                 _logger.LogDebug("Update schedule completed. Success {successCount} of {toUpdate.Count}.", successCount, toUpdate.Count);
-                _logger.LogDebug("Normal: {normalCount}, Active: {activeCount}, SemiActive: {semiActiveCount}, inactive: {inactiveCount}, API failure: {apiFailureCount}", normalCount, activeCount, semiActiveCount, inactiveCount, apiFailureCount);
+                _logger.LogDebug("Normal: {normalCount}, Active: {activeCount}, SemiActive: {semiActiveCount}, inactive: {inactiveCount}, API failure: {noChangeCount}", normalCount, activeCount, semiActiveCount, inactiveCount, noChangeCount);
             }
             catch (Exception e)
             {
