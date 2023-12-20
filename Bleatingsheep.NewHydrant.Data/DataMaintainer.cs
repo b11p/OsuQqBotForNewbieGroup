@@ -141,7 +141,7 @@ namespace Bleatingsheep.NewHydrant.Data
                     int newerStartIndex = 0;
                     for (; recentToAdd[newerStartIndex].Date <= existingRecords[0].Record.Date; newerStartIndex++)
                     { }
-                    toAdd.AddRange(recentToAdd[..newerStartIndex].Select(r => UserPlayRecord.Create(osuId, mode, default, r)));
+                    toAdd.AddRange(recentToAdd[..newerStartIndex].Select(r => UserPlayRecord.Create(osuId, mode, existingMaxPlayNumber, r)));
                     recentToAdd = recentToAdd[newerStartIndex..];
                 }
 
@@ -154,7 +154,7 @@ namespace Bleatingsheep.NewHydrant.Data
                 var sequentialToAdd = recentToAdd.Count <= userInfo1.PlayCount - existingMaxPlayNumber
                     ? recentToAdd
                     : recentToAdd[..(userInfo1.PlayCount - existingMaxPlayNumber)];
-                toAdd.AddRange(sequentialToAdd.Zip(CreateDescendingSequence(userInfo1.PlayCount),
+                toAdd.AddRange(sequentialToAdd.Reverse().Zip(CreateDescendingSequence(userInfo1.PlayCount),
                              (r, n) => UserPlayRecord.Create(osuId, mode, n, r)));
                 if (sequentialToAdd.Count < recentToAdd.Count)
                 {

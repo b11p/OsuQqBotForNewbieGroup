@@ -100,7 +100,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             int currentPC = userInfo.PlayCount;
             List<UserPlayRecord> playList = await _newbieContext.UserPlayRecords
                 .Where(r => r.UserId == osuId && r.Mode == _mode && r.PlayNumber > startPC)
-                .OrderBy(r => r.PlayNumber)
+                .OrderBy(r => r.Record.Date)
                 .ToListAsync().ConfigureAwait(false);
 
             if (playList.Count == 0)

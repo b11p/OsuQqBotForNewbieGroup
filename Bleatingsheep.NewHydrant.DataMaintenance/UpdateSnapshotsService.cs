@@ -94,7 +94,7 @@ public class UpdateSnapshotsService : BackgroundService
                 }
                 await db.SaveChangesAsync(stoppingToken).ConfigureAwait(false);
                 _logger.LogDebug("Update schedule completed. Success {successCount} of {toUpdate.Count}.", successCount, toUpdate.Count);
-                _logger.LogDebug("Normal: {normalCount}, Active: {activeCount}, SemiActive: {semiActiveCount}, inactive: {inactiveCount}, API failure: {noChangeCount}", normalCount, activeCount, semiActiveCount, inactiveCount, noChangeCount);
+                _logger.LogDebug("Normal: {normalCount}, Active: {activeCount}, SemiActive: {semiActiveCount}, Inactive: {inactiveCount}, No Change: {noChangeCount}", normalCount, activeCount, semiActiveCount, inactiveCount, noChangeCount);
             }
             catch (Exception e)
             {
