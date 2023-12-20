@@ -26,10 +26,13 @@ namespace Bleatingsheep.NewHydrant
 
         public void ConfigureServices(IServiceCollection services)
         {
+            string connectionString = Configuration.GetConnectionString("NewbieDatabase_Postgres");
+            var dataSourceBuilder = NewbieContext.GetDataSourceBuilder(connectionString);
+            var dataSource = dataSourceBuilder.Build();
             services.AddDbContext<NewbieContext>(
                 optionsBuilder =>
                     optionsBuilder.UseNpgsql(
-                        Configuration.GetConnectionString("NewbieDatabase_Postgres"),
+                        dataSource,
                         options => options.EnableRetryOnFailure())
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug)))
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))),
@@ -37,7 +40,7 @@ namespace Bleatingsheep.NewHydrant
             services.AddDbContextFactory<NewbieContext>(
                 optionsBuilder =>
                     optionsBuilder.UseNpgsql(
-                        Configuration.GetConnectionString("NewbieDatabase_Postgres"),
+                        dataSource,
                         options => options.EnableRetryOnFailure())
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug)))
                     .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuted, LogLevel.Debug))));

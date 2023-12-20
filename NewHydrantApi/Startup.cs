@@ -31,8 +31,11 @@ namespace NewHydrantApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string connectionString = Configuration.GetConnectionString("NewbieDatabase_Postgres");
+            var dataSourceBuilder = NewbieContext.GetDataSourceBuilder(connectionString);
+            var dataSource = dataSourceBuilder.Build();
             services.AddDbContext<NewbieContext>(
-                options => options.UseNpgsql(Configuration.GetConnectionString("NewbieDatabase_Postgres"),
+                options => options.UseNpgsql(dataSource,
                     options => options.EnableRetryOnFailure()),
                 ServiceLifetime.Transient);
             services.AddControllers();

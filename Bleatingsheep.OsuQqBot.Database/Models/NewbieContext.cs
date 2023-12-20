@@ -1,6 +1,7 @@
 ﻿using System;
 using Bleatingsheep.Osu.PerformancePlus;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Bleatingsheep.OsuQqBot.Database.Models
 {
@@ -43,11 +44,21 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
         public DbSet<RecommendationEntry> Recommendations { get; private set; }
         #endregion
 
+        public static NpgsqlDataSourceBuilder GetDataSourceBuilder(string connectionString)
+        {
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+            dataSourceBuilder.EnableDynamicJson();
+            return dataSourceBuilder;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("Xfs_ConnectionString_Postgres"),
+                string connectionString = Environment.GetEnvironmentVariable("Xfs_ConnectionString_Postgres");
+                var dataSourceBuilder = GetDataSourceBuilder(connectionString);
+                var dataSource = dataSourceBuilder.Build();
+                optionsBuilder.UseNpgsql(dataSource,
                     options => options.EnableRetryOnFailure());
             }
         }

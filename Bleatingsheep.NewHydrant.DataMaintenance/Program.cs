@@ -14,16 +14,19 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddHostedService<SyncScheduleService>();
         services.AddHostedService<UpdateSnapshotsService>();
 
+        string? connectionString = ctx.Configuration.GetConnectionString("NewbieDatabase_Postgres");
+        var dataSourceBuilder = NewbieContext.GetDataSourceBuilder(connectionString);
+        var dataSource = dataSourceBuilder.Build();
         services.AddDbContext<NewbieContext>(optionsBuilder =>
             optionsBuilder.UseNpgsql(
-                ctx.Configuration.GetConnectionString("NewbieDatabase_Postgres"),
+                dataSource,
                 options => options.EnableRetryOnFailure())
                 .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug),
                     (RelationalEventId.CommandExecuted, LogLevel.Debug))),
             ServiceLifetime.Transient);
         services.AddDbContextFactory<NewbieContext>(optionsBuilder =>
             optionsBuilder.UseNpgsql(
-                ctx.Configuration.GetConnectionString("NewbieDatabase_Postgres"),
+                dataSource,
                 options => options.EnableRetryOnFailure())
                 .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug),
                     (RelationalEventId.CommandExecuted, LogLevel.Debug))));
