@@ -45,28 +45,12 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                     _logger.LogDebug("CMBC Changed: {cmbcJson}", cmbcJson);
                 }
 
-                var cib = await HttpApi.Resolve<ICibRate>().GetRates().ConfigureAwait(false);
-                var cibJson = JsonSerializer.Serialize(cib);
-                if (cibJson != s_cibJson)
-                {
-                    s_cibJson = cibJson;
-                    _logger.LogDebug("CIB Changed: {cibJson}", cibJson);
-                }
-
                 var masterCard = await HttpApi.Resolve<IMasterCardRate>().GetRate("JPY", "USD").ConfigureAwait(false);
                 var masterCardJson = JsonSerializer.Serialize(masterCard);
                 if (masterCardJson != s_masterCardJson)
                 {
                     s_masterCardJson = masterCardJson;
                     _logger.LogDebug("MasterCard Changed: {masterCardJson}", masterCardJson);
-                }
-
-                var cmb = await HttpApi.Resolve<ICmbRateProvider>().GetRatesInCode().ConfigureAwait(false);
-                var cmbJson = JsonSerializer.Serialize(cmb);
-                if (cmbJson != s_cmbJson)
-                {
-                    s_cmbJson = cmbJson;
-                    _logger.LogDebug("CMB Changed: {cmbJson}", cmbJson);
                 }
             }
         }

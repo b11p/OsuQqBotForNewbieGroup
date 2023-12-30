@@ -95,11 +95,6 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                         : HttpApi.Resolve<IMasterCardRate>().GetRateToUsd(@base);
                     var cmbcTask = HttpApi.Resolve<ICmbcCreditRate>().GetRates();
 
-                    var cmbTask = HttpApi.Resolve<ICmbRateProvider>().GetRatesInCode();
-
-                    // cib
-                    var cibTask = HttpApi.Resolve<ICibRate>().GetRates();
-
                     // boc
                     //var bocTask = BocRateClient.GetExchangeSellingRateAsync(@base);
 
@@ -150,75 +145,6 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
                         results.Add("CMBC 查询失败。");
                         Logger.Error(e);
                     }
-
-                    // cmb
-                    try
-                    {
-                        if (context.UserId == 962549599 && !string.Equals("CNY", @base, StringComparison.OrdinalIgnoreCase))
-                        {
-                            var cmbResult = await cmbTask.ConfigureAwait(false);
-                            if (string.Equals("USD", @base, StringComparison.OrdinalIgnoreCase))
-                            {
-                                var price = cmbResult?.GetValueOrDefault(@base.ToUpperInvariant());
-                                if (price != null)
-                                {
-                                    var cny = amount * price.Value;
-                                    results.Add($"CMB CNY {cny}");
-                                }
-                            }
-                            else
-                            {
-                                var usdRate = masterCardResult?.Data?.ConversionRate;
-                                var usdPrice = cmbResult?.GetValueOrDefault("USD");
-                                if (usdPrice != null && usdRate != null)
-                                {
-                                    var cny = amount * usdRate.Value * usdPrice.Value;
-                                    results.Add($"MasterCard USD CMB CNY {cny}");
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        results.Add("CMB 查询失败。");
-                        Logger.Error(e);
-                    }
-
-                    // cib
-                    try
-                    {
-                        if (context.UserId == 962549599 && !string.Equals("CNY", @base, StringComparison.OrdinalIgnoreCase))
-                        {
-                            var cibResult = await cibTask.ConfigureAwait(false);
-
-                            var price = cibResult[@base];
-                            if (price != null)
-                            {
-                                var cny = amount * price.Value;
-                                results.Add($"CIB CNY {cny}");
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        results.Add("CIB 查询失败。");
-                        Logger.Error(e);
-                    }
-
-                    // boc
-                    //try
-                    //{
-                    //    var bocResult = await bocTask.ConfigureAwait(false);
-                    //    if (bocResult != null)
-                    //    {
-                    //        results.Add($"BOC CNY {bocResult * amount}");
-                    //    }
-                    //}
-                    //catch (Exception e)
-                    //{
-                    //    results.Add("BOC 查询失败。");
-                    //    Logger.Error(e);
-                    //}
 
                     await api.SendMessageAsync(context.Endpoint, string.Join("\r\n", results)).ConfigureAwait(false);
                 }
