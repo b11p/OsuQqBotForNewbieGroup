@@ -108,17 +108,16 @@ internal class Adhd : IMessageCommand
             }
             else
             {
-                sb.AppendLine($"您的测试分数为{_totalScore}");
+                sb.AppendLine($"您的测试分数为{_totalScore}，4分及以上说明您的症状与成年多动症相符。");
                 if (GetTotalScores() >= 4)
                 {
-                    sb.AppendLine("测试结果表明您可能患有 ADHD，如您生活中有相应困扰，可以考虑向合适的医生寻求帮助!");
+                    sb.AppendLine("测试结果表明您可能患有 ADHD，如您生活中有相应困扰，可以考虑向合适的医生寻求帮助~");
                 }
                 else
                 {
-                    sb.AppendLine("测试结果并未表明您可能患有 ADHD，如您生活中有相应困扰，可以考虑向合适的医生寻求帮助!");
+                    sb.AppendLine("测试结果并未表明您可能患有 ADHD，但是请注意本问卷的敏感性为 68.7%，特异性为 99.5%。如您生活中有相应困扰，依然可以考虑向合适的医生寻求帮助~");
                 }
 
-                sb.AppendLine("本问卷的敏感性为 68.7%，特异性为 99.5%。仅供参考，不构成医疗建议~");
                 sb.Append("参考资料：https://embrace-autism.com/asrs-v1-1/");
             }
             return sb.ToString();
