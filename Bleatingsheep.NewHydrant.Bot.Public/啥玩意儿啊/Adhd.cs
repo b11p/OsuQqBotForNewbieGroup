@@ -99,7 +99,7 @@ internal class Adhd : IMessageCommand
             var sb = new StringBuilder();
             if (_answeredQuestions == 0)
             {
-                sb.AppendLine("下面开始 ADHD 自评问卷，本问卷仅供智力正常的成年人使用（年龄>=18且IQ>=80），请根据个人情况回复相应数字~");
+                sb.AppendLine("下面开始 ADHD 自评问卷，本问卷仅供智力正常的成年人使用（年龄 ≥ 18 且 IQ ≥ 80），请根据您在过去 6 个月内的感受和行为回复相应数字~");
             }
             if (!IsOver())
             {
@@ -108,7 +108,7 @@ internal class Adhd : IMessageCommand
             }
             else
             {
-                sb.AppendLine($"您的测试分数为{_totalScore}，4分及以上说明您的症状与成年多动症相符。");
+                sb.AppendLine($"您的测试分数为 {_totalScore}，4 分及以上说明您的症状与成年多动症相符。");
                 if (GetTotalScores() >= 4)
                 {
                     sb.AppendLine("测试结果表明您可能患有 ADHD，如您生活中有相应困扰，可以考虑向合适的医生寻求帮助~");
@@ -118,7 +118,12 @@ internal class Adhd : IMessageCommand
                     sb.AppendLine("测试结果并未表明您可能患有 ADHD，但是请注意本问卷的敏感性为 68.7%，特异性为 99.5%。如您生活中有相应困扰，依然可以考虑向合适的医生寻求帮助~");
                 }
 
-                sb.Append("参考资料：https://embrace-autism.com/asrs-v1-1/");
+                sb.Append("""
+                    参考资料：https://embrace-autism.com/asrs-v1-1/
+                    https://qingshanasd.cn/medical-map/
+                    https://mp.weixin.qq.com/s/tcwm8yWNx2VD51NQDGk_Hg
+                    结果仅供参考，请通过正规途径求医~
+                    """);
             }
             return sb.ToString();
         }
