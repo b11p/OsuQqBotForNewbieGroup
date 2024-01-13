@@ -11,9 +11,9 @@
           "Bleatingsheep.NewHydrant.Data": "1.0.0",
           "Bleatingsheep.OsuQqBot.Database": "1.0.0",
           "Microsoft.Extensions.Hosting": "8.0.0",
-          "NLog": "5.2.3",
-          "NLog.Extensions.Hosting": "5.3.3",
-          "NLog.Extensions.Logging": "5.3.3",
+          "NLog": "5.2.8",
+          "NLog.Extensions.Hosting": "5.3.8",
+          "NLog.Extensions.Logging": "5.3.8",
           "System.Linq.Async": "6.0.1"
         },
         "runtime": {
@@ -806,36 +806,36 @@
           }
         }
       },
-      "NLog/5.2.3": {
+      "NLog/5.2.8": {
         "runtime": {
           "lib/netstandard2.0/NLog.dll": {
             "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.2.3.1999"
+            "fileVersion": "5.2.8.2366"
           }
         }
       },
-      "NLog.Extensions.Hosting/5.3.3": {
+      "NLog.Extensions.Hosting/5.3.8": {
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.0",
-          "NLog.Extensions.Logging": "5.3.3"
+          "NLog.Extensions.Logging": "5.3.8"
         },
         "runtime": {
-          "lib/net6.0/NLog.Extensions.Hosting.dll": {
+          "lib/net8.0/NLog.Extensions.Hosting.dll": {
             "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.3.3.381"
+            "fileVersion": "5.3.8.469"
           }
         }
       },
-      "NLog.Extensions.Logging/5.3.3": {
+      "NLog.Extensions.Logging/5.3.8": {
         "dependencies": {
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0",
           "Microsoft.Extensions.Logging": "8.0.0",
-          "NLog": "5.2.3"
+          "NLog": "5.2.8"
         },
         "runtime": {
-          "lib/net6.0/NLog.Extensions.Logging.dll": {
+          "lib/net8.0/NLog.Extensions.Logging.dll": {
             "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.3.3.381"
+            "fileVersion": "5.3.8.469"
           }
         }
       },
@@ -864,11 +864,22 @@
           }
         }
       },
-      "Polly/7.2.4": {
+      "Polly/8.2.1": {
+        "dependencies": {
+          "Polly.Core": "8.2.1"
+        },
         "runtime": {
-          "lib/netstandard2.0/Polly.dll": {
-            "assemblyVersion": "7.0.0.0",
-            "fileVersion": "7.2.4.982"
+          "lib/net6.0/Polly.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.2.1.2874"
+          }
+        }
+      },
+      "Polly.Core/8.2.1": {
+        "runtime": {
+          "lib/net8.0/Polly.Core.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.2.1.2874"
           }
         }
       },
@@ -1957,7 +1968,7 @@
         "dependencies": {
           "Bleatingsheep.Osu.ApiClient": "0.6.21",
           "Bleatingsheep.OsuQqBot.Database": "1.0.0",
-          "Polly": "7.2.4"
+          "Polly": "8.2.1"
         },
         "runtime": {
           "Bleatingsheep.NewHydrant.Data.dll": {}
@@ -2388,26 +2399,26 @@
       "path": "newtonsoft.json/12.0.3",
       "hashPath": "newtonsoft.json.12.0.3.nupkg.sha512"
     },
-    "NLog/5.2.3": {
+    "NLog/5.2.8": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-rHTNRtQF5qYqLutSR9ldUWXglKym/KA1R6GKw4JtDvza8i5+kgfmeKH75Ccn1noeJIOjHLXorphMxKk3EiN2tg==",
-      "path": "nlog/5.2.3",
-      "hashPath": "nlog.5.2.3.nupkg.sha512"
+      "sha512": "sha512-jAIELkWBs1CXFPp986KSGpDFQZHCFccO+LMbKBTTNm42KifaI1mYzFMFQQfuGmGMTrCx0TFPhDjHDE4cLAZWiQ==",
+      "path": "nlog/5.2.8",
+      "hashPath": "nlog.5.2.8.nupkg.sha512"
     },
-    "NLog.Extensions.Hosting/5.3.3": {
+    "NLog.Extensions.Hosting/5.3.8": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-wwthwjv4w7TIWkjUr8TsvbMBEfIaQvgowdQULf3mP1O5we5S0T3AUUH3Tpy7P5xyhb9yuas0a8abVFgPqHW/xA==",
-      "path": "nlog.extensions.hosting/5.3.3",
-      "hashPath": "nlog.extensions.hosting.5.3.3.nupkg.sha512"
+      "sha512": "sha512-4CyvTI8TzNFh2s8dChxyToyRIK+5famLGI4Q0f0VhKQLxA2R9dcw9+6QPLtDBPCr6zHeXv+3590Ny685xng1DA==",
+      "path": "nlog.extensions.hosting/5.3.8",
+      "hashPath": "nlog.extensions.hosting.5.3.8.nupkg.sha512"
     },
-    "NLog.Extensions.Logging/5.3.3": {
+    "NLog.Extensions.Logging/5.3.8": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-o3V1oUr0izjhU1djuVqN5JdmNUGmunTs3Amjhumt/nxva8kG9QWjOdba+ciwkP//QOjv+KkGklZtI9o4qz50hQ==",
-      "path": "nlog.extensions.logging/5.3.3",
-      "hashPath": "nlog.extensions.logging.5.3.3.nupkg.sha512"
+      "sha512": "sha512-6VD0lyeokWltL6j8lO7mS7v7lbuO/qn0F7kdvhKhEx1JvFyD39nzohOK3JvkVh4Nn3mrcMDCyDxvTvmiW55jQg==",
+      "path": "nlog.extensions.logging/5.3.8",
+      "hashPath": "nlog.extensions.logging.5.3.8.nupkg.sha512"
     },
     "Npgsql/8.0.0": {
       "type": "package",
@@ -2423,12 +2434,19 @@
       "path": "npgsql.entityframeworkcore.postgresql/8.0.0",
       "hashPath": "npgsql.entityframeworkcore.postgresql.8.0.0.nupkg.sha512"
     },
-    "Polly/7.2.4": {
+    "Polly/8.2.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-bw00Ck5sh6ekduDE3mnCo1ohzuad946uslCDEENu3091+6UKnBuKLo4e+yaNcCzXxOZCXWY2gV4a35+K1d4LDA==",
-      "path": "polly/7.2.4",
-      "hashPath": "polly.7.2.4.nupkg.sha512"
+      "sha512": "sha512-tVHvP5Z0fNoZCE9mpKAsh0IaValwsTGPrqjlWqkWR/Gpl5jL05HWC/AVGSL+jkAqkl1Jn7uBUOArnRD+dK5PfQ==",
+      "path": "polly/8.2.1",
+      "hashPath": "polly.8.2.1.nupkg.sha512"
+    },
+    "Polly.Core/8.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/Z3EspfWBdTla4I9IAcQn32/7kB5WS3rSnOYloz8YlVyClu8h7uuYf4pfUvffOYVbxmDX/mFRfxwzqW2Zs96ZA==",
+      "path": "polly.core/8.2.1",
+      "hashPath": "polly.core.8.2.1.nupkg.sha512"
     },
     "runtime.native.System/4.0.0": {
       "type": "package",
