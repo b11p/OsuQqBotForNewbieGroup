@@ -25,7 +25,10 @@ internal partial class 获取图片链接 : IMessageCommand
     public async Task ProcessAsync(MessageContext context, HttpApiClient api)
     {
         var url = await CitedImageUrlUtility.GetCitedImageUrlAsync(context, api, _logger);
-        await api.SendMessageAsync(context.Endpoint, url);
+        if (url != null)
+        {
+            await api.SendMessageAsync(context.Endpoint, url);
+        }
     }
 
     public bool ShouldResponse(MessageContext context)
