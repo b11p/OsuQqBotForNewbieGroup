@@ -35,7 +35,7 @@ namespace Bleatingsheep.NewHydrant.Admin
             2199188467, // NatsuRin
             524986802, // Dragon-Fox
             411843675, // xxbg
-            1584775323. // YRScarlet
+            1584775323, // YRScarlet
             3438313440, // MM
         };
 
