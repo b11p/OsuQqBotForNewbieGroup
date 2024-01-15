@@ -32,6 +32,13 @@ namespace Bleatingsheep.NewHydrant.Admin
             630060047, // CYCLC
             365246692, // -Spring Night-
             1120180945, // n0000000000o
+            2199188467, // NatsuRin
+            524986802, // Dragon-Fox
+            411843675, // Sakura Luna
+            2105109062, // xxbg
+            1584775323, // YRScarlet
+            3438313440, // MM
+            2733494248, // Molli
         };
 
         public AdminVerifier()
