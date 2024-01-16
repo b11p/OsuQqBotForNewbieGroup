@@ -27,8 +27,7 @@ namespace Bleatingsheep.NewHydrant
         public void ConfigureServices(IServiceCollection services)
         {
             string connectionString = Configuration.GetConnectionString("NewbieDatabase_Postgres");
-            var dataSourceBuilder = NewbieContext.GetDataSourceBuilder(connectionString);
-            var dataSource = dataSourceBuilder.Build();
+            var dataSource = NewbieContext.GetDataSource(connectionString);
             services.AddDbContext<NewbieContext>(
                 optionsBuilder =>
                     optionsBuilder.UseNpgsql(
