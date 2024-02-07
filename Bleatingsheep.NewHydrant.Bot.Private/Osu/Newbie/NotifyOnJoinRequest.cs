@@ -104,7 +104,12 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                         }
 
                         // 自动绑定，在请求消息完全匹配 osu! 用户名的前提下。
-                        if (userNames.Count() == 1
+                        if (r.UserId == 0)
+                        {
+                            // 必须判断 QQ 号是否已经设置，因为有些框架不上报加群请求的 QQ 号。
+                            hints.Add(new Message($"由于未获取到 QQ 号，跳过自动绑定。"));
+                        }
+                        else if (userNames.Count() == 1
                             && comment.TrimEnd().EndsWith($"答案：{name}", StringComparison.Ordinal)
                             && info != null)
                         {
@@ -173,7 +178,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
             await using var newbieContext = _contextFactory.CreateDbContext();
             newbieContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            var binding = await newbieContext.Bindings.SingleOrDefaultAsync(b => b.UserId == userId).ConfigureAwait(false);
+            var binding = userId == 0 // 有些框架不上报请求的 QQ 号，这时直接跳过绑定查询
+                ? default
+                : await newbieContext.Bindings.SingleOrDefaultAsync(b => b.UserId == userId).ConfigureAwait(false);
             var osuId = binding?.OsuId;
             var sb = new StringBuilder();
             sb.Append(comment).Append("\r\n");
