@@ -117,7 +117,7 @@ namespace Bleatingsheep.NewHydrant
                         }
                     }
 #if DEBUG
-                    logger.Info("权限提升验证为{elevated}，但是当然是 DEBUG 模式，强制开启高仅限。");
+                    logger.Info("权限提升验证为{elevated}，但是当前是 DEBUG 模式，强制开启高仅限。");
                     elevated = true;
 #endif
                     if (elevated)
