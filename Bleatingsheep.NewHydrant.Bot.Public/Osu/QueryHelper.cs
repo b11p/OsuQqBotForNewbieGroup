@@ -91,6 +91,12 @@ namespace Bleatingsheep.NewHydrant.Osu
                 var user = await _osuApi.GetUser(userName, mode).ConfigureAwait(false);
                 if (user is null)
                     return (true, user, default);
+                if (user.Id > int.MaxValue)
+                {
+                    // 数据库中使用 int 类型存储 osu! 玩家 ID，检查是否超过范围。
+                    _logger.LogCritical("玩家 {userName} 的 ID 超过 int32 类型范围，需要更新数据库以处理代码，现在暂时跳过查询玩家历史数据。", userName);
+                    return (true, user, default);
+                }
 
                 var (historySuccess, history) = await GetComparedData((int)user.Id, mode).ConfigureAwait(false);
                 if (historySuccess && user.Performance == 0 && history == null)
@@ -98,7 +104,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                     // the user may be inactive
                     try
                     {
-                        history = await _newbieContext.UserSnapshots.AsNoTracking().Where(s => s.UserId == user.Id && s.Mode == mode).OrderByDescending(s => s.Date).FirstOrDefaultAsync().ConfigureAwait(false);
+                        history = await _newbieContext.UserSnapshots.AsNoTracking().Where(s => s.UserId == (int)user.Id && s.Mode == mode).OrderByDescending(s => s.Date).FirstOrDefaultAsync().ConfigureAwait(false);
                     }
                     catch
                     {
