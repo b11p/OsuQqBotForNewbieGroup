@@ -178,7 +178,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
             await using var newbieContext = _contextFactory.CreateDbContext();
             newbieContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            var binding = userId == 0 // 有些框架不上报请求的 QQ 号，这时直接跳过绑定查询
+            var binding = userId == 0 || userId == default // 有些框架不上报请求的 QQ 号，这时直接跳过绑定查询
                 ? default
                 : await newbieContext.Bindings.SingleOrDefaultAsync(b => b.UserId == userId).ConfigureAwait(false);
             var osuId = binding?.OsuId;
@@ -204,7 +204,10 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
             if (osuId == null)
             {
-                sb.Append("这个人没绑定。");
+                if (userId == 0 || userId == default)
+                    sb.Append("未获取到申请人的 QQ 号，请注意鉴别申请信息真伪。");
+                else
+                    sb.Append("这个人没绑定。");
             }
             else
             {
