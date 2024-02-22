@@ -49,7 +49,7 @@ internal partial class 真随机数 : IMessageCommand
             {
                 goto failed;
             }
-            if (splits.Length >= 2 && (!int.TryParse(splits[1], out num2) || num2 <= num1 || num2 - num1 <= 1))
+            if (splits.Length >= 2 && (!int.TryParse(splits[1], out num2) || num2 <= num1 || num2 - num1 < 1 || num2 == int.MaxValue))
             {
                 goto failed;
             }
@@ -65,11 +65,11 @@ internal partial class 真随机数 : IMessageCommand
             if (splits.Length == 2)
             {
                 start = num1;
-                end = num2;
+                end = num2 + 1;
             }
         }
         var val = await GetInt32(start, end);
-        await api.SendMessageAsync(context.Endpoint, $"通过量子力学为你生成的随机数是 {val}。");
+        await api.SendMessageAsync(context.Endpoint, $"通过量子力学为你生成的 [{start}, {end - 1}] 范围内的随机数是 {val}。");
     }
 
     private async ValueTask<int> GetInt32(int fromInclusive, int toExclusive)
