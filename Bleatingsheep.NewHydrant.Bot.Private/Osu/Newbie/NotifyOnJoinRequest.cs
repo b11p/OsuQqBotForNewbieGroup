@@ -262,10 +262,14 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                         groups = "进阶群 928936255"
                         reason = "新人群超限"
                     }
-                    if (limit <= 4500)
+                    else if (limit <= 4500)
                     {
                         groups = "高阶群 281624271"
                         reason = "进阶群超限"
+                    }
+                    else if (limit <= 6000)
+                    {
+                        reason = "高阶群超限"
                     }
 
                     response = response + groups + "。";
