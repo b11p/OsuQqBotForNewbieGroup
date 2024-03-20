@@ -118,10 +118,10 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             try
             {
                 // 尝试查询 yumu ppm
-                // https://bot.365246692.xyz/pub/ppm?u1=-spring%20night-&mode=o
+                // https://bot.365246692.xyz/pub/ppm?name=-spring%20night-&mode=o
                 var yumuUri = new UriBuilder("https://bot.365246692.xyz/pub/ppm");
                 var query = HttpUtility.ParseQueryString(yumuUri.Query);
-                query.Add("u1", userName);
+                query.Add("name", userName);
                 query.Add("mode", "o");
                 yumuUri.Query = query.ToString();
                 using(HttpClient client = new HttpClient())
