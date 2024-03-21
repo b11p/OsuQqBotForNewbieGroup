@@ -34,9 +34,9 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 #endif
         private static readonly IReadOnlyDictionary<long, double?> ManagedGroups = new Dictionary<long, double?>
         {
-            [595985887] = 3000,
-            [928936255] = 4500,
-            [281624271] = 6000,
+            [595985887] = 2800,
+            [928936255] = 4300,
+            [281624271] = 5800,
             [758120648] = null,
             [514661057] = null,
 #if DEBUG
@@ -251,7 +251,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 Logger.Info($"{e.UserId}申请加入群{e.GroupId}。");
                 var endpoint = new GroupEndpoint(NewbieManagementGroupId);
                 var (performance, level) = HintBinding(httpApiClient, endpoint, e).ConfigureAwait(false).GetAwaiter().GetResult();
-                if (performance + 200 >= limit)
+                if (performance >= limit)
                 {
                     string response = "您的 PP 高于此群大部分玩家，不推荐加入本群。请加入";
                     string groups = "其他群";
