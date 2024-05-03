@@ -131,8 +131,15 @@ internal partial class PostToMemeRepository : IMessageCommand
         sb.Append($"推送图片成功。{fileName}.{ext}");
         if (pushData.HomePage is not null)
         {
+            var homeUrl = pushData.HomePage;
+            var uriBuilder = new UriBuilder(homeUrl);
+            if (uriBuilder.Fragment.Length <= "#".Length)
+            {
+                uriBuilder.Fragment = EncodeFileName(fileName);
+                homeUrl = uriBuilder.Uri.AbsoluteUri;
+            }
             sb.AppendLine();
-            sb.Append($"更多精彩尽在 {pushData.HomePage}");
+            sb.Append($"更多精彩尽在 {homeUrl}");
         }
 
         await api.SendMessageAsync(g.Endpoint, sb.ToString());
@@ -145,9 +152,9 @@ internal partial class PostToMemeRepository : IMessageCommand
         {
             GroupMessage g => g.Content.MergeContinuousTextSections().Sections.Where(s => s.Type != Section.TextType || !string.IsNullOrWhiteSpace(s.Data[Section.TextParamName])).ToList() switch
             {
-                [{ Type: "reply" }, { Type: "at" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
-                [{ Type: "reply" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
-                [{ Type: "reply" }, { Type: "text" } s, ..] => s.Data["text"],
+            [{ Type: "reply" }, { Type: "at" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
+            [{ Type: "reply" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
+            [{ Type: "reply" }, { Type: "text" } s, ..] => s.Data["text"],
                 _ => default,
             },
             _ => default,
