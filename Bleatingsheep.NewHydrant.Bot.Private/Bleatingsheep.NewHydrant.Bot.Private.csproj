@@ -9,9 +9,9 @@
   <ItemGroup>
     <PackageReference Include="Bleatingsheep.Osu.ApiClient" Version="0.6.21" />
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
-    <PackageReference Include="CsvHelper" Version="30.0.1" />
-    <PackageReference Include="Octokit" Version="9.1.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.2" />
+    <PackageReference Include="CsvHelper" Version="32.0.1" />
+    <PackageReference Include="Octokit" Version="11.0.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="8.0.0" />
   </ItemGroup>
