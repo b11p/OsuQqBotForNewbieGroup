@@ -47,6 +47,9 @@ namespace Bleatingsheep.NewHydrant
 
             try
             {
+                // workaround for HttpListener bug.
+                await Task.Delay(1000);
+
                 // 本应在此设置 HttpApiClient，并启动，但是使用反向 WebSocket 时，无需手动这么做。
                 var rServer = new ReverseWebSocketServer(int.Parse(s_hydrantConfigure["ServerPort"]));
                 rServer.SetListenerAuthenticationAndConfiguration(async r =>
