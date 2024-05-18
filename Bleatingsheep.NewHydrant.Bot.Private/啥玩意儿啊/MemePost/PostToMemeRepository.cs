@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -106,6 +106,12 @@ internal partial class PostToMemeRepository : IMessageCommand
             }
 
             var createFile = await gitHubClient.Repository.Content.CreateFile(pushData.Repository.Owner, pushData.Repository.Name, Path.Combine(pushData.Path, $"{EncodeFileName(fileName)}.{ext}"), new CreateFileRequest($"Bot upload. Group {g.GroupId}, User {g.UserId}", Convert.ToBase64String(imageBytes), false));
+        }
+        catch (HttpRequestException e)
+        {
+            _logger.LogInformation(e, "HTTP 请求错误，可能是图片链接失效。");
+            await api.SendMessageAsync(g.Endpoint, "图片获取失败，可能是 bot 框架提供的图片链接失效，请尝试将图片保存重发再试，或者换一张图片。");
+            return;
         }
         catch (ImageFormatException e)
         {
