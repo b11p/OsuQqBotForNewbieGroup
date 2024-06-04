@@ -22,7 +22,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             await page.GoToAsync("https://www.investing.com/indices/us-spx-500-futures").ConfigureAwait(false);
             const string selector = "#quotes_summary_current_data";
             var element = await page.QuerySelectorAsync(selector).ConfigureAwait(false);
-            var data = await element.ScreenshotDataAsync(new ScreenshotOptions
+            var data = await element.ScreenshotDataAsync(new ElementScreenshotOptions
             {
                 Type = ScreenshotType.Png,
             }).ConfigureAwait(false);

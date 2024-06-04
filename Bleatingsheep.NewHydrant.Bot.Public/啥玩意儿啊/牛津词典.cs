@@ -77,7 +77,7 @@ internal partial class 牛津词典 : IMessageCommand
         {
             try
             {
-                mainImage = await mainElement.ScreenshotDataAsync(new ScreenshotOptions
+                mainImage = await mainElement.ScreenshotDataAsync(new ElementScreenshotOptions
                 {
                     Type = ScreenshotType.Png,
                 });
@@ -114,7 +114,7 @@ internal partial class 牛津词典 : IMessageCommand
                 // silently return;
                 return;
             }
-            var sideImage = await sideElement.ScreenshotDataAsync(new ScreenshotOptions
+            var sideImage = await sideElement.ScreenshotDataAsync(new ElementScreenshotOptions
             {
                 Type = ScreenshotType.Png,
             });

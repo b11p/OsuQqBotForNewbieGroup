@@ -78,7 +78,7 @@ namespace Bleatingsheep.NewHydrant.Osu
                 Height = 80,
             }).ConfigureAwait(false);
             _ = await page.GoToAsync(url, WaitUntilNavigation.Networkidle0).ConfigureAwait(false);
-            await page.WaitForTimeoutAsync(500).ConfigureAwait(false);
+            await Task.Delay(500).ConfigureAwait(false);
             var data = await page.ScreenshotDataAsync(new ScreenshotOptions
             {
                 FullPage = true,

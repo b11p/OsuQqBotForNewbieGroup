@@ -35,7 +35,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             {
                 var detailElement = await page.WaitForSelectorAsync(selector);
                 var data = await detailElement
-                    .ScreenshotDataAsync(new ScreenshotOptions
+                    .ScreenshotDataAsync(new ElementScreenshotOptions
                     {
                     });
                 return data;

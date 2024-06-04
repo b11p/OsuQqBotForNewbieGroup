@@ -63,7 +63,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 
                     // seems that bp div adding and button availability changing is NOT synchronized
                     // wait for button availability change
-                    await page.WaitForTimeoutAsync(500).ConfigureAwait(false);
+                    await Task.Delay(500).ConfigureAwait(false);
 
                     // requery button
                     button = await page.QuerySelectorAsync(buttonSelector).ConfigureAwait(false);
@@ -105,7 +105,7 @@ bpList.forEach((element) => { var dateTime = element.querySelector("div.play-det
                     await (await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false))
                     .EvaluateFunctionHandleAsync("(element) => element.parentNode.parentNode").ConfigureAwait(false) as IElementHandle;
                 printElement ??= await page.QuerySelectorAsync(bestSelector).ConfigureAwait(false);
-                var data = await printElement.ScreenshotDataAsync(new ScreenshotOptions()).ConfigureAwait(false);
+                var data = await printElement.ScreenshotDataAsync(new ElementScreenshotOptions()).ConfigureAwait(false);
 
                 await api.SendMessageAsync(context.Endpoint, Message.ByteArrayImage(data)).ConfigureAwait(false);
             }

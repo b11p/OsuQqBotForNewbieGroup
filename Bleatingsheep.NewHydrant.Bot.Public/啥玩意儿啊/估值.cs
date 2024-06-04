@@ -64,7 +64,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                     await adElement.EvaluateFunctionAsync(@"(element) => { element.parentElement.remove(); }").ConfigureAwait(false);
 
                 var data = await detailElement
-                    .ScreenshotDataAsync(new ScreenshotOptions
+                    .ScreenshotDataAsync(new ElementScreenshotOptions
                     {
                         //FullPage = true,
                     });

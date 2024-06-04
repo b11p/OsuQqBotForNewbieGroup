@@ -31,7 +31,7 @@ internal class 美国新冠数据 : IMessageCommand
             Width = 1024,
             Height = 4000,
         }).ConfigureAwait(false);
-        var data2 = await element.ScreenshotDataAsync(new ScreenshotOptions
+        var data2 = await element.ScreenshotDataAsync(new ElementScreenshotOptions
         {
             Type = ScreenshotType.Jpeg,
             Quality = 100,
