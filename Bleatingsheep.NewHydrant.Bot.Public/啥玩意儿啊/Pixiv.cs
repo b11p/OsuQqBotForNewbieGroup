@@ -31,7 +31,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
             {
                 var imgUrl = imgNode.Attributes["src"].Value;
                 // Chagne URL host name to xfs-proxy-pixiv.b11p.com whatever the original host is
-                imgUrl = Regex.Replace(imgUrl, @"^https?://.+?/", "https://xfs-proxy-pixiv.b11p.com/");
+                // imgUrl = Regex.Replace(imgUrl, @"^https?://.+?/", "https://xfs-proxy-pixiv.b11p.com/");
                 if (await api.SendMessageAsync(
                     endpoint: context.Endpoint,
                     message: new Message(item.Title.Text + "\r\n")

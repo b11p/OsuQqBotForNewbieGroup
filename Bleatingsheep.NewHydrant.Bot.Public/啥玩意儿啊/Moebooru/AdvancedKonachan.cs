@@ -8,6 +8,7 @@ using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
 using Bleatingsheep.NewHydrant.Extentions;
 using Bleatingsheep.SimpleBooru;
+using Microsoft.Extensions.Caching.Memory;
 using Sisters.WudiLib;
 using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
@@ -24,7 +25,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
 
         private static readonly IReadOnlyDictionary<string, IBooruClient> s_Booru = new Dictionary<string, IBooruClient>
         {
-            { "KONACHAN", BooruFactory.CreateClient("https://xfs-proxy-konachan.b11p.com") },
+            { "KONACHAN", BooruFactory.Konachan },
             { "YANDERE", BooruFactory.Yandere },
         };
 
@@ -82,6 +83,12 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
 
         private static Task<bool> ShouldRandomize(Endpoint endpoint)
             => Task.FromResult(endpoint is PrivateEndpoint || endpoint is GroupEndpoint g && EnhancedGroups.Contains(g.GroupId));
+
+        private readonly IMemoryCache _memoryCache;
+        public AdvancedKonachan(IMemoryCache memoryCache)
+        {
+            _memoryCache = memoryCache;
+        }
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
@@ -153,11 +160,50 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
 
         private async Task<bool> TrySendImage(Endpoint endpoint, HttpApiClient api, int id, Uri uri, int length, int width, int height)
         {
-            string url = string.IsNullOrEmpty(_proxyDomain) ? uri.AbsoluteUri : Regex.Replace(uri.AbsoluteUri, @"^https?://.+?/", _proxyDomain);
-            bool success = await api.SendMessageAsync(endpoint, Message.NetImage(url)).ConfigureAwait(false) != default;
+            // string url = string.IsNullOrEmpty(_proxyDomain) ? uri.AbsoluteUri : Regex.Replace(uri.AbsoluteUri, @"^https?://.+?/", _proxyDomain);
+            // bool success = await api.SendMessageAsync(endpoint, Message.NetImage(url)).ConfigureAwait(false) != default;
+            using var httpClient = new HttpClient();
+            bool success = false;
+            try
+            {
+                var cacheKey = $"{nameof(AdvancedKonachan)}::{uri.AbsoluteUri}";
+                if (_memoryCache.TryGetValue<ImageCacheEntry>(cacheKey, out var entry))
+                {
+                    success = entry.IsSuccess
+                        && await api.SendMessageAsync(endpoint, Message.ByteArrayImage(entry.Data)).ConfigureAwait(false) != default;
+                }
+                else
+                {
+                    var data = await httpClient.GetByteArrayAsync(uri);
+                    if (data.Length > 10 * 1024 * 1024)
+                    {
+                        _memoryCache.Set(cacheKey, new ImageCacheEntry(false, null), new MemoryCacheEntryOptions
+                        {
+                            Size = 10,
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
+                        });
+                        success = false;
+                    }
+                    else
+                    {
+                        _memoryCache.Set(cacheKey, new ImageCacheEntry(true, data), new MemoryCacheEntryOptions
+                        {
+                            Size = data.Length,
+                            SlidingExpiration = TimeSpan.FromHours(1),
+                        });
+                        success = await api.SendMessageAsync(endpoint, Message.ByteArrayImage(data)).ConfigureAwait(false) != default;
+                    }
+                }
+            }
+            catch
+            {
+                success = false;
+            }
             Logger.Debug($"ID: {id}, length: {length}, {width}x{height}, success={success}, url: {uri} ");
             return success;
         }
+
+        private record struct ImageCacheEntry(bool IsSuccess, byte[] Data);
 
         public bool ShouldResponse(MessageContext context)
             => RegexCommand(s_regex, context.Content) && (!(context is GroupMessage g) || !(g.GroupId == 595985887));
