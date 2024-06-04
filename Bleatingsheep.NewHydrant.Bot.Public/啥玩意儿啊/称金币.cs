@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Microsoft.Extensions.Caching.Memory;
 using Sisters.WudiLib;
-using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 
 namespace Bleatingsheep.NewHydrant.啥玩意儿啊
@@ -39,8 +38,9 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
         private async Task Init(MessageContext context, HttpApiClient api)
         {
             var sb = new StringBuilder();
-            if (s_cache.TryGetValue(context.UserId, out ExecuteInfo exec))
+            if (s_cache.TryGetValue(context.UserId, out ExecuteInfo? exec))
             {
+                Debug.Assert(exec != null);
                 sb.AppendLine("当前游戏正在进行。");
             }
             else
@@ -70,6 +70,7 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊
                 await api.SendMessageAsync(context.Endpoint, "你未开始游戏！").ConfigureAwait(false);
                 return;
             }
+            Debug.Assert(exec != null);
 
             if (_left <= 0 || _left > Max || _right <= 0 || _right > Max)
             {

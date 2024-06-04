@@ -16,8 +16,6 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
         private static Stopwatch? s_stopwatch;
         private static long s_nextCheck = 0;
         private static string s_cmbcJson = "";
-        private static string s_cibJson = "";
-        private static string s_cmbJson = "";
         private static string s_masterCardJson = "";
         private readonly ILogger<ExchangeLogger> _logger;
 

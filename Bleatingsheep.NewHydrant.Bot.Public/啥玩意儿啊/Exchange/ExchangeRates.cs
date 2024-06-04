@@ -45,7 +45,9 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Exchange
 
         private record struct ExchangeCacheKey(string Base)
         {
+#pragma warning disable CS0414
             private readonly string _name = nameof(ExchangeCacheKey); // 改变 hash 值，减少碰撞
+#pragma warning restore CS0414
         }
         private static async ValueTask<ExchangeResponse> GetExchangeRatesWithCache(string @base, IExchangeRate exchangeRate, IMemoryCache memoryCache)
         {

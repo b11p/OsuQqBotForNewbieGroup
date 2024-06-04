@@ -33,12 +33,6 @@ namespace Bleatingsheep.OsuMixedApi
                 return client;
             }
         }
-        private static readonly int span = 60;
-        /// <summary>
-        /// 每 <see cref="span"/> 秒访问数限制。
-        /// </summary>
-        public int Limit { get; set; } = 60;
-        private readonly Queue<long> apiCalled = new Queue<long>();
         #endregion
 
         #region ctor and readonly vars
