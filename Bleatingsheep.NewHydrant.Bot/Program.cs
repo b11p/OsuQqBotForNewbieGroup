@@ -149,6 +149,11 @@ namespace Bleatingsheep.NewHydrant
                 logger.Fatal(e);
 
                 Console.WriteLine(e);
+                if (e is ArgumentNullException && e.StackTrace.Contains(nameof(System.Net.HttpListener)))
+                {
+                    // workaround for HttpListener bug.
+                    Environment.Exit(1);
+                }
             }
             finally
             {
