@@ -118,11 +118,11 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             try
             {
                 // 尝试查询 yumu ppm
-                // https://bot.365246692.xyz/pub/ppm?name=-spring%20night-&mode=o
-                var yumuUri = new UriBuilder("https://bot.365246692.xyz/pub/ppm");
+                // https://bot.365246692.xyz/pub/san?name=-spring%20night-&mode=osu
+                var yumuUri = new UriBuilder("https://bot.365246692.xyz/pub/san");
                 var query = HttpUtility.ParseQueryString(yumuUri.Query);
                 query.Add("name", userName);
-                query.Add("mode", "o");
+                query.Add("mode", "osu");
                 yumuUri.Query = query.ToString();
                 using(HttpClient client = new HttpClient())
                 {
