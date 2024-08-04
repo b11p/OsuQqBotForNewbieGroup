@@ -110,7 +110,12 @@ internal partial class PostToMemeRepository : IMessageCommand
         catch (HttpRequestException e)
         {
             _logger.LogInformation(e, "HTTP 请求错误，可能是图片链接失效。");
-            await api.SendMessageAsync(g.Endpoint, "图片获取失败，可能是 bot 框架提供的图片链接失效，请尝试将图片保存重发再试，或者换一张图片。");
+            await api.SendMessageAsync(g.Endpoint, """
+                图片获取失败，可能是 bot 框架提供的图片链接失效，请尝试：
+                1. 将图片保存重发再试
+                2. 换一张图片
+                3. 将图片发给管理员手动处理
+                """);
             return;
         }
         catch (ImageFormatException e)
