@@ -145,15 +145,16 @@ namespace Bleatingsheep.NewHydrant
             }
             catch (Exception e)
             {
-                var logger = LogManager.LogFactory.GetCurrentClassLogger();
-                logger.Fatal(e);
-
                 Console.WriteLine(e);
+                Console.WriteLine($"Exception's type is: {e.GetType()}. Stack trace is: {e.StackTrace}. Check type name: {nameof(System.Net.HttpListener)}");
                 if (e is ArgumentNullException && e.StackTrace.Contains(nameof(System.Net.HttpListener)))
                 {
                     // workaround for HttpListener bug.
                     Environment.Exit(1);
                 }
+
+                var logger = LogManager.LogFactory.GetCurrentClassLogger();
+                logger.Fatal(e);
             }
             finally
             {
@@ -176,7 +177,7 @@ namespace Bleatingsheep.NewHydrant
 
         private static Hydrant ConfigureHost(HttpApiClient httpApiClient, ApiPostListener apiPostListener, bool elevated, params Assembly[] assemblies)
         {
-            System.Console.WriteLine("开始配置消防栓。");
+            Console.WriteLine("开始配置消防栓。");
             var hydrant = new Hydrant(httpApiClient, apiPostListener, assemblies)
                 .AddLogger(LogManager.LogFactory);
 
@@ -189,7 +190,7 @@ namespace Bleatingsheep.NewHydrant
                 handler(e);
             });
 
-            System.Console.WriteLine("正在配置消防栓。(50%)");
+            Console.WriteLine("正在配置消防栓。(50%)");
             // 设置异常处理。
             hydrant.ExceptionCaught_Command += Hydrant_ExceptionCaught_Command;
 
