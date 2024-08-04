@@ -169,8 +169,7 @@ namespace Bleatingsheep.NewHydrant.Data
             }
             else
             {
-                _logger.LogWarning("Concurrent error! Get different play_count in two queries. ({userInfo1_PlayCount}, {userInfo2_PlayCount})", userInfo1.PlayCount, userInfo2?.PlayCount);
-                _logger.LogWarning("The user is {userInfo1.Name}({userInfo1.Id}); the mode is {mode}", userInfo1.Name, userInfo1.Id, mode);
+                _logger.LogWarning("Concurrent error! Get different play_count in two queries ({userInfo1_PlayCount}, {userInfo2_PlayCount}). The user is {userInfo1.Name}({userInfo1.Id}); the mode is {mode}", userInfo1.PlayCount, userInfo2?.PlayCount, userInfo1.Name, userInfo1.Id, mode);
             }
             return report;
         }
