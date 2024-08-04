@@ -11,6 +11,7 @@ using Bleatingsheep.Osu.ApiClient;
 using Bleatingsheep.OsuQqBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Sisters.WudiLib;
+using Sisters.WudiLib.Posts;
 using Message = Sisters.WudiLib.SendingMessage;
 using MessageContext = Sisters.WudiLib.Posts.Message;
 using Mode = Bleatingsheep.Osu.Mode;
@@ -44,7 +45,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
             var endDate = new DateTimeOffset(2024, 2, 21, 1, 1, 1, TimeSpan.Zero);
-            if (DateTimeOffset.UtcNow > endDate)
+            if (DateTimeOffset.UtcNow > endDate
+                && !(context is GroupMessage g && g.GroupId == 695600319)) // 允许管理群测试
             {
                 await api.SendMessageAsync(context.Endpoint, "活动已结束。");
                 return;
@@ -80,7 +82,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
                 .FirstOrDefaultAsync().ConfigureAwait(false);
             if (snap is null)
             {
-                _ = await api.SendMessageAsync(context.Endpoint, "没有找到快照数据。*请注意，由于一项 bug，未收集部分用户的数据，对此非常抱歉，欢迎明年再查xd*").ConfigureAwait(false);
+                _ = await api.SendMessageAsync(context.Endpoint, "没有找到快照数据。").ConfigureAwait(false);
                 return;
             }
 
@@ -112,7 +114,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
 
             if (playList.Count == 0)
             {
-                await api.SendMessageAsync(context.Endpoint, "你在过去一年没有玩儿过 osu!，或无游玩数据记录。*请注意，由于一项 bug，未收集部分用户的数据，对此非常抱歉，欢迎明年再查xd*").ConfigureAwait(false);
+                await api.SendMessageAsync(context.Endpoint, "你在过去一年没有玩儿过 osu!，或无游玩数据记录。").ConfigureAwait(false);
                 return;
             }
 
@@ -121,7 +123,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             {
                 // first response
                 var frsb = new StringBuilder();
-                frsb.AppendLine($"*由于程序bug，8月8日后的数据不完整，统计仅供参考。*\r\n{userInfo.Name}。当前模式：{_mode}，数据始于{snap.Date.ToOffset(_timeZone):M月d日}，完整度：{playList.Count}/{currentPC - startPC}。");
+                frsb.AppendLine($"\r\n{userInfo.Name}。当前模式：{_mode}，数据始于{snap.Date.ToOffset(_timeZone):M月d日}，完整度：{playList.Count}/{currentPC - startPC}。");
                 {
                     // days played
                     (int days, int totalDays) = GetPlayedDays();
