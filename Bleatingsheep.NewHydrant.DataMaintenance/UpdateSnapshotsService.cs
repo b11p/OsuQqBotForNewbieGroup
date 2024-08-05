@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Bleatingsheep.NewHydrant.DataMaintenance;
 public class UpdateSnapshotsService : BackgroundService
 {
-    private static readonly TimeSpan s_updateScheduleDefault = TimeSpan.FromHours(4);
+    private static readonly TimeSpan s_updateScheduleDefault = TimeSpan.FromHours(8);
     private static readonly TimeSpan s_updateScheduleActive = TimeSpan.FromHours(2); // when active within the interval
-    private static readonly TimeSpan s_updateScheduleSemiActive = TimeSpan.FromHours(2); // when API returns some recent play
+    private static readonly TimeSpan s_updateScheduleSemiActive = TimeSpan.FromHours(4); // when API returns some recent play
     private static readonly TimeSpan s_updateScheduleInactive = TimeSpan.FromDays(2); // when banned or inactive
-    private static readonly TimeSpan s_updateScheduleNotAdded = TimeSpan.FromHours(4); // when not added snapshots (due to completely same profile with most recent snapshot)
+    private static readonly TimeSpan s_updateScheduleNotAdded = TimeSpan.FromHours(6); // when not added snapshots (due to completely same profile with most recent snapshot)
 
     private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
     private readonly DataMaintainer _dataMaintainer;
@@ -24,7 +24,7 @@ public class UpdateSnapshotsService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromMinutes(2));
+        var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
         while (await timer.WaitForNextTickAsync(stoppingToken) && !stoppingToken.IsCancellationRequested)
         {
             try
@@ -40,7 +40,7 @@ public class UpdateSnapshotsService : BackgroundService
                 var toUpdate = await db.UpdateSchedules
                     .Where(s => s.NextUpdate <= DateTimeOffset.UtcNow)
                     .OrderBy(s => s.NextUpdate)
-                    .Take(200)
+                    .Take(120)
                     .ToListAsync(stoppingToken);
                 _logger.LogDebug("Updating {toUpdate.Count} of {scheduledCount} snapshots.", toUpdate.Count, scheduledCount);
                 int successCount = 0;
