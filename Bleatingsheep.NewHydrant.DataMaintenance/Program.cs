@@ -19,14 +19,14 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddDbContext<NewbieContext>(optionsBuilder =>
             optionsBuilder.UseNpgsql(
                 dataSource,
-                options => options.EnableRetryOnFailure())
+                options => options.EnableRetryOnFailure().CommandTimeout(600))
                 .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug),
                     (RelationalEventId.CommandExecuted, LogLevel.Debug))),
             ServiceLifetime.Transient);
         services.AddDbContextFactory<NewbieContext>(optionsBuilder =>
             optionsBuilder.UseNpgsql(
                 dataSource,
-                options => options.EnableRetryOnFailure())
+                options => options.EnableRetryOnFailure().CommandTimeout(600))
                 .ConfigureWarnings(c => c.Log((RelationalEventId.CommandExecuting, LogLevel.Debug),
                     (RelationalEventId.CommandExecuted, LogLevel.Debug))));
         services.AddTransient<DataMaintainer>();

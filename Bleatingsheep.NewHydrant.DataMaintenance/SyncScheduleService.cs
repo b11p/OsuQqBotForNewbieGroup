@@ -22,7 +22,9 @@ public sealed class SyncScheduleService : BackgroundService
 
     public async Task RunAsync()
     {
+        _logger.LogInformation("Start SyncScheduleService");
         await using var db1 = _dbContextFactory.CreateDbContext();
+        db1.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         var snapshotted =
             await db1.UserSnapshots
             .Select(s => new { s.UserId, s.Mode })
@@ -51,6 +53,7 @@ public sealed class SyncScheduleService : BackgroundService
             db1.UpdateSchedules.AddRange(toSchedule);
             await db1.SaveChangesAsync().ConfigureAwait(false);
         }
+        _logger.LogInformation("End SyncScheduleService");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
