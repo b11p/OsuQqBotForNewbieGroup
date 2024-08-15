@@ -1971,7 +1971,10 @@
           "Polly": "8.3.1"
         },
         "runtime": {
-          "Bleatingsheep.NewHydrant.Data.dll": {}
+          "Bleatingsheep.NewHydrant.Data.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Bleatingsheep.OsuQqBot.Database/1.0.0": {
@@ -1982,7 +1985,10 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.2"
         },
         "runtime": {
-          "Bleatingsheep.OsuQqBot.Database.dll": {}
+          "Bleatingsheep.OsuQqBot.Database.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }
