@@ -1636,7 +1636,10 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.2"
         },
         "runtime": {
-          "Bleatingsheep.OsuQqBot.Database.dll": {}
+          "Bleatingsheep.OsuQqBot.Database.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }

@@ -14,5 +14,13 @@
             <param name="limit">Maximum count in results.</param>
             <returns>Play records.</returns>
         </member>
+        <member name="M:NewHydrantApi.Controllers.UserSnapshotController.Get(System.Int32,Bleatingsheep.Osu.Mode)">
+            <summary>
+            Get the snapshot of user info 24 hours ago.
+            </summary>
+            <param name="userId">User osu! ID.</param>
+            <param name="mode">Game mode.</param>
+            <returns>NotFound if the user has no snapshot data in the past 36 hours. If found, the snapshot taken closest to the moment 24 hours ago.</returns>
+        </member>
     </members>
 </doc>
