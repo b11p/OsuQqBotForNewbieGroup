@@ -6,6 +6,7 @@ on:
     paths:
       - 'Bleatingsheep.OsuQqBot.Database/**'
       - 'NewHydrantApi/**'
+      - '.github/workflows/dotnet_web.yml'
   pull_request:
     branches: [ master ]
 

@@ -12,6 +12,7 @@ on:
       - 'Bleatingsheep.NewHydrant.Data/**'
       - 'Bleatingsheep.OsuMixedApi/**'
       - 'Bleatingsheep.OsuQqBot.Database/**'
+      - '.github/workflows/dotnet.yml'
   pull_request:
     branches: [ master ]
 

@@ -7,6 +7,7 @@ on:
       - 'Bleatingsheep.NewHydrant.Data/**'
       - 'Bleatingsheep.NewHydrant.DataMaintenance/**'
       - 'Bleatingsheep.OsuQqBot.Database/**'
+      - '.github/workflows/dotnet_datamaintenance.yml'
   pull_request:
     branches: [ master ]
 
