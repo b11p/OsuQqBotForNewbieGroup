@@ -33,6 +33,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             956887748, // 樱娜消防栓分身
             2509895200, // 消防栓2
             122866607, // 消防栓1
+            3889016014, // yumu
         };
 
         private static readonly HashSet<long> IgnorePerformanceListBase = new HashSet<long>
