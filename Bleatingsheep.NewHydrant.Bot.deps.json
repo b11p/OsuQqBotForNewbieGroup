@@ -2070,7 +2070,10 @@
           "Sisters.WudiLib": "0.4.2-alpha2"
         },
         "runtime": {
-          "Bleatingsheep.NewHydrant.dll": {}
+          "Bleatingsheep.NewHydrant.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Bleatingsheep.NewHydrant.Bot.Common/1.0.0": {
@@ -2082,7 +2085,10 @@
           "PuppeteerSharp": "17.0.0"
         },
         "runtime": {
-          "Bleatingsheep.NewHydrant.Bot.Common.dll": {}
+          "Bleatingsheep.NewHydrant.Bot.Common.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Bleatingsheep.NewHydrant.Bot.Private/1.0.0": {
@@ -2098,7 +2104,10 @@
           "System.ServiceModel.Syndication": "8.0.0"
         },
         "runtime": {
-          "Bleatingsheep.NewHydrant.Bot.Private.dll": {}
+          "Bleatingsheep.NewHydrant.Bot.Private.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Bleatingsheep.NewHydrant.Bot.Public/1.0.0": {
@@ -2114,7 +2123,10 @@
           "WebApiClient.AOT": "1.1.4"
         },
         "runtime": {
-          "Bleatingsheep.NewHydrant.Bot.Public.dll": {}
+          "Bleatingsheep.NewHydrant.Bot.Public.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Bleatingsheep.NewHydrant.Data/1.0.0": {
@@ -2124,7 +2136,10 @@
           "Polly": "8.3.1"
         },
         "runtime": {
-          "Bleatingsheep.NewHydrant.Data.dll": {}
+          "Bleatingsheep.NewHydrant.Data.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Bleatingsheep.OsuMixedApi/1.0.0": {
@@ -2134,7 +2149,10 @@
           "Polly": "8.3.1"
         },
         "runtime": {
-          "Bleatingsheep.OsuMixedApi.dll": {}
+          "Bleatingsheep.OsuMixedApi.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "Bleatingsheep.OsuQqBot.Database/1.0.0": {
@@ -2145,7 +2163,10 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.2"
         },
         "runtime": {
-          "Bleatingsheep.OsuQqBot.Database.dll": {}
+          "Bleatingsheep.OsuQqBot.Database.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }
