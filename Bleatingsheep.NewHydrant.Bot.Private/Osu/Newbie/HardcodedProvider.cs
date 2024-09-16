@@ -34,6 +34,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             2509895200, // 消防栓2
             122866607, // 消防栓1
             3889016014, // yumu
+            2854196310, // qq群管家
         };
 
         private static readonly HashSet<long> IgnorePerformanceListBase = new HashSet<long>
