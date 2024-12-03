@@ -11,9 +11,9 @@
     <PackageReference Include="Bleatingsheep.Osu.Helper" Version="1.0.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Octokit" Version="13.0.1" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="System.ServiceModel.Syndication" Version="8.0.0" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
