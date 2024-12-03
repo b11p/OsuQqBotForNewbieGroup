@@ -44,12 +44,20 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
 
         public async Task ProcessAsync(MessageContext context, HttpApiClient api)
         {
-            var endDate = new DateTimeOffset(2024, 2, 21, 1, 1, 1, TimeSpan.Zero);
-            if (DateTimeOffset.UtcNow > endDate
-                && !(context is GroupMessage g && g.GroupId == 695600319)) // 允许管理群测试
+            var startDate = new DateTimeOffset(2024, 12, 31, 17, 0, 0, _timeZone);
+            var endDate = new DateTimeOffset(2025, 2, 13, 0, 0, 0, _timeZone);
+            if (!(context is GroupMessage g && g.GroupId == 695600319)) // 允许管理群测试
             {
-                await api.SendMessageAsync(context.Endpoint, "活动已结束。");
-                return;
+                if (DateTimeOffset.UtcNow < startDate)
+                {
+                    await api.SendMessageAsync(context.Endpoint, "活动未开始。");
+                    return;
+                }
+                if (DateTimeOffset.UtcNow >= endDate)
+                {
+                    await api.SendMessageAsync(context.Endpoint, "活动已结束。");
+                    return;
+                }
             }
 
             // check binding
