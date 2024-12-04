@@ -131,7 +131,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Yearly
             {
                 // first response
                 var frsb = new StringBuilder();
-                frsb.AppendLine($"\r\n{userInfo.Name}。当前模式：{_mode}，数据始于{snap.Date.ToOffset(_timeZone):M月d日}，完整度：{playList.Count}/{currentPC - startPC}。");
+                frsb.AppendLine($"{userInfo.Name}。当前模式：{_mode}，数据始于{snap.Date.ToOffset(_timeZone):M月d日}，完整度：{playList.Count}/{currentPC - startPC}。");
                 {
                     // days played
                     (int days, int totalDays) = GetPlayedDays();
