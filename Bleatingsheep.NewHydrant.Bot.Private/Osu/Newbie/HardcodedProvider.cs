@@ -90,7 +90,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
 #pragma warning disable CS1998
         public async Task<bool> ShouldIgnoreAsync(long qq) => IgnoreList.Contains(qq);
-        public async Task<bool> ShouldIgnorePerformanceAsync(long group, long qq) => group == NewbieGroupId ? IgnorePerformanceListBase.Contains(qq) : false;
+        public async Task<bool> ShouldIgnorePerformanceAsync(long group, long qq) => (group == NewbieGroupId || group == LegacyNewbieGroupId) ? IgnorePerformanceListBase.Contains(qq) : false;
 #pragma warning restore CS1998
         public double? PerformanceLimit(long group) => group == NewbieGroupId ? (double?)2500 : null;
     }
