@@ -65,7 +65,7 @@ Accuracy: {userPlus.Accuracy}";
 
         public bool ShouldResponse(MessageContext context)
         {
-            if (context is GroupMessage g && g.GroupId == 595985887)
+            if (context is GroupMessage g && (g.GroupId == 595985887 || g.GroupId == 231094840))
                 return false; // ignored in newbie group.
             return context.Content.TryGetPlainText(out var text) && text == "++";
         }
