@@ -254,7 +254,7 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
                 var (performance, level) = HintBinding(httpApiClient, endpoint, e).ConfigureAwait(false).GetAwaiter().GetResult();
                 if (performance >= limit)
                 {
-                    string response = "您的 PP 高于此群大部分玩家，不推荐加入本群。请加入";
+                    string response = "您的 PP 过高，请加入";
                     string groups = "其他群";
                     string reason = "暂无";
 
