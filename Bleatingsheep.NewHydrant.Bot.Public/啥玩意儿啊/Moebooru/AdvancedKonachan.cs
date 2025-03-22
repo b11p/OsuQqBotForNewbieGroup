@@ -206,6 +206,6 @@ namespace Bleatingsheep.NewHydrant.啥玩意儿啊.Moebooru
         private record struct ImageCacheEntry(bool IsSuccess, byte[] Data);
 
         public bool ShouldResponse(MessageContext context)
-            => RegexCommand(s_regex, context.Content) && (!(context is GroupMessage g) || !(g.GroupId == 595985887 || g.GroupId == 231094840));
+            => RegexCommand(s_regex, context.Content) && (!(context is GroupMessage g) || g.GroupId != 231094840);
     }
 }

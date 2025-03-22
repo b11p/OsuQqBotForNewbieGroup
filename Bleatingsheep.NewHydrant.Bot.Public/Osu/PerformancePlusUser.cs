@@ -165,7 +165,7 @@ namespace Bleatingsheep.NewHydrant.Osu
         {
             if (!message.Content.IsPlaintext)
                 return false;
-            if (message is GroupMessage g && (g.GroupId == 595985887 || g.GroupId == 231094840))
+            if (message is GroupMessage g && g.GroupId == 231094840)
                 return false; // ignored in newbie group.
             string text = message.Content.Text.Trim();
             if (text.StartsWith("+", StringComparison.Ordinal))

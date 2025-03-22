@@ -71,7 +71,6 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             97512825, // a9
         };
 
-        private const long LegacyNewbieGroupId = 595985887; // 即将删除
         private const long NewbieGroupId = 231094840;
         private const long AdvancedGroupId = 928936255;
         private const long HyperGroupId = 281624271;
@@ -83,14 +82,13 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
 
         public IEnumerable<long> MonitoredGroups { get; } = new List<long>
         {
-            LegacyNewbieGroupId,
             NewbieGroupId,
             AdvancedGroupId
         }.AsReadOnly();
 
 #pragma warning disable CS1998
         public async Task<bool> ShouldIgnoreAsync(long qq) => IgnoreList.Contains(qq);
-        public async Task<bool> ShouldIgnorePerformanceAsync(long group, long qq) => (group == NewbieGroupId || group == LegacyNewbieGroupId) ? IgnorePerformanceListBase.Contains(qq) : false;
+        public async Task<bool> ShouldIgnorePerformanceAsync(long group, long qq) => group == NewbieGroupId ? IgnorePerformanceListBase.Contains(qq) : false;
 #pragma warning restore CS1998
         public double? PerformanceLimit(long group) => group == NewbieGroupId ? (double?)2500 : null;
     }
