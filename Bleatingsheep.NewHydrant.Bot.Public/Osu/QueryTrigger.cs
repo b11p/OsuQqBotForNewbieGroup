@@ -134,9 +134,9 @@ namespace Bleatingsheep.NewHydrant.Osu
 
             // 临时广告：新人群 post 功能。
             long[] newbieGroups = [231094840, 928936255, 281624271, 758120648, 514661057]; // Span<long> 要到 9.0 才支持，因为这是个 async 方法。
-            if (DateTimeOffset.UtcNow < new DateTimeOffset(2025, 4, 3, 0, 0, 0, default) && context is GroupMessage g && newbieGroups.Contains(g.GroupId))
+            if (DateTimeOffset.UtcNow < new DateTimeOffset(2025, 4, 9, 0, 0, 0, default) && context is GroupMessage g && newbieGroups.Contains(g.GroupId))
             {
-                var textWithAdd = message.Sections[0].Data["text"] + "\r\n/post复活: https://osuxrq.com/misc/meme/";
+                var textWithAdd = message.Sections[0].Data["text"] + "\r\npost 4月7日重新复活";
                 message = new Message(textWithAdd);
             }
 
