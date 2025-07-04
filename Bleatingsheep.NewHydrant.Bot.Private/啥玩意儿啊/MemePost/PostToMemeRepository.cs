@@ -105,7 +105,11 @@ internal partial class PostToMemeRepository : IMessageCommand
                 return;
             }
 
-            var createFile = await gitHubClient.Repository.Content.CreateFile(pushData.Repository.Owner, pushData.Repository.Name, Path.Combine(pushData.Path, $"{EncodeFileName(fileName)}.{ext}"), new CreateFileRequest($"Bot upload. Group {g.GroupId}, User {g.UserId}", Convert.ToBase64String(imageBytes), false));
+            string commitMessage = $"""
+                Bot upload. Group {g.GroupId}, User {g.UserId}, Nickname {g.Sender.InGroupName}
+                {fileName}
+                """;
+            var createFile = await gitHubClient.Repository.Content.CreateFile(pushData.Repository.Owner, pushData.Repository.Name, Path.Combine(pushData.Path, $"{EncodeFileName(fileName)}.{ext}"), new CreateFileRequest(commitMessage, Convert.ToBase64String(imageBytes), false));
         }
         catch (HttpRequestException e)
         {
