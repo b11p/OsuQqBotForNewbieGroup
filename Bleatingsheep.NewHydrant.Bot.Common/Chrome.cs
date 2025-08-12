@@ -30,7 +30,7 @@ public static class Chrome
                 Width = 360,
                 Height = 640,
             },
-            Args = new[] { "--no-sandbox", "--lang=zh-CN" },
+            Args = new[] { "--no-sandbox", "--lang=zh-CN", "--font-render-hinting=medium" },
         });
     }
 
