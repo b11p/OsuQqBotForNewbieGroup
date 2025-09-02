@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Bleatingsheep.NewHydrant.Core;
 
 namespace Bleatingsheep.NewHydrant.Osu.Newbie
@@ -13,8 +14,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         /// <summary>
         /// 获取群名片提示。
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="v"></param>
+        /// <param name="name">玩家名</param>
+        /// <param name="card">群名片</param>
         /// <returns></returns>
         public static string GetHintMessage(string name, string card)
         {
@@ -24,9 +25,17 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
             // 用户名不行。
             else if (card.Contains(name, StringComparison.OrdinalIgnoreCase))
             {
-                // 临时忽略。
-                hint = "建议修改群名片，不要在用户名前后添加可以被用做用户名的字符，以免混淆。";
-                hint += "\r\n" + "建议群名片：" + RecommendCard(card, name);
+                if (name.Contains("_old", StringComparison.OrdinalIgnoreCase) || card.Contains("_old", StringComparison.OrdinalIgnoreCase))
+                {
+                    // 这是被 ppy 重命名了，推荐忽略掉
+                    hint = null;
+                }
+                else
+                {
+                    // 临时忽略。
+                    hint = "建议修改群名片，不要在用户名前后添加可以被用做用户名的字符，以免混淆。";
+                    hint += "\r\n" + "建议群名片：" + RecommendCard(card, name);
+                }
             }
             else
             {

@@ -58,7 +58,7 @@ public class Bind : Service, IMessageCommand
         }
         else if (oldOsuId == userInfo.Id)
         {
-            await api.SendMessageAsync(message.Endpoint, "未更改绑定。").ConfigureAwait(false);
+            await api.SendMessageAsync(message.Endpoint, "你已经绑定了这个账号。").ConfigureAwait(false);
         }
         else
         {
