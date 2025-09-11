@@ -89,7 +89,7 @@ csharp_prefer_braces = true:silent
 csharp_preserve_single_line_blocks = true:none
 csharp_preserve_single_line_statements = false:none
 csharp_prefer_static_local_function = true:suggestion
-csharp_prefer_simple_using_statement = false:none
+csharp_prefer_simple_using_statement = true:suggestion
 csharp_style_prefer_switch_expression = true:suggestion
 dotnet_style_readonly_field = true:suggestion
 
@@ -128,8 +128,8 @@ csharp_style_throw_expression = true:suggestion
 csharp_style_conditional_delegate_call = true:suggestion
 
 # Other features
-csharp_style_prefer_index_operator = false:none
-csharp_style_prefer_range_operator = false:none
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
 csharp_style_pattern_local_over_anonymous_function = false:none
 
 # Space preferences
