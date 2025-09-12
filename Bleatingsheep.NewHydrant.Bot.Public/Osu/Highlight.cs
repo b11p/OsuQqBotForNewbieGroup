@@ -60,7 +60,7 @@ public sealed partial class Highlight : Service, IMessageCommand
         {
             await api.SendMessageAsync(
                 context.Endpoint,
-                "开始查询今日高光，本群人数较多，可能耗时较长，请耐心等待。"
+                $"开始查询今日高光，本群人数较多，预计需要 {TimeSpan.FromSeconds(osuIds.Count * 0.4).TotalMinutes:0.0} 分钟，请耐心等待。"
             );
         }
 
@@ -81,6 +81,11 @@ public sealed partial class Highlight : Service, IMessageCommand
         List<UserSnapshot> history = await GetHistories(osuIds, mode).ConfigureAwait(false);
 
         Logger.Info($"找到 {history.Count} 个历史信息，耗时 {stopwatch.ElapsedMilliseconds}ms。");
+        if (history.Count == 0)
+        {
+            await api.SendMessageAsync(context.Endpoint, "你群根本没有人屙屎。");
+            return;
+        }
 
         var nowInfos = new ConcurrentDictionary<int, UserInfo>(-1, history.Count);
         var fails = Channel.CreateBounded<int>(history.Count);
@@ -88,11 +93,12 @@ public sealed partial class Highlight : Service, IMessageCommand
         stopwatch = Stopwatch.StartNew();
         var fetchIds = history.Select(h => h.UserId).Distinct().ToList();
         int completes = 0;
-        var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(5)).Token;
-        var tasks = await fetchIds
-            .ToAsyncEnumerable()
-            .Concat(failsRx.ReadAllAsync())
-            .Select(async bi =>
+        int retries = 0;
+        var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(10)).Token;
+        await Parallel.ForEachAsync(
+            fetchIds.ToAsyncEnumerable().Concat(failsRx.ReadAllAsync()),
+            new ParallelOptions { MaxDegreeOfParallelism = 8 },
+            async (bi, _cancellationToken) =>
             {
                 var (success, userInfo) = await OsuApi
                     .GetCachedUserInfo(bi, mode)
@@ -105,6 +111,7 @@ public sealed partial class Highlight : Service, IMessageCommand
                         _ = failsTx.TryComplete();
                     }
 
+                    Interlocked.Increment(ref retries);
                     _ = failsTx.TryWrite(bi);
                     // 如果写入时 Channel 已关闭，则会写入失败，这种情况下不需要再写入了。
                 }
@@ -121,11 +128,10 @@ public sealed partial class Highlight : Service, IMessageCommand
                         nowInfos[bi] = userInfo;
                     }
                 }
-            })
-            .ToArrayAsync();
-        await Task.WhenAll(tasks).ConfigureAwait(false);
+            }
+        );
         Logger.Info(
-            $"查询 API 花费 {stopwatch.ElapsedMilliseconds}ms，失败 {fetchIds.Count - completes} 个，重试 {tasks.Length - fetchIds.Count} 次。"
+            $"查询 API 花费 {stopwatch.ElapsedMilliseconds}ms，失败 {fetchIds.Count - completes} 个，重试 {retries} 次。"
         );
 
         var errorMessages = new List<string>();
@@ -136,7 +142,7 @@ public sealed partial class Highlight : Service, IMessageCommand
         if (fetchIds.Count - completes > 0)
         {
             errorMessages.Add(
-                $"有 {fetchIds.Count - completes} 人增量数据查询失败，重试了 {tasks.Length - fetchIds.Count} 次。"
+                $"有 {fetchIds.Count - completes} 人增量数据查询失败，重试了 {retries} 次。"
             );
         }
 
