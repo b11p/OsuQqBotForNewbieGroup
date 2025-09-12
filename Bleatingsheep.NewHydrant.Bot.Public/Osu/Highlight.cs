@@ -125,7 +125,7 @@ public sealed partial class Highlight : Service, IMessageCommand
             .ToArrayAsync();
         await Task.WhenAll(tasks).ConfigureAwait(false);
         Logger.Info(
-            $"查询 API 花费 {stopwatch.ElapsedMilliseconds}ms，失败 {tasks.Length - fetchIds.Count} 个。"
+            $"查询 API 花费 {stopwatch.ElapsedMilliseconds}ms，失败 {fetchIds.Count - completes} 个，重试 {tasks.Length - fetchIds.Count} 次。"
         );
 
         var errorMessages = new List<string>();
@@ -133,9 +133,11 @@ public sealed partial class Highlight : Service, IMessageCommand
         {
             errorMessages.Add("查询用户信息超时，部分数据可能不完整。");
         }
-        if (tasks.Length - fetchIds.Count > 0)
+        if (fetchIds.Count - completes > 0)
         {
-            errorMessages.Add($"有 {tasks.Length - fetchIds.Count} 人增量数据查询失败。");
+            errorMessages.Add(
+                $"有 {fetchIds.Count - completes} 人增量数据查询失败，重试了 {tasks.Length - fetchIds.Count} 次。"
+            );
         }
 
         var cps = (
