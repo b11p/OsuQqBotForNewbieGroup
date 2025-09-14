@@ -105,9 +105,13 @@ public sealed partial class Highlight : Service, IMessageCommand
                     .ConfigureAwait(false);
                 if (!success)
                 {
-                    if (cancellationToken.IsCancellationRequested)
+                    try
                     {
-                        Logger.Error("查询用户信息超时，取消中...");
+                        await Task.Delay(100, cancellationToken);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        // 超时，关闭 Channel，不再重试。
                         _ = failsTx.TryComplete();
                     }
 
