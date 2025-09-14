@@ -1938,14 +1938,6 @@
           "System.Runtime.Handles": "4.0.1"
         }
       },
-      "System.Threading.RateLimiting/9.0.9": {
-        "runtime": {
-          "lib/net8.0/System.Threading.RateLimiting.dll": {
-            "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.925.41916"
-          }
-        }
-      },
       "System.Threading.Tasks/4.0.11": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.0.2",
@@ -2135,8 +2127,7 @@
           "Octokit": "14.0.0",
           "SixLabors.ImageSharp": "3.1.11",
           "System.Linq.Async": "6.0.3",
-          "System.ServiceModel.Syndication": "9.0.9",
-          "System.Threading.RateLimiting": "9.0.9"
+          "System.ServiceModel.Syndication": "9.0.9"
         },
         "runtime": {
           "Bleatingsheep.NewHydrant.Bot.Private.dll": {
@@ -3317,13 +3308,6 @@
       "sha512": "sha512-f7aLuLkBoCQM2kng7zqLFBXz9Gk48gDK8lk1ih9rH/1arJJzZK9gJwNvPDhL6Ps/l6rwOr8jw+4FCHL0KKWiEg==",
       "path": "system.threading.overlapped/4.0.1",
       "hashPath": "system.threading.overlapped.4.0.1.nupkg.sha512"
-    },
-    "System.Threading.RateLimiting/9.0.9": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-+2gqdVYz7yXABt5ocTReuccVPVCLh6dowyL02R5wvHO+J+jGxgDMgAG97IvV0Aw1sGkJmQDH1eJSxZgbxHoo9A==",
-      "path": "system.threading.ratelimiting/9.0.9",
-      "hashPath": "system.threading.ratelimiting.9.0.9.nupkg.sha512"
     },
     "System.Threading.Tasks/4.0.11": {
       "type": "package",
