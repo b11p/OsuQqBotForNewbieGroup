@@ -11,9 +11,9 @@
           "Bleatingsheep.NewHydrant": "1.0.0",
           "Bleatingsheep.NewHydrant.Bot.Private": "1.0.0",
           "Bleatingsheep.NewHydrant.Bot.Public": "1.0.0",
-          "Microsoft.Extensions.Configuration.Json": "9.0.7",
-          "Microsoft.Extensions.Hosting": "9.0.7",
-          "NLog.Extensions.Logging": "6.0.2",
+          "Microsoft.Extensions.Configuration.Json": "9.0.9",
+          "Microsoft.Extensions.Hosting": "9.0.9",
+          "NLog.Extensions.Logging": "6.0.4",
           "Sisters.WudiLib": "0.4.2-alpha2",
           "Sisters.WudiLib.WebSocket": "0.2.1"
         },
@@ -243,8 +243,8 @@
         "dependencies": {
           "Microsoft.EntityFrameworkCore.Abstractions": "9.0.1",
           "Microsoft.EntityFrameworkCore.Analyzers": "9.0.1",
-          "Microsoft.Extensions.Caching.Memory": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7"
+          "Microsoft.Extensions.Caching.Memory": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.EntityFrameworkCore.dll": {
@@ -265,9 +265,9 @@
       "Microsoft.EntityFrameworkCore.Relational/9.0.1": {
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "9.0.1",
-          "Microsoft.Extensions.Caching.Memory": "9.0.7",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7"
+          "Microsoft.Extensions.Caching.Memory": "9.0.9",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.EntityFrameworkCore.Relational.dll": {
@@ -276,263 +276,263 @@
           }
         }
       },
-      "Microsoft.Extensions.Caching.Abstractions/9.0.7": {
+      "Microsoft.Extensions.Caching.Abstractions/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "9.0.7"
+          "Microsoft.Extensions.Primitives": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Caching.Abstractions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Caching.Memory/9.0.7": {
+      "Microsoft.Extensions.Caching.Memory/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Caching.Abstractions": "9.0.7",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7",
-          "Microsoft.Extensions.Primitives": "9.0.7"
+          "Microsoft.Extensions.Caching.Abstractions": "9.0.9",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9",
+          "Microsoft.Extensions.Primitives": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Caching.Memory.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Configuration/9.0.7": {
+      "Microsoft.Extensions.Configuration/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Primitives": "9.0.7"
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Primitives": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.Abstractions/9.0.7": {
+      "Microsoft.Extensions.Configuration.Abstractions/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "9.0.7"
+          "Microsoft.Extensions.Primitives": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.Abstractions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.Binder/9.0.7": {
+      "Microsoft.Extensions.Configuration.Binder/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7"
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.Binder.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.CommandLine/9.0.7": {
+      "Microsoft.Extensions.Configuration.CommandLine/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "9.0.7",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7"
+          "Microsoft.Extensions.Configuration": "9.0.9",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.CommandLine.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.EnvironmentVariables/9.0.7": {
+      "Microsoft.Extensions.Configuration.EnvironmentVariables/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "9.0.7",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7"
+          "Microsoft.Extensions.Configuration": "9.0.9",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.EnvironmentVariables.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.FileExtensions/9.0.7": {
+      "Microsoft.Extensions.Configuration.FileExtensions/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "9.0.7",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.7",
-          "Microsoft.Extensions.FileProviders.Physical": "9.0.7",
-          "Microsoft.Extensions.Primitives": "9.0.7"
+          "Microsoft.Extensions.Configuration": "9.0.9",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.9",
+          "Microsoft.Extensions.FileProviders.Physical": "9.0.9",
+          "Microsoft.Extensions.Primitives": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.FileExtensions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.Json/9.0.7": {
+      "Microsoft.Extensions.Configuration.Json/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "9.0.7",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Configuration.FileExtensions": "9.0.7",
-          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.7",
-          "System.Text.Json": "9.0.7"
+          "Microsoft.Extensions.Configuration": "9.0.9",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Configuration.FileExtensions": "9.0.9",
+          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.9",
+          "System.Text.Json": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.Json.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Configuration.UserSecrets/9.0.7": {
+      "Microsoft.Extensions.Configuration.UserSecrets/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Configuration.Json": "9.0.7",
-          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.7",
-          "Microsoft.Extensions.FileProviders.Physical": "9.0.7"
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Configuration.Json": "9.0.9",
+          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.9",
+          "Microsoft.Extensions.FileProviders.Physical": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Configuration.UserSecrets.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.DependencyInjection/9.0.7": {
+      "Microsoft.Extensions.DependencyInjection/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.DependencyInjection.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.7": {
+      "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.9": {
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Diagnostics/9.0.7": {
+      "Microsoft.Extensions.Diagnostics/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "9.0.7",
-          "Microsoft.Extensions.Diagnostics.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.7"
+          "Microsoft.Extensions.Configuration": "9.0.9",
+          "Microsoft.Extensions.Diagnostics.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Diagnostics.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Diagnostics.Abstractions/9.0.7": {
+      "Microsoft.Extensions.Diagnostics.Abstractions/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7",
-          "System.Diagnostics.DiagnosticSource": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9",
+          "System.Diagnostics.DiagnosticSource": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Diagnostics.Abstractions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.FileProviders.Abstractions/9.0.7": {
+      "Microsoft.Extensions.FileProviders.Abstractions/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "9.0.7"
+          "Microsoft.Extensions.Primitives": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.FileProviders.Abstractions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.FileProviders.Physical/9.0.7": {
+      "Microsoft.Extensions.FileProviders.Physical/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.7",
-          "Microsoft.Extensions.FileSystemGlobbing": "9.0.7",
-          "Microsoft.Extensions.Primitives": "9.0.7"
+          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.9",
+          "Microsoft.Extensions.FileSystemGlobbing": "9.0.9",
+          "Microsoft.Extensions.Primitives": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.FileProviders.Physical.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.FileSystemGlobbing/9.0.7": {
+      "Microsoft.Extensions.FileSystemGlobbing/9.0.9": {
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.FileSystemGlobbing.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Hosting/9.0.7": {
+      "Microsoft.Extensions.Hosting/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "9.0.7",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Configuration.Binder": "9.0.7",
-          "Microsoft.Extensions.Configuration.CommandLine": "9.0.7",
-          "Microsoft.Extensions.Configuration.EnvironmentVariables": "9.0.7",
-          "Microsoft.Extensions.Configuration.FileExtensions": "9.0.7",
-          "Microsoft.Extensions.Configuration.Json": "9.0.7",
-          "Microsoft.Extensions.Configuration.UserSecrets": "9.0.7",
-          "Microsoft.Extensions.DependencyInjection": "9.0.7",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Diagnostics": "9.0.7",
-          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.7",
-          "Microsoft.Extensions.FileProviders.Physical": "9.0.7",
-          "Microsoft.Extensions.Hosting.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging.Configuration": "9.0.7",
-          "Microsoft.Extensions.Logging.Console": "9.0.7",
-          "Microsoft.Extensions.Logging.Debug": "9.0.7",
-          "Microsoft.Extensions.Logging.EventLog": "9.0.7",
-          "Microsoft.Extensions.Logging.EventSource": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7"
+          "Microsoft.Extensions.Configuration": "9.0.9",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Configuration.Binder": "9.0.9",
+          "Microsoft.Extensions.Configuration.CommandLine": "9.0.9",
+          "Microsoft.Extensions.Configuration.EnvironmentVariables": "9.0.9",
+          "Microsoft.Extensions.Configuration.FileExtensions": "9.0.9",
+          "Microsoft.Extensions.Configuration.Json": "9.0.9",
+          "Microsoft.Extensions.Configuration.UserSecrets": "9.0.9",
+          "Microsoft.Extensions.DependencyInjection": "9.0.9",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Diagnostics": "9.0.9",
+          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.9",
+          "Microsoft.Extensions.FileProviders.Physical": "9.0.9",
+          "Microsoft.Extensions.Hosting.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging.Configuration": "9.0.9",
+          "Microsoft.Extensions.Logging.Console": "9.0.9",
+          "Microsoft.Extensions.Logging.Debug": "9.0.9",
+          "Microsoft.Extensions.Logging.EventLog": "9.0.9",
+          "Microsoft.Extensions.Logging.EventSource": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Hosting.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Hosting.Abstractions/9.0.7": {
+      "Microsoft.Extensions.Hosting.Abstractions/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Diagnostics.Abstractions": "9.0.7",
-          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7"
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Diagnostics.Abstractions": "9.0.9",
+          "Microsoft.Extensions.FileProviders.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Hosting.Abstractions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
       "Microsoft.Extensions.Http/2.1.0": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Extensions.Http.dll": {
@@ -541,141 +541,141 @@
           }
         }
       },
-      "Microsoft.Extensions.Logging/9.0.7": {
+      "Microsoft.Extensions.Logging/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection": "9.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Logging.Abstractions/9.0.7": {
+      "Microsoft.Extensions.Logging.Abstractions/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "System.Diagnostics.DiagnosticSource": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "System.Diagnostics.DiagnosticSource": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.Abstractions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Logging.Configuration/9.0.7": {
+      "Microsoft.Extensions.Logging.Configuration/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration": "9.0.7",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Configuration.Binder": "9.0.7",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.7"
+          "Microsoft.Extensions.Configuration": "9.0.9",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Configuration.Binder": "9.0.9",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.Configuration.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Logging.Console/9.0.7": {
+      "Microsoft.Extensions.Logging.Console/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging.Configuration": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7",
-          "System.Text.Json": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging.Configuration": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9",
+          "System.Text.Json": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.Console.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Logging.Debug/9.0.7": {
+      "Microsoft.Extensions.Logging.Debug/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.Debug.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Logging.EventLog/9.0.7": {
+      "Microsoft.Extensions.Logging.EventLog/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7",
-          "System.Diagnostics.EventLog": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9",
+          "System.Diagnostics.EventLog": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.EventLog.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Logging.EventSource/9.0.7": {
+      "Microsoft.Extensions.Logging.EventSource/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7",
-          "Microsoft.Extensions.Primitives": "9.0.7",
-          "System.Text.Json": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9",
+          "Microsoft.Extensions.Primitives": "9.0.9",
+          "System.Text.Json": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Logging.EventSource.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Options/9.0.7": {
+      "Microsoft.Extensions.Options/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Primitives": "9.0.7"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Primitives": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Options.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Options.ConfigurationExtensions/9.0.7": {
+      "Microsoft.Extensions.Options.ConfigurationExtensions/9.0.9": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Configuration.Binder": "9.0.7",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Options": "9.0.7",
-          "Microsoft.Extensions.Primitives": "9.0.7"
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Configuration.Binder": "9.0.9",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options": "9.0.9",
+          "Microsoft.Extensions.Primitives": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Options.ConfigurationExtensions.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "Microsoft.Extensions.Primitives/9.0.7": {
+      "Microsoft.Extensions.Primitives/9.0.9": {
         "runtime": {
           "lib/net8.0/Microsoft.Extensions.Primitives.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
@@ -694,7 +694,7 @@
           "System.Collections.Immutable": "1.2.0",
           "System.ComponentModel": "4.0.1",
           "System.ComponentModel.Annotations": "4.1.0",
-          "System.Diagnostics.DiagnosticSource": "9.0.7",
+          "System.Diagnostics.DiagnosticSource": "9.0.9",
           "System.Diagnostics.Process": "4.1.0",
           "System.Dynamic.Runtime": "4.0.11",
           "System.Globalization.Extensions": "4.0.1",
@@ -849,30 +849,30 @@
           }
         }
       },
-      "NLog/6.0.2": {
+      "NLog/6.0.4": {
         "runtime": {
           "lib/netstandard2.1/NLog.dll": {
             "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.2.4328"
+            "fileVersion": "6.0.4.4534"
           }
         }
       },
-      "NLog.Extensions.Logging/6.0.2": {
+      "NLog.Extensions.Logging/6.0.4": {
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Logging": "9.0.7",
-          "NLog": "6.0.2"
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Logging": "9.0.9",
+          "NLog": "6.0.4"
         },
         "runtime": {
           "lib/net8.0/NLog.Extensions.Logging.dll": {
             "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.2.729"
+            "fileVersion": "6.0.4.735"
           }
         }
       },
       "Npgsql/9.0.3": {
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7"
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/Npgsql.dll": {
@@ -902,28 +902,28 @@
           }
         }
       },
-      "Polly/8.6.2": {
+      "Polly/8.6.3": {
         "dependencies": {
-          "Polly.Core": "8.6.2"
+          "Polly.Core": "8.6.3"
         },
         "runtime": {
           "lib/net6.0/Polly.dll": {
             "assemblyVersion": "8.0.0.0",
-            "fileVersion": "8.6.2.4790"
+            "fileVersion": "8.6.3.4893"
           }
         }
       },
-      "Polly.Core/8.6.2": {
+      "Polly.Core/8.6.3": {
         "runtime": {
           "lib/net8.0/Polly.Core.dll": {
             "assemblyVersion": "8.0.0.0",
-            "fileVersion": "8.6.2.4790"
+            "fileVersion": "8.6.3.4893"
           }
         }
       },
       "PuppeteerSharp/20.2.2": {
         "dependencies": {
-          "Microsoft.Extensions.Logging": "9.0.7"
+          "Microsoft.Extensions.Logging": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/PuppeteerSharp.dll": {
@@ -964,7 +964,7 @@
       },
       "Sisters.WudiLib/0.4.2-alpha2": {
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
           "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
@@ -1077,19 +1077,19 @@
           "System.Runtime": "4.1.0"
         }
       },
-      "System.Diagnostics.DiagnosticSource/9.0.7": {
+      "System.Diagnostics.DiagnosticSource/9.0.9": {
         "runtime": {
           "lib/net8.0/System.Diagnostics.DiagnosticSource.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "System.Diagnostics.EventLog/9.0.7": {
+      "System.Diagnostics.EventLog/9.0.9": {
         "runtime": {
           "lib/net8.0/System.Diagnostics.EventLog.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         },
         "runtimeTargets": {
@@ -1097,13 +1097,13 @@
             "rid": "win",
             "assetType": "runtime",
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           },
           "runtimes/win/lib/net8.0/System.Diagnostics.EventLog.dll": {
             "rid": "win",
             "assetType": "runtime",
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
@@ -1307,11 +1307,11 @@
           "runtime.native.System": "4.0.0"
         }
       },
-      "System.IO.Pipelines/9.0.7": {
+      "System.IO.Pipelines/9.0.9": {
         "runtime": {
           "lib/net8.0/System.IO.Pipelines.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
@@ -1395,7 +1395,7 @@
           "Microsoft.NETCore.Platforms": "1.0.2",
           "System.Collections": "4.0.11",
           "System.Diagnostics.Debug": "4.0.11",
-          "System.Diagnostics.DiagnosticSource": "9.0.7",
+          "System.Diagnostics.DiagnosticSource": "9.0.9",
           "System.Diagnostics.Tracing": "4.1.0",
           "System.Globalization": "4.0.11",
           "System.Globalization.Extensions": "4.0.1",
@@ -1847,11 +1847,11 @@
           "System.Threading": "4.0.11"
         }
       },
-      "System.ServiceModel.Syndication/9.0.7": {
+      "System.ServiceModel.Syndication/9.0.9": {
         "runtime": {
           "lib/net8.0/System.ServiceModel.Syndication.dll": {
-            "assemblyVersion": "9.0.0.7",
-            "fileVersion": "9.0.725.31616"
+            "assemblyVersion": "9.0.0.9",
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
@@ -1886,11 +1886,11 @@
           "System.Text.Encoding": "4.0.11"
         }
       },
-      "System.Text.Encodings.Web/9.0.7": {
+      "System.Text.Encodings.Web/9.0.9": {
         "runtime": {
           "lib/net8.0/System.Text.Encodings.Web.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         },
         "runtimeTargets": {
@@ -1898,19 +1898,19 @@
             "rid": "browser",
             "assetType": "runtime",
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
-      "System.Text.Json/9.0.7": {
+      "System.Text.Json/9.0.9": {
         "dependencies": {
-          "System.IO.Pipelines": "9.0.7",
-          "System.Text.Encodings.Web": "9.0.7"
+          "System.IO.Pipelines": "9.0.9",
+          "System.Text.Encodings.Web": "9.0.9"
         },
         "runtime": {
           "lib/net8.0/System.Text.Json.dll": {
             "assemblyVersion": "9.0.0.0",
-            "fileVersion": "9.0.725.31616"
+            "fileVersion": "9.0.925.41916"
           }
         }
       },
@@ -1936,6 +1936,14 @@
           "System.Resources.ResourceManager": "4.0.1",
           "System.Runtime": "4.1.0",
           "System.Runtime.Handles": "4.0.1"
+        }
+      },
+      "System.Threading.RateLimiting/9.0.9": {
+        "runtime": {
+          "lib/net8.0/System.Threading.RateLimiting.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.925.41916"
+          }
         }
       },
       "System.Threading.Tasks/4.0.11": {
@@ -2074,10 +2082,10 @@
       },
       "WebApiClient.AOT/1.1.4": {
         "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "9.0.7",
+          "Microsoft.Extensions.Caching.Memory": "9.0.9",
           "Microsoft.Extensions.Http": "2.1.0",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.7",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.7",
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "9.0.9",
           "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
@@ -2089,10 +2097,10 @@
       },
       "Bleatingsheep.NewHydrant/1.0.0": {
         "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "9.0.7",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.7",
-          "Microsoft.Extensions.DependencyInjection": "9.0.7",
-          "NLog": "6.0.2",
+          "Microsoft.Extensions.Caching.Memory": "9.0.9",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
+          "Microsoft.Extensions.DependencyInjection": "9.0.9",
+          "NLog": "6.0.4",
           "Sisters.WudiLib": "0.4.2-alpha2"
         },
         "runtime": {
@@ -2127,7 +2135,8 @@
           "Octokit": "14.0.0",
           "SixLabors.ImageSharp": "3.1.11",
           "System.Linq.Async": "6.0.3",
-          "System.ServiceModel.Syndication": "9.0.7"
+          "System.ServiceModel.Syndication": "9.0.9",
+          "System.Threading.RateLimiting": "9.0.9"
         },
         "runtime": {
           "Bleatingsheep.NewHydrant.Bot.Private.dll": {
@@ -2145,7 +2154,7 @@
           "Bleatingsheep.SimpleBooru": "0.3.0",
           "HtmlAgilityPack": "1.12.2",
           "System.Linq.Async": "6.0.3",
-          "System.ServiceModel.Syndication": "9.0.7",
+          "System.ServiceModel.Syndication": "9.0.9",
           "WebApiClient.AOT": "1.1.4"
         },
         "runtime": {
@@ -2159,7 +2168,7 @@
         "dependencies": {
           "Bleatingsheep.Osu.ApiClient": "0.6.21",
           "Bleatingsheep.OsuQqBot.Database": "1.0.0",
-          "Polly": "8.6.2"
+          "Polly": "8.6.3"
         },
         "runtime": {
           "Bleatingsheep.NewHydrant.Data.dll": {
@@ -2172,7 +2181,7 @@
         "dependencies": {
           "Bleatingsheep.Osu.Enums": "0.6.0",
           "Newtonsoft.Json": "13.0.3",
-          "Polly": "8.6.2"
+          "Polly": "8.6.3"
         },
         "runtime": {
           "Bleatingsheep.OsuMixedApi.dll": {
@@ -2329,138 +2338,138 @@
       "path": "microsoft.entityframeworkcore.relational/9.0.1",
       "hashPath": "microsoft.entityframeworkcore.relational.9.0.1.nupkg.sha512"
     },
-    "Microsoft.Extensions.Caching.Abstractions/9.0.7": {
+    "Microsoft.Extensions.Caching.Abstractions/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-30necCQehcg9lFkMEIE7HczcoYGML8GUH6jlincA18d896fLZM9wl5tpTPJHgzANQE/6KXRLZSWbgevgg5csSw==",
-      "path": "microsoft.extensions.caching.abstractions/9.0.7",
-      "hashPath": "microsoft.extensions.caching.abstractions.9.0.7.nupkg.sha512"
+      "sha512": "sha512-NgtRHOdPrAEacfjXLSrH/SRrSqGf6Vaa6d16mW2yoyJdg7AJr0BnBvxkv7PkCm/CHVyzojTK7Y+oUDEulqY1Qw==",
+      "path": "microsoft.extensions.caching.abstractions/9.0.9",
+      "hashPath": "microsoft.extensions.caching.abstractions.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Caching.Memory/9.0.7": {
+    "Microsoft.Extensions.Caching.Memory/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-nDu6c8fwrHQYccLnWnvyElrdkL3rZ97TZNqL+niMFUcApVBHdpDmKcRvciGymJ4Y0iLDTOo5J2XhDQEbNb+dFg==",
-      "path": "microsoft.extensions.caching.memory/9.0.7",
-      "hashPath": "microsoft.extensions.caching.memory.9.0.7.nupkg.sha512"
+      "sha512": "sha512-ln31BtsDsBQxykJgxuCtiUXWRET9FmqeEq0BpPIghkYtGpDDVs8ZcLHAjCCzbw6aGoLek4Z7JaDjSO/CjOD0iw==",
+      "path": "microsoft.extensions.caching.memory/9.0.9",
+      "hashPath": "microsoft.extensions.caching.memory.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration/9.0.7": {
+    "Microsoft.Extensions.Configuration/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-oxGR51+w5cXm5B9gU6XwpAB2sTiyPSmZm7hjvv0rzRnmL5o/KZzE103AuQj7sK26OBupjVzU/bZxDWvvU4nhEg==",
-      "path": "microsoft.extensions.configuration/9.0.7",
-      "hashPath": "microsoft.extensions.configuration.9.0.7.nupkg.sha512"
+      "sha512": "sha512-w87wF/90/VI0ZQBhf4rbMEeyEy0vi2WKjFmACsNAKNaorY+ZlVz7ddyXkbADvaWouMKffNmR0yQOGcrvSSvKGg==",
+      "path": "microsoft.extensions.configuration/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.Abstractions/9.0.7": {
+    "Microsoft.Extensions.Configuration.Abstractions/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-lut/kiVvNsQ120VERMUYSFhpXPpKjjql+giy03LesASPBBcC0o6+aoFdzJH9GaYpFTQ3fGVhVjKjvJDoAW5/IQ==",
-      "path": "microsoft.extensions.configuration.abstractions/9.0.7",
-      "hashPath": "microsoft.extensions.configuration.abstractions.9.0.7.nupkg.sha512"
+      "sha512": "sha512-p5RKAY9POvs3axwA/AQRuJeM8AHuE8h4qbP1NxQeGm0ep46aXz1oCLAp/oOYxX1GsjStgdhHrN3XXLLXr0+b3w==",
+      "path": "microsoft.extensions.configuration.abstractions/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.abstractions.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.Binder/9.0.7": {
+    "Microsoft.Extensions.Configuration.Binder/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ExY+zXHhU4o9KC2alp3ZdLWyVWVRSn5INqax5ABk+HEOHlAHzomhJ7ek9HHliyOMiVGoYWYaMFOGr9q59mSAGA==",
-      "path": "microsoft.extensions.configuration.binder/9.0.7",
-      "hashPath": "microsoft.extensions.configuration.binder.9.0.7.nupkg.sha512"
+      "sha512": "sha512-6SIp/6Bngk4jm2W36JekZbiIbFPdE/eMUtrJEqIqHGpd1zar3jvgnwxnpWQfzUiGrkyY8q8s6V82zkkEZozghA==",
+      "path": "microsoft.extensions.configuration.binder/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.binder.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.CommandLine/9.0.7": {
+    "Microsoft.Extensions.Configuration.CommandLine/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-LqwdkMNFeRyuqExewBSaWj8roEgZH8JQ9zEAmHl5ZFcnhCvjAdHICdYVRIiSEq9RWGB731LL8kZJM8tdTKEscA==",
-      "path": "microsoft.extensions.configuration.commandline/9.0.7",
-      "hashPath": "microsoft.extensions.configuration.commandline.9.0.7.nupkg.sha512"
+      "sha512": "sha512-9bzGOcHoTi8ijrj0MHh5qUY6n9CuittZUqEOj5iE0ZJoSCfG0BI9nhcpd8MC9bOOgjZW5OeizKO8rgta9lSVyA==",
+      "path": "microsoft.extensions.configuration.commandline/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.commandline.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.EnvironmentVariables/9.0.7": {
+    "Microsoft.Extensions.Configuration.EnvironmentVariables/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-R8kgazVpDr4k1K7MeWPLAwsi5VpwrhE3ubXK38D9gpHEvf9XhZhJ8kWHKK00LDg5hJ7pMQLggdZ7XFdQ5182Ug==",
-      "path": "microsoft.extensions.configuration.environmentvariables/9.0.7",
-      "hashPath": "microsoft.extensions.configuration.environmentvariables.9.0.7.nupkg.sha512"
+      "sha512": "sha512-AB8suTh4STAMGDkPer5vL0YNp09eplvbkIbOfFJ1z8D1zOiFF8Hipk9FhCLU4Ea6TosWmGrK30ZIUO9KvAeFcg==",
+      "path": "microsoft.extensions.configuration.environmentvariables/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.environmentvariables.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.FileExtensions/9.0.7": {
+    "Microsoft.Extensions.Configuration.FileExtensions/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-3LVg32iMfR9ENeegXAo73L+877iOcQauLJsXlKZNVSsLA/HbPgClZdeMGdjLSkaidYw3l02XbXTlOdGYNgu91Q==",
-      "path": "microsoft.extensions.configuration.fileextensions/9.0.7",
-      "hashPath": "microsoft.extensions.configuration.fileextensions.9.0.7.nupkg.sha512"
+      "sha512": "sha512-fvgubCs++wTowHWuQ5TAyZV0S6ldA59U+tBVqFr4/WLd0oEf6ESbdBN2CFaVdn4sZqnarqMnl2O3++RG/Jrf/w==",
+      "path": "microsoft.extensions.configuration.fileextensions/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.fileextensions.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.Json/9.0.7": {
+    "Microsoft.Extensions.Configuration.Json/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-3HQV326liEInT9UKEc+k73f1ECwNhvDS/DJAe5WvtMKDJTJqTH2ujrUC2ZlK/j6pXyPbV9f0Ku8JB20JveGImg==",
-      "path": "microsoft.extensions.configuration.json/9.0.7",
-      "hashPath": "microsoft.extensions.configuration.json.9.0.7.nupkg.sha512"
+      "sha512": "sha512-PiPYo1GTinR2ECM80zYdZUIFmde6jj5DryXUcOJg3yIjh+KQMQr42e+COD03QUsUiqNkJk511wVTnVpTm2AVZA==",
+      "path": "microsoft.extensions.configuration.json/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.json.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Configuration.UserSecrets/9.0.7": {
+    "Microsoft.Extensions.Configuration.UserSecrets/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ouDuPgRdeF4TJXKUh+lbm6QwyWwnCy+ijiqfFM2cI5NmW83MwKg1WNp2nCdMVcwQW8wJXteF/L9lA6ZPS3bCIQ==",
-      "path": "microsoft.extensions.configuration.usersecrets/9.0.7",
-      "hashPath": "microsoft.extensions.configuration.usersecrets.9.0.7.nupkg.sha512"
+      "sha512": "sha512-bFaNxfU8gQJX3K/Dd6XT0YIJ5ZVihdAY6Z02p2nVTUHjUsaWflLIucZOgB/ecSNnN3zbbBEf1oFC7q5NHTZIHw==",
+      "path": "microsoft.extensions.configuration.usersecrets/9.0.9",
+      "hashPath": "microsoft.extensions.configuration.usersecrets.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.DependencyInjection/9.0.7": {
+    "Microsoft.Extensions.DependencyInjection/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-i05AYA91vgq0as84ROVCyltD2gnxaba/f1Qw2rG7mUsS0gv8cPTr1Gm7jPQHq7JTr4MJoQUcanLVs16tIOUJaQ==",
-      "path": "microsoft.extensions.dependencyinjection/9.0.7",
-      "hashPath": "microsoft.extensions.dependencyinjection.9.0.7.nupkg.sha512"
+      "sha512": "sha512-zQV2WOSP+3z1EuK91ULxfGgo2Y75bTRnmJHp08+w/YXAyekZutX/qCd88/HOMNh35MDW9mJJJxPpMPS+1Rww8A==",
+      "path": "microsoft.extensions.dependencyinjection/9.0.9",
+      "hashPath": "microsoft.extensions.dependencyinjection.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.7": {
+    "Microsoft.Extensions.DependencyInjection.Abstractions/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-iPK1FxbGFr2Xb+4Y+dTYI8Gupu9pOi8I3JPuPsrogUmEhe2hzZ9LpCmolMEBhVDo2ikcSr7G5zYiwaapHSQTew==",
-      "path": "microsoft.extensions.dependencyinjection.abstractions/9.0.7",
-      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.9.0.7.nupkg.sha512"
+      "sha512": "sha512-/hymojfWbE9AlDOa0mczR44m00Jj+T3+HZO0ZnVTI032fVycI0ZbNOVFP6kqZMcXiLSYXzR2ilcwaRi6dzeGyA==",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/9.0.9",
+      "hashPath": "microsoft.extensions.dependencyinjection.abstractions.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Diagnostics/9.0.7": {
+    "Microsoft.Extensions.Diagnostics/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-6ykfInm6yw7pPHJACgnrPUXxUWVslFnzad44K/siXk6Ovan6fNMnXxI5X9vphHJuZ4JbMOdPIgsfTmLD+Dyxug==",
-      "path": "microsoft.extensions.diagnostics/9.0.7",
-      "hashPath": "microsoft.extensions.diagnostics.9.0.7.nupkg.sha512"
+      "sha512": "sha512-gtzl9SD6CvFYOb92qEF41Z9rICzYniM342TWbbJwN3eLS6a5fCLFvO1pQGtpMSnP3h1zHXupMEeKSA9musWYCQ==",
+      "path": "microsoft.extensions.diagnostics/9.0.9",
+      "hashPath": "microsoft.extensions.diagnostics.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Diagnostics.Abstractions/9.0.7": {
+    "Microsoft.Extensions.Diagnostics.Abstractions/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-d39Ov1JpeWCGLCOTinlaDkujhrSAQ0HFxb7Su1BjhCKBfmDcQ6Ia1i3JI6kd3NFgwi1dexTunu82daDNwt7E6w==",
-      "path": "microsoft.extensions.diagnostics.abstractions/9.0.7",
-      "hashPath": "microsoft.extensions.diagnostics.abstractions.9.0.7.nupkg.sha512"
+      "sha512": "sha512-YHGmxccrVZ2Ar3eI+/NdbOHkd1/HzrHvmQ5yBsp0Gl7jTyBe6qcXNYjUt9v9JIO+Z14la44+YYEe63JSqs1fYg==",
+      "path": "microsoft.extensions.diagnostics.abstractions/9.0.9",
+      "hashPath": "microsoft.extensions.diagnostics.abstractions.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.FileProviders.Abstractions/9.0.7": {
+    "Microsoft.Extensions.FileProviders.Abstractions/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-y9djCca1cz/oz/J8jTxtoecNiNvaiGBJeWd7XOPxonH+FnfHqcfslJMcSr5JMinmWFyS7eh3C9L6m6oURZ5lSA==",
-      "path": "microsoft.extensions.fileproviders.abstractions/9.0.7",
-      "hashPath": "microsoft.extensions.fileproviders.abstractions.9.0.7.nupkg.sha512"
+      "sha512": "sha512-M1ZhL9QkBQ/k6l/Wjgcli5zrV86HzytQ+gQiNtk9vs9Ge1fb17KKZil9T6jd15p2x/BGfXpup7Hg55CC0kkfig==",
+      "path": "microsoft.extensions.fileproviders.abstractions/9.0.9",
+      "hashPath": "microsoft.extensions.fileproviders.abstractions.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.FileProviders.Physical/9.0.7": {
+    "Microsoft.Extensions.FileProviders.Physical/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-JYEPYrb+YBpFTCdmSBrk8cg3wAi1V4so7ccq04qbhg3FQHQqgJk28L3heEOKMXcZobOBUjTnGCFJD49Ez9kG5w==",
-      "path": "microsoft.extensions.fileproviders.physical/9.0.7",
-      "hashPath": "microsoft.extensions.fileproviders.physical.9.0.7.nupkg.sha512"
+      "sha512": "sha512-sRrPtEwbK23OCFOQ36Xn6ofiB0/nl54/BOdR7lJ/Vwg3XlyvUdmyXvFUS1EU5ltn+sQtbcPuy1l0hsysO8++SQ==",
+      "path": "microsoft.extensions.fileproviders.physical/9.0.9",
+      "hashPath": "microsoft.extensions.fileproviders.physical.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.FileSystemGlobbing/9.0.7": {
+    "Microsoft.Extensions.FileSystemGlobbing/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-5VKpTH2ME0SSs0lrtkpKgjCeHzXR5ka/H+qThPwuWi78wHubApZ/atD7w69FDt0OOM7UMV6LIbkqEQgoby4IXA==",
-      "path": "microsoft.extensions.filesystemglobbing/9.0.7",
-      "hashPath": "microsoft.extensions.filesystemglobbing.9.0.7.nupkg.sha512"
+      "sha512": "sha512-iQAgORaVIlkhcpxFnVEfjqNWfQCwBEEH7x2IanTwGafA6Tb4xiBoDWySTxUo3MV2NUV/PmwS/8OhT/elPnJCnw==",
+      "path": "microsoft.extensions.filesystemglobbing/9.0.9",
+      "hashPath": "microsoft.extensions.filesystemglobbing.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Hosting/9.0.7": {
+    "Microsoft.Extensions.Hosting/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Dkv55VfitwJjPUk9mFHxT9MJAd8su7eJNaCHhBU/Y9xFqw3ZNHwrpeptXeaXiaPtfQq+alMmawIz1Impk5pHkQ==",
-      "path": "microsoft.extensions.hosting/9.0.7",
-      "hashPath": "microsoft.extensions.hosting.9.0.7.nupkg.sha512"
+      "sha512": "sha512-DmRsWH3g8yZGho/pLQ79hxhM2ctE1eDTZ/HbAnrD/uw8m+P2pRRJOoBVxlrhbhMP3/y3oAJoy0yITasfmilbTg==",
+      "path": "microsoft.extensions.hosting/9.0.9",
+      "hashPath": "microsoft.extensions.hosting.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Hosting.Abstractions/9.0.7": {
+    "Microsoft.Extensions.Hosting.Abstractions/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-yG2JCXAR+VqI1mKqynLPNJlNlrUJeEISEpX4UznOp2uM4IEFz3pDDauzyMvTjICutEJtOigJ1yWBvxbaIlibBw==",
-      "path": "microsoft.extensions.hosting.abstractions/9.0.7",
-      "hashPath": "microsoft.extensions.hosting.abstractions.9.0.7.nupkg.sha512"
+      "sha512": "sha512-ORA4dICNz7cuwupPkjXpSuoiK6GMg0aygInBIQCCFEimwoHntRKdJqB59faxq2HHJuTPW3NsZm5EjN5P5Zh6nQ==",
+      "path": "microsoft.extensions.hosting.abstractions/9.0.9",
+      "hashPath": "microsoft.extensions.hosting.abstractions.9.0.9.nupkg.sha512"
     },
     "Microsoft.Extensions.Http/2.1.0": {
       "type": "package",
@@ -2469,75 +2478,75 @@
       "path": "microsoft.extensions.http/2.1.0",
       "hashPath": "microsoft.extensions.http.2.1.0.nupkg.sha512"
     },
-    "Microsoft.Extensions.Logging/9.0.7": {
+    "Microsoft.Extensions.Logging/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-fdIeQpXYV8yxSWG03cCbU2Otdrq4NWuhnQLXokWLv3L9YcK055E7u8WFJvP+uuP4CFeCEoqZQL4yPcjuXhCZrg==",
-      "path": "microsoft.extensions.logging/9.0.7",
-      "hashPath": "microsoft.extensions.logging.9.0.7.nupkg.sha512"
+      "sha512": "sha512-MaCB0Y9hNDs4YLu3HCJbo199WnJT8xSgajG1JYGANz9FkseQ5f3v/llu3HxLI6mjDlu7pa7ps9BLPWjKzsAAzQ==",
+      "path": "microsoft.extensions.logging/9.0.9",
+      "hashPath": "microsoft.extensions.logging.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Logging.Abstractions/9.0.7": {
+    "Microsoft.Extensions.Logging.Abstractions/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-sMM6NEAdUTE/elJ2wqjOi0iBWqZmSyaTByLF9e8XHv6DRJFFnOe0N+s8Uc6C91E4SboQCfLswaBIZ+9ZXA98AA==",
-      "path": "microsoft.extensions.logging.abstractions/9.0.7",
-      "hashPath": "microsoft.extensions.logging.abstractions.9.0.7.nupkg.sha512"
+      "sha512": "sha512-FEgpSF+Z9StMvrsSViaybOBwR0f0ZZxDm8xV5cSOFiXN/t+ys+rwAlTd/6yG7Ld1gfppgvLcMasZry3GsI9lGA==",
+      "path": "microsoft.extensions.logging.abstractions/9.0.9",
+      "hashPath": "microsoft.extensions.logging.abstractions.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Logging.Configuration/9.0.7": {
+    "Microsoft.Extensions.Logging.Configuration/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-AEBty9rvFGvdFRqgIDEhQmiCnIfQWyzVoOZrO244cfu+n9M+wI1QLDpuROVILlplIBtLVmOezAF7d1H3Qog6Xw==",
-      "path": "microsoft.extensions.logging.configuration/9.0.7",
-      "hashPath": "microsoft.extensions.logging.configuration.9.0.7.nupkg.sha512"
+      "sha512": "sha512-Abuo+S0Sg+Ke6vzSh5Ell+lwJJM+CEIqg1ImtWnnqF6a/ibJkQnmFJi4/ekEw/0uAcdFKJXtGV7w6cFN0nyXeg==",
+      "path": "microsoft.extensions.logging.configuration/9.0.9",
+      "hashPath": "microsoft.extensions.logging.configuration.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Logging.Console/9.0.7": {
+    "Microsoft.Extensions.Logging.Console/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pEHlNa8iCfKsBFA3YVDn/8EicjSU/m8uDfyoR0i4svONDss4Yu9Kznw53E/TyI+TveTo7CwRid4kfd4pLYXBig==",
-      "path": "microsoft.extensions.logging.console/9.0.7",
-      "hashPath": "microsoft.extensions.logging.console.9.0.7.nupkg.sha512"
+      "sha512": "sha512-x3+W7IfW9Tg3sV+sU9N1039M4CqklaAecwhz9qNtjOCBdmg7h96JaL+NAvhYgZgweVJTJaxAvuO8I+ZZehE7Pg==",
+      "path": "microsoft.extensions.logging.console/9.0.9",
+      "hashPath": "microsoft.extensions.logging.console.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Logging.Debug/9.0.7": {
+    "Microsoft.Extensions.Logging.Debug/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-MxzZj7XbsYJwfjclVTjJym2/nVIkksu7l7tC/4HYy+YRdDmpE4B+hTzCXu3BNfLNhdLPZsWpyXuYe6UGgWDm3g==",
-      "path": "microsoft.extensions.logging.debug/9.0.7",
-      "hashPath": "microsoft.extensions.logging.debug.9.0.7.nupkg.sha512"
+      "sha512": "sha512-q8IbjIzTjfaGfuf9LAuG3X9BytAWj2hWhLU61rEkit847oaSSbcdx/yybY3yL9RgVG1u9ctk7kbCv18M+7Fi6Q==",
+      "path": "microsoft.extensions.logging.debug/9.0.9",
+      "hashPath": "microsoft.extensions.logging.debug.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Logging.EventLog/9.0.7": {
+    "Microsoft.Extensions.Logging.EventLog/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-usrMVsY7c8M8fESt34Y3eEIQIlRlKXfPDlI+vYEb6xT7SUjhua2ey3NpHgQktiTgz8Uo5RiWqGD8ieiyo2WaDA==",
-      "path": "microsoft.extensions.logging.eventlog/9.0.7",
-      "hashPath": "microsoft.extensions.logging.eventlog.9.0.7.nupkg.sha512"
+      "sha512": "sha512-1SX5+mv16SBb5NrtLNxIvUt8PHbdvDloZazQdxz1CNM39jG7yeF6olH3sceQ4ONF0oVD5mVUsTag0iVX4xgyog==",
+      "path": "microsoft.extensions.logging.eventlog/9.0.9",
+      "hashPath": "microsoft.extensions.logging.eventlog.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Logging.EventSource/9.0.7": {
+    "Microsoft.Extensions.Logging.EventSource/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-/wwi6ckTEegCExFV6gVToCO7CvysZnmE50fpdkYUsSMh0ue9vRkQ7uOqkHyHol93ASYTEahrp+guMtS/+fZKaA==",
-      "path": "microsoft.extensions.logging.eventsource/9.0.7",
-      "hashPath": "microsoft.extensions.logging.eventsource.9.0.7.nupkg.sha512"
+      "sha512": "sha512-rGQi5mImot7tTFxj1tQWknWjOBHX1+gsX1WLmQNl5WHr4Sx1kXUBGDuRUjfx4c8pe/hcYHdalAmgk7RdusW6Jw==",
+      "path": "microsoft.extensions.logging.eventsource/9.0.9",
+      "hashPath": "microsoft.extensions.logging.eventsource.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Options/9.0.7": {
+    "Microsoft.Extensions.Options/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-trJnF6cRWgR5uMmHpGoHmM1wOVFdIYlELlkO9zX+RfieK0321Y55zrcs4AaEymKup7dxgEN/uJU25CAcMNQRXw==",
-      "path": "microsoft.extensions.options/9.0.7",
-      "hashPath": "microsoft.extensions.options.9.0.7.nupkg.sha512"
+      "sha512": "sha512-loxGGHE1FC2AefwPHzrjPq7X92LQm64qnU/whKfo6oWaceewPUVYQJBJs3S3E2qlWwnCpeZ+dGCPTX+5dgVAuQ==",
+      "path": "microsoft.extensions.options/9.0.9",
+      "hashPath": "microsoft.extensions.options.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Options.ConfigurationExtensions/9.0.7": {
+    "Microsoft.Extensions.Options.ConfigurationExtensions/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pE/jeAWHEIy/8HsqYA+I1+toTsdvsv+WywAcRoNSvPoFwjOREa8Fqn7D0/i0PbiXsDLFupltTTctliePx8ib4w==",
-      "path": "microsoft.extensions.options.configurationextensions/9.0.7",
-      "hashPath": "microsoft.extensions.options.configurationextensions.9.0.7.nupkg.sha512"
+      "sha512": "sha512-n4DCdnn2qs6V5U06Sx62FySEAZsJiJJgOzrPHDh9hPK7c2W8hEabC76F3Re3tGPjpiKa02RvB6FxZyxo8iICzg==",
+      "path": "microsoft.extensions.options.configurationextensions/9.0.9",
+      "hashPath": "microsoft.extensions.options.configurationextensions.9.0.9.nupkg.sha512"
     },
-    "Microsoft.Extensions.Primitives/9.0.7": {
+    "Microsoft.Extensions.Primitives/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ti/zD9BuuO50IqlvhWQs9GHxkCmoph5BHjGiWKdg2t6Or8XoyAfRJiKag+uvd/fpASnNklfsB01WpZ4fhAe0VQ==",
-      "path": "microsoft.extensions.primitives/9.0.7",
-      "hashPath": "microsoft.extensions.primitives.9.0.7.nupkg.sha512"
+      "sha512": "sha512-z4pyMePOrl733ltTowbN565PxBw1oAr8IHmIXNDiDqd22nFpYltX9KhrNC/qBWAG1/Zx5MHX+cOYhWJQYCO/iw==",
+      "path": "microsoft.extensions.primitives/9.0.9",
+      "hashPath": "microsoft.extensions.primitives.9.0.9.nupkg.sha512"
     },
     "Microsoft.NETCore.App/1.0.5": {
       "type": "package",
@@ -2637,19 +2646,19 @@
       "path": "newtonsoft.json/13.0.3",
       "hashPath": "newtonsoft.json.13.0.3.nupkg.sha512"
     },
-    "NLog/6.0.2": {
+    "NLog/6.0.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-kfjfjcjh/hHXLJ0TbEUH6ajb2jQFmwk/23nyYW9iPZ6cj5769SyeDTbUwGI7LSVUk5iTRJoC6CTKKmWrXK79oA==",
-      "path": "nlog/6.0.2",
-      "hashPath": "nlog.6.0.2.nupkg.sha512"
+      "sha512": "sha512-Xr+lIk1ZlTTFXEqnxQVLxrDqZlt2tm5X+/AhJbaY2emb/dVtGDiU5QuEtj3gHtwV/SWlP/rJ922I/BPuOJXlRw==",
+      "path": "nlog/6.0.4",
+      "hashPath": "nlog.6.0.4.nupkg.sha512"
     },
-    "NLog.Extensions.Logging/6.0.2": {
+    "NLog.Extensions.Logging/6.0.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-H+kC/F52BF6EEzj2qYdPOEwH2EvnP1A2NZsvMBjWdnsjeRH1Bf1i/Mk2G+M+DXutJ/AFd+yV6gF0rbp3KLzk9w==",
-      "path": "nlog.extensions.logging/6.0.2",
-      "hashPath": "nlog.extensions.logging.6.0.2.nupkg.sha512"
+      "sha512": "sha512-8lQ44ZFdJwOJNH61HySZiNUWHjWfT3GYRT3gcTrnlf4mDHWMRKhWvNmr1P0VznT/0sNqpnga+Zy4CECX1SJiDQ==",
+      "path": "nlog.extensions.logging/6.0.4",
+      "hashPath": "nlog.extensions.logging.6.0.4.nupkg.sha512"
     },
     "Npgsql/9.0.3": {
       "type": "package",
@@ -2672,19 +2681,19 @@
       "path": "octokit/14.0.0",
       "hashPath": "octokit.14.0.0.nupkg.sha512"
     },
-    "Polly/8.6.2": {
+    "Polly/8.6.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-+irkpMJQ29+o8+u/SdN+1+AP4rB4TGoKZ6gXhD04dPKG+DX2grvKJ6Z6UAK3vYkSQQcbATt+YPt+ac6/X2wVAA==",
-      "path": "polly/8.6.2",
-      "hashPath": "polly.8.6.2.nupkg.sha512"
+      "sha512": "sha512-8X6mWAGDrgTHyqDthifiv9QGR+FgnRe13/sPhSR4ZbhXCqUDJuLrVqunB39LLbf87TXZ+06dMdopd6LpY4oK0w==",
+      "path": "polly/8.6.3",
+      "hashPath": "polly.8.6.3.nupkg.sha512"
     },
-    "Polly.Core/8.6.2": {
+    "Polly.Core/8.6.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ImAKLH6qVDjj0vzw+QxMYxxT/NhQrHK+sZE4GT5JbIfDBOrMDbE4we3BR6SqUQCJuKdjOKf3smUjxIgOUUfNVw==",
-      "path": "polly.core/8.6.2",
-      "hashPath": "polly.core.8.6.2.nupkg.sha512"
+      "sha512": "sha512-xRlcE+1FidqIfZ7zxBT6klSblJ/7MAJq1x5yvYoLnwNhs8Xc2gp3Srf8wHG2NpFxVBqrldc3svhkMPJjSzTmzw==",
+      "path": "polly.core/8.6.3",
+      "hashPath": "polly.core.8.6.3.nupkg.sha512"
     },
     "PuppeteerSharp/20.2.2": {
       "type": "package",
@@ -2812,19 +2821,19 @@
       "path": "system.diagnostics.debug/4.0.11",
       "hashPath": "system.diagnostics.debug.4.0.11.nupkg.sha512"
     },
-    "System.Diagnostics.DiagnosticSource/9.0.7": {
+    "System.Diagnostics.DiagnosticSource/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-i0uHOKl+qabSYMpY8i676wgi8TI9D3yJIh9s8eog9xhcIqWiA+8khfYkAumCmTkJNMsI7qV527VTeSiQc6tPWA==",
-      "path": "system.diagnostics.diagnosticsource/9.0.7",
-      "hashPath": "system.diagnostics.diagnosticsource.9.0.7.nupkg.sha512"
+      "sha512": "sha512-8hy61dsFYYSDjT9iTAfygGMU3A0EAnG69x5FUXeKsCjMhBmtTBt4UMUEW3ipprFoorOW6Jw/7hDMjXtlrsOvVQ==",
+      "path": "system.diagnostics.diagnosticsource/9.0.9",
+      "hashPath": "system.diagnostics.diagnosticsource.9.0.9.nupkg.sha512"
     },
-    "System.Diagnostics.EventLog/9.0.7": {
+    "System.Diagnostics.EventLog/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-AJ+9fyCtQUImntxAJ9l4PZiCd4iepuk4pm7Qcno7PBIWQnfXlvwKuFsGk2H+QyY69GUVzDP2heELW6ho5BCXUg==",
-      "path": "system.diagnostics.eventlog/9.0.7",
-      "hashPath": "system.diagnostics.eventlog.9.0.7.nupkg.sha512"
+      "sha512": "sha512-wpsUfnyv8E5K4WQaok6weewvAbQhcLwXFcHBm5U0gdEaBs85N//ssuYvRPFWwz2rO/9/DFP3A1sGMzUFBj8y3w==",
+      "path": "system.diagnostics.eventlog/9.0.9",
+      "hashPath": "system.diagnostics.eventlog.9.0.9.nupkg.sha512"
     },
     "System.Diagnostics.FileVersionInfo/4.0.0": {
       "type": "package",
@@ -2938,12 +2947,12 @@
       "path": "system.io.memorymappedfiles/4.0.0",
       "hashPath": "system.io.memorymappedfiles.4.0.0.nupkg.sha512"
     },
-    "System.IO.Pipelines/9.0.7": {
+    "System.IO.Pipelines/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-I9KHYFNKQkufs/Ec7evpPPSu2HkuW+jNpq1kT0WOWjzuN6BjxRYy7CuWNLjQmuBzcKd9vKrHaPGcHVxSF5DadQ==",
-      "path": "system.io.pipelines/9.0.7",
-      "hashPath": "system.io.pipelines.9.0.7.nupkg.sha512"
+      "sha512": "sha512-VySjpsCLprojvat550Flrm3NQB982CPuDzILajqjQihFmrQXZPdQyktIbcpVPJyaExFYtAfY1DpwMdWQuS0kbw==",
+      "path": "system.io.pipelines/9.0.9",
+      "hashPath": "system.io.pipelines.9.0.9.nupkg.sha512"
     },
     "System.IO.UnmanagedMemoryStream/4.0.1": {
       "type": "package",
@@ -3246,12 +3255,12 @@
       "path": "system.security.principal.windows/4.0.0",
       "hashPath": "system.security.principal.windows.4.0.0.nupkg.sha512"
     },
-    "System.ServiceModel.Syndication/9.0.7": {
+    "System.ServiceModel.Syndication/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-S76MEzM4Oz46zkVcLauwtMv/nXb3Nk+ZYdT/2o4xhNLMmh+Fwg+d3YKPSEGuF8gokQ1w5B0Kvo3YVx+uPSl+Dw==",
-      "path": "system.servicemodel.syndication/9.0.7",
-      "hashPath": "system.servicemodel.syndication.9.0.7.nupkg.sha512"
+      "sha512": "sha512-6vbZOwGjsnR2+3aaJlnBFBpXhrPtwDK6zPa2AWZoF9sV0KS1Hez+Y03ZnJk0L2JKvawMtsr3sNVTQaNXyiNV/A==",
+      "path": "system.servicemodel.syndication/9.0.9",
+      "hashPath": "system.servicemodel.syndication.9.0.9.nupkg.sha512"
     },
     "System.Text.Encoding/4.0.11": {
       "type": "package",
@@ -3274,19 +3283,19 @@
       "path": "system.text.encoding.extensions/4.0.11",
       "hashPath": "system.text.encoding.extensions.4.0.11.nupkg.sha512"
     },
-    "System.Text.Encodings.Web/9.0.7": {
+    "System.Text.Encodings.Web/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-WswuKENaV4gC4ZYZi8BhehJHHRdyZQzXEYv/lV8DHW9FwkdnKaTutdRbK/S1wHZtKUUzzptBPAX2XOxdoURkMw==",
-      "path": "system.text.encodings.web/9.0.7",
-      "hashPath": "system.text.encodings.web.9.0.7.nupkg.sha512"
+      "sha512": "sha512-bzYTmAcmfelUOCBxvbgsfSr2tq94ydA2gJZAxZRcuNa0LlmlVz8JNHst6RG1qsDujyVYT4vjv06y8sCLbvCXdg==",
+      "path": "system.text.encodings.web/9.0.9",
+      "hashPath": "system.text.encodings.web.9.0.9.nupkg.sha512"
     },
-    "System.Text.Json/9.0.7": {
+    "System.Text.Json/9.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-u/lN2FEEXs3ghj2ta8tWA4r2MS9Yni07K7jDmnz8h1UPDf0lIIIEMkWx383Zz4fJjJio7gDl+00RYuQ/7R8ZQw==",
-      "path": "system.text.json/9.0.7",
-      "hashPath": "system.text.json.9.0.7.nupkg.sha512"
+      "sha512": "sha512-NEnpppwq67fRz/OvQRxsEMgetDJsxlxpEsAFO/4PZYbAyAMd4Ol6KS7phc8uDoKPsnbdzRLKobpX303uQwCqdg==",
+      "path": "system.text.json/9.0.9",
+      "hashPath": "system.text.json.9.0.9.nupkg.sha512"
     },
     "System.Text.RegularExpressions/4.1.0": {
       "type": "package",
@@ -3308,6 +3317,13 @@
       "sha512": "sha512-f7aLuLkBoCQM2kng7zqLFBXz9Gk48gDK8lk1ih9rH/1arJJzZK9gJwNvPDhL6Ps/l6rwOr8jw+4FCHL0KKWiEg==",
       "path": "system.threading.overlapped/4.0.1",
       "hashPath": "system.threading.overlapped.4.0.1.nupkg.sha512"
+    },
+    "System.Threading.RateLimiting/9.0.9": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-+2gqdVYz7yXABt5ocTReuccVPVCLh6dowyL02R5wvHO+J+jGxgDMgAG97IvV0Aw1sGkJmQDH1eJSxZgbxHoo9A==",
+      "path": "system.threading.ratelimiting/9.0.9",
+      "hashPath": "system.threading.ratelimiting.9.0.9.nupkg.sha512"
     },
     "System.Threading.Tasks/4.0.11": {
       "type": "package",
