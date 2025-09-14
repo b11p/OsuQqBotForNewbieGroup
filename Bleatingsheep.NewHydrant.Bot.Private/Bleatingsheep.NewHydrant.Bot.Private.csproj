@@ -14,7 +14,6 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     <PackageReference Include="System.Linq.Async" Version="6.0.3" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="9.0.9" />
-    <PackageReference Include="System.Threading.RateLimiting" Version="9.0.9" />
   </ItemGroup>
 
   <ItemGroup>

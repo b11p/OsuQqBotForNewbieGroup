@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.RateLimiting;
 using System.Threading.Tasks;
 using Bleatingsheep.NewHydrant.Attributions;
 using Bleatingsheep.NewHydrant.Core;
@@ -113,63 +113,52 @@ public partial class 统计新人群成员 : Service, IMessageCommand
             .ConfigureAwait(false);
         Logger.Info($"Find {snapshots.Count} snapshots.");
 
-        // TODO: share token bucket across statics and highlights for batch API invocation.
-        await using var rateLimiter = new TokenBucketRateLimiter(
-            new TokenBucketRateLimiterOptions()
-            {
-                ReplenishmentPeriod = TimeSpan.FromMilliseconds(50),
-                AutoReplenishment = true,
-                TokenLimit = 200,
-                TokensPerPeriod = 1,
-                QueueLimit = bindingList.Count,
-            }
-        );
-        Task<(
-            BindingInfo BindingInfo,
-            bool Successful,
-            UserInfo? UserInfo,
-            UserBest? bp1
-        )>[] userInfoTaskArray = bindingList
-            .Select(async b =>
+        var userInfoResults =
+            new ConcurrentBag<(
+                BindingInfo BindingInfo,
+                bool Successful,
+                UserInfo? UserInfo,
+                UserBest? bp1
+            )>();
+        await Parallel.ForEachAsync(
+            bindingList,
+            new ParallelOptions { MaxDegreeOfParallelism = 8 },
+            async (b, _) =>
             {
                 var o = b.OsuId;
                 UserInfo? userInfo = default;
                 try
                 {
                     var snapshotInfo = snapshots.GetValueOrDefault(o);
-                    userInfo = snapshotInfo?.UserInfo;
-                    if (userInfo is null)
-                    {
-                        await rateLimiter.AcquireAsync();
-                        userInfo = (UserInfo?)
+                    userInfo =
+                        snapshotInfo?.UserInfo
+                        ?? (UserInfo?)
                             await _dataProvider.Value.GetUserInfoRetryAsync(o, Mode.Standard);
-                    }
-                    await rateLimiter.AcquireAsync();
                     var bp1 = await _dataProvider.Value.GetUserBestLimitRetryAsync(
                         o,
                         Mode.Standard,
                         1
                     );
-                    return (
-                        BindingInfo: b,
-                        Successful: true,
-                        UserInfo: userInfo,
-                        bp1?.FirstOrDefault()
+                    userInfoResults.Add(
+                        (
+                            BindingInfo: b,
+                            Successful: true,
+                            UserInfo: userInfo,
+                            bp1?.FirstOrDefault()
+                        )
                     );
                 }
                 catch (Exception)
                 {
                     // 即使出现异常，userInfo也可能是可用的。
-                    return (b, false, userInfo, null);
+                    userInfoResults.Add((b, false, userInfo, null));
                 }
-            })
-            .ToArray();
-        await Task.WhenAll(userInfoTaskArray).ConfigureAwait(false);
+            }
+        );
         Logger.Info("Complete fetching user info.");
-        var userInfo = userInfoTaskArray.Select(t => t.Result);
         var results =
             from i in infoList
-            join u in userInfo on i.UserId equals u.BindingInfo.UserId into validUsers
+            join u in userInfoResults on i.UserId equals u.BindingInfo.UserId into validUsers
             from v in validUsers.DefaultIfEmpty()
             let b = v.BindingInfo
             let netOk = v.Successful
