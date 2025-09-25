@@ -14,7 +14,7 @@
           "Microsoft.Extensions.Configuration.Json": "9.0.9",
           "Microsoft.Extensions.Hosting": "9.0.9",
           "NLog.Extensions.Logging": "6.0.4",
-          "Sisters.WudiLib": "0.4.2-alpha2",
+          "Sisters.WudiLib": "0.5.0-alpha1",
           "Sisters.WudiLib.WebSocket": "0.2.1"
         },
         "runtime": {
@@ -962,22 +962,22 @@
           "Microsoft.NETCore.Targets": "1.0.3"
         }
       },
-      "Sisters.WudiLib/0.4.2-alpha2": {
+      "Sisters.WudiLib/0.5.0-alpha1": {
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "9.0.9",
           "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
-          "lib/net7.0/Sisters.WudiLib.dll": {
-            "assemblyVersion": "0.4.2.0",
-            "fileVersion": "0.4.2.0"
+          "lib/net8.0/Sisters.WudiLib.dll": {
+            "assemblyVersion": "0.5.0.0",
+            "fileVersion": "0.5.0.0"
           }
         }
       },
       "Sisters.WudiLib.WebSocket/0.2.1": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.3",
-          "Sisters.WudiLib": "0.4.2-alpha2"
+          "Sisters.WudiLib": "0.5.0-alpha1"
         },
         "runtime": {
           "lib/netcoreapp2.1/Sisters.WudiLib.WebSocket.dll": {
@@ -2093,7 +2093,7 @@
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.9",
           "Microsoft.Extensions.DependencyInjection": "9.0.9",
           "NLog": "6.0.4",
-          "Sisters.WudiLib": "0.4.2-alpha2"
+          "Sisters.WudiLib": "0.5.0-alpha1"
         },
         "runtime": {
           "Bleatingsheep.NewHydrant.dll": {
@@ -2728,12 +2728,12 @@
       "path": "runtime.native.system.security.cryptography/4.0.1",
       "hashPath": "runtime.native.system.security.cryptography.4.0.1.nupkg.sha512"
     },
-    "Sisters.WudiLib/0.4.2-alpha2": {
+    "Sisters.WudiLib/0.5.0-alpha1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-9MAF5udqOXZCK47uxSN+0oFWkfmq9DesPPf4nRp/+t2D+Ynpf/S27CihS802WmXDDpXVxZnwgArrF2m/qW++xA==",
-      "path": "sisters.wudilib/0.4.2-alpha2",
-      "hashPath": "sisters.wudilib.0.4.2-alpha2.nupkg.sha512"
+      "sha512": "sha512-vMQxrC0PzzAiYwZxufVWuOvcuLfU9cqv946cIEGcI/ma45pG1caj7oZRF+XuPMFJVPJtB1BQQRmlANBWnk6PvA==",
+      "path": "sisters.wudilib/0.5.0-alpha1",
+      "hashPath": "sisters.wudilib.0.5.0-alpha1.nupkg.sha512"
     },
     "Sisters.WudiLib.WebSocket/0.2.1": {
       "type": "package",
