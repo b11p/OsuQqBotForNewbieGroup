@@ -106,10 +106,7 @@ public partial class 统计新人群成员 : Service, IMessageCommand
             )
             .AsAsyncEnumerable()
             .GroupBy(s => s.UserId)
-            .ToDictionaryAwaitAsync(
-                g => ValueTask.FromResult(g.Key),
-                g => g.OrderByDescending(s => s.Date).FirstOrDefaultAsync()
-            )
+            .ToDictionaryAsync(g => g.Key, g => g.OrderByDescending(s => s.Date).FirstOrDefault())
             .ConfigureAwait(false);
         Logger.Info($"Find {snapshots.Count} snapshots.");
 

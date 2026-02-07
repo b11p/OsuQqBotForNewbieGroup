@@ -1,17 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Bleatingsheep.NewHydrant</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Bleatingsheep.IPLocation" Version="0.3.0" />
-    <PackageReference Include="Bleatingsheep.Osu.ApiClient" Version="0.6.21" />
+    <PackageReference Include="Bleatingsheep.Osu.ApiClient" Version="0.7.1" />
     <PackageReference Include="Bleatingsheep.SimpleBooru" Version="0.3.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.3" />
     <PackageReference Include="System.ServiceModel.Syndication" Version="9.0.9" />
     <PackageReference Include="WebApiClient.AOT" Version="1.1.4" />
   </ItemGroup>
