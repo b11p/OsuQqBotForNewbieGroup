@@ -156,7 +156,7 @@ namespace Bleatingsheep.NewHydrant.Osu
 {userInfo.Performance:0.##}pp 表现{IncrementUtility.FormatIncrement(userInfo.Performance - compared?.Performance)}
 #{userInfo.Rank}{IncrementUtility.FormatIncrement(userInfo.Rank - compared?.Rank, '↓', '↑')}
 {userInfo.CountryName} #{userInfo.CountryRank}{IncrementUtility.FormatIncrement(userInfo.CountryRank - compared?.CountryRank, '↓', '↑')}
-{userInfo.RankedScore / 1_000_000.0:#,##0}m Ranked谱面总分{IncrementUtility.FormatIncrement((userInfo.RankedScore - userInfo.RankedScore) / 1_000_000.0, "#,###")}
+{userInfo.RankedScore / 1_000_000.0:#,##0}m Ranked谱面总分{IncrementUtility.FormatIncrement((userInfo.RankedScore - compared?.RankedScore) / 1_000_000.0, "#,###")}
 {userInfo.AccuracyFloat:0.##%} 准确率{IncrementUtility.FormatIncrementPercentage(userInfo.AccuracyFloat - compared?.AccuracyFloat)}
 {userInfo.PlayCount} 游玩次数{IncrementUtility.FormatIncrement(userInfo.PlayCount - compared?.PlayCount)}
 {userInfo.TotalHits:#,##0} 总命中次数{IncrementUtility.FormatIncrement(userInfo.TotalHits - compared?.TotalHits, "#,###")}
