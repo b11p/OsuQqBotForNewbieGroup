@@ -83,7 +83,8 @@ namespace Bleatingsheep.NewHydrant.Osu.Newbie
         public IEnumerable<long> MonitoredGroups { get; } = new List<long>
         {
             NewbieGroupId,
-            AdvancedGroupId
+            AdvancedGroupId,
+            HyperGroupId,
         }.AsReadOnly();
 
 #pragma warning disable CS1998
