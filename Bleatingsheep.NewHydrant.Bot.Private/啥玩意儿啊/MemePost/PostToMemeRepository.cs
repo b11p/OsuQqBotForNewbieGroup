@@ -105,8 +105,10 @@ internal partial class PostToMemeRepository : IMessageCommand
                 return;
             }
 
+            var userDisplayName = string.IsNullOrEmpty(g.Sender.InGroupName) ? g.Sender.Nickname : g.Sender.InGroupName;
+
             string commitMessage = $"""
-                Bot upload. Group {g.GroupId}, User {g.UserId}, Nickname {g.Sender.InGroupName}
+                Bot upload. Group {g.GroupId}, User {g.UserId}, Nickname {userDisplayName}
                 {fileName}
                 """;
             var createFile = await gitHubClient.Repository.Content.CreateFile(pushData.Repository.Owner, pushData.Repository.Name, Path.Combine(pushData.Path, $"{EncodeFileName(fileName)}.{ext}"), new CreateFileRequest(commitMessage, Convert.ToBase64String(imageBytes), false));
@@ -167,9 +169,9 @@ internal partial class PostToMemeRepository : IMessageCommand
         {
             GroupMessage g => g.Content.MergeContinuousTextSections().Sections.Where(s => s.Type != Section.TextType || !string.IsNullOrWhiteSpace(s.Data[Section.TextParamName])).ToList() switch
             {
-            [{ Type: "reply" }, { Type: "at" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
-            [{ Type: "reply" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
-            [{ Type: "reply" }, { Type: "text" } s, ..] => s.Data["text"],
+                [{ Type: "reply" }, { Type: "at" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
+                [{ Type: "reply" }, { Type: "at" }, { Type: "text" } s, ..] => s.Data["text"],
+                [{ Type: "reply" }, { Type: "text" } s, ..] => s.Data["text"],
                 _ => default,
             },
             _ => default,
