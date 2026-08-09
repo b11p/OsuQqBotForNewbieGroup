@@ -6,11 +6,11 @@ namespace Bleatingsheep.NewHydrant.DataMaintenance;
 
 public class UpdateSnapshotsService : BackgroundService
 {
-    private static readonly TimeSpan s_updateScheduleDefault = TimeSpan.FromHours(8);
-    private static readonly TimeSpan s_updateScheduleActive = TimeSpan.FromHours(2); // when active within the interval
-    private static readonly TimeSpan s_updateScheduleSemiActive = TimeSpan.FromHours(4); // when API returns some recent play
-    private static readonly TimeSpan s_updateScheduleInactive = TimeSpan.FromDays(2); // when banned or inactive
-    private static readonly TimeSpan s_updateScheduleNotAdded = TimeSpan.FromHours(6); // when not added snapshots (due to completely same profile with most recent snapshot)
+    private static readonly TimeSpan s_updateScheduleDefault = TimeSpan.FromHours(16);
+    private static readonly TimeSpan s_updateScheduleActive = TimeSpan.FromHours(8); // when active within the interval
+    private static readonly TimeSpan s_updateScheduleSemiActive = TimeSpan.FromHours(12); // when API returns some recent play
+    private static readonly TimeSpan s_updateScheduleInactive = TimeSpan.FromDays(15); // when banned or inactive
+    private static readonly TimeSpan s_updateScheduleNotAdded = TimeSpan.FromHours(14); // when not added snapshots (due to completely same profile with most recent snapshot)
 
     private readonly IDbContextFactory<NewbieContext> _dbContextFactory;
     private readonly DataMaintainer _dataMaintainer;
@@ -54,7 +54,7 @@ public class UpdateSnapshotsService : BackgroundService
                 var toUpdate = await db
                     .UpdateSchedules.Where(s => s.NextUpdate <= DateTimeOffset.UtcNow)
                     .OrderBy(s => s.NextUpdate)
-                    .Take(160)
+                    .Take(80)
                     .ToListAsync(stoppingToken);
                 _logger.LogDebug(
                     "Updating {toUpdate.Count} of {scheduledCount} snapshots.",
