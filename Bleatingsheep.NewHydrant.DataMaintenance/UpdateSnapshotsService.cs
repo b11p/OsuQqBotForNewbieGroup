@@ -54,7 +54,7 @@ public class UpdateSnapshotsService : BackgroundService
                 var toUpdate = await db
                     .UpdateSchedules.Where(s => s.NextUpdate <= DateTimeOffset.UtcNow)
                     .OrderBy(s => s.NextUpdate)
-                    .Take(80)
+                    .Take(15)
                     .ToListAsync(stoppingToken);
                 _logger.LogDebug(
                     "Updating {toUpdate.Count} of {scheduledCount} snapshots.",
