@@ -89,7 +89,12 @@ public partial class 统计新人群成员 : Service, IMessageCommand
         dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         var infoList = await api.GetGroupMemberListAsync(groupId);
         Logger.Info($"Find {infoList.Length} users.");
-        var userIdList = infoList.Select(i => i.UserId).ToList();
+        var managementMembers = await api.GetGroupMemberListAsync(管理群号);
+        var managementUserIds = managementMembers.Select(i => i.UserId).ToHashSet();
+        var userIdList = infoList
+            .Where(i => !managementUserIds.Contains(i.UserId)) // 排除管理群成员   
+            .Select(i => i.UserId)
+            .ToList();
         IQueryable<BindingInfo> bindingQuery = dbContext.Bindings.Where(b =>
             userIdList.Contains(b.UserId)
         );
