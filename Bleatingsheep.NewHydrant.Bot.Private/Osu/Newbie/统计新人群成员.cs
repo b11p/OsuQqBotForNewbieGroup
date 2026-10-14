@@ -88,6 +88,9 @@ public partial class 统计新人群成员 : Service, IMessageCommand
         await using var dbContext = _contextFactory.CreateDbContext();
         dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         var infoList = await api.GetGroupMemberListAsync(groupId);
+         var managementMembers = await api.GetGroupMemberListAsync(管理群号);
+        var managementUserIds = managementMembers.Select(i => i.UserId).ToHashSet();
+        infoList = infoList.Where(i => !managementUserIds.Contains(i.UserId)).ToArray();
         Logger.Info($"Find {infoList.Length} users.");
         var userIdList = infoList.Select(i => i.UserId).ToList();
         IQueryable<BindingInfo> bindingQuery = dbContext.Bindings.Where(b =>
