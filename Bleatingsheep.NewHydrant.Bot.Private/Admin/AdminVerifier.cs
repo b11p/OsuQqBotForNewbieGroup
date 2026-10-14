@@ -39,6 +39,7 @@ namespace Bleatingsheep.NewHydrant.Admin
             1584775323, // YRScarlet
             3438313440, // MM
             2733494248, // Molli
+            2432619518, // fufuOwO
         };
 
         public AdminVerifier()

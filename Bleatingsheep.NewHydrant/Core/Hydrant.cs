@@ -260,7 +260,7 @@ namespace Bleatingsheep.NewHydrant.Core
         private void LogException(string name, string? message, Exception e)
         {
             var logger = _logFactory?.GetLogger(name) ?? LogManager.CreateNullLogger();
-            logger.Warn(e, message);
+            logger.Warn(e, message ?? string.Empty);
         }
 
         #region Create Service Instance

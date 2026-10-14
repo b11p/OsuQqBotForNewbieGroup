@@ -120,6 +120,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Models
 
             modelBuilder.Entity<UpdateSchedule>()
                 .HasKey(s => new { s.UserId, s.Mode });
+            modelBuilder.Entity<UpdateSchedule>()
+                .HasIndex(s => new { s.NextUpdate });
 
             modelBuilder.Entity<RecommendationEntry>()
                 .Property(r => r.Left)

@@ -19,7 +19,7 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -371,6 +371,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
 
                     b.HasKey("UserId", "Mode");
 
+                    b.HasIndex("NextUpdate");
+
                     b.ToTable("UpdateSchedules");
                 });
 
@@ -506,6 +508,8 @@ namespace Bleatingsheep.OsuQqBot.Database.Migrations
                                 .HasColumnType("integer");
 
                             b1.HasKey("UserPlayRecordId");
+
+                            b1.HasIndex("Date");
 
                             b1.ToTable("UserPlayRecords");
 

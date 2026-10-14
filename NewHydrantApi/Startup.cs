@@ -76,10 +76,10 @@ namespace NewHydrantApi
                 // add prefixes to known networks.
                 foreach (IPAddress ip in knownPrefixes)
                 {
-                    options.KnownNetworks.Add(new IPNetwork(ip, 64));
+                    options.KnownIPNetworks.Add(new System.Net.IPNetwork(ip, 64));
                 }
 
-                options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("172.16.0.0"), 12)); // dockerr internal
+                options.KnownIPNetworks.Add(new System.Net.IPNetwork(IPAddress.Parse("172.16.0.0"), 12)); // docker internal
                 options.ForwardLimit = 1;
                 options.ForwardedHeaders = ForwardedHeaders.All;
             });
@@ -99,7 +99,7 @@ namespace NewHydrantApi
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
