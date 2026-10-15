@@ -34,6 +34,11 @@ public sealed partial class Highlight : Service, IMessageCommand
 
     public async Task ProcessAsync(MessageContext superContext, HttpApiClient api)
     {
+        await api.SendMessageAsync(superContext.Endpoint, "功能维护中。");
+    }
+
+    public async Task ProcessAsync_NotOpen(MessageContext superContext, HttpApiClient api)
+    {
         var context = superContext as GroupMessage;
         var groupMembers = await api.GetGroupMemberListAsync(context.GroupId);
         Logger.Info($"群 {context.GroupId} 开启今日高光，成员共 {groupMembers.Length} 名。");
